@@ -1,14 +1,25 @@
-This is a Kotlin Multiplatform project targeting Android, iOS.
+# Departure Widget for PATH
 
-* `/composeApp` is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - `commonMain` is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    `iosMain` would be the right folder for such calls.
+This is a [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html) project targeting Android and iOS. Currently, only the iOS implementation is in this repository, but the the data and networking logic is in the shared code and could be used for Android as well.
 
-* `/iosApp` contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform, 
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+## Setup
 
+[Android Studio](https://developer.android.com/studio) Hedgehog or newer for editing the Kotlin code and running on Android. The JDK for the IDE should be Java 17.
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+[Xcode](https://developer.apple.com/xcode/) 15 or newer for editing the Swift code natively.
+
+You _can_ run the iOS app from Android Studio, but usually you'd want to run the widget extension target in Xcode, and I don't think you can do that from AS.
+
+## App store links
+
+[Android](https://play.google.com/store/apps/details?id=com.sixbynine.transit.path)
+
+iOS: Coming soon
+
+## Localizations
+
+English and Spanish currently. If you want to contribute something else feel free. Translations are found in the following files:
+
+- composeApp/src/commonMain/resources/MR/{locale}/strings.xml
+- iosApp/widget/Localizable.xcstrings (edit in Xcode)
+- iosApp/iosApp/InfoPlist.xcstrings (edit in Xcode)

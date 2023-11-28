@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Salidas para PATH</string>
+    <string name="updated_at_time">Se actualizó a las %1$s</string>
+    <string name="to_destination">%1$s</string>
+    <string name="edit_to_add_stations">Mantén presionado y edita el widget para añadir estaciones</string>
+    <string name="error_short">Error</string>
+    <string name="error_long">Error al actualizar</string>
+    <string name="report_a_problem">Informar sobre un problema</string>
+    <string name="welcome_text">Bienvenido al widget de Salidas para la aplicación PATH. Para añadir un widget, mantenga presionada la pantalla de inicio y busque esta aplicación.</string>
+</resources>

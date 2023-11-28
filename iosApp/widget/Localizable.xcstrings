@@ -1,0 +1,284 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "9th Street" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "9th Street"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "9th Street"
+          }
+        }
+      }
+    },
+    "14th Street" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "14th Street"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "14th Street"
+          }
+        }
+      }
+    },
+    "23rd Street" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "23rd Street"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "23rd Street"
+          }
+        }
+      }
+    },
+    "33rd Street" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "33rd Street"
+          }
+        }
+      }
+    },
+    "A-Z" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A-Z"
+          }
+        }
+      }
+    },
+    "All trains" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todos los trenes"
+          }
+        }
+      }
+    },
+    "Christopher Street" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Christopher Street"
+          }
+        }
+      }
+    },
+    "Departure board for PATH" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salidas de PATH"
+          }
+        }
+      }
+    },
+    "Departure board for PATH trains" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tablero de salidas para el tren PATH"
+          }
+        }
+      }
+    },
+    "Exchange Place" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exchange Place"
+          }
+        }
+      }
+    },
+    "Filter" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtro"
+          }
+        }
+      }
+    },
+    "Grove Street" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grove Street"
+          }
+        }
+      }
+    },
+    "Harrison" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Harrison"
+          }
+        }
+      }
+    },
+    "Hoboken" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoboken"
+          }
+        }
+      }
+    },
+    "Journal Square" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Journal Square"
+          }
+        }
+      }
+    },
+    "Newark" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Newark"
+          }
+        }
+      }
+    },
+    "Newport" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Newport"
+          }
+        }
+      }
+    },
+    "NJ morning, NY evening" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NJ por la mañana, NY por la tarde"
+          }
+        }
+      }
+    },
+    "NY morning, NJ evening" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NY por la mañana, NJ por la tarde"
+          }
+        }
+      }
+    },
+    "Only interstate trains" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo los trenes entre los dos estados"
+          }
+        }
+      }
+    },
+    "Order" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Orden"
+          }
+        }
+      }
+    },
+    "Refresh" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recargar"
+          }
+        }
+      }
+    },
+    "Station Choice" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elección de estación"
+          }
+        }
+      }
+    },
+    "Stations" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estaciones"
+          }
+        }
+      }
+    },
+    "Updates all the widgets" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualiza todos los widgets"
+          }
+        }
+      }
+    },
+    "World Trade Center" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "World Trade Center"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Departures for PATH</string>
+    <string name="updated_at_time">Updated at %1$s</string>
+    <string name="to_destination">%1$s</string>
+    <string name="edit_to_add_stations">Tap and hold and edit the widget to add stations</string>
+    <string name="error_short">Error</string>
+    <string name="error_long">Failed to update</string>
+    <string name="report_a_problem">Report a problem</string>
+    <string name="welcome_text">Welcome to the Departures widget for PATH app. To add a widget, press and hold your home screen and search for this app.</string>
+</resources>

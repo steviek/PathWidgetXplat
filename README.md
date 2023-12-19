@@ -14,7 +14,7 @@ You _can_ run the iOS app from Android Studio, but usually you'd want to run the
 
 [Android](https://play.google.com/store/apps/details?id=com.sixbynine.transit.path)
 
-iOS: Coming soon
+[iOS](https://apps.apple.com/id/app/departures-widget-for-path/id6470330823?platform=iphone)
 
 ## Localizations
 

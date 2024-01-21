@@ -1,9 +1,12 @@
 package com.sixbynine.transit.path.widget
 
+import com.sixbynine.transit.path.MR.strings
+import com.sixbynine.transit.path.resources.getString
 import com.sixbynine.transit.path.time.is24HourClock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
 object WidgetDataFormatter {
@@ -27,8 +30,6 @@ object WidgetDataFormatter {
     }
 
     fun formatHeadSign(title: String, width: HeadSignWidth): String {
-        if (width == HeadSignWidth.Wide) return title
-
         if (title.startsWith("Journal Square")) {
             return when (width) {
                 HeadSignWidth.Narrow -> "JSQ"
@@ -98,6 +99,30 @@ object WidgetDataFormatter {
             else -> (time.hour - 12).toString()
         }
         return hour + ":" + time.minute.toString().padStart(2, '0')
+    }
+
+    fun formatTimeWithSeconds(instant: Instant): String {
+        val dateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+        val time = dateTime.time
+        val hour = when {
+            is24HourClock() -> time.hour.toString().padStart(2, '0')
+            time.hour in 1..12 -> time.hour.toString()
+            time.hour == 0 -> "12"
+            else -> (time.hour - 12).toString()
+        }
+        return hour + ":" + time.minute.toString().padStart(2, '0') +
+                ":" + time.second.toString().padStart(2, '0')
+    }
+
+    fun formatRelativeTime(now: Instant, time: Instant): String {
+        val duration = time - now
+        return if (duration < 1.minutes) {
+            getString(strings.due_now)
+        } else if (duration < 1.hours) {
+            duration.inWholeMinutes.toString() + " min"
+        } else {
+            duration.inWholeHours.toString() + " hr " + (duration.inWholeMinutes % 60) + " min"
+        }
     }
 }
 

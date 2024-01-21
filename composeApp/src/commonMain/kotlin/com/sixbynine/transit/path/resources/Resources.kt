@@ -6,3 +6,5 @@ expect fun getString(resource: StringResource): String
 
 expect fun getString(resource: StringResource, arg1: String): String
 
+expect fun getString(resource: StringResource, arg1: String, arg2: String): String
+

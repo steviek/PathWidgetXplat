@@ -12,4 +12,9 @@ object Logging {
             Napier.base(DebugAntilog())
         }
     }
+
+    fun d(message: String) {
+        initialize()
+        Napier.d(message)
+    }
 }

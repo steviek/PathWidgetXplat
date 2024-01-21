@@ -7,4 +7,21 @@
     <string name="error_long">Error al actualizar</string>
     <string name="report_a_problem">Informar sobre un problema</string>
     <string name="welcome_text">Bienvenido al widget de Salidas para la aplicación PATH. Para añadir un widget, mantenga presionada la pantalla de inicio y busque esta aplicación.</string>
+    <string name="confirm">Confirmar</string>
+    <string name="choose_stations">Choose stations to view in the app</string>
+    <string name="failed_to_fetch">Error al obtener los horarios de los trenes</string>
+    <string name="retry">Reintentar</string>
+    <string name="edit">Editar</string>
+    <string name="done">Terminar</string>
+    <string name="stations">Estaciones</string>
+    <string name="filter">Filtro</string>
+    <string name="confirm">Confirmar</string>
+    <string name="sort">Ordenar</string>
+    <string name="move_up">Subir</string>
+    <string name="move_down">Bajar</string>
+    <string name="show_all_trains">Mostrar todos los trenes</string>
+    <string name="show_interstate_trains">Mostrar solo los trenes entre los dos estados</string>
+    <string name="update_footer_text">Se actualizó a las %1$s, va actualizarse de nuevo en %2$s</string>
+    <string name="update_now">Actualizar ahora</string>
+    <string name="due_now">llega</string>
 </resources>

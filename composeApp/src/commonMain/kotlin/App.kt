@@ -1,39 +1,47 @@
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.painterResource
 
-@OptIn(ExperimentalResourceApi::class)
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Modifier
+import com.sixbynine.transit.path.app.ui.home.HomeScreen
+import com.sixbynine.transit.path.app.ui.setup.SetupScreen
+import com.sixbynine.transit.path.app.ui.theme.AppTheme
+import moe.tlaster.precompose.PreComposeApp
+import moe.tlaster.precompose.navigation.NavHost
+import moe.tlaster.precompose.navigation.Navigator
+import moe.tlaster.precompose.navigation.rememberNavigator
+
 @Composable
 fun App() {
-    MaterialTheme {
-        var greetingText by remember { mutableStateOf("Hello World!") }
-        var showImage by remember { mutableStateOf(false) }
-        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-            Button(onClick = {
-                greetingText = "Compose: ${Greeting().greet()}"
-                showImage = !showImage
-            }) {
-                Text(greetingText)
-            }
-            AnimatedVisibility(showImage) {
-                Image(
-                    painterResource("compose-multiplatform.xml"),
-                    null
-                )
+    PreComposeApp {
+        val navigator = rememberNavigator()
+        CompositionLocalProvider(LocalNavigator provides navigator) {
+            AppTheme {
+                NavHost(
+                    modifier = Modifier
+                        .background(colorScheme.background)
+                        .windowInsetsPadding(WindowInsets.safeDrawing)
+                        .fillMaxSize(),
+                    navigator = navigator,
+                    initialRoute = "/home"
+                ) {
+                    scene("/setup") {
+                        SetupScreen()
+                    }
+
+                    scene("/home") {
+                        HomeScreen()
+                    }
+                }
             }
         }
     }
 }
+
+val LocalNavigator = staticCompositionLocalOf<Navigator> { error("Navigator not found") }

@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">Departures for PATH</string>
+    <string name="updated_at_time">Updated at %1$s</string>
+    <string name="to_destination">%1$s</string>
+    <string name="edit_to_add_stations">Tap and hold and edit the widget to add stations</string>
+    <string name="error_short">Error</string>
+    <string name="error_long">Failed to update</string>
+    <string name="report_a_problem">Report a problem</string>
+    <string name="welcome_text">Welcome to the Departures widget for PATH app. To add a widget, press and hold your home screen and search for this app.</string>
+    <string name="confirm">Confirm</string>
+    <string name="choose_stations">Choose stations to view in the app</string>
+    <string name="failed_to_fetch">Failed to fetch train times</string>
+    <string name="retry">Retry</string>
+    <string name="edit">Edit</string>
+    <string name="done">Done</string>
+    <string name="stations">Stations</string>
+    <string name="filter">Filter</string>
+    <string name="confirm">Confirm</string>
+    <string name="sort">Sort</string>
+    <string name="move_up">Move up</string>
+    <string name="move_down">Move down</string>
+    <string name="show_all_trains">Show all trains</string>
+    <string name="show_interstate_trains">Show only interstate trains</string>
+    <string name="update_footer_text">Updated at %1$s, updating again in %2$s</string>
+    <string name="update_now">Update now</string>
+    <string name="updating">Updating…</string>
+    <string name="due_now">due</string>
+</resources>

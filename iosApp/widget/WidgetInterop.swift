@@ -80,6 +80,7 @@ extension WidgetDataFetcher {
                     stations: stations,
                     sort: sort,
                     filter: filter,
+                    force: false,
                     onSuccess: { data in
                         continuation.resume(returning: FetchResult(data: data, hasError: false))
                     },

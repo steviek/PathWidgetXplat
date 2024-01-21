@@ -1,10 +1,10 @@
-package com.sixbynine.transit.path.ui
+package com.sixbynine.transit.path.app.ui
 
 import androidx.compose.ui.graphics.Color
 import com.sixbynine.transit.path.Logging
-import com.sixbynine.transit.path.ui.theme.md_theme_dark_background
-import com.sixbynine.transit.path.ui.theme.md_theme_light_background
-import com.sixbynine.transit.path.ui.theme.seed
+import com.sixbynine.transit.path.app.ui.theme.md_theme_dark_background
+import com.sixbynine.transit.path.app.ui.theme.md_theme_light_background
+import com.sixbynine.transit.path.app.ui.theme.seed
 import io.github.aakira.napier.Napier
 
 object Colors {

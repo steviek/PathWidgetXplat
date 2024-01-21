@@ -45,9 +45,11 @@ kotlin {
                 implementation(libs.kotlin.serialization.json)
                 implementation(libs.moko.resources)
                 implementation(libs.moko.resources.compose)
+                implementation(libs.moko.mvvm)
                 implementation(libs.napier)
                 implementation(libs.ktor.core)
                 implementation(libs.ktor.logging)
+                implementation(libs.precompose)
             }
         }
 
@@ -68,7 +70,12 @@ kotlin {
         }
 
         all {
+            languageSettings.optIn("androidx.compose.foundation.ExperimentalFoundationApi")
+            languageSettings.optIn("androidx.compose.foundation.layout.ExperimentalLayoutApi")
+            languageSettings.optIn("androidx.compose.material3.ExperimentalMaterial3Api")
             languageSettings.optIn("kotlin.time.ExperimentalTime")
+            languageSettings.optIn("kotlinx.cinterop.ExperimentalForeignApi")
+            languageSettings.optIn("kotlinx.serialization.ExperimentalSerializationApi")
         }
     }
 }
@@ -122,4 +129,5 @@ dependencies {
 
 multiplatformResources {
     multiplatformResourcesPackage = "com.sixbynine.transit.path"
+    iosBaseLocalizationRegion = "en"
 }

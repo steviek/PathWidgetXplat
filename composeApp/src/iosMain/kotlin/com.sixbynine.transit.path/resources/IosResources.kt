@@ -12,3 +12,7 @@ actual fun getString(resource: StringResource): String {
 actual fun getString(resource: StringResource, arg1: String): String {
     return StringDesc.ResourceFormatted(resource, arg1).localized()
 }
+
+actual fun getString(resource: StringResource, arg1: String, arg2: String): String {
+    return StringDesc.ResourceFormatted(resource, arg1, arg2).localized()
+}

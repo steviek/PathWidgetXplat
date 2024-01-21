@@ -1,5 +1,5 @@
 package com.sixbynine.transit.path.api
 
-enum class StationSort {
-    Alphabetical, NjAm, NyAm
+enum class StationSort(val number: Int) {
+    Alphabetical(1), NjAm(2), NyAm(3)
 }

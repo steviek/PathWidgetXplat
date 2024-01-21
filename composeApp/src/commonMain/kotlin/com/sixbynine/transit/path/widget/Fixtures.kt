@@ -1,6 +1,7 @@
 package com.sixbynine.transit.path.widget
 
-import com.sixbynine.transit.path.ui.Colors
+import com.sixbynine.transit.path.api.State
+import com.sixbynine.transit.path.app.ui.Colors
 import kotlinx.datetime.Clock
 import kotlin.time.Duration.Companion.minutes
 
@@ -19,7 +20,7 @@ object Fixtures {
                             id = "JSQ:1",
                             title = "33S",
                             colors = Colors.Jsq33s,
-                            projectedArrival = now + 3.minutes
+                            projectedArrival = now + 3.minutes,
                         ),
                         WidgetData.TrainData(
                             id = "JSQ:2",
@@ -40,6 +41,7 @@ object Fixtures {
                             projectedArrival = now + 7.minutes
                         )
                     ),
+                    state = State.NewJersey,
                 ),
                 WidgetData.StationData(
                     id = "WTC",
@@ -71,6 +73,7 @@ object Fixtures {
                             projectedArrival = now + 7.minutes
                         )
                     ),
+                    state = State.NewYork,
                 ),
                 WidgetData.StationData(
                     id = "NWK",
@@ -102,6 +105,7 @@ object Fixtures {
                             projectedArrival = now + 8.minutes
                         )
                     ),
+                    state = State.NewJersey,
                 ),
                 WidgetData.StationData(
                     id = "33S",
@@ -133,6 +137,7 @@ object Fixtures {
                             projectedArrival = now + 7.minutes
                         )
                     ),
+                    state = State.NewYork,
                 )
             ).take(limit),
             fetchTime = now,

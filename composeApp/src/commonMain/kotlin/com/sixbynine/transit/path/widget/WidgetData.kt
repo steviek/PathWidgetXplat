@@ -1,6 +1,7 @@
 package com.sixbynine.transit.path.widget
 
-import com.sixbynine.transit.path.ui.ColorWrapper
+import com.sixbynine.transit.path.api.State
+import com.sixbynine.transit.path.app.ui.ColorWrapper
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.minutes
 
@@ -14,6 +15,7 @@ data class WidgetData(
         val displayName: String,
         val signs: List<SignData>,
         val trains: List<TrainData>,
+        val state: State,
     )
 
     data class SignData(

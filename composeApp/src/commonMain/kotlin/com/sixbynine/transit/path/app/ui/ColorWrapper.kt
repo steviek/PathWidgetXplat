@@ -1,4 +1,4 @@
-package com.sixbynine.transit.path.ui
+package com.sixbynine.transit.path.app.ui
 
 import androidx.compose.ui.graphics.Color
 

@@ -5,7 +5,7 @@ import com.sixbynine.transit.path.api.NetworkException
 import com.sixbynine.transit.path.api.PathApi
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.Stations
-import com.sixbynine.transit.path.ui.Colors
+import com.sixbynine.transit.path.app.ui.Colors
 import com.sixbynine.transit.path.util.runCatchingSuspend
 import com.sixbynine.transit.path.widget.widgetDataStore
 import io.ktor.client.HttpClient
@@ -14,9 +14,7 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.isSuccess
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlin.time.Duration.Companion.seconds
 
@@ -25,7 +23,6 @@ internal class PathApiImpl : PathApi {
 
     override suspend fun fetchUpcomingDepartures():
             Result<Map<Station, List<DepartureBoardTrain>>> {
-        val stationsToCheck = Stations.All.associateBy { it.pathApiName }
         return client.getResults()
             .mapCatching { results ->
                 resultsToMap(results)
@@ -64,7 +61,6 @@ internal class PathApiImpl : PathApi {
 }
 
 private class PathClient {
-    @OptIn(ExperimentalSerializationApi::class)
     private val jsonFormat = Json {
         ignoreUnknownKeys = true
         explicitNulls = false

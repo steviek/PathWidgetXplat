@@ -11,7 +11,8 @@ import com.sixbynine.transit.path.api.isEastOf
 import com.sixbynine.transit.path.api.isInNewJersey
 import com.sixbynine.transit.path.api.isInNewYork
 import com.sixbynine.transit.path.api.isWestOf
-import com.sixbynine.transit.path.ui.ColorWrapper
+import com.sixbynine.transit.path.api.state
+import com.sixbynine.transit.path.app.ui.ColorWrapper
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.GlobalScope
@@ -32,6 +33,7 @@ object WidgetDataFetcher {
         stations: List<Station>,
         sort: StationSort,
         filter: StationFilter,
+        force: Boolean,
         onSuccess: (WidgetData) -> Unit,
         onFailure: (WidgetData?) -> Unit,
     ) {
@@ -44,7 +46,8 @@ object WidgetDataFetcher {
                 if (lastFetch != null &&
                     !(lastFetch.isCompleted && lastFetch.getCompleted().isFailure) &&
                     lastFetchTime != null &&
-                    lastFetchTime in (now - 30.seconds)..now
+                    lastFetchTime in (now - 30.seconds)..now &&
+                    !force
                 ) {
                     Napier.d("Reuse existing fetch")
                     lastFetch
@@ -60,6 +63,7 @@ object WidgetDataFetcher {
                 .await()
                 .onSuccess { onSuccess(createWidgetData(limit, stations, sort, filter, it)) }
                 .onFailure {
+                    Napier.e("Failed to fetch", it)
                     val lastResults = PathApi.instance.getLastSuccessfulUpcomingDepartures()
                     onFailure(
                         lastResults?.let { createWidgetData(limit, stations, sort, filter, it) }
@@ -68,7 +72,6 @@ object WidgetDataFetcher {
         }
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
     private fun createWidgetData(
         limit: Int,
         stations: List<Station>,
@@ -115,7 +118,8 @@ object WidgetDataFetcher {
                     id = station.pathApiName,
                     displayName = station.displayName,
                     signs = signs,
-                    trains = trains
+                    trains = trains,
+                    state = station.state,
                 )
             }
         }

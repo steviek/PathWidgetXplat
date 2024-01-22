@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 object Logging {
     private val hasInitialized = MutableStateFlow(false)
+    private var isTest = false
 
     fun initialize() {
         if (hasInitialized.compareAndSet(expect = false, update = true)) {
@@ -13,7 +14,15 @@ object Logging {
         }
     }
 
+    fun setTest() {
+        isTest = true
+    }
+
     fun d(message: String) {
+        if (isTest) {
+            println(message)
+            return
+        }
         initialize()
         Napier.d(message)
     }

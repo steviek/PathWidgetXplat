@@ -65,6 +65,10 @@ kotlin {
             implementation(libs.ktor.okhttp)
         }
 
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+        }
+
         iosMain.dependencies {
             implementation(libs.ktor.darwin)
         }

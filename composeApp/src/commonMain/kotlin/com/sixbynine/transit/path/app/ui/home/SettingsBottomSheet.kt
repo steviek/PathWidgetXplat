@@ -35,7 +35,7 @@ import kotlin.time.Duration.Companion.minutes
 
 @Composable
 fun HomeScreenScope.SettingsBottomSheet() {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val sheetState = rememberModalBottomSheetState()
     PathBottomSheet(
         onDismissRequest = { onIntent(SettingsBottomSheetDismissed) },
         sheetState = sheetState
@@ -104,11 +104,17 @@ private fun HomeScreenScope.StationOrderSection() {
         StationSort.entries.forEach { sort ->
             val text = when (sort) {
                 Alphabetical -> strings.station_order_fixed
-                NjAm -> strings.station_order_nj_am
-                NyAm -> strings.station_order_ny_am
+                NjAm -> strings.station_order_nj_am_title
+                NyAm -> strings.station_order_ny_am_title
+            }
+            val subtext = when(sort) {
+                Alphabetical -> null
+                NjAm -> strings.station_order_nj_am_subtext
+                NyAm -> strings.station_order_ny_am_subtext
             }
             item(
                 text = stringResource(text),
+                subtext = subtext?.let { stringResource(it) },
                 selected = sort == state.stationSort,
                 onClick = {
                     onIntent(SettingsSortChanged(sort))

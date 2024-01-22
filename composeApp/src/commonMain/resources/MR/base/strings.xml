@@ -35,7 +35,9 @@
     <string name="setting_time_display_clock">Clock (“at %1$s”)</string>
     <string name="interstate_explanation">Interstate trains includes trains heading toward New York from New Jersey stations, and vice versa.</string>
     <string name="station_order_fixed">Fixed</string>
-    <string name="station_order_ny_am">From New York in the morning, from New Jersey in the evening</string>
-    <string name="station_order_nj_am">From New Jersey in the morning, from New York in the evening</string>
+    <string name="station_order_ny_am_title">New York commuter</string>
+    <string name="station_order_nj_am_title">New Jersey commuter</string>
+    <string name="station_order_ny_am_subtext">Show trains from New York first in the morning, and trains from New Jersey first in the evening</string>
+    <string name="station_order_nj_am_subtext">Show trains from New Jersey first in the morning, and trains from New York first in the evening</string>
     <string name="cannot_move_explanation">You have sorted stations by state</string>
 </resources>

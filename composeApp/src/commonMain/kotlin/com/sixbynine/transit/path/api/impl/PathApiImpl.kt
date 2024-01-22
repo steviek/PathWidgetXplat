@@ -52,6 +52,7 @@ internal class PathApiImpl : PathApi {
             station to trains
         }
             .toMap()
+            .let { TrainBackfillHelper.withBackfill(it) }
     }
 
     override fun getLastSuccessfulUpcomingDepartures(): Map<Station, List<DepartureBoardTrain>>? {

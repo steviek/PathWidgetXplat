@@ -61,7 +61,7 @@ internal class PathApiImpl : PathApi {
     }
 }
 
-private class PathClient {
+class PathClient {
     private val jsonFormat = Json {
         ignoreUnknownKeys = true
         explicitNulls = false

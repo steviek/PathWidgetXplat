@@ -130,7 +130,7 @@ private fun HomeScreenScope.MainContent(modifier: Modifier) {
                 )
             }
 
-            state.hasError || state.data == null -> {
+            state.hasError && state.data == null -> {
                 ErrorState()
             }
 

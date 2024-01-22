@@ -1,5 +1,6 @@
 package com.sixbynine.transit.path.api.impl
 
+import androidx.compose.ui.graphics.Color
 import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.api.DepartureBoardTrain
 import com.sixbynine.transit.path.api.Station
@@ -16,45 +17,118 @@ import com.sixbynine.transit.path.api.Stations.NinthStreet
 import com.sixbynine.transit.path.api.Stations.ThirtyThirdStreet
 import com.sixbynine.transit.path.api.Stations.TwentyThirdStreet
 import com.sixbynine.transit.path.api.Stations.WorldTradeCenter
+import com.sixbynine.transit.path.api.impl.TrainBackfillHelper.LineId.Companion.HOB_WTC
+import com.sixbynine.transit.path.api.impl.TrainBackfillHelper.LineId.Companion.NWK_WTC
+import com.sixbynine.transit.path.api.impl.TrainBackfillHelper.LineId.Companion.OK_33S_HOB
+import com.sixbynine.transit.path.api.impl.TrainBackfillHelper.LineId.Companion.OK_33S_JSQ
+import com.sixbynine.transit.path.api.impl.TrainBackfillHelper.LineId.Companion.OK_HOB_33S
+import com.sixbynine.transit.path.api.impl.TrainBackfillHelper.LineId.Companion.OK_JSQ_33S
+import com.sixbynine.transit.path.api.impl.TrainBackfillHelper.LineId.Companion.PAIN_33S_JSQ
+import com.sixbynine.transit.path.api.impl.TrainBackfillHelper.LineId.Companion.PAIN_JSQ_33S
+import com.sixbynine.transit.path.api.impl.TrainBackfillHelper.LineId.Companion.WTC_HOB
+import com.sixbynine.transit.path.api.impl.TrainBackfillHelper.LineId.Companion.WTC_NWK
+import com.sixbynine.transit.path.app.ui.ColorWrapper
+import com.sixbynine.transit.path.app.ui.Colors
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 object TrainBackfillHelper {
 
-    private val HeadSignToCheckpoints = mapOf(
-        "World Trade Center" to mapOf(
-            Newark to 0.seconds,
-            Harrison to 1.minutes + 48.seconds,
-            JournalSquare to 12.minutes + 2.seconds,
-            GroveStreet to 16.minutes + 37.seconds,
-            ExchangePlace to 19.minutes + 44.seconds
+    private data class LineId(val headSign: String, val colors: List<Color>) {
+        companion object {
+            private fun List<ColorWrapper>.unwrap(): List<Color> {
+                return map { it.color }
+            }
+
+            val NWK_WTC = LineId("World Trade Center", Colors.NwkWtc.unwrap())
+            val WTC_NWK = NWK_WTC.copy(headSign = "Newark")
+            val OK_33S_JSQ = LineId("Journal Square", Colors.Jsq33s.unwrap())
+            val OK_JSQ_33S = OK_33S_JSQ.copy(headSign = "33rd Street")
+            val PAIN_33S_JSQ = LineId("Journal Square via Hoboken", Colors.Hob33s.unwrap() + Colors.Jsq33s.unwrap())
+            val PAIN_JSQ_33S = PAIN_33S_JSQ.copy(headSign = "33rd Street via Hoboken")
+            val HOB_WTC = LineId("World Trade Center", Colors.HobWtc.unwrap())
+            val WTC_HOB = HOB_WTC.copy(headSign = "Hoboken")
+            val OK_HOB_33S = LineId("33rd Street", Colors.Hob33s.unwrap())
+            val OK_33S_HOB = OK_HOB_33S.copy(headSign = "Hoboken")
+        }
+    }
+
+    private val LineIdToCheckpoints = mapOf(
+        NWK_WTC to mapOf(
+            Newark to 0.minutes,
+            Harrison to 1.minutes + 42.seconds,
+            JournalSquare to 12.minutes + 43.seconds,
+            GroveStreet to 17.minutes + 30.seconds,
+            ExchangePlace to 20.minutes + 30.seconds
         ),
-        "Newark" to mapOf(
-            WorldTradeCenter to 0.seconds,
-            ExchangePlace to 3.minutes + 49.seconds,
-            GroveStreet to 6.minutes + 56.seconds,
-            JournalSquare to 9.minutes + 48.seconds,
-            Harrison to 16.minutes + 54.seconds
+        WTC_NWK to mapOf(
+            WorldTradeCenter to 0.minutes,
+            ExchangePlace to 3.minutes + 24.seconds,
+            GroveStreet to 6.minutes + 27.seconds,
+            JournalSquare to 11.minutes + 27.seconds,
+            Harrison to 16.minutes + 33.seconds
         ),
-        "Journal Square via Hoboken" to mapOf(
-            ThirtyThirdStreet to 0.seconds,
-            TwentyThirdStreet to 1.minutes + 52.seconds,
-            FourteenthStreet to 4.minutes + 7.seconds,
-            NinthStreet to 5.minutes + 23.seconds,
-            ChristopherStreet to 7.minutes + 23.seconds,
-            Hoboken to 17.minutes + 30.seconds,
-            Newport to 26.minutes + 48.seconds,
-            GroveStreet to 30.minutes + 53.seconds,
+        HOB_WTC to mapOf(
+            Hoboken to 0.minutes,
+            Newport to 3.minutes + 42.seconds,
+            ExchangePlace to 8.minutes + 42.seconds,
         ),
-        "33rd Street via Hoboken" to mapOf(
-            JournalSquare to 0.seconds,
-            GroveStreet to 3.minutes + 54.seconds,
-            Newport to 7.minutes + 59.seconds,
-            Hoboken to 16.minutes + 17.seconds,
-            ChristopherStreet to 26.minutes + 13.seconds,
-            NinthStreet to 27.minutes + 53.seconds,
-            FourteenthStreet to 29.minutes + 3.seconds,
-            TwentyThirdStreet to 31.minutes + 13.seconds
+        WTC_HOB to mapOf(
+            WorldTradeCenter to 0.minutes,
+            ExchangePlace to 3.minutes + 42.seconds,
+            Newport to 8.minutes + 38.seconds,
+        ),
+        OK_33S_JSQ to mapOf(
+            ThirtyThirdStreet to 0.minutes,
+            TwentyThirdStreet to 1.minutes + 42.seconds,
+            FourteenthStreet to 3.minutes + 31.seconds,
+            NinthStreet to 4.minutes + 31.seconds,
+            ChristopherStreet to 6.minutes + 31.seconds,
+            Newport to 16.minutes + 31.seconds,
+            GroveStreet to 20.minutes + 31.seconds,
+        ),
+        PAIN_33S_JSQ to mapOf(
+            ThirtyThirdStreet to 0.minutes,
+            TwentyThirdStreet to 1.minutes + 42.seconds,
+            FourteenthStreet to 3.minutes + 31.seconds,
+            NinthStreet to 4.minutes + 31.seconds,
+            ChristopherStreet to 6.minutes + 31.seconds,
+            Hoboken to 19.minutes + 48.seconds,
+            Newport to 23.minutes + 30.seconds,
+            GroveStreet to 27.minutes + 30.seconds,
+        ),
+        OK_JSQ_33S to mapOf(
+            JournalSquare to 0.minutes,
+            GroveStreet to 4.minutes + 37.seconds,
+            Newport to 8.minutes + 37.seconds,
+            ChristopherStreet to 15.minutes + 13.seconds,
+            NinthStreet to 17.minutes + 13.seconds,
+            FourteenthStreet to 18.minutes + 14.seconds,
+            TwentyThirdStreet to 20.minutes + 14.seconds,
+        ),
+        PAIN_JSQ_33S to mapOf(
+            JournalSquare to 0.minutes,
+            GroveStreet to 4.minutes + 37.seconds,
+            Newport to 8.minutes + 37.seconds,
+            Hoboken to 16.minutes + 55.seconds,
+            ChristopherStreet to 25.minutes + 37.seconds,
+            NinthStreet to 27.minutes + 37.seconds,
+            FourteenthStreet to 28.minutes + 38.seconds,
+            TwentyThirdStreet to 30.minutes + 38.seconds,
+        ),
+        OK_33S_HOB to mapOf(
+            ThirtyThirdStreet to 0.minutes,
+            TwentyThirdStreet to 1.minutes + 42.seconds,
+            FourteenthStreet to 3.minutes + 31.seconds,
+            NinthStreet to 4.minutes + 31.seconds,
+            ChristopherStreet to 6.minutes + 31.seconds,
+        ),
+        OK_HOB_33S to mapOf(
+            Hoboken to 0.minutes,
+            ChristopherStreet to 8.minutes + 42.seconds,
+            NinthStreet to 10.minutes + 42.seconds,
+            FourteenthStreet to 11.minutes + 43.seconds,
+            TwentyThirdStreet to 13.minutes + 43.seconds,
         ),
     )
 
@@ -63,10 +137,10 @@ object TrainBackfillHelper {
     ): Map<Station, List<DepartureBoardTrain>> {
         val backfilled = trains.toMutableMap()
         trains.keys.forEach eachStation@{ station ->
-            val headSigns =
-                backfilled[station]?.map { it.headsign }?.distinct() ?: return@eachStation
-            headSigns.forEach eachHeadSign@{ headSign ->
-                val checkpointsInLine = HeadSignToCheckpoints[headSign] ?: return@eachHeadSign
+            val lineIds =
+                backfilled[station]?.map { it.lineId }?.distinct() ?: return@eachStation
+            lineIds.forEach eachHeadSign@{ lineId ->
+                val checkpointsInLine = LineIdToCheckpoints[lineId] ?: return@eachHeadSign
                 val stationCheckpoint = checkpointsInLine[station] ?: return@eachHeadSign
                 checkpointsInLine
                     .filterValues { it < stationCheckpoint }
@@ -75,7 +149,7 @@ object TrainBackfillHelper {
                     .forEach { (priorStation, priorStationCheckpoint) ->
                         val travelTimeBetweenStations = stationCheckpoint - priorStationCheckpoint
                         backfilled[priorStation]
-                            ?.filter { it.headsign == headSign }
+                            ?.filter { it.lineId == lineId }
                             ?.map {
                                 it.copy(
                                     projectedArrival = it.projectedArrival +
@@ -84,7 +158,7 @@ object TrainBackfillHelper {
                             }
                             ?.forEach { hypotheticalTrain ->
                                 val trainMatches: (DepartureBoardTrain) -> Boolean = trainMatches@{
-                                    if (it.headsign != headSign) return@trainMatches false
+                                    if (it.lineId != lineId) return@trainMatches false
                                     val timeDelta =
                                         (hypotheticalTrain.projectedArrival - it.projectedArrival)
                                             .absoluteValue
@@ -94,7 +168,7 @@ object TrainBackfillHelper {
                                 if (currentTrains.none { trainMatches(it) }) {
                                     Logging.d(
                                         "Backfilling ${station.displayName} with a train from " +
-                                                "${priorStation.displayName} to $headSign" +
+                                                "${priorStation.displayName} to $lineId" +
                                                 " hypothetically departing at " +
                                                 "${hypotheticalTrain.projectedArrival}"
                                     )
@@ -108,5 +182,5 @@ object TrainBackfillHelper {
         return backfilled
     }
 
-
+    private val DepartureBoardTrain.lineId get() = LineId(headsign, lineColors)
 }

@@ -52,10 +52,13 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlin.coroutines.resume
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -250,32 +253,45 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : ViewModel() {
                     updateFooterText = null,
                 )
             }
-            WidgetDataFetcher.fetchWidgetData(
-                limit = Int.MAX_VALUE,
-                stations = state.value.selectedStations,
-                sort = state.value.stationSort,
-                filter = StationFilterManager.filter.value,
-                force = force,
-                onSuccess = {
-                    updateState {
-                        copy(
-                            isLoading = false,
-                            hasError = false,
-                            data = it.sorted()
-                        )
-                    }
-                    lastFetchTime.value = Clock.System.now()
-                },
-                onFailure = {
-                    updateState {
-                        copy(
-                            isLoading = false,
-                            hasError = true,
-                            data = it?.sorted()
-                        )
-                    }
+            withTimeoutOrNull(5000) {
+                suspendCancellableCoroutine<Boolean> { continuation ->
+                    WidgetDataFetcher.fetchWidgetData(
+                        limit = Int.MAX_VALUE,
+                        stations = state.value.selectedStations,
+                        sort = state.value.stationSort,
+                        filter = StationFilterManager.filter.value,
+                        force = force,
+                        onSuccess = {
+                            updateState {
+                                copy(
+                                    isLoading = false,
+                                    hasError = false,
+                                    data = it.sorted()
+                                )
+                            }
+                            lastFetchTime.value = Clock.System.now()
+                            continuation.resume(true)
+                        },
+                        onFailure = {
+                            updateState {
+                                copy(
+                                    isLoading = false,
+                                    hasError = true,
+                                    data = it?.sorted()
+                                )
+                            }
+                            continuation.resume(false)
+                        }
+                    )
                 }
-            )
+            } ?: run {
+                updateState {
+                    copy(
+                        isLoading = false,
+                        hasError = true,
+                    )
+                }
+            }
         }
     }
 

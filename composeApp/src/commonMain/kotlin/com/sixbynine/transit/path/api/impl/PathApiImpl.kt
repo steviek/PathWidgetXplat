@@ -45,7 +45,9 @@ internal class PathApiImpl : PathApi {
                         projectedArrival = (it.lastUpdated + it.durationToArrival)
                             .coerceAtLeast(Clock.System.now()),
                         lineColors = it.lineColor.split(",")
-                            .map { Colors.parse(it) }
+                            .map { Colors.parse(it) },
+                        isDelayed = it.arrivalTimeMessage == "Delayed",
+                        backfillSource = null,
                     )
                 }
 
@@ -109,6 +111,7 @@ class PathClient {
     data class PathDestinationMessage(
         val target: String,
         val secondsToArrival: String,
+        val arrivalTimeMessage: String?,
         val lineColor: String,
         val headSign: String,
         val lastUpdated: Instant

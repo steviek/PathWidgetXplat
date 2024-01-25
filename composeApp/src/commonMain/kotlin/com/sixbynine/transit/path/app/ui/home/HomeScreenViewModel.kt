@@ -13,6 +13,8 @@ import com.sixbynine.transit.path.app.lifecycle.AppLifecycleObserver
 import com.sixbynine.transit.path.app.station.StationSelectionManager
 import com.sixbynine.transit.path.app.ui.home.ConfigurationItem.Settings
 import com.sixbynine.transit.path.app.ui.home.ConfigurationItem.Station
+import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.DepartureBoardData
+import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.HomeBackfillSource
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.AddStationClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.ConfigurationChipClicked
@@ -33,6 +35,8 @@ import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StationS
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StopEditingClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.UpdateNowClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.State
+import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.StationData
+import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.TrainData
 import com.sixbynine.transit.path.app.ui.layout.LayoutOption.OneColumn
 import com.sixbynine.transit.path.app.ui.layout.LayoutOption.ThreeColumns
 import com.sixbynine.transit.path.app.ui.layout.LayoutOption.TwoColumns
@@ -45,6 +49,7 @@ import com.sixbynine.transit.path.widget.WidgetData
 import com.sixbynine.transit.path.widget.WidgetDataFetcher
 import com.sixbynine.transit.path.widget.WidgetDataFormatter
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -82,13 +87,13 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : ViewModel() {
             timeDisplay = TimeDisplay.entries.firstOrNull { it.number == timeDisplayNumber }
                 ?: TimeDisplay.Relative,
             stationSort = StationSort.entries.firstOrNull { it.number == stationSortNumber }
-                ?: StationSort.Alphabetical,
+                ?: Alphabetical,
         )
     )
     val state = _state.asStateFlow()
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             combine(StationSelectionManager.selection, StationFilterManager.filter, ::Pair)
                 .collectLatest { (selection, filter) ->
                     updateState {
@@ -105,7 +110,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : ViewModel() {
                 }
         }
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             lastFetchTime.collectLatest { fetchTime ->
                 if (fetchTime == null) return@collectLatest
                 while (true) {
@@ -135,7 +140,8 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : ViewModel() {
                             )
                         updateState {
                             copy(
-                                updateFooterText = footerText
+                                updateFooterText = footerText,
+                                data = data?.withTrainDisplayUpdated()
                             )
                         }
                     }
@@ -245,7 +251,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : ViewModel() {
     }
 
     private fun fetchData(force: Boolean) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             updateState {
                 copy(
                     isLoading = true,
@@ -266,7 +272,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : ViewModel() {
                                 copy(
                                     isLoading = false,
                                     hasError = false,
-                                    data = it.sorted()
+                                    data = it.toDepartureBoardData(state.value.timeDisplay).sorted()
                                 )
                             }
                             lastFetchTime.value = Clock.System.now()
@@ -277,7 +283,8 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : ViewModel() {
                                 copy(
                                     isLoading = false,
                                     hasError = true,
-                                    data = it?.sorted()
+                                    data = it?.toDepartureBoardData(state.value.timeDisplay)
+                                        ?.sorted()
                                 )
                             }
                             continuation.resume(false)
@@ -295,7 +302,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : ViewModel() {
         }
     }
 
-    private fun WidgetData.sorted(): WidgetData {
+    private fun DepartureBoardData.sorted(): DepartureBoardData {
         val stationToIndex =
             state
                 .value
@@ -305,9 +312,9 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : ViewModel() {
         val hour = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).hour
         val isMorning = hour in 3 until 12
         return copy(
-            stations = stations.sortedBy { stationToIndex[it.id] }
+            stations = stations.sortedBy { stationToIndex[it.station.pathApiName] }
                 .sortedBy {
-                    val station = Stations.All.first { s -> s.pathApiName == it.id }
+                    val station = it.station
                     val isFirst = when (state.value.stationSort) {
                         StationSort.NjAm -> isMorning == station.isInNewJersey
                         StationSort.NyAm -> isMorning == station.isInNewYork
@@ -318,15 +325,85 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : ViewModel() {
         )
     }
 
+    private fun DepartureBoardData.withTrainDisplayUpdated(): DepartureBoardData {
+        return copy(
+            stations = stations.map {
+                it.copy(trains = it.trains.map { train ->
+                    train.copy(
+                        displayText = trainDisplayTime(
+                            state.value.timeDisplay,
+                            train.isDelayed,
+                            train.projectedArrival
+                        )
+                    )
+                })
+            }
+        )
+    }
+
     private fun defaultLayout(maxWidth: Dp) = when (maxWidth) {
         in 0.dp..600.dp -> OneColumn
         in 600.dp..1200.dp -> TwoColumns
         else -> ThreeColumns
     }
 
-    private companion object {
-        val IsFirstLaunchKey = BooleanPreferencesKey("is_first_launch")
-        val TimeDisplayOption = IntPreferencesKey("time_display_option")
-        val SortOptionKey = IntPreferencesKey("sort_option")
+    companion object {
+        private val IsFirstLaunchKey = BooleanPreferencesKey("is_first_launch")
+        private val TimeDisplayOption = IntPreferencesKey("time_display_option")
+        private val SortOptionKey = IntPreferencesKey("sort_option")
+
+        fun WidgetData.toDepartureBoardData(timeDisplay: TimeDisplay): DepartureBoardData {
+            val stations = stations.mapNotNull { data ->
+                val station =
+                    Stations.All.firstOrNull { it.pathApiName == data.id }
+                        ?: return@mapNotNull null
+                val stationData = StationData(
+                    station = station,
+                    trains = data.trains
+                        .filter { it.projectedArrival >= Clock.System.now() - 1.minutes }
+                        .map { train ->
+                            TrainData(
+                                id = train.id,
+                                title = train.title,
+                                colors = train.colors.map { it.color },
+                                displayText = trainDisplayTime(
+                                    timeDisplay,
+                                    train.isDelayed,
+                                    train.projectedArrival
+                                ),
+                                projectedArrival = train.projectedArrival,
+                                isDelayed = train.isDelayed,
+                                backfill = train.backfillSource?.let {
+                                    HomeBackfillSource(
+                                        it,
+                                        trainDisplayTime(
+                                            timeDisplay,
+                                            train.isDelayed,
+                                            it.projectedArrival
+                                        )
+                                    )
+                                },
+                            )
+                        }
+                )
+                stationData
+            }
+            return DepartureBoardData(stations = stations)
+        }
+
+        private fun trainDisplayTime(
+            timeDisplay: TimeDisplay,
+            isDelayed: Boolean,
+            projectedArrival: Instant
+        ): String {
+            return (if (isDelayed) "Delay - " else "") + when (timeDisplay) {
+                TimeDisplay.Relative -> WidgetDataFormatter.formatRelativeTime(
+                    Clock.System.now(),
+                    projectedArrival
+                )
+
+                TimeDisplay.Clock -> WidgetDataFormatter.formatTime(projectedArrival)
+            }
+        }
     }
 }

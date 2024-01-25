@@ -254,7 +254,9 @@ class TrainBackfillHelperTest {
             return DepartureBoardTrain(
                 headsign = "Newark",
                 projectedArrival = projectedArrival,
-                lineColors = Colors.NwkWtc.map { it.color }
+                lineColors = Colors.NwkWtc.map { it.color },
+                isDelayed = false,
+                backfillSource = null,
             )
         }
 
@@ -262,7 +264,9 @@ class TrainBackfillHelperTest {
             return DepartureBoardTrain(
                 headsign = "World Trade Center",
                 projectedArrival = projectedArrival,
-                lineColors = Colors.NwkWtc.map { it.color }
+                lineColors = Colors.NwkWtc.map { it.color },
+                isDelayed = false,
+                backfillSource = null,
             )
         }
 
@@ -270,7 +274,9 @@ class TrainBackfillHelperTest {
             return DepartureBoardTrain(
                 headsign = "World Trade Center",
                 projectedArrival = projectedArrival,
-                lineColors = Colors.HobWtc.map { it.color }
+                lineColors = Colors.HobWtc.map { it.color },
+                isDelayed = false,
+                backfillSource = null,
             )
         }
 

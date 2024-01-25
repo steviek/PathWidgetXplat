@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -19,6 +20,8 @@ import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.UpdateNo
 import com.sixbynine.transit.path.app.ui.theme.Dimensions
 import dev.icerock.moko.resources.compose.stringResource
 
+private val MinHeight = 76.dp
+
 @Composable
 fun HomeScreenScope.DepartureBoardFooter() {
     if (state.updateFooterText != null) {
@@ -26,9 +29,11 @@ fun HomeScreenScope.DepartureBoardFooter() {
             Column(
                 modifier =
                 Modifier.fillMaxWidth()
+                    .heightIn(MinHeight)
                     .padding(top = 8.dp)
                     .padding(horizontal = Dimensions.gutter(state.isTablet)),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Bottom
             ) {
                 UpdatedText()
                 UpdateNowButton()
@@ -36,6 +41,7 @@ fun HomeScreenScope.DepartureBoardFooter() {
         } else {
             FlowRow(
                 modifier = Modifier
+                    .heightIn(MinHeight)
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
                     .padding(horizontal = Dimensions.gutter(state.isTablet)),
@@ -47,14 +53,17 @@ fun HomeScreenScope.DepartureBoardFooter() {
             }
         }
     } else if (state.isLoading && state.data != null) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(
+            modifier = Modifier.heightIn(MinHeight),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
             Text(
                 modifier = Modifier.padding(8.dp),
                 text = stringResource(strings.updating),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodyMedium,
             )
-            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
         }
     }
 }

@@ -18,17 +18,23 @@ internal class MockPathApi : PathApi {
                 DepartureBoardTrain(
                     headsign = "Hoboken",
                     projectedArrival = now + 2.minutes,
-                    lineColors = listOf(Color.Green)
+                    lineColors = listOf(Color.Green),
+                    isDelayed = false,
+                    backfillSource = null,
                 ),
                 DepartureBoardTrain(
                     headsign = "Newark",
                     projectedArrival = now + 4.minutes,
-                    lineColors = listOf(Color.Red)
+                    lineColors = listOf(Color.Red),
+                    isDelayed = false,
+                    backfillSource = null,
                 ),
                 DepartureBoardTrain(
                     headsign = "World Trade Center",
                     projectedArrival = now + 7.minutes,
-                    lineColors = listOf(Color.Blue)
+                    lineColors = listOf(Color.Blue),
+                    isDelayed = false,
+                    backfillSource = null,
                 )
             )
         }

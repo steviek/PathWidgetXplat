@@ -106,7 +106,9 @@ object WidgetDataFetcher {
                         id = it.headsign + ":" + it.projectedArrival,
                         title = it.headsign,
                         colors = colors,
-                        projectedArrival = it.projectedArrival
+                        projectedArrival = it.projectedArrival,
+                        isDelayed = it.isDelayed,
+                        backfillSource = it.backfillSource,
                     )
                 }
                 .filter { matchesFilter(station, it, filter) }

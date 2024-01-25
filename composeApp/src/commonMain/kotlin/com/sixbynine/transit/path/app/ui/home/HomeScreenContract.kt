@@ -1,11 +1,14 @@
 package com.sixbynine.transit.path.app.ui.home
 
+import androidx.compose.ui.graphics.Color
+import com.sixbynine.transit.path.api.BackfillSource
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.StationFilter
 import com.sixbynine.transit.path.api.StationSort
+import com.sixbynine.transit.path.api.state
 import com.sixbynine.transit.path.app.station.StationSelection
 import com.sixbynine.transit.path.app.ui.layout.LayoutOption
-import com.sixbynine.transit.path.widget.WidgetData
+import kotlinx.datetime.Instant
 
 object HomeScreenContract {
     data class State(
@@ -19,7 +22,7 @@ object HomeScreenContract {
         var stationSort: StationSort = StationSort.Alphabetical,
         val isLoading: Boolean = true,
         val hasError: Boolean = false,
-        val data: WidgetData? = null,
+        val data: DepartureBoardData? = null,
         val showStationSelectionDialog: Boolean = false,
         val showFilterDialog: Boolean = false,
         val showSettingsBottomSheet: Boolean = false,
@@ -27,6 +30,42 @@ object HomeScreenContract {
         val useColumnForFooter: Boolean = false,
         val updateFooterText: String? = null,
     )
+
+    data class DepartureBoardData(
+        val stations: List<StationData>,
+    )
+
+    data class StationData(
+        val station: Station,
+        val trains: List<TrainData>,
+    ) {
+        val id get() = station.pathApiName
+        val state get() = station.state
+    }
+
+    data class TrainData(
+        val id: String,
+        val title: String,
+        val colors: List<Color>,
+        val projectedArrival: Instant,
+        val displayText: String,
+        val isDelayed: Boolean = false,
+        val backfill: HomeBackfillSource? = null,
+    ) {
+        val isBackfilled: Boolean
+            get() = backfill != null
+    }
+
+    data class HomeBackfillSource(
+        val source: BackfillSource,
+        val displayText: String,
+    ) {
+        val projectedArrival: Instant
+            get() = source.projectedArrival
+
+        val station: Station
+            get() = source.station
+    }
 
     sealed interface Intent {
         data object RetryClicked : Intent

@@ -3,7 +3,7 @@ package com.sixbynine.transit.path.app.ui.home
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -18,12 +18,10 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
@@ -35,13 +33,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.sixbynine.transit.path.MR.strings
+import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.app.ui.AppUiScope
 import com.sixbynine.transit.path.app.ui.filter.FilterBottomSheet
@@ -58,20 +58,16 @@ import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StationF
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StationSelectionDialogDismissed
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StopEditingClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.State
-import com.sixbynine.transit.path.app.ui.home.TimeDisplay.Clock
-import com.sixbynine.transit.path.app.ui.home.TimeDisplay.Relative
+import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.StationData
+import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.TrainData
 import com.sixbynine.transit.path.app.ui.icon.IconType
 import com.sixbynine.transit.path.app.ui.icon.NativeIconButton
 import com.sixbynine.transit.path.app.ui.station.AddStationBottomSheet
 import com.sixbynine.transit.path.app.ui.station.StationConfigurationBottomSheet
 import com.sixbynine.transit.path.app.ui.theme.Dimensions
-import com.sixbynine.transit.path.widget.WidgetData.StationData
-import com.sixbynine.transit.path.widget.WidgetData.TrainData
-import com.sixbynine.transit.path.widget.WidgetDataFormatter
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import dev.icerock.moko.resources.compose.stringResource
-import kotlinx.datetime.Instant
 
 class HomeScreenScope(
     val state: State,
@@ -231,7 +227,6 @@ private fun HomeScreenScope.DepartureBoard() {
             item(station.id) {
                 StationView(
                     modifier = Modifier.fillMaxSize().animateItemPlacement(),
-                    fetchTime = data.fetchTime,
                     canMoveDown = canMoveDown,
                     canMoveUp = canMoveUp,
                     data = station
@@ -265,7 +260,6 @@ private fun HomeScreenScope.DepartureBoard() {
 
 @Composable
 private fun HomeScreenScope.StationView(
-    fetchTime: Instant,
     data: StationData,
     canMoveDown: Boolean,
     canMoveUp: Boolean,
@@ -279,7 +273,7 @@ private fun HomeScreenScope.StationView(
         ) {
             Text(
                 modifier = Modifier.weight(1f).padding(start = gutter()),
-                text = data.displayName,
+                text = data.station.displayName,
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -318,12 +312,9 @@ private fun HomeScreenScope.StationView(
             }
         }
 
-        Column(
-            modifier = Modifier.padding(horizontal = gutter()),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
+        Column {
             data.trains.forEach {
-                TrainLine(fetchTime, it)
+                TrainLine(data.station, it)
             }
         }
 
@@ -331,39 +322,27 @@ private fun HomeScreenScope.StationView(
 }
 
 @Composable
-private fun HomeScreenScope.TrainLine(fetchTime: Instant, data: TrainData) {
-    Row {
-        Box(Modifier.size(24.dp)) {
-            data.colors.firstOrNull()?.let {
-                Box(Modifier.size(24.dp).clip(CircleShape).background(it.color))
-            }
-
-            data.colors.getOrNull(1)?.let {
-                Box(
-                    Modifier.size(24.dp)
-                        .clip(CircleShape)
-                        .padding(top = 12.dp)
-                        .clip(RectangleShape)
-                        .background(it.color)
-                )
+private fun HomeScreenScope.TrainLine(station: Station, data: TrainData) {
+    var showBottomSheet by remember { mutableStateOf(false) }
+    TrainLineContent(
+        data,
+        modifier = Modifier.let { modifier ->
+            if (data.isBackfilled) {
+                modifier.clickable { showBottomSheet = true }
+            } else {
+                modifier
             }
         }
-        Spacer(Modifier.width(16.dp))
-        Text(
-            modifier = Modifier.weight(1f),
-            text = data.title,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-        Text(
-            modifier = Modifier.widthIn(min = 60.dp),
-            textAlign = TextAlign.End,
-            text = when (state.timeDisplay) {
-                Relative -> WidgetDataFormatter.formatRelativeTime(fetchTime, data.projectedArrival)
-                Clock -> WidgetDataFormatter.formatTime(data.projectedArrival)
-            },
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurface
+            .padding(horizontal = gutter(), vertical = 4.dp)
+            .fillMaxWidth()
+    )
+
+    if (showBottomSheet && data.backfill != null) {
+        BackfillBottomSheet(
+            station = station,
+            trainData = data,
+            source = data.backfill,
+            onDismiss = { showBottomSheet = false }
         )
     }
 }

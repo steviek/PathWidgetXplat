@@ -1,5 +1,6 @@
 package com.sixbynine.transit.path.widget
 
+import com.sixbynine.transit.path.api.BackfillSource
 import com.sixbynine.transit.path.api.State
 import com.sixbynine.transit.path.app.ui.ColorWrapper
 import kotlinx.datetime.Instant
@@ -28,10 +29,15 @@ data class WidgetData(
         val id: String,
         val title: String,
         val colors: List<ColorWrapper>,
-        val projectedArrival: Instant
+        val projectedArrival: Instant,
+        val isDelayed: Boolean = false,
+        val backfillSource: BackfillSource? = null,
     ) {
         fun isPast(now: Instant): Boolean {
             return projectedArrival < now - 1.minutes
         }
+
+        val isBackfilled: Boolean
+            get() = backfillSource != null
     }
 }

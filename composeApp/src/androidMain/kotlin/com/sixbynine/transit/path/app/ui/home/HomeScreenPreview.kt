@@ -23,6 +23,7 @@ import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StationS
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StopEditingClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.UpdateNowClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.State
+import com.sixbynine.transit.path.app.ui.home.HomeScreenViewModel.Companion.toDepartureBoardData
 import com.sixbynine.transit.path.app.ui.layout.LayoutOption.TwoColumns
 import com.sixbynine.transit.path.widget.Fixtures
 
@@ -41,7 +42,7 @@ fun HomeScreenPreview() {
                 layoutOption = TwoColumns,
                 isLoading = false,
                 hasError = false,
-                data = Fixtures.widgetData(),
+                data = Fixtures.widgetData().toDepartureBoardData(TimeDisplay.Relative),
                 timeDisplay = TimeDisplay.Relative,
                 stationFilter = Interstate,
                 showSettingsBottomSheet = showSettingsBottomSheet,

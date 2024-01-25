@@ -2,6 +2,7 @@ package com.sixbynine.transit.path.api.impl
 
 import androidx.compose.ui.graphics.Color
 import com.sixbynine.transit.path.Logging
+import com.sixbynine.transit.path.api.BackfillSource
 import com.sixbynine.transit.path.api.DepartureBoardTrain
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.Stations.ChristopherStreet
@@ -148,12 +149,16 @@ object TrainBackfillHelper {
                     .sortedByDescending { (_, checkpoint) -> checkpoint }
                     .forEach { (priorStation, priorStationCheckpoint) ->
                         val travelTimeBetweenStations = stationCheckpoint - priorStationCheckpoint
-                        backfilled[priorStation]
+                        trains[priorStation]
                             ?.filter { it.lineId == lineId }
                             ?.map {
                                 it.copy(
                                     projectedArrival = it.projectedArrival +
-                                            travelTimeBetweenStations
+                                            travelTimeBetweenStations,
+                                    backfillSource = BackfillSource(
+                                        station = priorStation,
+                                        projectedArrival = it.projectedArrival,
+                                    )
                                 )
                             }
                             ?.forEach { hypotheticalTrain ->

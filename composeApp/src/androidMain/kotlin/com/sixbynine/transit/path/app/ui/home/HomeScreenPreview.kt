@@ -7,18 +7,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.sixbynine.transit.path.PathWidgetPreview
 import com.sixbynine.transit.path.PreviewTheme
-import com.sixbynine.transit.path.api.StationFilter.Interstate
 import com.sixbynine.transit.path.api.Stations
+import com.sixbynine.transit.path.app.settings.TimeDisplay
 import com.sixbynine.transit.path.app.ui.home.ConfigurationItem.Settings
 import com.sixbynine.transit.path.app.ui.home.ConfigurationItem.Station
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.ConfigurationChipClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.EditClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.RetryClicked
-import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.SettingsBottomSheetDismissed
-import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.SettingsFilterChanged
-import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.SettingsSortChanged
-import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.SettingsTimeDisplayChanged
-import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StationFilterDialogDismissed
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StationSelectionDialogDismissed
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StopEditingClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.UpdateNowClicked
@@ -44,8 +39,6 @@ fun HomeScreenPreview() {
                 hasError = false,
                 data = Fixtures.widgetData().toDepartureBoardData(TimeDisplay.Relative),
                 timeDisplay = TimeDisplay.Relative,
-                stationFilter = Interstate,
-                showSettingsBottomSheet = showSettingsBottomSheet,
             ),
             onIntent = {
                 when (it) {
@@ -72,15 +65,6 @@ fun HomeScreenPreview() {
                         }
                     }
                     is StationSelectionDialogDismissed -> TODO()
-                    StationFilterDialogDismissed -> TODO()
-                    SettingsBottomSheetDismissed -> {
-                        showSettingsBottomSheet = false
-                    }
-
-                    is SettingsTimeDisplayChanged -> {}
-                    is SettingsFilterChanged -> TODO()
-
-                    is SettingsSortChanged -> {}
                     else -> {}
                 }
             })

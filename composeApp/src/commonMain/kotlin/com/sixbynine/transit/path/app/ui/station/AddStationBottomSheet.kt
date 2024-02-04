@@ -19,7 +19,9 @@ import com.sixbynine.transit.path.app.ui.home.HomeScreenScope
 
 @Composable
 fun HomeScreenScope.AddStationBottomSheet() {
-    PathBottomSheet(onDismissRequest = { onIntent(StationBottomSheetDismissed) }) {
+    PathBottomSheet(
+        isShown = state.showAddStationBottomSheet,
+        onDismissRequest = { onIntent(StationBottomSheetDismissed) }) {
         state.unselectedStations.forEach {
             Box(modifier = Modifier.fillMaxWidth()
                 .height(48.dp)

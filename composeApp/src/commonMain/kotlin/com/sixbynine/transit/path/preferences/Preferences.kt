@@ -57,6 +57,20 @@ class IntPreferenceDelegate(private val key: IntPreferencesKey) {
 
 fun persisting(key: IntPreferencesKey): IntPreferenceDelegate = IntPreferenceDelegate(key)
 
+class LongPreferenceDelegate(private val key: LongPreferencesKey) {
+    private val preferences: Preferences = Preferences()
+
+    operator fun getValue(thisRef: Any?, property: Any?): Long? {
+        return preferences[key]
+    }
+
+    operator fun setValue(thisRef: Any?, property: Any?, value: Long?) {
+        preferences[key] = value
+    }
+}
+
+fun persisting(key: LongPreferencesKey): LongPreferenceDelegate = LongPreferenceDelegate(key)
+
 // stores a list of strings as a json array
 class StringListPreferenceDelegate(private val key: StringPreferencesKey) {
     private val preferences: Preferences = Preferences()

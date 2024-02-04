@@ -4,7 +4,7 @@ import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.api.DepartureBoardTrain
 import com.sixbynine.transit.path.api.PathApi
 import com.sixbynine.transit.path.api.Station
-import com.sixbynine.transit.path.api.StationFilter
+import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.isEastOf
@@ -32,7 +32,7 @@ object WidgetDataFetcher {
         limit: Int,
         stations: List<Station>,
         sort: StationSort,
-        filter: StationFilter,
+        filter: TrainFilter,
         force: Boolean,
         onSuccess: (WidgetData) -> Unit,
         onFailure: (WidgetData?) -> Unit,
@@ -76,7 +76,7 @@ object WidgetDataFetcher {
         limit: Int,
         stations: List<Station>,
         sort: StationSort,
-        filter: StationFilter,
+        filter: TrainFilter,
         data: Map<Station, List<DepartureBoardTrain>>
     ): WidgetData {
         val stationDatas = arrayListOf<WidgetData.StationData>()
@@ -142,9 +142,9 @@ object WidgetDataFetcher {
     private fun matchesFilter(
         station: Station,
         train: WidgetData.TrainData,
-        filter: StationFilter
+        filter: TrainFilter
     ): Boolean {
-        if (filter == StationFilter.All) return true
+        if (filter == TrainFilter.All) return true
 
         val destination = Stations.fromHeadSign(train.title) ?: return true
         return when {

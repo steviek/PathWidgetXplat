@@ -1,5 +1,8 @@
 package com.sixbynine.transit.path.api
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Station(
     val pathApiName: String,
     val displayName: String,

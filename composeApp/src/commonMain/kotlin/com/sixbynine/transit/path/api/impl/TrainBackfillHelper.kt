@@ -30,6 +30,12 @@ import com.sixbynine.transit.path.api.impl.TrainBackfillHelper.LineId.Companion.
 import com.sixbynine.transit.path.api.impl.TrainBackfillHelper.LineId.Companion.WTC_NWK
 import com.sixbynine.transit.path.app.ui.ColorWrapper
 import com.sixbynine.transit.path.app.ui.Colors
+import com.sixbynine.transit.path.time.NewYorkTimeZone
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DayOfWeek.SATURDAY
+import kotlinx.datetime.DayOfWeek.SUNDAY
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -138,10 +144,14 @@ object TrainBackfillHelper {
     ): Map<Station, List<DepartureBoardTrain>> {
         val backfilled = trains.toMutableMap()
         trains.keys.forEach eachStation@{ station ->
+            Logging.d("Backfill station: ${station.displayName}")
             val lineIds =
-                backfilled[station]?.map { it.lineId }?.distinct() ?: return@eachStation
+                trains[station]?.map { it.lineId }?.distinct() ?: return@eachStation
             lineIds.forEach eachHeadSign@{ lineId ->
-                val checkpointsInLine = LineIdToCheckpoints[lineId] ?: return@eachHeadSign
+                val checkpointsInLine = LineIdToCheckpoints[lineId] ?: run {
+                    Logging.d("\tBackfill: No checkpoints for ${station.displayName} for $lineId!")
+                    return@eachHeadSign
+                }
                 val stationCheckpoint = checkpointsInLine[station] ?: return@eachHeadSign
                 checkpointsInLine
                     .filterValues { it < stationCheckpoint }
@@ -167,24 +177,43 @@ object TrainBackfillHelper {
                                     val timeDelta =
                                         (hypotheticalTrain.projectedArrival - it.projectedArrival)
                                             .absoluteValue
-                                    timeDelta <= 10.minutes
+                                    timeDelta <= getCloseTrainThreshold()
                                 }
                                 val currentTrains = backfilled[station] ?: return@eachStation
                                 if (currentTrains.none { trainMatches(it) }) {
                                     Logging.d(
-                                        "Backfilling ${station.displayName} with a train from " +
+                                        "\tBackfilling ${station.displayName} with a train from " +
                                                 "${priorStation.displayName} to $lineId" +
                                                 " hypothetically departing at " +
                                                 "${hypotheticalTrain.projectedArrival}"
                                     )
                                     backfilled[station] = currentTrains + hypotheticalTrain
+                                } else {
+                                    Logging.d(
+                                        "\tSkip backfilling ${station.displayName} with a train from " +
+                                                "${priorStation.displayName} to $lineId" +
+                                                " hypothetically departing at " +
+                                                "${hypotheticalTrain.projectedArrival}"
+                                    )
                                 }
                             }
                     }
-
             }
         }
         return backfilled
+    }
+
+    private fun getCloseTrainThreshold(): Duration {
+        val date = Clock.System.now().toLocalDateTime(NewYorkTimeZone)
+        if (date.dayOfWeek in listOf(SATURDAY, SUNDAY)) {
+            return 10.minutes
+        }
+
+        if (date.time.hour in 6..10 || date.time.hour in 16..20) {
+            return 4.minutes
+        }
+
+        return 10.minutes
     }
 
     private val DepartureBoardTrain.lineId get() = LineId(headsign, lineColors)

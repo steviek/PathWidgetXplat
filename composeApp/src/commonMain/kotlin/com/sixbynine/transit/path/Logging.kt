@@ -26,4 +26,13 @@ object Logging {
         initialize()
         Napier.d(message)
     }
+
+    fun e(message: String, throwable: Throwable? = null) {
+        if (isTest) {
+            println(message)
+            return
+        }
+        initialize()
+        Napier.e(message, throwable)
+    }
 }

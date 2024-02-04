@@ -2,35 +2,36 @@ package com.sixbynine.transit.path.app.ui.home
 
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.MR.strings
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.StationSort.Alphabetical
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.isInNewJersey
 import com.sixbynine.transit.path.api.isInNewYork
-import com.sixbynine.transit.path.app.filter.StationFilterManager
 import com.sixbynine.transit.path.app.lifecycle.AppLifecycleObserver
+import com.sixbynine.transit.path.app.settings.SettingsManager
+import com.sixbynine.transit.path.app.settings.TimeDisplay
 import com.sixbynine.transit.path.app.station.StationSelectionManager
+import com.sixbynine.transit.path.app.ui.PathViewModel
 import com.sixbynine.transit.path.app.ui.home.ConfigurationItem.Settings
 import com.sixbynine.transit.path.app.ui.home.ConfigurationItem.Station
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.DepartureBoardData
+import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Effect
+import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Effect.NavigateToSettings
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.HomeBackfillSource
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.AddStationClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.ConfigurationChipClicked
+import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.ConstraintsChanged
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.EditClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.MoveStationDownClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.MoveStationUpClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.RemoveStationClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.RetryClicked
-import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.SettingsBottomSheetDismissed
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.SettingsClicked
-import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.SettingsFilterChanged
-import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.SettingsSortChanged
-import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.SettingsTimeDisplayChanged
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StationBottomSheetDismissed
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StationBottomSheetSelection
-import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StationFilterDialogDismissed
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StationSelectionDialogDismissed
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StopEditingClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.UpdateNowClicked
@@ -42,20 +43,28 @@ import com.sixbynine.transit.path.app.ui.layout.LayoutOption.ThreeColumns
 import com.sixbynine.transit.path.app.ui.layout.LayoutOption.TwoColumns
 import com.sixbynine.transit.path.app.ui.layout.LayoutOptionManager
 import com.sixbynine.transit.path.preferences.BooleanPreferencesKey
-import com.sixbynine.transit.path.preferences.IntPreferencesKey
+import com.sixbynine.transit.path.preferences.LongPreferencesKey
+import com.sixbynine.transit.path.preferences.Preferences
+import com.sixbynine.transit.path.preferences.StringPreferencesKey
 import com.sixbynine.transit.path.preferences.persisting
 import com.sixbynine.transit.path.resources.getString
 import com.sixbynine.transit.path.widget.WidgetData
 import com.sixbynine.transit.path.widget.WidgetDataFetcher
 import com.sixbynine.transit.path.widget.WidgetDataFormatter
-import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeoutOrNull
@@ -63,53 +72,63 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import kotlin.coroutines.resume
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : ViewModel() {
+class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, Intent, Effect>() {
 
     private var hasLaunchedBefore by persisting(IsFirstLaunchKey)
-    private var timeDisplayNumber by persisting(TimeDisplayOption)
-    private var stationSortNumber by persisting(SortOptionKey)
-    private var lastFetchTime = MutableStateFlow<Instant?>(null)
+    private var storedLastFetchTime by persisting(LastFetchKey)
+    private var lastFetchTime = MutableStateFlow(
+        storedLastFetchTime?.let { Instant.fromEpochMilliseconds(it) }
+    )
+
+    private val latestWidgetData = MutableStateFlow(getStoredWidgetData())
 
     private val _state = MutableStateFlow(
-        State(
-            isTablet = maxWidth >= 480.dp && maxHeight >= 480.dp,
-            selectedStations = StationSelectionManager.selection.value.selectedStations,
-            unselectedStations = StationSelectionManager.selection.value.unselectedStations,
-            layoutOption = LayoutOptionManager.layoutOption ?: defaultLayout(maxWidth),
-            useColumnForFooter = maxWidth < 480.dp,
-            isEditing = hasLaunchedBefore != true,
-            stationFilter = StationFilterManager.filter.value,
-            timeDisplay = TimeDisplay.entries.firstOrNull { it.number == timeDisplayNumber }
-                ?: TimeDisplay.Relative,
-            stationSort = StationSort.entries.firstOrNull { it.number == stationSortNumber }
-                ?: Alphabetical,
-        )
+        run {
+            val lastFetchTime = lastFetchTime.value
+            val isLoading: Boolean
+            val updateFooterText: String?
+            if (lastFetchTime?.let { it + 1.minutes > Clock.System.now() } == true) {
+                isLoading = false
+                val nextFetchTime = lastFetchTime + 1.minutes
+
+                val timeUntilNextFetch =
+                    (nextFetchTime - Clock.System.now()).coerceAtLeast(Duration.ZERO)
+                updateFooterText = createFooterText(lastFetchTime, timeUntilNextFetch)
+            } else {
+                isLoading = true
+                updateFooterText = null
+            }
+            State(
+                isLoading = isLoading,
+                isTablet = maxWidth >= 480.dp && maxHeight >= 480.dp,
+                selectedStations = StationSelectionManager.selection.value.selectedStations,
+                unselectedStations = StationSelectionManager.selection.value.unselectedStations,
+                layoutOption = LayoutOptionManager.layoutOption ?: defaultLayout(maxWidth),
+                useColumnForFooter = maxWidth < 480.dp,
+                isEditing = hasLaunchedBefore != true,
+                timeDisplay = SettingsManager.timeDisplay.value,
+                stationSort = SettingsManager.stationSort.value,
+                updateFooterText = updateFooterText,
+                data = latestWidgetData.value?.toDepartureBoardData()
+                    ?.adjustedForLatestSettings()
+            )
+        }
     )
-    val state = _state.asStateFlow()
+    override val state = _state.asStateFlow()
+
+    private val _effects = Channel<Effect>()
+    override val effects = _effects.receiveAsFlow()
 
     init {
-        viewModelScope.launch(Dispatchers.Default) {
-            combine(StationSelectionManager.selection, StationFilterManager.filter, ::Pair)
-                .collectLatest { (selection, filter) ->
-                    updateState {
-                        copy(
-                            selectedStations = selection.selectedStations,
-                            unselectedStations = selection.unselectedStations,
-                            stationFilter = filter,
-                        )
-                    }
-                    updateState {
-                        copy(data = data?.sorted())
-                    }
-                    fetchData(force = false)
-                }
-        }
-
+        Logging.d("Create home screen")
         viewModelScope.launch(Dispatchers.Default) {
             lastFetchTime.collectLatest { fetchTime ->
                 if (fetchTime == null) return@collectLatest
@@ -129,19 +148,10 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : ViewModel() {
                     }
 
                     if (!state.value.isLoading) {
-                        val formattedFetchTime =
-                            WidgetDataFormatter.formatTimeWithSeconds(fetchTime)
-                        // could be localized better, but this works for en and es
-                        val footerText =
-                            getString(
-                                strings.update_footer_text,
-                                formattedFetchTime,
-                                "${timeUntilNextFetch.inWholeSeconds}s"
-                            )
                         updateState {
                             copy(
-                                updateFooterText = footerText,
-                                data = data?.withTrainDisplayUpdated()
+                                updateFooterText = createFooterText(fetchTime, timeUntilNextFetch),
+                                data = data?.adjustedForLatestSettings()
                             )
                         }
                     }
@@ -155,15 +165,61 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : ViewModel() {
             delay(5.seconds)
             hasLaunchedBefore = true
         }
+
+        updateStateOnEach(StationSelectionManager.selection.drop(1)) {
+            copy(
+                selectedStations = it.selectedStations,
+                unselectedStations = it.unselectedStations,
+                data = data?.adjustedForLatestSettings()
+            ).also { fetchData(force = false) }
+        }
+
+        updateStateOnEach(SettingsManager.stationLimit) {
+            copy(data = data?.adjustedForLatestSettings())
+        }
+
+        updateStateOnEach(SettingsManager.stationSort) {
+            copy(
+                stationSort = stationSort,
+                data = data?.adjustedForLatestSettings()
+            )
+        }
+
+        updateStateOnEach(SettingsManager.displayPresumedTrains) {
+            copy(data = data?.adjustedForLatestSettings())
+        }
+
+        updateStateOnEach(SettingsManager.timeDisplay) {
+            copy(
+                timeDisplay = it,
+                data = data?.adjustedForLatestSettings()
+            )
+        }
+
+        updateStateOnEach(SettingsManager.trainFilter) {
+            copy(data = data?.adjustedForLatestSettings())
+        }
+
+        updateStateOnEach(latestWidgetData) {
+            copy(
+                data = it?.toDepartureBoardData()
+                    ?.adjustedForLatestSettings()
+            )
+        }
+
+        latestWidgetData
+            .onEach { storeWidgetData(it) }
+            .flowOn(Dispatchers.IO)
+            .launchIn(viewModelScope)
     }
 
-    fun onIntent(intent: Intent) {
+    override fun onIntent(intent: Intent) {
         when (intent) {
             RetryClicked -> fetchData(force = true)
             UpdateNowClicked -> fetchData(force = true)
             EditClicked -> updateState { copy(isEditing = true) }
             StopEditingClicked -> updateState { copy(isEditing = false) }
-            SettingsClicked -> updateState { copy(showSettingsBottomSheet = true) }
+            SettingsClicked -> sendEffect(NavigateToSettings)
             is ConfigurationChipClicked -> {
                 when (intent.item) {
                     Station -> {
@@ -171,7 +227,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : ViewModel() {
                     }
 
                     Settings -> {
-                        updateState { copy(showSettingsBottomSheet = true) }
+
                     }
                 }
             }
@@ -179,29 +235,6 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : ViewModel() {
             is StationSelectionDialogDismissed -> {
                 updateState { copy(showStationSelectionDialog = false) }
                 StationSelectionManager.updateSelection(intent.state)
-            }
-
-            StationFilterDialogDismissed -> {
-                updateState { copy(showFilterDialog = false) }
-            }
-
-            SettingsBottomSheetDismissed -> {
-                updateState { copy(showSettingsBottomSheet = false) }
-            }
-
-            is SettingsTimeDisplayChanged -> {
-                timeDisplayNumber = intent.timeDisplay.number
-                updateState { copy(timeDisplay = intent.timeDisplay) }
-            }
-
-            is SettingsFilterChanged -> {
-                StationFilterManager.update(intent.filter)
-            }
-
-            is SettingsSortChanged -> {
-                stationSortNumber = intent.sort.number
-                updateState { copy(stationSort = intent.sort) }
-                updateState { copy(data = data?.sorted()) }
             }
 
             is MoveStationDownClicked -> {
@@ -234,16 +267,34 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : ViewModel() {
             AddStationClicked -> {
                 updateState { copy(showAddStationBottomSheet = true) }
             }
+
+            is ConstraintsChanged -> {
+                val (maxWidth, maxHeight) = intent
+                updateState {
+                    copy(
+                        isTablet = maxWidth >= 480.dp && maxHeight >= 480.dp,
+                        layoutOption = LayoutOptionManager.layoutOption ?: defaultLayout(maxWidth),
+                    )
+                }
+            }
         }
     }
 
-    fun onConstraintsChanged(maxWidth: Dp, maxHeight: Dp) {
-        updateState {
-            copy(
-                isTablet = maxWidth >= 480.dp && maxHeight >= 480.dp,
-                layoutOption = LayoutOptionManager.layoutOption ?: defaultLayout(maxWidth),
-            )
-        }
+    private fun createFooterText(fetchTime: Instant, timeUntilNextFetch: Duration): String {
+        val formattedFetchTime =
+            WidgetDataFormatter.formatTimeWithSeconds(fetchTime)
+        // could be localized better, but this works for en and es
+        return getString(
+            strings.update_footer_text,
+            formattedFetchTime,
+            "${timeUntilNextFetch.inWholeSeconds}s"
+        )
+    }
+
+    private inline fun <T> updateStateOnEach(flow: Flow<T>, crossinline block: State.(T) -> State) {
+        flow.onEach { updateState { block(it) } }
+            .flowOn(Dispatchers.Default)
+            .launchIn(viewModelScope)
     }
 
     private fun updateState(operation: State.() -> State) {
@@ -265,17 +316,19 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : ViewModel() {
                         limit = Int.MAX_VALUE,
                         stations = state.value.selectedStations,
                         sort = state.value.stationSort,
-                        filter = StationFilterManager.filter.value,
+                        filter = SettingsManager.trainFilter.value,
                         force = force,
                         onSuccess = {
                             updateState {
                                 copy(
                                     isLoading = false,
                                     hasError = false,
-                                    data = it.toDepartureBoardData(state.value.timeDisplay).sorted()
+                                    data = it.toDepartureBoardData().adjustedForLatestSettings()
                                 )
                             }
+                            latestWidgetData.value = it
                             lastFetchTime.value = Clock.System.now()
+                            storedLastFetchTime = lastFetchTime.value?.toEpochMilliseconds()
                             continuation.resume(true)
                         },
                         onFailure = {
@@ -283,10 +336,10 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : ViewModel() {
                                 copy(
                                     isLoading = false,
                                     hasError = true,
-                                    data = it?.toDepartureBoardData(state.value.timeDisplay)
-                                        ?.sorted()
+                                    data = it?.toDepartureBoardData()?.adjustedForLatestSettings()
                                 )
                             }
+                            latestWidgetData.value = it
                             continuation.resume(false)
                         }
                     )
@@ -302,9 +355,10 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : ViewModel() {
         }
     }
 
-    private fun DepartureBoardData.sorted(): DepartureBoardData {
+    private fun DepartureBoardData.adjustedForLatestSettings(): DepartureBoardData {
         val stationToIndex =
-            state
+            StationSelectionManager
+                .selection
                 .value
                 .selectedStations
                 .mapIndexed { index, station -> station.pathApiName to index }
@@ -312,33 +366,38 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : ViewModel() {
         val hour = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).hour
         val isMorning = hour in 3 until 12
         return copy(
-            stations = stations.sortedBy { stationToIndex[it.station.pathApiName] }
+            stations = stations
+                .sortedBy { stationToIndex[it.station.pathApiName] }
                 .sortedBy {
                     val station = it.station
-                    val isFirst = when (state.value.stationSort) {
+                    val isFirst = when (SettingsManager.stationSort.value) {
                         StationSort.NjAm -> isMorning == station.isInNewJersey
                         StationSort.NyAm -> isMorning == station.isInNewYork
                         else -> return@sortedBy 0
                     }
                     if (isFirst) 0 else 1
                 }
+                .map { data ->
+                    data.copy(
+                        trains = data.trains
+                            .filterNot { it.shouldHideForPresumption() }
+                            .filter(StationLimitFilter(SettingsManager.stationLimit.value))
+                            .map { train ->
+                                train.copy(
+                                    displayText = trainDisplayTime(
+                                        SettingsManager.timeDisplay.value,
+                                        train.isDelayed,
+                                        train.projectedArrival
+                                    )
+                                )
+                            }
+                    )
+                }
         )
     }
 
-    private fun DepartureBoardData.withTrainDisplayUpdated(): DepartureBoardData {
-        return copy(
-            stations = stations.map {
-                it.copy(trains = it.trains.map { train ->
-                    train.copy(
-                        displayText = trainDisplayTime(
-                            state.value.timeDisplay,
-                            train.isDelayed,
-                            train.projectedArrival
-                        )
-                    )
-                })
-            }
-        )
+    private fun TrainData.shouldHideForPresumption(): Boolean {
+        return isBackfilled && !SettingsManager.displayPresumedTrains.value
     }
 
     private fun defaultLayout(maxWidth: Dp) = when (maxWidth) {
@@ -347,12 +406,18 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : ViewModel() {
         else -> ThreeColumns
     }
 
+    private fun sendEffect(effect: Effect) {
+        viewModelScope.launch {
+            _effects.send(effect)
+        }
+    }
+
     companion object {
         private val IsFirstLaunchKey = BooleanPreferencesKey("is_first_launch")
-        private val TimeDisplayOption = IntPreferencesKey("time_display_option")
-        private val SortOptionKey = IntPreferencesKey("sort_option")
+        private val LatestWidgetDataKey = StringPreferencesKey("latest_widget_data")
+        private val LastFetchKey = LongPreferencesKey("last_fetch")
 
-        fun WidgetData.toDepartureBoardData(timeDisplay: TimeDisplay): DepartureBoardData {
+        fun WidgetData.toDepartureBoardData(timeDisplay: TimeDisplay = SettingsManager.timeDisplay.value): DepartureBoardData {
             val stations = stations.mapNotNull { data ->
                 val station =
                     Stations.All.firstOrNull { it.pathApiName == data.id }
@@ -404,6 +469,26 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : ViewModel() {
 
                 TimeDisplay.Clock -> WidgetDataFormatter.formatTime(projectedArrival)
             }
+        }
+
+        private fun getStoredWidgetData(): WidgetData? {
+            val raw = Preferences()[LatestWidgetDataKey] ?: return null
+            return try {
+                Json.decodeFromString(raw)
+            } catch (e: SerializationException) {
+                Logging.e("Failed to deseralize widget data", e)
+                null
+            }
+        }
+
+        private fun storeWidgetData(data: WidgetData?) {
+            val raw = try {
+                Json.encodeToString(data)
+            } catch (e: SerializationException) {
+                Logging.e("Failed to serialize widget data", e)
+                return
+            }
+            Preferences()[LatestWidgetDataKey] = raw
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.sixbynine.transit.path.app.ui.icon
 
 import androidx.compose.material.icons.Icons.Filled
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Settings
@@ -11,6 +12,7 @@ import androidx.compose.ui.res.painterResource
 import com.sixbynine.transit.path.R
 import com.sixbynine.transit.path.app.ui.icon.IconType.ArrowDown
 import com.sixbynine.transit.path.app.ui.icon.IconType.ArrowUp
+import com.sixbynine.transit.path.app.ui.icon.IconType.Back
 import com.sixbynine.transit.path.app.ui.icon.IconType.Delete
 import com.sixbynine.transit.path.app.ui.icon.IconType.Edit
 import com.sixbynine.transit.path.app.ui.icon.IconType.Filter
@@ -31,5 +33,6 @@ actual fun IconPainter(icon: IconType): Painter {
         ArrowDown -> painterResource(R.drawable.ic_arrow_down)
         Settings -> rememberVectorPainter(Filled.Settings)
         Delete -> rememberVectorPainter(Filled.Delete)
+        Back -> rememberVectorPainter(Filled.ArrowBack)
     }
 }

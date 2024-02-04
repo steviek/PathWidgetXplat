@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import getPlatform
 
 enum class IconType {
-    Edit, Station, Filter, Sort, LayoutOneColumn, ArrowUp, ArrowDown, Settings, Delete
+    Edit, Station, Filter, Sort, LayoutOneColumn, ArrowUp, ArrowDown, Settings, Delete, Back
 }
 
 @Composable

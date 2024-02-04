@@ -20,10 +20,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.sixbynine.transit.path.MR.strings
-import com.sixbynine.transit.path.api.StationFilter
-import com.sixbynine.transit.path.api.StationFilter.All
-import com.sixbynine.transit.path.api.StationFilter.Interstate
-import com.sixbynine.transit.path.app.filter.StationFilterManager
+import com.sixbynine.transit.path.api.TrainFilter
+import com.sixbynine.transit.path.api.TrainFilter.All
+import com.sixbynine.transit.path.api.TrainFilter.Interstate
+import com.sixbynine.transit.path.app.settings.SettingsManager
 import com.sixbynine.transit.path.app.ui.AppUiScope
 import com.sixbynine.transit.path.app.ui.PathBottomSheet
 import com.sixbynine.transit.path.app.ui.gutter
@@ -32,13 +32,13 @@ import dev.icerock.moko.resources.compose.stringResource
 @Composable
 fun AppUiScope.FilterBottomSheet(onDismiss: () -> Unit) {
     var filter by remember {
-        mutableStateOf(StationFilterManager.filter.value)
+        mutableStateOf(SettingsManager.trainFilter.value)
     }
     FilterBottomSheet(
         filter = filter,
         onFilterClick = { filter = it },
         onDismiss = {
-            StationFilterManager.update(filter)
+            SettingsManager.updateTrainFilter(filter)
             onDismiss()
         }
     )
@@ -46,14 +46,15 @@ fun AppUiScope.FilterBottomSheet(onDismiss: () -> Unit) {
 
 @Composable
 fun AppUiScope.FilterBottomSheet(
-    filter: StationFilter,
-    onFilterClick: (StationFilter) -> Unit,
+    filter: TrainFilter,
+    onFilterClick: (TrainFilter) -> Unit,
     onDismiss: () -> Unit
 ) {
     PathBottomSheet(
+        isShown = true,
         onDismissRequest = onDismiss,
     ) {
-        StationFilter.entries.forEach {
+        TrainFilter.entries.forEach {
             FilterRow(it, selected = it == filter, onClick = { onFilterClick(it) })
         }
         Spacer(Modifier.height(16.dp))
@@ -62,7 +63,7 @@ fun AppUiScope.FilterBottomSheet(
 
 @Composable
 private fun AppUiScope.FilterRow(
-    filter: StationFilter,
+    filter: TrainFilter,
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier

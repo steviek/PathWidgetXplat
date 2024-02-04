@@ -164,7 +164,7 @@ class TrainBackfillHelperTest {
         val expNwkTrains =
             backfilled[ExchangePlace]!!.filter { it.headsign == "Newark" }
         val expNwkTrainsTimes = expNwkTrains.map { it.projectedArrival.printForAssertions() }
-        assertEquals(expNwkTrainsTimes, listOf("10:03", "10:23"))
+        assertEquals(listOf("10:03", "10:23"), expNwkTrainsTimes)
     }
 
     @Test
@@ -189,7 +189,30 @@ class TrainBackfillHelperTest {
 
         val grvTrains = backfilled[GroveStreet]
         val grvTrainsTimes = grvTrains?.map { it.projectedArrival.printForAssertions() }
-        assertEquals(grvTrainsTimes, listOf("10:05"))
+        assertEquals(listOf("10:05"), grvTrainsTimes)
+    }
+
+    @Test
+    fun `another case`() {
+        val trains = departuresMap {
+            station(WorldTradeCenter) {
+                newarkTrainAt(21, 4)
+                wtcHobTrainAt(21, 7)
+                newarkTrainAt(21, 14)
+                wtcHobTrainAt(21, 19)
+            }
+
+            station(ExchangePlace) {
+                newarkTrainAt(21, 7)
+                wtcHobTrainAt(21, 10)
+            }
+        }
+
+        val backfilled = TrainBackfillHelper.withBackfill(trains)
+        val expHobTrains = backfilled[ExchangePlace]!!.filter { it.headsign == "Hoboken" }
+        val expTrainsTimes = expHobTrains.map { it.projectedArrival.printForAssertions() }
+        assertContains(expTrainsTimes, "21:10")
+        assertContains(expTrainsTimes, "21:22")
     }
 
     private fun departuresMap(
@@ -220,6 +243,12 @@ class TrainBackfillHelperTest {
                     map.getOrPut(station) { mutableListOf() }
                         .add(hobWtcTrain(time.toUtcInstant()))
                 }
+
+                override fun wtcHobTrainAt(hour: Int, minute: Int) {
+                    val time = date.atTime(hour, minute)
+                    map.getOrPut(station) { mutableListOf() }
+                        .add(wtcHobTrain(time.toUtcInstant()))
+                }
             }
             block(scope)
         }
@@ -228,6 +257,7 @@ class TrainBackfillHelperTest {
             fun newarkTrainAt(hour: Int, minute: Int)
             fun nwkWtcTrainAt(hour: Int, minute: Int)
             fun hobWtcTrainAt(hour: Int, minute: Int)
+            fun wtcHobTrainAt(hour: Int, minute: Int)
         }
 
         fun build(): Map<Station, List<DepartureBoardTrain>> {
@@ -273,6 +303,16 @@ class TrainBackfillHelperTest {
         fun hobWtcTrain(projectedArrival: Instant): DepartureBoardTrain {
             return DepartureBoardTrain(
                 headsign = "World Trade Center",
+                projectedArrival = projectedArrival,
+                lineColors = Colors.HobWtc.map { it.color },
+                isDelayed = false,
+                backfillSource = null,
+            )
+        }
+
+        fun wtcHobTrain(projectedArrival: Instant): DepartureBoardTrain {
+            return DepartureBoardTrain(
+                headsign = "Hoboken",
                 projectedArrival = projectedArrival,
                 lineColors = Colors.HobWtc.map { it.color },
                 isDelayed = false,

@@ -4,13 +4,16 @@ import com.sixbynine.transit.path.api.BackfillSource
 import com.sixbynine.transit.path.api.State
 import com.sixbynine.transit.path.app.ui.ColorWrapper
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.minutes
 
+@Serializable
 data class WidgetData(
     val stations: List<StationData>,
     val fetchTime: Instant,
     val nextFetchTime: Instant,
 ) {
+    @Serializable
     data class StationData(
         val id: String,
         val displayName: String,
@@ -19,12 +22,14 @@ data class WidgetData(
         val state: State,
     )
 
+    @Serializable
     data class SignData(
         val title: String,
         val colors: List<ColorWrapper>,
         val projectedArrivals: List<Instant>
     )
 
+    @Serializable
     data class TrainData(
         val id: String,
         val title: String,

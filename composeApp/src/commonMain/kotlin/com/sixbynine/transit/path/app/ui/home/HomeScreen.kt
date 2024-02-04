@@ -31,7 +31,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,18 +43,18 @@ import com.sixbynine.transit.path.MR.strings
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.app.ui.AppUiScope
-import com.sixbynine.transit.path.app.ui.filter.FilterBottomSheet
+import com.sixbynine.transit.path.app.ui.ViewModelScreen
 import com.sixbynine.transit.path.app.ui.gutter
+import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Effect.NavigateToSettings
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.AddStationClicked
+import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.ConstraintsChanged
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.EditClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.MoveStationDownClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.MoveStationUpClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.RemoveStationClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.RetryClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.SettingsClicked
-import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StationFilterDialogDismissed
-import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StationSelectionDialogDismissed
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StopEditingClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.State
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.StationData
@@ -63,10 +62,7 @@ import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.TrainData
 import com.sixbynine.transit.path.app.ui.icon.IconType
 import com.sixbynine.transit.path.app.ui.icon.NativeIconButton
 import com.sixbynine.transit.path.app.ui.station.AddStationBottomSheet
-import com.sixbynine.transit.path.app.ui.station.StationConfigurationBottomSheet
 import com.sixbynine.transit.path.app.ui.theme.Dimensions
-import dev.icerock.moko.mvvm.compose.getViewModel
-import dev.icerock.moko.mvvm.compose.viewModelFactory
 import dev.icerock.moko.resources.compose.stringResource
 
 class HomeScreenScope(
@@ -79,20 +75,29 @@ class HomeScreenScope(
 @Composable
 fun HomeScreen() {
     BoxWithConstraints {
-        val viewModel = getViewModel(
-            key = "home-screen",
-            factory = viewModelFactory {
+        ViewModelScreen(
+            viewModelKey = "home-screen",
+            createViewModel = {
                 HomeScreenViewModel(
                     maxWidth = maxWidth,
                     maxHeight = maxHeight
                 )
+            },
+            onEffect = { effect ->
+                when (effect) {
+                    is NavigateToSettings -> {
+                        navigator.navigate("/settings")
+                    }
+                }
             }
-        )
-        LaunchedEffect(maxWidth, maxHeight) {
-            viewModel.onConstraintsChanged(maxWidth, maxHeight)
+        ) {
+            LaunchedEffect(maxWidth, maxHeight) {
+                onIntent(ConstraintsChanged(maxWidth, maxHeight))
+            }
+
+            HomeScreen(state, onIntent)
         }
-        val state by viewModel.state.collectAsState()
-        HomeScreen(state, viewModel::onIntent)
+
     }
 }
 
@@ -156,25 +161,7 @@ private fun HomeScreenScope.MainContent(modifier: Modifier) {
         }
     }
 
-    if (state.showStationSelectionDialog) {
-        StationConfigurationBottomSheet(
-            onDismiss = { onIntent(StationSelectionDialogDismissed(it)) }
-        )
-    }
-
-    if (state.showFilterDialog) {
-        FilterBottomSheet(
-            onDismiss = { onIntent(StationFilterDialogDismissed) }
-        )
-    }
-
-    if (state.showSettingsBottomSheet) {
-        SettingsBottomSheet()
-    }
-
-    if (state.showAddStationBottomSheet) {
-        AddStationBottomSheet()
-    }
+    AddStationBottomSheet()
 }
 
 @Composable
@@ -337,8 +324,9 @@ private fun HomeScreenScope.TrainLine(station: Station, data: TrainData) {
             .fillMaxWidth()
     )
 
-    if (showBottomSheet && data.backfill != null) {
+    if (data.backfill != null) {
         BackfillBottomSheet(
+            isShown = showBottomSheet,
             station = station,
             trainData = data,
             source = data.backfill,

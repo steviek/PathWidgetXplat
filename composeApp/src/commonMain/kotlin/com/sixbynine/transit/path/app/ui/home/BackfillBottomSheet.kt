@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.sixbynine.transit.path.MR.images
 import com.sixbynine.transit.path.api.Station
+import com.sixbynine.transit.path.app.settings.TimeDisplay
 import com.sixbynine.transit.path.app.ui.PathBottomSheet
 import com.sixbynine.transit.path.app.ui.gutter
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.HomeBackfillSource
@@ -30,12 +31,13 @@ import dev.icerock.moko.resources.compose.painterResource
 
 @Composable
 fun HomeScreenScope.BackfillBottomSheet(
+    isShown: Boolean,
     station: Station,
     trainData: TrainData,
     source: HomeBackfillSource,
     onDismiss: () -> Unit
 ) {
-    PathBottomSheet(onDismissRequest = onDismiss) {
+    PathBottomSheet(isShown = isShown, onDismissRequest = onDismiss) {
         Column(Modifier.padding(horizontal = gutter()).padding(bottom = 16.dp)) {
             Text(
                 modifier = Modifier.align(Alignment.CenterHorizontally),

@@ -1,11 +1,12 @@
 package com.sixbynine.transit.path.app.ui.home
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import com.sixbynine.transit.path.api.BackfillSource
 import com.sixbynine.transit.path.api.Station
-import com.sixbynine.transit.path.api.StationFilter
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.state
+import com.sixbynine.transit.path.app.settings.TimeDisplay
 import com.sixbynine.transit.path.app.station.StationSelection
 import com.sixbynine.transit.path.app.ui.layout.LayoutOption
 import kotlinx.datetime.Instant
@@ -18,14 +19,11 @@ object HomeScreenContract {
         val layoutOption: LayoutOption,
         val isEditing: Boolean,
         val timeDisplay: TimeDisplay,
-        val stationFilter: StationFilter,
-        var stationSort: StationSort = StationSort.Alphabetical,
+        val stationSort: StationSort = StationSort.Alphabetical,
         val isLoading: Boolean = true,
         val hasError: Boolean = false,
         val data: DepartureBoardData? = null,
         val showStationSelectionDialog: Boolean = false,
-        val showFilterDialog: Boolean = false,
-        val showSettingsBottomSheet: Boolean = false,
         val showAddStationBottomSheet: Boolean = false,
         val useColumnForFooter: Boolean = false,
         val updateFooterText: String? = null,
@@ -78,13 +76,13 @@ object HomeScreenContract {
         data class RemoveStationClicked(val id: String) : Intent
         data class ConfigurationChipClicked(val item: ConfigurationItem) : Intent
         data class StationSelectionDialogDismissed(val state: StationSelection) : Intent
-        data object StationFilterDialogDismissed : Intent
-        data object SettingsBottomSheetDismissed : Intent
-        data class SettingsTimeDisplayChanged(val timeDisplay: TimeDisplay) : Intent
-        data class SettingsFilterChanged(val filter: StationFilter) : Intent
-        data class SettingsSortChanged(val sort: StationSort) : Intent
         data object StationBottomSheetDismissed : Intent
         data class StationBottomSheetSelection(val station: Station) : Intent
         data object AddStationClicked : Intent
+        data class ConstraintsChanged(val maxWidth: Dp, val maxHeight: Dp) : Intent
+    }
+
+    sealed interface Effect {
+        data object NavigateToSettings : Effect
     }
 }

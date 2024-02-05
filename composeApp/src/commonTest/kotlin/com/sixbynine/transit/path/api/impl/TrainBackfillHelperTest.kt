@@ -3,6 +3,8 @@ package com.sixbynine.transit.path.api.impl
 import androidx.compose.ui.graphics.Color
 import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.api.DepartureBoardTrain
+import com.sixbynine.transit.path.api.State.NewJersey
+import com.sixbynine.transit.path.api.State.NewYork
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.Stations.ExchangePlace
 import com.sixbynine.transit.path.api.Stations.GroveStreet
@@ -215,6 +217,61 @@ class TrainBackfillHelperTest {
         assertContains(expTrainsTimes, "21:22")
     }
 
+    @Test
+    fun `match for shortened routes`() {
+        val trains = departuresMap {
+            station(WorldTradeCenter) {
+                wtcJsqTrainAt(22, 45)
+                wtcJsqTrainAt(23, 20)
+            }
+
+            station(ExchangePlace) {
+                wtcJsqTrainAt(22, 48)
+            }
+        }
+
+        val backfilled = TrainBackfillHelper.withBackfill(trains)
+        val expTrains = backfilled[ExchangePlace]
+        val expTrainTimes = expTrains?.map { it.projectedArrival.printForAssertions() }
+        assertEquals(listOf("22:48", "23:23"), expTrainTimes)
+    }
+
+    @Test
+    fun `can backfill exchange place with nwkwtc trains if we have hobwtc trains`() {
+        val trains = departuresMap {
+            station(GroveStreet) {
+                nwkWtcTrainAt(10, 30)
+            }
+
+            station(ExchangePlace) {
+                hobWtcTrainAt(10, 30)
+            }
+        }
+
+        val backfilled = TrainBackfillHelper.withBackfill(trains)
+        val expTrains = backfilled[ExchangePlace]
+        val expTrainTimes = expTrains?.map { it.projectedArrival.printForAssertions() }
+        assertEquals(listOf("10:30", "10:33"), expTrainTimes)
+    }
+
+    @Test
+    fun `can backfill exchange place with hobwtc trains if we have nwkwtc trains`() {
+        val trains = departuresMap {
+            station(Newport) {
+                hobWtcTrainAt(10, 30)
+            }
+
+            station(ExchangePlace) {
+                nwkWtcTrainAt(10, 30)
+            }
+        }
+
+        val backfilled = TrainBackfillHelper.withBackfill(trains)
+        val expTrains = backfilled[ExchangePlace]
+        val expTrainTimes = expTrains?.map { it.projectedArrival.printForAssertions() }
+        assertEquals(listOf("10:30", "10:35"), expTrainTimes)
+    }
+
     private fun departuresMap(
         builder: DeparturesMapBuilder.() -> Unit
     ): Map<Station, List<DepartureBoardTrain>> {
@@ -249,6 +306,12 @@ class TrainBackfillHelperTest {
                     map.getOrPut(station) { mutableListOf() }
                         .add(wtcHobTrain(time.toUtcInstant()))
                 }
+
+                override fun wtcJsqTrainAt(hour: Int, minute: Int) {
+                    val time = date.atTime(hour, minute)
+                    map.getOrPut(station) { mutableListOf() }
+                        .add(wtcJsqTrain(time.toUtcInstant()))
+                }
             }
             block(scope)
         }
@@ -258,6 +321,7 @@ class TrainBackfillHelperTest {
             fun nwkWtcTrainAt(hour: Int, minute: Int)
             fun hobWtcTrainAt(hour: Int, minute: Int)
             fun wtcHobTrainAt(hour: Int, minute: Int)
+            fun wtcJsqTrainAt(hour: Int, minute: Int)
         }
 
         fun build(): Map<Station, List<DepartureBoardTrain>> {
@@ -287,6 +351,7 @@ class TrainBackfillHelperTest {
                 lineColors = Colors.NwkWtc.map { it.color },
                 isDelayed = false,
                 backfillSource = null,
+                directionState = NewJersey
             )
         }
 
@@ -297,6 +362,7 @@ class TrainBackfillHelperTest {
                 lineColors = Colors.NwkWtc.map { it.color },
                 isDelayed = false,
                 backfillSource = null,
+                directionState = NewYork
             )
         }
 
@@ -307,6 +373,7 @@ class TrainBackfillHelperTest {
                 lineColors = Colors.HobWtc.map { it.color },
                 isDelayed = false,
                 backfillSource = null,
+                directionState = NewYork
             )
         }
 
@@ -317,6 +384,18 @@ class TrainBackfillHelperTest {
                 lineColors = Colors.HobWtc.map { it.color },
                 isDelayed = false,
                 backfillSource = null,
+                directionState = NewJersey
+            )
+        }
+
+        fun wtcJsqTrain(projectedArrival: Instant): DepartureBoardTrain {
+            return DepartureBoardTrain(
+                headsign = "Journal Square",
+                projectedArrival = projectedArrival,
+                lineColors = Colors.NwkWtc.map { it.color },
+                isDelayed = false,
+                backfillSource = null,
+                directionState = NewJersey
             )
         }
 

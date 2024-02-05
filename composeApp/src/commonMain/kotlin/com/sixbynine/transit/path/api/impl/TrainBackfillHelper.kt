@@ -4,6 +4,9 @@ import androidx.compose.ui.graphics.Color
 import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.api.BackfillSource
 import com.sixbynine.transit.path.api.DepartureBoardTrain
+import com.sixbynine.transit.path.api.State
+import com.sixbynine.transit.path.api.State.NewJersey
+import com.sixbynine.transit.path.api.State.NewYork
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.Stations.ChristopherStreet
 import com.sixbynine.transit.path.api.Stations.ExchangePlace
@@ -43,22 +46,66 @@ object TrainBackfillHelper {
 
     private const val ShouldLog = false
 
-    private data class LineId(val headSign: String, val colors: List<Color>) {
+    private data class LineId(
+        val headSign: String,
+        val colors: List<Color>,
+        val direction: State?
+    ) {
         companion object {
             private fun List<ColorWrapper>.unwrap(): List<Color> {
                 return map { it.color }
             }
 
-            val NWK_WTC = LineId("World Trade Center", Colors.NwkWtc.unwrap())
-            val WTC_NWK = NWK_WTC.copy(headSign = "Newark")
-            val OK_33S_JSQ = LineId("Journal Square", Colors.Jsq33s.unwrap())
-            val OK_JSQ_33S = OK_33S_JSQ.copy(headSign = "33rd Street")
-            val PAIN_33S_JSQ = LineId("Journal Square via Hoboken", Colors.Hob33s.unwrap() + Colors.Jsq33s.unwrap())
-            val PAIN_JSQ_33S = PAIN_33S_JSQ.copy(headSign = "33rd Street via Hoboken")
-            val HOB_WTC = LineId("World Trade Center", Colors.HobWtc.unwrap())
-            val WTC_HOB = HOB_WTC.copy(headSign = "Hoboken")
-            val OK_HOB_33S = LineId("33rd Street", Colors.Hob33s.unwrap())
-            val OK_33S_HOB = OK_HOB_33S.copy(headSign = "Hoboken")
+            val NWK_WTC = LineId(
+                headSign = "World Trade Center",
+                colors = Colors.NwkWtc.unwrap(),
+                direction = NewYork
+            )
+            val WTC_NWK = LineId(
+                headSign = "Newark",
+                colors = Colors.NwkWtc.unwrap(),
+                direction = NewJersey
+            )
+            val OK_33S_JSQ = LineId(
+                headSign = "Journal Square",
+                colors = Colors.Jsq33s.unwrap(),
+                direction = NewJersey
+            )
+            val OK_JSQ_33S = LineId(
+                headSign = "33rd Street",
+                colors = Colors.Jsq33s.unwrap(),
+                direction = NewYork
+            )
+            val PAIN_33S_JSQ = LineId(
+                headSign = "Journal Square via Hoboken",
+                colors = Colors.Hob33s.unwrap() + Colors.Jsq33s.unwrap(),
+                direction = NewJersey
+            )
+            val PAIN_JSQ_33S = LineId(
+                headSign = "33rd Street via Hoboken",
+                colors = Colors.Hob33s.unwrap() + Colors.Jsq33s.unwrap(),
+                direction = NewYork
+            )
+            val HOB_WTC = LineId(
+                headSign = "World Trade Center",
+                colors = Colors.HobWtc.unwrap(),
+                direction = NewYork
+            )
+            val WTC_HOB = LineId(
+                headSign = "Hoboken",
+                colors = Colors.HobWtc.unwrap(),
+                direction = NewJersey
+            )
+            val OK_HOB_33S = LineId(
+                headSign = "33rd Street",
+                colors = Colors.Hob33s.unwrap(),
+                direction = NewYork
+            )
+            val OK_33S_HOB = LineId(
+                headSign = "Hoboken",
+                colors = Colors.Hob33s.unwrap(),
+                direction = NewJersey
+            )
         }
     }
 
@@ -141,6 +188,20 @@ object TrainBackfillHelper {
         ),
     )
 
+    // Map to check for when trains are heading in the same direction with the same color as the
+    // main line, but stopping at an earlier station. This checks that e.g. a train from World Trade
+    // Center heading to Journal Square with the right color will match with the WTC-NWK line.
+    private val LineIdAliases: Map<LineId, LineId> = run {
+        val aliases = mutableMapOf<LineId, LineId>()
+        LineIdToCheckpoints.forEach { (lineId, checkpoints) ->
+            checkpoints.keys.forEach { station ->
+                val alias = lineId.copy(headSign = station.displayName)
+                aliases[alias] = lineId
+            }
+        }
+        aliases
+    }
+
     fun withBackfill(
         trains: Map<Station, List<DepartureBoardTrain>>,
     ): Map<Station, List<DepartureBoardTrain>> {
@@ -150,7 +211,17 @@ object TrainBackfillHelper {
                 Logging.d("Backfill station: ${station.displayName}")
             }
             val lineIds =
-                trains[station]?.map { it.lineId }?.distinct() ?: return@eachStation
+                (trains[station]?.map { it.lineId } ?: return@eachStation).toMutableSet()
+            if (station == ExchangePlace) {
+                // We avoid backfilling from lines that aren't already on the departure board for
+                // the station. But Exchange Place is a special case, if we have a train going there
+                // from one of the WTC lines, we assume the other line is also stopping there.
+                if (NWK_WTC in lineIds) {
+                    lineIds += HOB_WTC
+                } else if (HOB_WTC in lineIds) {
+                    lineIds += NWK_WTC
+                }
+            }
             lineIds.forEach eachHeadSign@{ lineId ->
                 val checkpointsInLine = LineIdToCheckpoints[lineId] ?: run {
                     if (ShouldLog) {
@@ -227,5 +298,9 @@ object TrainBackfillHelper {
         return 10.minutes
     }
 
-    private val DepartureBoardTrain.lineId get() = LineId(headsign, lineColors)
+    private val DepartureBoardTrain.lineId: LineId
+        get() {
+            val id = LineId(headsign, lineColors, directionState)
+            return LineIdAliases[id] ?: id
+        }
 }

@@ -15,19 +15,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.sixbynine.transit.path.MR.images
+import com.sixbynine.transit.path.MR.strings
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.app.settings.TimeDisplay
 import com.sixbynine.transit.path.app.ui.PathBottomSheet
 import com.sixbynine.transit.path.app.ui.gutter
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.HomeBackfillSource
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.TrainData
+import com.sixbynine.transit.path.resources.getString
 import dev.icerock.moko.resources.compose.painterResource
+import dev.icerock.moko.resources.compose.stringResource
 
 @Composable
 fun HomeScreenScope.BackfillBottomSheet(
@@ -41,7 +45,7 @@ fun HomeScreenScope.BackfillBottomSheet(
         Column(Modifier.padding(horizontal = gutter()).padding(bottom = 16.dp)) {
             Text(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                text = "Presumed train",
+                text = stringResource(strings.presumed_train),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface,
             )
@@ -73,44 +77,79 @@ fun HomeScreenScope.BackfillBottomSheet(
 
             Spacer(Modifier.height(16.dp))
 
-            val subtext = buildAnnotatedString {
-                append("This train is not yet reported for ")
-                pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-                append(station.displayName)
-                pop()
-                append(" by PATH, but is displayed here because a train to ")
-                pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-                append(trainData.title)
-                pop()
-                append(" is departing from ")
-                pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-                append(source.station.displayName)
-                pop()
-                when (state.timeDisplay) {
-                    TimeDisplay.Relative -> {
-                        append(" in ")
-                        pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-                        append(source.displayText)
-                        pop()
-                    }
-
-                    TimeDisplay.Clock -> {
-                        append(" at ")
-                        pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-                        append(source.displayText)
-                        pop()
-                    }
-                }
-                append(".")
-            }
             Text(
-                subtext,
+                createSubtext(station, trainData, source),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )
         }
     }
+}
+
+private fun HomeScreenScope.createSubtext(
+    station: Station,
+    trainData: TrainData,
+    source: HomeBackfillSource,
+): AnnotatedString {
+    return when (getString(strings.langauge_code)) {
+        "es" -> createSpanishSubtext(station, trainData, source)
+        else -> createEnglishSubtext(station, trainData, source)
+    }
+}
+
+private fun HomeScreenScope.createEnglishSubtext(
+    station: Station,
+    trainData: TrainData,
+    source: HomeBackfillSource,
+) = buildAnnotatedString {
+    append("This train is not yet reported for ")
+    appendBolded(station.displayName)
+    append(" by PATH, but is displayed here because a train to ")
+    appendBolded(trainData.title)
+    append(" is departing from ")
+    appendBolded(source.station.displayName)
+    when (state.timeDisplay) {
+        TimeDisplay.Relative -> {
+            append(" in ")
+            appendBolded(source.displayText)
+        }
+
+        TimeDisplay.Clock -> {
+            append(" at ")
+            appendBolded(source.displayText)
+        }
+    }
+}
+
+private fun HomeScreenScope.createSpanishSubtext(
+    station: Station,
+    trainData: TrainData,
+    source: HomeBackfillSource,
+) = buildAnnotatedString {
+    append("Este tren aún no está reportado por PATH para ")
+    appendBolded(station.displayName)
+    append(", pero se muestra aquí porque un tren con destino a ")
+    appendBolded(trainData.title)
+    append(" está saliendo de ")
+    appendBolded(source.station.displayName)
+    when (state.timeDisplay) {
+        TimeDisplay.Relative -> {
+            append(" en ")
+            appendBolded(source.displayText)
+        }
+
+        TimeDisplay.Clock -> {
+            append(" a las ")
+            appendBolded(source.displayText)
+        }
+    }
+}
+
+private fun AnnotatedString.Builder.appendBolded(text: String) {
+    pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
+    append(text)
+    pop()
 }
 
 @Composable

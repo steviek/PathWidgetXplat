@@ -3,6 +3,7 @@ package com.sixbynine.transit.path.api.impl
 import com.sixbynine.transit.path.api.DepartureBoardTrain
 import com.sixbynine.transit.path.api.NetworkException
 import com.sixbynine.transit.path.api.PathApi
+import com.sixbynine.transit.path.api.State
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.app.ui.Colors
@@ -38,17 +39,24 @@ internal class PathApiImpl : PathApi {
                 stationsToCheck[result.consideredStation] ?: return@mapNotNull null
 
             val trains = result.destinations
-                .flatMap { it.messages }
-                .map {
-                    DepartureBoardTrain(
-                        headsign = it.headSign,
-                        projectedArrival = (it.lastUpdated + it.durationToArrival)
-                            .coerceAtLeast(Clock.System.now()),
-                        lineColors = it.lineColor.split(",")
-                            .map { Colors.parse(it) },
-                        isDelayed = it.arrivalTimeMessage == "Delayed",
-                        backfillSource = null,
-                    )
+                .flatMap { destination ->
+                    destination.messages.map {
+                        val directionState = when (destination.label) {
+                            "ToNJ" -> State.NewJersey
+                            "ToNY" -> State.NewYork
+                            else -> null
+                        }
+                        DepartureBoardTrain(
+                            headsign = it.headSign,
+                            projectedArrival = (it.lastUpdated + it.durationToArrival)
+                                .coerceAtLeast(Clock.System.now()),
+                            lineColors = it.lineColor.split(",")
+                                .map { Colors.parse(it) },
+                            isDelayed = it.arrivalTimeMessage == "Delayed",
+                            backfillSource = null,
+                            directionState = directionState
+                        )
+                    }
                 }
 
             station to trains

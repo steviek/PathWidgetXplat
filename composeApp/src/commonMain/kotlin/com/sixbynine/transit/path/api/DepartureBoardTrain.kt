@@ -10,6 +10,7 @@ data class DepartureBoardTrain(
     val lineColors: List<Color>,
     val isDelayed: Boolean,
     val backfillSource: BackfillSource?,
+    val directionState: State?,
 )
 
 @Serializable

@@ -74,7 +74,6 @@ object HomeScreenContract {
         data class MoveStationUpClicked(val id: String) : Intent
         data class MoveStationDownClicked(val id: String) : Intent
         data class RemoveStationClicked(val id: String) : Intent
-        data class ConfigurationChipClicked(val item: ConfigurationItem) : Intent
         data class StationSelectionDialogDismissed(val state: StationSelection) : Intent
         data object StationBottomSheetDismissed : Intent
         data class StationBottomSheetSelection(val station: Station) : Intent

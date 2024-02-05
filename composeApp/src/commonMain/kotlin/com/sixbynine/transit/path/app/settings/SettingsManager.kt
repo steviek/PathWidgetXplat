@@ -2,6 +2,7 @@ package com.sixbynine.transit.path.app.settings
 
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.TrainFilter
+import com.sixbynine.transit.path.util.combineStates
 
 object SettingsManager {
     private val trainFilterPersister = SettingPersister("train_filter", TrainFilter.All)
@@ -15,6 +16,15 @@ object SettingsManager {
     val stationLimit = stationLimitPersister.flow
     val stationSort = stationSortPersister.flow
     val displayPresumedTrains = displayPresumedTrainsPersister.flow
+
+    val settings = combineStates(
+        trainFilter,
+        timeDisplay,
+        stationLimit,
+        stationSort,
+        displayPresumedTrains,
+        ::AppSettings
+    )
 
     fun updateTrainFilter(trainFilter: TrainFilter) {
         trainFilterPersister.update(trainFilter)

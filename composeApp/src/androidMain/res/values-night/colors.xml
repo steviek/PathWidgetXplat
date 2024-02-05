@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="widget_background">@android:color/black</color>
+    <color name="widget_accent_color">@color/path_blue_200</color>
+    <color name="widget_text_primary">@android:color/white</color>
+    <color name="widget_text_secondary">@android:color/darker_gray</color>
+</resources>

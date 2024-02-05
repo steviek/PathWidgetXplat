@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:theme="@style/Glance.AppWidget.Theme"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/widget_background"
+    android:padding="16dp">
+
+    <TextView
+        android:text="Newark"
+        android:textColor="@color/widget_text_primary"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="8dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:background="#B95141"/>
+
+        <TextView
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/widget_text_primary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="8dp"
+            android:text="World Trade Center"/>
+    </LinearLayout>
+
+    <TextView
+        android:textSize="14sp"
+        android:textColor="@color/widget_text_secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="26dp"
+        android:text="8:26, 8:36"/>
+
+    <TextView
+        android:text="World Trade Center"
+        android:textColor="@color/widget_text_primary"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="8dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:background="#B95141"/>
+
+        <TextView
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/widget_text_primary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="8dp"
+            android:text="Newark"/>
+    </LinearLayout>
+
+    <TextView
+        android:textSize="14sp"
+        android:textColor="@color/widget_text_secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="26dp"
+        android:text="8:22, 8:32"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:background="#8BBD4F"/>
+
+        <TextView
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/widget_text_primary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="8dp"
+            android:text="Hoboken"/>
+    </LinearLayout>
+
+    <TextView
+        android:textSize="14sp"
+        android:textColor="@color/widget_text_secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="26dp"
+        android:text="8:27, 8:33"/>
+
+
+</LinearLayout>

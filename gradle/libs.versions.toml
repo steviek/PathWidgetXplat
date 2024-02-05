@@ -2,7 +2,7 @@
 compose = "1.5.4"
 compose-plugin = "1.5.10"
 compose-compiler = "1.5.3"
-agp = "8.2.1"
+agp = "8.2.2"
 android-minSdk = "21"
 android-compileSdk = "34"
 android-targetSdk = "34"
@@ -28,6 +28,7 @@ firebase = "32.6.0"
 napier = "2.6.1"
 ktor = "2.3.3"
 precompose = "1.5.7"
+glance = "1.0.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -50,6 +51,8 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 androidx-material = { group = "com.google.android.material", name = "material", version.ref = "androidx-material" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "androidx-constraintlayout" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
+androidx-glance-appwidget = { group = "androidx.glance", name = "glance-appwidget", version.ref = "glance" }
+androidx-glance-material3 = { group = "androidx.glance", name = "glance-material3", version.ref = "glance" }
 resources-generator = { module = "dev.icerock.moko:resources-generator", version.ref = "moko-resources" }
 moko-resources = { module = "dev.icerock.moko:resources", version.ref = "moko-resources" }
 moko-resources-compose = { module = "dev.icerock.moko:resources-compose", version.ref = "moko-resources" }

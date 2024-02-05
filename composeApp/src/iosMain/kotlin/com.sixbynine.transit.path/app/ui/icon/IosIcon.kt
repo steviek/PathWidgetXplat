@@ -8,6 +8,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import com.sixbynine.transit.path.app.ui.icon.IconType.ArrowDown
 import com.sixbynine.transit.path.app.ui.icon.IconType.ArrowUp
+import com.sixbynine.transit.path.app.ui.icon.IconType.Back
 import com.sixbynine.transit.path.app.ui.icon.IconType.Delete
 import com.sixbynine.transit.path.app.ui.icon.IconType.Edit
 import com.sixbynine.transit.path.app.ui.icon.IconType.Filter
@@ -36,6 +37,7 @@ actual fun IconPainter(icon: IconType): Painter {
         ArrowDown -> "arrow.down"
         Settings -> "gearshape.fill"
         Delete -> "minus.circle.fill"
+        Back -> "chevron.left"
     }
     val bitmap = rememberImageBitmapWithSystemName(imageName)
     return BitmapPainter(bitmap)

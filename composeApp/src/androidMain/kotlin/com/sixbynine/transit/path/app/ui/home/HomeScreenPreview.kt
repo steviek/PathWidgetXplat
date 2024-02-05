@@ -9,9 +9,6 @@ import com.sixbynine.transit.path.PathWidgetPreview
 import com.sixbynine.transit.path.PreviewTheme
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.app.settings.TimeDisplay
-import com.sixbynine.transit.path.app.ui.home.ConfigurationItem.Settings
-import com.sixbynine.transit.path.app.ui.home.ConfigurationItem.Station
-import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.ConfigurationChipClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.EditClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.RetryClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StationSelectionDialogDismissed
@@ -26,12 +23,11 @@ import com.sixbynine.transit.path.widget.Fixtures
 @Composable
 fun HomeScreenPreview() {
     PreviewTheme {
-        var showConfiguration by remember { mutableStateOf(true) }
-        var showSettingsBottomSheet by remember { mutableStateOf(false) }
+        var isEditing by remember { mutableStateOf(true) }
         HomeScreen(
             state = State(
                 isTablet = false,
-                isEditing = showConfiguration,
+                isEditing = isEditing,
                 selectedStations = listOf(Stations.Hoboken),
                 unselectedStations = emptyList(),
                 layoutOption = TwoColumns,
@@ -43,11 +39,11 @@ fun HomeScreenPreview() {
             onIntent = {
                 when (it) {
                     is EditClicked -> {
-                        showConfiguration = true
+                        isEditing = true
                     }
 
                     StopEditingClicked -> {
-                        showConfiguration = false
+                        isEditing = false
                     }
 
                     is RetryClicked -> {
@@ -56,14 +52,6 @@ fun HomeScreenPreview() {
 
                     UpdateNowClicked -> {}
 
-                    is ConfigurationChipClicked -> {
-                        when (it.item) {
-                            Station -> {
-                                showSettingsBottomSheet = true
-                            }
-                            Settings -> {}
-                        }
-                    }
                     is StationSelectionDialogDismissed -> TODO()
                     else -> {}
                 }

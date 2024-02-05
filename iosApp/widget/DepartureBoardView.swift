@@ -187,9 +187,12 @@ struct DepartureBoardView: View {
                         Text(getString(strings().to_destination, arg1: destination))
                             .font(Font.system(size: 12))
                             .lineLimit(1)
-                        let arrivalTime = WidgetDataFormatter().formatTime(instant: train.projectedArrival)
+                        let arrivalTime = (train.isBackfilled ? "~" : "") + WidgetDataFormatter().formatTime(instant: train.projectedArrival)
                         Spacer()
-                        Text(arrivalTime).font(Font.system(size: 12).monospacedDigit()).lineLimit(1)
+                        Text(arrivalTime)
+                            .font(Font.system(size: 12)
+                            .monospacedDigit())
+                            .lineLimit(1)
                     }
                 }
                 

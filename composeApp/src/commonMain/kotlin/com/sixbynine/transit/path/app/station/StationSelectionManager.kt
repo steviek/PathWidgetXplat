@@ -1,6 +1,5 @@
 package com.sixbynine.transit.path.app.station
 
-import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.state
@@ -10,11 +9,19 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 object StationSelectionManager {
+    private val DefaultStations = listOf(
+        Stations.WorldTradeCenter,
+        Stations.ThirtyThirdStreet,
+        Stations.Hoboken,
+        Stations.JournalSquare,
+        Stations.Newark,
+    )
+
     private val selectedStationsKey = StringPreferencesKey("selected_stations")
     private var storedSelectedStationsNames by persistingList(selectedStationsKey)
     private var storedSelectedStations: List<Station>
         get() {
-            val storedNames = storedSelectedStationsNames ?: return Stations.All
+            val storedNames = storedSelectedStationsNames ?: return DefaultStations
             return storedNames.mapNotNull(this::stationFromString)
         }
         set(value) {
@@ -25,7 +32,8 @@ object StationSelectionManager {
     private var storedUnselectedStationsNames by persistingList(unselectedStationsKey)
     private var storedUnselectedStations: List<Station>
         get() {
-            val storedNames = storedUnselectedStationsNames ?: return emptyList()
+            val storedNames =
+                storedUnselectedStationsNames ?: return Stations.All - storedSelectedStations.toSet()
             return storedNames.mapNotNull(this::stationFromString)
         }
         set(value) {
@@ -47,7 +55,6 @@ object StationSelectionManager {
     }
 
     fun moveDown(stationId: String, groupedByState: Boolean) {
-        Logging.d("Move down $stationId")
         updateSelection {
             var origIndex: Int? = null
             var newIndex: Int? = null
@@ -73,13 +80,11 @@ object StationSelectionManager {
             newSelectedStations.add(newIndex, station)
 
 
-            Logging.d("Index was $origIndex, list went from ${selectedStations.map { it.pathApiName }} to ${newSelectedStations.map { it.pathApiName }}")
             copy(selectedStations = newSelectedStations)
         }
     }
 
     fun moveUp(stationId: String, groupedByState: Boolean) {
-        Logging.d("Move up $stationId")
         updateSelection {
             var origIndex: Int? = null
             var newIndex: Int? = null
@@ -104,13 +109,11 @@ object StationSelectionManager {
             val station = newSelectedStations.removeAt(origIndex)
             newSelectedStations.add(newIndex, station)
 
-            Logging.d("Index was $origIndex, list went from ${selectedStations.map { it.pathApiName }} to ${newSelectedStations.map { it.pathApiName }}")
             copy(selectedStations = newSelectedStations)
         }
     }
 
     fun remove(stationId: String) {
-        Logging.d("Remove $stationId")
         updateSelection {
             val newSelectedStations = selectedStations.toMutableList()
             val index = newSelectedStations.indexOfFirst { it.pathApiName == stationId }

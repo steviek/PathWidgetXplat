@@ -56,12 +56,12 @@ extension StationChoice {
 }
 
 extension Filter {
-    func toStationFilter() -> StationFilter {
+    func toTrainFilter() -> TrainFilter {
         return switch (self) {
         case .all:
-            StationFilter.all
+            TrainFilter.all
         case .interstate:
-            StationFilter.interstate
+            TrainFilter.interstate
         }
     }
 }
@@ -70,7 +70,7 @@ extension WidgetDataFetcher {
     func fetchWidgetDataAsync(
         limit: Int32,
         stations: [Station],
-        filter: StationFilter,
+        filter: TrainFilter,
         sort: StationSort
     ) async -> FetchResult {
         do {

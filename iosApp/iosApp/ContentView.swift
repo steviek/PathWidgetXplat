@@ -25,7 +25,7 @@ struct ContentView: View {
             .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
                 AppLifecycleObserver().setAppIsActive(isActive: false)
             }
-            .ignoresSafeArea(.keyboard) // Compose has own keyboard handler
+            .ignoresSafeArea(.all) // Compose has own keyboard handler
     }
 }
 

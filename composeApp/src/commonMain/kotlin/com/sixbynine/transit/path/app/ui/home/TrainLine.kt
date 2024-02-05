@@ -18,7 +18,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.TrainData
@@ -41,7 +40,6 @@ fun TrainLineContent(
             text = data.title,
             style = textStyle,
             color = textColor,
-            fontStyle = if (data.isBackfilled) FontStyle.Italic else FontStyle.Normal,
         )
         Spacer(Modifier.width(16.dp))
         Text(
@@ -49,7 +47,6 @@ fun TrainLineContent(
             textAlign = TextAlign.End,
             text = data.displayText,
             style = textStyle,
-            fontStyle = if (data.isBackfilled) FontStyle.Italic else FontStyle.Normal,
             color = textColor
         )
     }

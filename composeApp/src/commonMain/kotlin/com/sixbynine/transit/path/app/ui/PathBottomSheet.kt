@@ -3,7 +3,10 @@ package com.sixbynine.transit.path.app.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.only
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -53,7 +56,7 @@ fun PathBottomSheet(
     title: @Composable ColumnScope.() -> Unit = {},
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val sheetState = rememberModalBottomSheetState()
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     var transitionState by remember { mutableStateOf(if (isShown) Shown else Hidden) }
 
@@ -74,7 +77,11 @@ fun PathBottomSheet(
     }
 
     if (transitionState != Hidden) {
-        ModalBottomSheet(onDismissRequest = onDismissRequest, sheetState = sheetState) {
+        ModalBottomSheet(
+            onDismissRequest = onDismissRequest,
+            sheetState = sheetState,
+            windowInsets = BottomSheetDefaults.windowInsets.only(WindowInsetsSides.Top)
+        ) {
             Column(
                 modifier.navigationBarsPadding(),
                 verticalArrangement = Arrangement.spacedBy(16.dp)

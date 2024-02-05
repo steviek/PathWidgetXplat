@@ -70,8 +70,6 @@ fun SettingsScope.Content() {
             StationOrderSection()
 
             StationLimitSection()
-
-            ShowPresumedTrainsSection()
         }
 
         StationLimitBottomSheet(

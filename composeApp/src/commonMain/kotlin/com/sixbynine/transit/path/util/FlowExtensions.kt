@@ -1,9 +1,13 @@
 package com.sixbynine.transit.path.util
 
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+
+suspend fun Flow<Boolean>.awaitTrue() = first { it }
 
 fun <T, R> StateFlow<T>.mapState(block: (T) -> R): StateFlow<R> {
     val delegate = this

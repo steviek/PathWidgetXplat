@@ -1,0 +1,13 @@
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minResizeWidth="100dp"
+    android:minResizeHeight="50dp"
+    android:minWidth="200dp"
+    android:minHeight="100dp"
+    android:updatePeriodMillis="1800000"
+    android:initialLayout="@layout/glance_default_loading_layout"
+    android:resizeMode="horizontal|vertical"
+    android:description="@string/widget_description"
+    android:previewImage="@drawable/widget_preview"
+    android:previewLayout="@layout/widget_preview"
+    android:widgetCategory="home_screen"
+    android:widgetFeatures="reconfigurable"/>

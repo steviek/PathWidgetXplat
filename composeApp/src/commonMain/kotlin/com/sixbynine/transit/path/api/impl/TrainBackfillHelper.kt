@@ -41,6 +41,8 @@ import kotlin.time.Duration.Companion.seconds
 
 object TrainBackfillHelper {
 
+    private const val ShouldLog = false
+
     private data class LineId(val headSign: String, val colors: List<Color>) {
         companion object {
             private fun List<ColorWrapper>.unwrap(): List<Color> {
@@ -144,12 +146,16 @@ object TrainBackfillHelper {
     ): Map<Station, List<DepartureBoardTrain>> {
         val backfilled = trains.toMutableMap()
         trains.keys.forEach eachStation@{ station ->
-            Logging.d("Backfill station: ${station.displayName}")
+            if (ShouldLog) {
+                Logging.d("Backfill station: ${station.displayName}")
+            }
             val lineIds =
                 trains[station]?.map { it.lineId }?.distinct() ?: return@eachStation
             lineIds.forEach eachHeadSign@{ lineId ->
                 val checkpointsInLine = LineIdToCheckpoints[lineId] ?: run {
-                    Logging.d("\tBackfill: No checkpoints for ${station.displayName} for $lineId!")
+                    if (ShouldLog) {
+                        Logging.d("\tBackfill: No checkpoints for ${station.displayName} for $lineId!")
+                    }
                     return@eachHeadSign
                 }
                 val stationCheckpoint = checkpointsInLine[station] ?: return@eachHeadSign
@@ -181,20 +187,25 @@ object TrainBackfillHelper {
                                 }
                                 val currentTrains = backfilled[station] ?: return@eachStation
                                 if (currentTrains.none { trainMatches(it) }) {
-                                    Logging.d(
-                                        "\tBackfilling ${station.displayName} with a train from " +
-                                                "${priorStation.displayName} to $lineId" +
-                                                " hypothetically departing at " +
-                                                "${hypotheticalTrain.projectedArrival}"
-                                    )
+                                    if (ShouldLog) {
+                                        Logging.d(
+                                            "\tBackfilling ${station.displayName} with a train from " +
+                                                    "${priorStation.displayName} to $lineId" +
+                                                    " hypothetically departing at " +
+                                                    "${hypotheticalTrain.projectedArrival}"
+                                        )
+                                    }
+
                                     backfilled[station] = currentTrains + hypotheticalTrain
                                 } else {
-                                    Logging.d(
-                                        "\tSkip backfilling ${station.displayName} with a train from " +
-                                                "${priorStation.displayName} to $lineId" +
-                                                " hypothetically departing at " +
-                                                "${hypotheticalTrain.projectedArrival}"
-                                    )
+                                    if (ShouldLog) {
+                                        Logging.d(
+                                            "\tSkip backfilling ${station.displayName} with a train from " +
+                                                    "${priorStation.displayName} to $lineId" +
+                                                    " hypothetically departing at " +
+                                                    "${hypotheticalTrain.projectedArrival}"
+                                        )
+                                    }
                                 }
                             }
                     }

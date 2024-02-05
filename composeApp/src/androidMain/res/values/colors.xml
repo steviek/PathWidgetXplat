@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ic_launcher_background">#1896D1</color>
+    <color name="path_blue_200">#64c6ff</color>
+    <color name="path_blue_500">#1896D1</color>
+    <color name="ic_launcher_background">@color/path_blue_500</color>
+    <color name="widget_background">@android:color/white</color>
+    <color name="widget_accent_color">@color/path_blue_500</color>
+    <color name="widget_text_primary">@android:color/black</color>
+    <color name="widget_text_secondary">@android:color/darker_gray</color>
 </resources>

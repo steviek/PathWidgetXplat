@@ -80,8 +80,24 @@ object WidgetDataFormatter {
 
         if (title.startsWith("Christopher")) {
             return when (width) {
-                HeadSignWidth.Narrow -> "Christopher"
+                HeadSignWidth.Narrow -> "CHR"
                 HeadSignWidth.Short -> "Christopher St"
+                HeadSignWidth.Wide -> title
+            }
+        }
+
+        if (title.startsWith("Har")) {
+            return when (width) {
+                HeadSignWidth.Narrow -> "HAR"
+                HeadSignWidth.Short -> title
+                HeadSignWidth.Wide -> title
+            }
+        }
+
+        if ("Grove" in title) {
+            return when (width) {
+                HeadSignWidth.Narrow -> "GRV"
+                HeadSignWidth.Short -> "Grove St"
                 HeadSignWidth.Wide -> title
             }
         }

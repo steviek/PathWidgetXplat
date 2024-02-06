@@ -24,7 +24,8 @@ moko-resources = "0.23.0"
 moko-mvvm = "0.16.1"
 uiToolingPreviewAndroid = "1.5.4"
 google-services = "4.4.0"
-firebase = "32.6.0"
+firebase = "32.7.1"
+crashlytics-plugin = "2.9.9"
 napier = "2.6.1"
 ktor = "2.3.3"
 precompose = "1.5.7"
@@ -61,6 +62,7 @@ androidx-ui-tooling-preview-android = { group = "androidx.compose.ui", name = "u
 precompose = { module = "moe.tlaster:precompose", version.ref = "precompose" }
 firebase = { module = "com.google.firebase:firebase-bom", version.ref = "firebase" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
 napier = { module = "io.github.aakira:napier", version.ref = "napier" }
 ktor-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
@@ -74,3 +76,4 @@ androidLibrary = { id = "com.android.library", version.ref = "agp" }
 google-services = {id = "com.google.gms.google-services", version.ref = "google-services" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crashlytics-plugin" }

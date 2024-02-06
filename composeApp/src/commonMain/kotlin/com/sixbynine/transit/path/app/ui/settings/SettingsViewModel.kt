@@ -71,7 +71,10 @@ class SettingsViewModel : BaseViewModel<State, Intent, Effect>(
                 updateState { copy(bottomSheet = null) }
             }
 
-            is TrainFilterChanged -> SettingsManager.updateTrainFilter(intent.filter)
+            is TrainFilterChanged -> {
+                SettingsManager.updateTrainFilter(intent.filter)
+                updateState { copy(bottomSheet = null) }
+            }
 
             is StationLimitSelected -> {
                 SettingsManager.updateStationLimit(intent.limit)
@@ -85,6 +88,7 @@ class SettingsViewModel : BaseViewModel<State, Intent, Effect>(
 
             is ShowPresumedTrainsChanged -> {
                 SettingsManager.updateDisplayPresumedTrains(intent.show)
+                updateState { copy(bottomSheet = null) }
             }
 
             BackClicked -> sendEffect(GoBack)

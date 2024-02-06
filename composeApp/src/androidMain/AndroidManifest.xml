@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove" />
 
     <application
         android:allowBackup="true"
@@ -22,6 +23,18 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="play.google.com"
+                    android:pathPattern="/store/apps/details?id=com.sixbynine.transit.path" />
+            </intent-filter>
         </activity>
         <receiver
             android:name=".widget.DepartureBoardWidgetReceiver"
@@ -34,6 +47,9 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/departure_widget" />
         </receiver>
+
+        <!-- We don't need to collect this... -->
+        <meta-data android:name="google_analytics_adid_collection_enabled" android:value="false" />
     </application>
 
 </manifest>

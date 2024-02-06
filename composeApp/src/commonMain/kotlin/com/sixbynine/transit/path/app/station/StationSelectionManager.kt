@@ -1,5 +1,6 @@
 package com.sixbynine.transit.path.app.station
 
+import com.sixbynine.transit.path.analytics.Analytics
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.state
@@ -119,6 +120,7 @@ object StationSelectionManager {
             val index = newSelectedStations.indexOfFirst { it.pathApiName == stationId }
             if (index < 0) return@updateSelection this
             val station = newSelectedStations.removeAt(index)
+            Analytics.stationRemoved(station)
             copy(
                 selectedStations = newSelectedStations,
                 unselectedStations = unselectedStations + station
@@ -133,6 +135,7 @@ object StationSelectionManager {
             if (index < 0) return@updateSelection this
 
             val station = newUnselectedStations.removeAt(index)
+            Analytics.stationAdded(station)
             copy(
                 selectedStations = selectedStations + station,
                 unselectedStations = newUnselectedStations

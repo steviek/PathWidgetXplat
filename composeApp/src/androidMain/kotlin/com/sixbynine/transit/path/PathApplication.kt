@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Application
 import android.app.Application.ActivityLifecycleCallbacks
 import android.os.Bundle
+import com.sixbynine.transit.path.analytics.Analytics
 import com.sixbynine.transit.path.app.lifecycle.AppLifecycleObserver
 import com.sixbynine.transit.path.native.NativeHolder
 import com.sixbynine.transit.path.widget.WidgetReloader
@@ -12,6 +13,8 @@ class PathApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
+
+        Analytics.appLaunched()
 
         NativeHolder.initialize(
             object : WidgetReloader {

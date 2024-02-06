@@ -1,5 +1,6 @@
 package com.sixbynine.transit.path.app.settings
 
+import com.sixbynine.transit.path.analytics.Analytics
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.util.combineStates
@@ -27,18 +28,22 @@ object SettingsManager {
     )
 
     fun updateTrainFilter(trainFilter: TrainFilter) {
+        Analytics.filterSet(trainFilter)
         trainFilterPersister.update(trainFilter)
     }
 
     fun updateTimeDisplay(timeDisplay: TimeDisplay) {
+        Analytics.timeDisplaySet(timeDisplay)
         timeDisplayPersister.update(timeDisplay)
     }
 
     fun updateStationLimit(stationLimit: StationLimit) {
+        Analytics.stationLimitSet(stationLimit)
         stationLimitPersister.update(stationLimit)
     }
 
     fun updateStationSort(stationSort: StationSort) {
+        Analytics.stationSortSet(stationSort)
         stationSortPersister.update(stationSort)
     }
 

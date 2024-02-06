@@ -6,6 +6,8 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
     id("dev.icerock.mobile.multiplatform-resources")
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.crashlytics)
 }
 
 kotlin {
@@ -65,6 +67,9 @@ kotlin {
             implementation(libs.androidx.glance.appwidget)
             implementation(libs.androidx.glance.material3)
             implementation(libs.ktor.okhttp)
+            implementation(project.dependencies.platform(libs.firebase))
+            implementation(libs.firebase.analytics)
+            implementation(libs.firebase.crashlytics)
         }
 
         commonTest.dependencies {

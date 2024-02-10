@@ -194,7 +194,6 @@ private fun HomeScreenScope.DepartureBoard() {
         columns = GridCells.Adaptive(minSize = 300.dp),
         state = gridState,
         horizontalArrangement = Arrangement.spacedBy(Dimensions.gutter(isTablet = isTablet)),
-        verticalArrangement = Arrangement.spacedBy(24.dp),
         contentPadding = PaddingValues(bottom = 16.dp),
     ) {
         data.stations.forEachIndexed { index, station ->
@@ -212,12 +211,23 @@ private fun HomeScreenScope.DepartureBoard() {
             }
 
             item(station.id) {
-                StationView(
-                    modifier = Modifier.fillMaxSize().animateItemPlacement(),
+                StationHeader(
+                    modifier = Modifier.fillMaxSize().animateItemPlacement()
+                        .padding(top = if (index == 0) 0.dp else 16.dp),
                     canMoveDown = canMoveDown,
                     canMoveUp = canMoveUp,
                     data = station
                 )
+            }
+
+            station.trains.forEach { train ->
+                item(station.id + train.id) {
+                    StationTrain(
+                        data = station,
+                        train = train,
+                        modifier = Modifier.fillMaxSize().animateItemPlacement()
+                    )
+                }
             }
 
             if (state.isEditing &&
@@ -233,7 +243,7 @@ private fun HomeScreenScope.DepartureBoard() {
 
         if (state.unselectedStations.isNotEmpty()) {
             item("add", span = { GridItemSpan(maxLineSpan) }) {
-                Box(Modifier.padding(horizontal = gutter())) {
+                Box(Modifier.padding(horizontal = gutter(), vertical = 16.dp)) {
                     Button(
                         modifier = Modifier.fillMaxWidth(),
                         onClick = { onIntent(AddStationClicked) }) {
@@ -246,80 +256,85 @@ private fun HomeScreenScope.DepartureBoard() {
 }
 
 @Composable
-private fun HomeScreenScope.StationView(
+private fun HomeScreenScope.StationHeader(
     data: StationData,
     canMoveDown: Boolean,
     canMoveUp: Boolean,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Row(
-            modifier = Modifier.heightIn(48.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+    Row(
+        modifier = modifier.heightIn(48.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            modifier = Modifier.weight(1f).padding(start = gutter()),
+            text = data.station.displayName,
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        AnimatedVisibility(
+            state.isEditing,
+            enter = fadeIn(),
+            exit = fadeOut()
         ) {
-            Text(
-                modifier = Modifier.weight(1f).padding(start = gutter()),
-                text = data.station.displayName,
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            AnimatedVisibility(
-                state.isEditing,
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                Row(Modifier.padding(end = gutter() - 12.dp)) {
-                    if (canMoveDown) {
-                        NativeIconButton(
-                            icon = IconType.ArrowDown,
-                            contentDescription = stringResource(strings.move_down),
-                            onClick = { onIntent(MoveStationDownClicked(data.id)) }
-                        )
-                    } else {
-                        Spacer(Modifier.width(48.dp))
-                    }
-
-                    if (canMoveUp) {
-                        NativeIconButton(
-                            icon = IconType.ArrowUp,
-                            contentDescription = stringResource(strings.move_up),
-                            onClick = { onIntent(MoveStationUpClicked(data.id)) }
-                        )
-                    } else {
-                        Spacer(Modifier.width(48.dp))
-                    }
-
+            Row(Modifier.padding(end = gutter() - 12.dp)) {
+                if (canMoveDown) {
                     NativeIconButton(
-                        icon = IconType.Delete,
-                        contentDescription = stringResource(strings.delete),
-                        onClick = { onIntent(RemoveStationClicked(data.id)) }
+                        icon = IconType.ArrowDown,
+                        contentDescription = stringResource(strings.move_down),
+                        onClick = { onIntent(MoveStationDownClicked(data.id)) }
                     )
+                } else {
+                    Spacer(Modifier.width(48.dp))
                 }
+
+                if (canMoveUp) {
+                    NativeIconButton(
+                        icon = IconType.ArrowUp,
+                        contentDescription = stringResource(strings.move_up),
+                        onClick = { onIntent(MoveStationUpClicked(data.id)) }
+                    )
+                } else {
+                    Spacer(Modifier.width(48.dp))
+                }
+
+                NativeIconButton(
+                    icon = IconType.Delete,
+                    contentDescription = stringResource(strings.delete),
+                    onClick = { onIntent(RemoveStationClicked(data.id)) }
+                )
             }
         }
-
-        Column {
-            data.trains.forEach {
-                TrainLine(data.station, it)
-            }
-        }
-
     }
 }
 
 @Composable
-private fun HomeScreenScope.TrainLine(station: Station, data: TrainData) {
+private fun HomeScreenScope.StationTrain(
+    data: StationData,
+    train: TrainData,
+    modifier: Modifier = Modifier
+) {
+    TrainLine(data.station, train, modifier)
+}
+
+@Composable
+private fun HomeScreenScope.TrainLine(
+    station: Station,
+    data: TrainData,
+    modifier: Modifier = Modifier
+) {
     var showBottomSheet by remember { mutableStateOf(false) }
     TrainLineContent(
         data,
-        modifier = Modifier.let { modifier ->
+        modifier = Modifier.run {
             if (data.isBackfilled) {
-                modifier.clickable { showBottomSheet = true }
+                clickable { showBottomSheet = true }
             } else {
-                modifier
+                this
             }
         }
+            .then(modifier)
             .padding(horizontal = gutter(), vertical = 4.dp)
             .fillMaxWidth()
     )

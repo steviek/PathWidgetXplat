@@ -4,9 +4,9 @@ import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.api.DepartureBoardTrain
 import com.sixbynine.transit.path.api.PathApi
 import com.sixbynine.transit.path.api.Station
-import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.Stations
+import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.api.isEastOf
 import com.sixbynine.transit.path.api.isInNewJersey
 import com.sixbynine.transit.path.api.isInNewYork
@@ -46,7 +46,7 @@ object WidgetDataFetcher {
                 if (lastFetch != null &&
                     !(lastFetch.isCompleted && lastFetch.getCompleted().isFailure) &&
                     lastFetchTime != null &&
-                    lastFetchTime in (now - 30.seconds)..now &&
+                    lastFetchTime in (now - 10.seconds)..now &&
                     !force
                 ) {
                     Napier.d("Reuse existing fetch")

@@ -7,7 +7,7 @@ import com.sixbynine.transit.path.api.State
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.app.ui.Colors
-import com.sixbynine.transit.path.util.runCatchingSuspend
+import com.sixbynine.transit.path.util.suspendRunCatching
 import com.sixbynine.transit.path.widget.widgetDataStore
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
@@ -79,7 +79,7 @@ class PathClient {
     private val httpClient = HttpClient()
 
     suspend fun getResults(): Result<PathServiceResults> {
-        return runCatchingSuspend {
+        return suspendRunCatching {
             httpClient.get("https://www.panynj.gov/bin/portauthority/ridepath.json")
         }
             .mapCatching { response ->

@@ -1,12 +1,15 @@
 package com.sixbynine.transit.path.util
 
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
 import kotlin.time.Duration
 
-suspend fun <T> runCatchingSuspend(block: suspend () -> T): Result<T> {
+suspend fun <T> suspendRunCatching(block: suspend () -> T): Result<T> {
     return try {
         Result.success(block())
+    } catch (e: TimeoutCancellationException) {
+        Result.failure(e)
     } catch (e : CancellationException) {
         throw e
     } catch (e: Throwable) {

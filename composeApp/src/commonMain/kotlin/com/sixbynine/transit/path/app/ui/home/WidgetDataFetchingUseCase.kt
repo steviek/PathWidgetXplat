@@ -153,11 +153,16 @@ class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
         fun createInitialFetchData(): FetchData {
             val lastFetchTime = lastFetchTime
             val now = now()
-            val nextFetchTime = if (lastFetchTime != null) {
-                lastFetchTime + FetchInterval
-            } else {
-                now
+            if (lastFetchTime == null || lastFetchTime < now - 10.minutes) {
+                return FetchData(
+                    lastFetchTime = null,
+                    nextFetchTime = now,
+                    data = null,
+                    hasError = false,
+                    isFetching = true,
+                )
             }
+            val nextFetchTime = lastFetchTime + FetchInterval
             val data = getStoredWidgetData()
             val isFetching = nextFetchTime <= now
             return FetchData(

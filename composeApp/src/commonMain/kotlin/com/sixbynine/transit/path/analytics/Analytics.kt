@@ -36,6 +36,14 @@ object Analytics {
     fun stationLimitSet(limit: StationLimit) {
         strategy.logEvent("set_station_limit", mapOf("limit" to limit.name.lowercase()))
     }
+
+    fun shareAppClicked() {
+        strategy.logEvent("share_app_clicked")
+    }
+
+    fun rateAppClicked() {
+        strategy.logEvent("rate_app_clicked")
+    }
 }
 
 interface AnalyticsStrategy {

@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.only
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.MaterialTheme
@@ -83,7 +82,7 @@ fun PathBottomSheet(
             windowInsets = BottomSheetDefaults.windowInsets.only(WindowInsetsSides.Top)
         ) {
             Column(
-                modifier.navigationBarsPadding(),
+                modifier,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 title()

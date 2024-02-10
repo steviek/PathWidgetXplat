@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,7 +44,12 @@ fun HomeScreenScope.BackfillBottomSheet(
     onDismiss: () -> Unit
 ) {
     PathBottomSheet(isShown = isShown, onDismissRequest = onDismiss) {
-        Column(Modifier.padding(horizontal = gutter()).padding(bottom = 16.dp)) {
+        Column(
+            Modifier
+                .padding(horizontal = gutter())
+                .verticalScroll(rememberScrollState())
+                .padding(bottom = 32.dp)
+        ) {
             Text(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 text = stringResource(strings.presumed_train),

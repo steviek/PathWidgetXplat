@@ -30,6 +30,7 @@ napier = "2.6.1"
 ktor = "2.3.3"
 precompose = "1.5.7"
 glance = "1.0.0"
+google-play-review = "2.0.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -68,6 +69,8 @@ ktor-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
 ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 ktor-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
+google-play-review = { module = "com.google.android.play:review", version.ref = "google-play-review" }
+google-play-review-ktx = { module = "com.google.android.play:review-ktx", version.ref = "google-play-review" }
 
 [plugins]
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }

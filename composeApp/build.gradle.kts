@@ -70,6 +70,8 @@ kotlin {
             implementation(project.dependencies.platform(libs.firebase))
             implementation(libs.firebase.analytics)
             implementation(libs.firebase.crashlytics)
+            implementation(libs.google.play.review)
+            implementation(libs.google.play.review.ktx)
         }
 
         commonTest.dependencies {

@@ -1,5 +1,8 @@
 package com.sixbynine.transit.path.app.ui.settings
 
+import com.sixbynine.transit.path.analytics.Analytics
+import com.sixbynine.transit.path.app.external.ExternalRoutingManager
+import com.sixbynine.transit.path.app.external.shareAppToSystem
 import com.sixbynine.transit.path.app.settings.SettingsManager
 import com.sixbynine.transit.path.app.ui.BaseViewModel
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.BottomSheetType.StationLimit
@@ -11,6 +14,9 @@ import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Effect.GoBack
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.BackClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.BottomSheetDismissed
+import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.RateAppClicked
+import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.SendFeedbackClicked
+import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.ShareAppClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.ShowPresumedTrainsChanged
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.StationLimitClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.StationLimitSelected
@@ -25,6 +31,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 class SettingsViewModel : BaseViewModel<State, Intent, Effect>(
     State(
@@ -111,6 +118,20 @@ class SettingsViewModel : BaseViewModel<State, Intent, Effect>(
 
             TrainFilterClicked -> {
                 updateState { copy(bottomSheet = TrainFilter) }
+            }
+
+            RateAppClicked -> {
+                Analytics.rateAppClicked()
+                viewModelScope.launch { ExternalRoutingManager().launchAppRating() }
+            }
+
+            SendFeedbackClicked -> {
+                ExternalRoutingManager().openEmail()
+            }
+
+            ShareAppClicked -> {
+                Analytics.shareAppClicked()
+                ExternalRoutingManager().shareAppToSystem()
             }
         }
     }

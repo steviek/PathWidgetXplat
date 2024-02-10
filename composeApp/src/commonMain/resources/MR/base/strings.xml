@@ -21,8 +21,10 @@
     <string name="move_up">Move up</string>
     <string name="presumed_train">Presumed train</string>
     <string name="presumed_trains_subtext">Presumed trains are those which aren’t yet reported by RidePATH, but which should exist because of reported trains at stations earlier in the line and the usual travel time between stations.</string>
+    <string name="rate_app">Rate app</string>
     <string name="report_a_problem">Report a problem</string>
     <string name="retry">Retry</string>
+    <string name="send_feedback">Send feedback</string>
     <string name="setting_header_time_display">Time display</string>
     <string name="setting_time_display_clock">Clock</string>
     <string name="setting_time_display_clock_subtitle">e.g. “at %1$s“</string>
@@ -30,6 +32,9 @@
     <string name="setting_time_display_relative_subtitle">e.g. “in 5 minutes“</string>
     <string name="settings">Settings</string>
     <string name="settings_header_station_filter">Maximum trains per station</string>
+    <string name="share">Share</string>
+    <string name="share_app">Share app</string>
+    <string name="sharing_message">Check out this app and widget that shows when the PATH train is coming!</string>
     <string name="show_all_trains">Show all trains</string>
     <string name="show_interstate_trains">Show only interstate trains</string>
     <string name="show_presumed_trains">Show presumed trains</string>

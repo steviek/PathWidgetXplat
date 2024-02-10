@@ -14,8 +14,12 @@ import androidx.compose.ui.unit.dp
 import com.sixbynine.transit.path.app.ui.RadioButtonWithText
 
 @Composable
-fun RadioSection(title: String? = null, content: @Composable RadioSectionScope.() -> Unit) {
-    Column(Modifier.selectableGroup()) {
+fun RadioSection(
+    modifier: Modifier = Modifier,
+    title: String? = null,
+    content: @Composable RadioSectionScope.() -> Unit
+) {
+    Column(modifier.selectableGroup()) {
         title?.let { SettingsHeader(it) }
         val scope = RadioSectionScope(this)
         scope.content()

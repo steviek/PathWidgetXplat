@@ -34,6 +34,9 @@ object SettingsContract {
         data object TrainFilterClicked : Intent
         data object BottomSheetDismissed : Intent
         data object BackClicked : Intent
+        data object SendFeedbackClicked : Intent
+        data object RateAppClicked : Intent
+        data object ShareAppClicked : Intent
     }
 
     sealed interface Effect {

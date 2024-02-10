@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -23,6 +24,9 @@ import com.sixbynine.transit.path.app.ui.icon.IconType
 import com.sixbynine.transit.path.app.ui.icon.NativeIconButton
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.BottomSheetType
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Effect.GoBack
+import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.RateAppClicked
+import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.SendFeedbackClicked
+import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.ShareAppClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.ShowPresumedTrainsChanged
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.StationLimitClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.StationSortClicked
@@ -70,6 +74,14 @@ fun SettingsScope.Content() {
             StationOrderSection()
 
             StationLimitSection()
+
+            Divider()
+
+            SettingsItem(stringResource(strings.send_feedback)) { onIntent(SendFeedbackClicked) }
+
+            SettingsItem(stringResource(strings.rate_app)) { onIntent(RateAppClicked) }
+
+            SettingsItem(stringResource(strings.share_app)) { onIntent(ShareAppClicked) }
         }
 
         StationLimitBottomSheet(
@@ -154,20 +166,22 @@ private fun SettingsScope.ShowPresumedTrainsSection() {
 }
 
 @Composable
-private fun SettingsItem(title: String, subtitle: String, onClick: () -> Unit) {
+private fun SettingsItem(title: String, subtitle: String? = null, onClick: () -> Unit) {
     Column(
         Modifier.clickable(onClick = onClick)
             .padding(vertical = 8.dp)
             .fillMaxWidth()
-            .heightIn(56.dp),
+            .heightIn(if (subtitle == null) 48.dp else 56.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)
     ) {
         SettingsHeader(title)
-        Text(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            text = subtitle,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+        if (subtitle != null) {
+            Text(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                text = subtitle,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
 }

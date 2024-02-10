@@ -1,6 +1,9 @@
 package com.sixbynine.transit.path.app.ui.settings
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.sixbynine.transit.path.MR.strings
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.app.ui.PathBottomSheet
@@ -18,7 +21,7 @@ fun StationSortBottomSheet(
         onDismissRequest = onDismiss,
         title = stringResource(strings.station_order)
     ) {
-        RadioSection {
+        RadioSection(modifier = Modifier.padding(bottom = 16.dp)) {
             StationSort.entries.forEach {
                 item(
                     text = stringResource(it.title),

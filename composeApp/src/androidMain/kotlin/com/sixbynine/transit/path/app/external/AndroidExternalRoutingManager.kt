@@ -17,11 +17,11 @@ import kotlinx.coroutines.withContext
 
 object AndroidExternalRoutingManager : ExternalRoutingManager {
 
-    override fun openEmail(): Boolean {
+    override suspend fun openEmail(): Boolean {
         val activity = ActivityRegistry.peekCreatedActivity() ?: return false
         val intent = Intent(Intent.ACTION_SENDTO).apply {
             data = Uri.parse("mailto:")
-            putExtra(Intent.EXTRA_EMAIL, arrayOf("sixbynineapps@gmail.com"))
+            putExtra(Intent.EXTRA_EMAIL, arrayOf(FeedbackEmail))
             putExtra(Intent.EXTRA_SUBJECT, getString(strings.app_name))
         }
 

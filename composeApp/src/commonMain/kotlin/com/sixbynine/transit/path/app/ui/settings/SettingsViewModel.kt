@@ -126,7 +126,9 @@ class SettingsViewModel : BaseViewModel<State, Intent, Effect>(
             }
 
             SendFeedbackClicked -> {
-                ExternalRoutingManager().openEmail()
+                viewModelScope.launch {
+                    ExternalRoutingManager().openEmail()
+                }
             }
 
             ShareAppClicked -> {

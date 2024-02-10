@@ -1,11 +1,12 @@
 package com.sixbynine.transit.path.app.external
 
+import PlatformType
 import com.sixbynine.transit.path.MR.strings
 import com.sixbynine.transit.path.resources.getString
 import getPlatform
 
 interface ExternalRoutingManager {
-    fun openEmail(): Boolean
+    suspend fun openEmail(): Boolean
 
     fun shareTextToSystem(text: String): Boolean
 
@@ -26,6 +27,8 @@ fun ExternalRoutingManager.shareAppToSystem(): Boolean {
 
     return shareTextToSystem(text.toString())
 }
+
+const val FeedbackEmail = "sixbynineapps@gmail.com"
 
 private const val IosSharingLine =
     "iOS: https://apps.apple.com/id/app/departures-widget-for-path/id6470330823"

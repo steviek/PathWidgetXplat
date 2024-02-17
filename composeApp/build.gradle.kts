@@ -59,8 +59,8 @@ kotlin {
             dependsOn(commonMain)
         }
 
-        
         androidMain.dependencies {
+            implementation(compose.material3)
             implementation(libs.compose.ui)
             implementation(libs.compose.ui.tooling.preview)
             implementation(libs.androidx.activity.compose)
@@ -87,8 +87,10 @@ kotlin {
             languageSettings.optIn("androidx.compose.foundation.layout.ExperimentalLayoutApi")
             languageSettings.optIn("androidx.compose.material3.ExperimentalMaterial3Api")
             languageSettings.optIn("kotlin.ExperimentalStdlibApi")
+            languageSettings.optIn("kotlin.contracts.ExperimentalContracts")
             languageSettings.optIn("kotlin.time.ExperimentalTime")
             languageSettings.optIn("kotlinx.cinterop.ExperimentalForeignApi")
+            languageSettings.optIn("kotlinx.coroutines.DelicateCoroutinesApi")
             languageSettings.optIn("kotlinx.serialization.ExperimentalSerializationApi")
         }
     }

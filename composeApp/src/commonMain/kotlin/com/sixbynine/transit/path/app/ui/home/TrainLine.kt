@@ -1,6 +1,8 @@
 package com.sixbynine.transit.path.app.ui.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,7 +22,10 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.sixbynine.transit.path.app.ui.ColorWrapper
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.TrainData
+import com.sixbynine.transit.path.app.ui.unwrap
+import com.sixbynine.transit.path.util.conditional
 
 @Composable
 fun TrainLineContent(
@@ -31,9 +36,7 @@ fun TrainLineContent(
     fullWidth: Boolean = true,
 ) {
     Row(modifier, verticalAlignment = Alignment.CenterVertically) {
-        TrainLineColorCircle(
-            data.colors,
-        )
+        TrainLineColorCircle(data.colors)
         Spacer(Modifier.width(16.dp))
         Text(
             modifier = Modifier.weight(1f, fill = fullWidth),
@@ -53,19 +56,26 @@ fun TrainLineContent(
 }
 
 @Composable
-private fun TrainLineColorCircle(colors: List<Color>, modifier: Modifier = Modifier) {
-    Box(modifier.size(24.dp)) {
+private fun TrainLineColorCircle(colors: List<ColorWrapper>, modifier: Modifier = Modifier) {
+    Box(
+        modifier
+            .size(24.dp)
+            .clip(CircleShape)
+            .conditional(isSystemInDarkTheme()) {
+                border(1.dp, MaterialTheme.colorScheme.onSurface, CircleShape)
+            }
+    ) {
         colors.firstOrNull()?.let {
-            Box(Modifier.size(24.dp).clip(CircleShape).background(it))
+            Box(Modifier.size(24.dp).clip(CircleShape).background(it.unwrap()))
         }
 
         colors.getOrNull(1)?.let {
             Box(
                 Modifier.size(24.dp)
                     .clip(CircleShape)
-                    .padding(top = 12.dp)
+                    .padding(start = 12.dp)
                     .clip(RectangleShape)
-                    .background(it)
+                    .background(it.unwrap())
             )
         }
     }

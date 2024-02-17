@@ -6,7 +6,9 @@ import com.sixbynine.transit.path.api.PathApi
 import com.sixbynine.transit.path.api.State
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.Stations
+import com.sixbynine.transit.path.app.ui.ColorWrapper
 import com.sixbynine.transit.path.app.ui.Colors
+import com.sixbynine.transit.path.util.JsonFormat
 import com.sixbynine.transit.path.util.suspendRunCatching
 import com.sixbynine.transit.path.widget.widgetDataStore
 import io.ktor.client.HttpClient
@@ -16,7 +18,6 @@ import io.ktor.http.isSuccess
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 import kotlin.time.Duration.Companion.seconds
 
 internal class PathApiImpl : PathApi {
@@ -51,7 +52,8 @@ internal class PathApiImpl : PathApi {
                             projectedArrival = (it.lastUpdated + it.durationToArrival)
                                 .coerceAtLeast(Clock.System.now()),
                             lineColors = it.lineColor.split(",")
-                                .map { Colors.parse(it) },
+                                .map { Colors.parse(it) }
+                                .map { ColorWrapper(it) },
                             isDelayed = it.arrivalTimeMessage == "Delayed",
                             backfillSource = null,
                             directionState = directionState
@@ -72,10 +74,6 @@ internal class PathApiImpl : PathApi {
 }
 
 class PathClient {
-    private val jsonFormat = Json {
-        ignoreUnknownKeys = true
-        explicitNulls = false
-    }
     private val httpClient = HttpClient()
 
     suspend fun getResults(): Result<PathServiceResults> {
@@ -86,7 +84,7 @@ class PathClient {
                 if (response.status.isSuccess()) {
                     val responseText = response.bodyAsText()
                     widgetDataStore()["last_success"] = responseText
-                    jsonFormat.decodeFromString<PathServiceResults>(responseText)
+                    JsonFormat.decodeFromString<PathServiceResults>(responseText)
                 } else {
                     return Result.failure(NetworkException(response.status.toString()))
                 }
@@ -96,7 +94,7 @@ class PathClient {
     fun getLastSuccessfulResults(): PathServiceResults? {
         return runCatching {
             val lastResponse = widgetDataStore()["last_success"] ?: return null
-            jsonFormat.decodeFromString<PathServiceResults>(lastResponse)
+            JsonFormat.decodeFromString<PathServiceResults>(lastResponse)
         }.getOrNull()
     }
 

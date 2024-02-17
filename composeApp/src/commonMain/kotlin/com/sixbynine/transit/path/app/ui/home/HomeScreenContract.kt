@@ -1,6 +1,5 @@
 package com.sixbynine.transit.path.app.ui.home
 
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import com.sixbynine.transit.path.api.BackfillSource
 import com.sixbynine.transit.path.api.Station
@@ -8,6 +7,7 @@ import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.state
 import com.sixbynine.transit.path.app.settings.TimeDisplay
 import com.sixbynine.transit.path.app.station.StationSelection
+import com.sixbynine.transit.path.app.ui.ColorWrapper
 import com.sixbynine.transit.path.app.ui.layout.LayoutOption
 import kotlinx.datetime.Instant
 
@@ -44,7 +44,7 @@ object HomeScreenContract {
     data class TrainData(
         val id: String,
         val title: String,
-        val colors: List<Color>,
+        val colors: List<ColorWrapper>,
         val projectedArrival: Instant,
         val displayText: String,
         val isDelayed: Boolean = false,

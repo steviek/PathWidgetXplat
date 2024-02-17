@@ -11,9 +11,11 @@ import com.sixbynine.transit.path.preferences.Preferences
 import com.sixbynine.transit.path.preferences.StringPreferencesKey
 import com.sixbynine.transit.path.preferences.persisting
 import com.sixbynine.transit.path.time.now
+import com.sixbynine.transit.path.util.DataResult
 import com.sixbynine.transit.path.util.awaitTrue
 import com.sixbynine.transit.path.widget.WidgetData
 import com.sixbynine.transit.path.widget.WidgetDataFetcher
+import com.sixbynine.transit.path.widget.fetchWidgetDataSuspending
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -26,13 +28,11 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlin.coroutines.resume
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
@@ -103,23 +103,14 @@ class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
             }
 
             withTimeoutOrNull(5000) {
-                suspendCancellableCoroutine<Boolean> { continuation ->
-                    WidgetDataFetcher.fetchWidgetData(
-                        limit = Int.MAX_VALUE,
-                        stations = StationSelectionManager.selection.value.selectedStations,
-                        sort = SettingsManager.stationSort.value,
-                        filter = TrainFilter.All, // filtering happens downstream
-                        force = force,
-                        onSuccess = { data ->
-                            completeFetch(data, error = false)
-                            continuation.resume(true)
-                        },
-                        onFailure = { data ->
-                            completeFetch(data, error = true)
-                            continuation.resume(false)
-                        }
-                    )
-                }
+                val result = WidgetDataFetcher.fetchWidgetDataSuspending(
+                    limit = Int.MAX_VALUE,
+                    stations = StationSelectionManager.selection.value.selectedStations,
+                    sort = SettingsManager.stationSort.value,
+                    filter = TrainFilter.All, // filtering happens downstream
+                    force = force,
+                )
+                completeFetch(result.data, error = result is DataResult.Failure)
             } ?: run { completeFetch(_fetchData.value.data, error = true)}
         }
     }

@@ -1,9 +1,11 @@
 <resources>
     <string name="add_station">Add station</string>
+    <string name="and_or">and/or</string>
     <string name="app_name">Departures for PATH</string>
     <string name="back">Back</string>
     <string name="cannot_move_explanation">You have sorted stations by state</string>
     <string name="choose_stations">Choose stations to view in the app</string>
+    <string name="closest_station">The closest station (requires location access)</string>
     <string name="confirm">Confirm</string>
     <string name="delay_time">Delayed - </string>
     <string name="delete">Delete</string>
@@ -17,11 +19,14 @@
     <string name="filter">Filter</string>
     <string name="interstate_explanation">Interstate trains includes trains heading toward New York from New Jersey stations, and vice versa.</string>
     <string name="langauge_code">en</string>
+    <string name="closest_always_first">Note: the closest station will always be displayed first</string>
     <string name="move_down">Move down</string>
     <string name="move_up">Move up</string>
     <string name="presumed_train">Presumed train</string>
     <string name="presumed_trains_subtext">Presumed trains are those which aren’t yet reported by RidePATH, but which should exist because of reported trains at stations earlier in the line and the usual travel time between stations.</string>
     <string name="rate_app">Rate app</string>
+    <string name="refreshing">Refreshing…</string>
+    <string name="refreshing_short">…</string>
     <string name="report_a_problem">Report a problem</string>
     <string name="retry">Retry</string>
     <string name="send_feedback">Send feedback</string>

@@ -7,6 +7,7 @@ import com.sixbynine.transit.path.api.State.NewJersey
 import com.sixbynine.transit.path.api.State.NewYork
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.Stations
+import com.sixbynine.transit.path.app.ui.ColorWrapper
 import kotlinx.datetime.Clock
 import kotlin.time.Duration.Companion.minutes
 
@@ -20,7 +21,7 @@ internal class MockPathApi : PathApi {
                 DepartureBoardTrain(
                     headsign = "Hoboken",
                     projectedArrival = now + 2.minutes,
-                    lineColors = listOf(Color.Green),
+                    lineColors = listOf(Color.Green).map { ColorWrapper((it)) },
                     isDelayed = false,
                     backfillSource = null,
                     directionState = NewJersey
@@ -28,7 +29,7 @@ internal class MockPathApi : PathApi {
                 DepartureBoardTrain(
                     headsign = "Newark",
                     projectedArrival = now + 4.minutes,
-                    lineColors = listOf(Color.Red),
+                    lineColors = listOf(Color.Red).map { ColorWrapper((it)) },
                     isDelayed = false,
                     backfillSource = null,
                     directionState = NewJersey
@@ -36,7 +37,7 @@ internal class MockPathApi : PathApi {
                 DepartureBoardTrain(
                     headsign = "World Trade Center",
                     projectedArrival = now + 7.minutes,
-                    lineColors = listOf(Color.Blue),
+                    lineColors = listOf(Color.Blue).map { ColorWrapper((it)) },
                     isDelayed = false,
                     backfillSource = null,
                     directionState = NewYork

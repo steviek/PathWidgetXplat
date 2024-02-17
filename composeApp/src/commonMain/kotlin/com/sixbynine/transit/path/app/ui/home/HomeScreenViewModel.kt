@@ -285,7 +285,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
                             TrainData(
                                 id = train.id,
                                 title = train.title,
-                                colors = train.colors.map { it.color },
+                                colors = train.colors,
                                 displayText = trainDisplayTime(
                                     timeDisplay,
                                     isDelayed = train.isDelayed,

@@ -2,7 +2,9 @@ package com.sixbynine.transit.path.widget
 
 import com.sixbynine.transit.path.api.BackfillSource
 import com.sixbynine.transit.path.api.State
+import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.app.ui.ColorWrapper
+import com.sixbynine.transit.path.widget.WidgetData.StationData
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.minutes
@@ -45,4 +47,12 @@ data class WidgetData(
         val isBackfilled: Boolean
             get() = backfillSource != null
     }
+}
+
+fun StationData.longId(): Long {
+    return Stations.All
+        .indexOfFirst { it.pathApiName == id }
+        .takeIf { it != -1}
+        ?.toLong()
+        ?: (id.hashCode().toLong() + 10)
 }

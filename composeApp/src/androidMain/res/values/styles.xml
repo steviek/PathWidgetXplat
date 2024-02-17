@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Glance.AppWidget.List" parent="" tools:override="true">
+        <item name="android:scrollbars">none</item>
+        <item name="android:scrollIndicators" tools:targetApi="M">bottom</item>
+    </style>
+    <style name="Glance.AppWidget.Text" parent="" tools:override="true">
+        <item name="android:ellipsize">end</item>
+    </style>
+</resources>

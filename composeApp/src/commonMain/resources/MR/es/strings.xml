@@ -1,15 +1,18 @@
 <resources>
     <string name="add_station">Añadir una estación</string>
+    <string name="and_or">y/o</string>
     <string name="app_name">Salidas para PATH</string>
     <string name="back">Atrás</string>
     <string name="cannot_move_explanation">Las estaciones están organizadas por estado</string>
     <string name="choose_stations">Choose stations to view in the app</string>
+    <string name="closest_station">La estación más cercana (require acceso a la ubicación)</string>
     <string name="confirm">Confirmar</string>
     <string name="delay_time">Retrasado - </string>
     <string name="delete">Eliminar</string>
     <string name="done">Terminar</string>
     <string name="due_now">llega</string>
     <string name="edit">Editar</string>
+    <string name="closest_always_first">Nota: la estación más cercana siempre se mostrará primero</string>
     <string name="edit_to_add_stations">Mantén presionado y edita el widget para añadir estaciones</string>
     <string name="error_long">Error al actualizar</string>
     <string name="error_short">Error</string>
@@ -22,6 +25,8 @@
     <string name="presumed_train">Tren supuesto</string>
     <string name="presumed_trains_subtext">Trenes supuestos son los que aún no están reportados por RidePATH, pero que deberían existir debido a trenes reportados en estaciones anteriores de la línea y el tiempo habitual de viaje entre estaciones</string>
     <string name="rate_app">Calificar la aplicación</string>
+    <string name="refreshing">Recargando…</string>
+    <string name="refreshing_short">…</string>
     <string name="report_a_problem">Informar sobre un problema</string>
     <string name="retry">Reintentar</string>
     <string name="send_feedback">Enviar comentarios</string>

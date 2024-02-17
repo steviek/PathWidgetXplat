@@ -1,5 +1,6 @@
 package com.sixbynine.transit.path.widget
 
+import androidx.compose.ui.graphics.toArgb
 import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.api.DepartureBoardTrain
 import com.sixbynine.transit.path.api.PathApi
@@ -12,14 +13,16 @@ import com.sixbynine.transit.path.api.isInNewJersey
 import com.sixbynine.transit.path.api.isInNewYork
 import com.sixbynine.transit.path.api.isWestOf
 import com.sixbynine.transit.path.api.state
-import com.sixbynine.transit.path.app.ui.ColorWrapper
+import com.sixbynine.transit.path.util.DataResult
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlin.coroutines.resume
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -35,7 +38,7 @@ object WidgetDataFetcher {
         filter: TrainFilter,
         force: Boolean,
         onSuccess: (WidgetData) -> Unit,
-        onFailure: (WidgetData?) -> Unit,
+        onFailure: (Throwable, WidgetData?) -> Unit,
     ) {
         Logging.initialize()
         GlobalScope.launch {
@@ -66,6 +69,7 @@ object WidgetDataFetcher {
                     Napier.e("Failed to fetch", it)
                     val lastResults = PathApi.instance.getLastSuccessfulUpcomingDepartures()
                     onFailure(
+                        it,
                         lastResults?.let { createWidgetData(limit, stations, sort, filter, it) }
                     )
                 }
@@ -88,7 +92,9 @@ object WidgetDataFetcher {
                     .groupBy { it.headsign }
                     .mapNotNull { (headSign, trains) ->
                         val colors =
-                            trains.flatMap { it.lineColors }.distinct().map { ColorWrapper(it) }
+                            trains.flatMap { it.lineColors }
+                                .distinct()
+                                .sortedBy { it.color.toArgb() }
                         val arrivals = trains.map { it.projectedArrival }.distinct().sorted()
                         if (arrivals.isEmpty()) return@mapNotNull null
                         WidgetData.SignData(
@@ -101,7 +107,7 @@ object WidgetDataFetcher {
 
             val trains = apiTrains
                 .map {
-                    val colors = it.lineColors.distinct().map(::ColorWrapper)
+                    val colors = it.lineColors.distinct()
                     WidgetData.TrainData(
                         id = it.headsign + ":" + it.projectedArrival,
                         title = it.headsign,
@@ -154,6 +160,26 @@ object WidgetDataFetcher {
             station.isInNewJersey -> destination.isInNewYork || destination isEastOf station
             else -> true // never happens, here for readability
         }
+    }
+}
+
+suspend fun WidgetDataFetcher.fetchWidgetDataSuspending(
+    limit: Int,
+    stations: List<Station>,
+    sort: StationSort,
+    filter: TrainFilter,
+    force: Boolean
+): DataResult<WidgetData> {
+    return suspendCancellableCoroutine { continuation ->
+        fetchWidgetData(
+            limit,
+            stations,
+            sort,
+            filter,
+            force,
+            { continuation.resume(DataResult.success(it)) },
+            { e, data -> continuation.resume(DataResult.failure(e, data)) }
+        )
     }
 }
 

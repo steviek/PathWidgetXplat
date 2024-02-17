@@ -1,21 +1,114 @@
 package com.sixbynine.transit.path.widget
 
 import android.content.Context
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.glance.GlanceId
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
+import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.provideContent
-import androidx.glance.text.Text
+import androidx.glance.appwidget.updateAll
+import androidx.glance.currentState
+import com.sixbynine.transit.path.MR.strings
+import com.sixbynine.transit.path.PathApplication
+import com.sixbynine.transit.path.resources.getString
+import com.sixbynine.transit.path.time.now
+import com.sixbynine.transit.path.time.today
+import com.sixbynine.transit.path.util.DataResult
+import com.sixbynine.transit.path.util.map
+import com.sixbynine.transit.path.widget.AndroidWidgetDataRepository.WidgetDataWithClosestStation
+import com.sixbynine.transit.path.widget.configuration.StoredWidgetConfiguration
+import com.sixbynine.transit.path.widget.configuration.WidgetConfigurationManager
+import com.sixbynine.transit.path.widget.configuration.needsSetup
+import com.sixbynine.transit.path.widget.ui.WidgetContent
+import com.sixbynine.transit.path.widget.ui.WidgetState
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atTime
+import kotlinx.datetime.toInstant
 
 class DepartureBoardWidget : GlanceAppWidget() {
+
+    override val sizeMode = SizeMode.Responsive(setOf(SmallWidgetSize, getMediumWidgetSize()))
+
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
-            Text("Hello, world")
+            val updateTime =
+                currentState(key = LastUpdateKey)
+                    ?.let { Instant.fromEpochMilliseconds(it) } ?: now()
+            val configuration = with(WidgetConfigurationManager) { getWidgetConfiguration() }
+
+            val widgetState = if (configuration.needsSetup()) {
+                WidgetState(
+                    result = DataResult.loading(),
+                    updateTime = updateTime,
+                    needsSetup = true
+                )
+            } else {
+                val result by AndroidWidgetDataRepository.data.collectAsState()
+                WidgetState(
+                    result = result.map { it.adjustForConfiguration(configuration) },
+                    updateTime,
+                    needsSetup = false
+                )
+            }
+            WidgetContent(widgetState)
         }
     }
 
+    private fun WidgetDataWithClosestStation.adjustForConfiguration(
+        configuration: StoredWidgetConfiguration
+    ): WidgetData {
+        val newStations = widgetData.stations.toMutableList()
+
+        newStations.removeAll { it.id !in configuration.fixedStations.orEmpty() }
+
+        newStations.sortWith(StationDataComparator(configuration.sortOrder))
+
+        if (configuration.useClosestStation && closestStation != null) {
+            newStations.removeAll { it.id == closestStation.pathApiName }
+            widgetData.stations.find { it.id == closestStation.pathApiName }?.let {
+                newStations.add(0, it)
+            }
+        }
+
+        return widgetData.copy(stations = newStations)
+    }
+
+    companion object {
+        suspend fun onDataChanged() {
+            updateAppWidgetStates<DepartureBoardWidget> { prefs, _ ->
+                prefs[LastUpdateKey] = System.currentTimeMillis()
+            }
+            DepartureBoardWidget().updateAll(PathApplication.instance)
+        }
+    }
+}
+
+val SmallWidgetSize = DpSize(1.dp, 1.dp)
+
+private fun getMediumWidgetSize(): DpSize {
+    val context = PathApplication.instance
+    val widestUpdatedAtText =
+        getString(
+            strings.updated_at_time,
+            WidgetDataFormatter.formatTime(
+                today().atTime(22, 20)
+                    .toInstant(TimeZone.currentSystemDefault())
+            )
+        )
+    val updatedAtWidth = estimateTextWidth(context, widestUpdatedAtText, 12.sp)
+    val requiredWidth = 16.dp * 2 + 8.dp + 32.dp + updatedAtWidth
+    return DpSize(requiredWidth, 1.dp)
 }
 
 class DepartureBoardWidgetReceiver : GlanceAppWidgetReceiver() {
-    override val glanceAppWidget get() = DepartureBoardWidget()
+    override val glanceAppWidget = DepartureBoardWidget()
 }
+
+private val LastUpdateKey = longPreferencesKey("last_update")

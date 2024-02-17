@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.Path" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <!-- Primary brand color-v31. -->
+        <!--<item name="colorPrimary">@color/path_blue_500</item>
+        <item name="colorPrimaryVariant">@color/path_blue_700</item>
+        <item name="colorOnPrimary">@color/white</item> -->
+        <!-- Secondary brand color-v31. -->
+        <!-- <item name="colorSecondary">@color/path_blue_200</item>
+         <item name="colorSecondaryVariant">@color/path_blue_700</item>
+         <item name="colorOnSecondary">@color/black</item>-->
+         <!-- Status bar color-v31. -->
+        <!-- <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>-->
+        <!-- Customize your theme here. -->
+    </style>
+</resources>

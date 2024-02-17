@@ -1,6 +1,5 @@
 package com.sixbynine.transit.path.api.impl
 
-import androidx.compose.ui.graphics.Color
 import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.api.BackfillSource
 import com.sixbynine.transit.path.api.DepartureBoardTrain
@@ -48,62 +47,59 @@ object TrainBackfillHelper {
 
     private data class LineId(
         val headSign: String,
-        val colors: List<Color>,
+        val colors: List<ColorWrapper>,
         val direction: State?
     ) {
         companion object {
-            private fun List<ColorWrapper>.unwrap(): List<Color> {
-                return map { it.color }
-            }
 
             val NWK_WTC = LineId(
                 headSign = "World Trade Center",
-                colors = Colors.NwkWtc.unwrap(),
+                colors = Colors.NwkWtc,
                 direction = NewYork
             )
             val WTC_NWK = LineId(
                 headSign = "Newark",
-                colors = Colors.NwkWtc.unwrap(),
+                colors = Colors.NwkWtc,
                 direction = NewJersey
             )
             val OK_33S_JSQ = LineId(
                 headSign = "Journal Square",
-                colors = Colors.Jsq33s.unwrap(),
+                colors = Colors.Jsq33s,
                 direction = NewJersey
             )
             val OK_JSQ_33S = LineId(
                 headSign = "33rd Street",
-                colors = Colors.Jsq33s.unwrap(),
+                colors = Colors.Jsq33s,
                 direction = NewYork
             )
             val PAIN_33S_JSQ = LineId(
                 headSign = "Journal Square via Hoboken",
-                colors = Colors.Hob33s.unwrap() + Colors.Jsq33s.unwrap(),
+                colors = Colors.Hob33s + Colors.Jsq33s,
                 direction = NewJersey
             )
             val PAIN_JSQ_33S = LineId(
                 headSign = "33rd Street via Hoboken",
-                colors = Colors.Hob33s.unwrap() + Colors.Jsq33s.unwrap(),
+                colors = Colors.Hob33s + Colors.Jsq33s,
                 direction = NewYork
             )
             val HOB_WTC = LineId(
                 headSign = "World Trade Center",
-                colors = Colors.HobWtc.unwrap(),
+                colors = Colors.HobWtc,
                 direction = NewYork
             )
             val WTC_HOB = LineId(
                 headSign = "Hoboken",
-                colors = Colors.HobWtc.unwrap(),
+                colors = Colors.HobWtc,
                 direction = NewJersey
             )
             val OK_HOB_33S = LineId(
                 headSign = "33rd Street",
-                colors = Colors.Hob33s.unwrap(),
+                colors = Colors.Hob33s,
                 direction = NewYork
             )
             val OK_33S_HOB = LineId(
                 headSign = "Hoboken",
-                colors = Colors.Hob33s.unwrap(),
+                colors = Colors.Hob33s,
                 direction = NewJersey
             )
         }

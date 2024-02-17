@@ -10,10 +10,14 @@ import kotlin.coroutines.resume
 
 class IosExternalRoutingManager : ExternalRoutingManager {
     override suspend fun openEmail(): Boolean {
-        val url = NSURL.URLWithString("mailto:$FeedbackEmail") ?: return false
+        return openUrl("mailto:$FeedbackEmail")
+    }
+
+    override suspend fun openUrl(url: String): Boolean {
+        val nsUrl = NSURL.URLWithString("url") ?: return false
         return suspendCancellableCoroutine { continuation ->
             UIApplication.sharedApplication.openURL(
-                url = url,
+                url = nsUrl,
                 options = emptyMap<Any?, Any?>()
             ) { result ->
                 continuation.resume(result)

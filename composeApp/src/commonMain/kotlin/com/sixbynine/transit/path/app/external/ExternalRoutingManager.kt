@@ -8,6 +8,8 @@ import getPlatform
 interface ExternalRoutingManager {
     suspend fun openEmail(): Boolean
 
+    suspend fun openUrl(url: String): Boolean
+
     fun shareTextToSystem(text: String): Boolean
 
     suspend fun launchAppRating(): Boolean

@@ -44,6 +44,10 @@ object Analytics {
     fun rateAppClicked() {
         strategy.logEvent("rate_app_clicked")
     }
+
+    fun buyMeACoffeeClicked() {
+        strategy.logEvent("buy_me_a_coffee_clicked")
+    }
 }
 
 interface AnalyticsStrategy {

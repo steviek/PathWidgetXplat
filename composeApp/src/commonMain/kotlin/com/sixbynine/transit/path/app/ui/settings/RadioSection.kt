@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.sixbynine.transit.path.app.ui.RadioButtonWithText
 
@@ -17,10 +18,11 @@ import com.sixbynine.transit.path.app.ui.RadioButtonWithText
 fun RadioSection(
     modifier: Modifier = Modifier,
     title: String? = null,
+    titleStyle: TextStyle = MaterialTheme.typography.titleMedium,
     content: @Composable RadioSectionScope.() -> Unit
 ) {
     Column(modifier.selectableGroup()) {
-        title?.let { SettingsHeader(it) }
+        title?.let { SettingsHeader(it, style = titleStyle) }
         val scope = RadioSectionScope(this)
         scope.content()
     }
@@ -49,10 +51,10 @@ class RadioSectionScope(column: ColumnScope) : ColumnScope by column {
 }
 
 @Composable
-fun SettingsHeader(text: String) {
+fun SettingsHeader(text: String, style: TextStyle = MaterialTheme.typography.titleMedium) {
     Text(
         text = text,
-        style = MaterialTheme.typography.titleMedium,
+        style = style,
         color = MaterialTheme.colorScheme.onSurface,
         modifier = Modifier.padding(horizontal = 16.dp).semantics { heading() }
     )

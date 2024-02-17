@@ -4,15 +4,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.MR.strings
-import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.StationSort.Alphabetical
 import com.sixbynine.transit.path.api.Stations
-import com.sixbynine.transit.path.api.TrainFilter
-import com.sixbynine.transit.path.api.isEastOf
+import com.sixbynine.transit.path.api.TrainFilter.Companion.matchesFilter
 import com.sixbynine.transit.path.api.isInNewJersey
 import com.sixbynine.transit.path.api.isInNewYork
-import com.sixbynine.transit.path.api.isWestOf
 import com.sixbynine.transit.path.app.lifecycle.AppLifecycleObserver
 import com.sixbynine.transit.path.app.settings.SettingsManager
 import com.sixbynine.transit.path.app.settings.TimeDisplay
@@ -335,23 +332,6 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
                 append(time)
 
                 toString()
-            }
-        }
-
-        private fun matchesFilter(
-            station: Station,
-            train: WidgetData.TrainData,
-            filter: TrainFilter
-        ): Boolean {
-            if (filter == TrainFilter.All) return true
-
-            val destination = Stations.fromHeadSign(train.title) ?: return true
-            return when {
-                // Newport -> Hoboken is the only time an NJ-terminating train travels east.
-                destination == Stations.Hoboken -> station.isInNewYork
-                station.isInNewYork -> destination.isInNewJersey || destination isWestOf station
-                station.isInNewJersey -> destination.isInNewYork || destination isEastOf station
-                else -> true // never happens, here for readability
             }
         }
     }

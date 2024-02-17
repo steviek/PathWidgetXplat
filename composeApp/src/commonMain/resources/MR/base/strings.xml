@@ -3,10 +3,12 @@
     <string name="and_or">and/or</string>
     <string name="app_name">Departures for PATH</string>
     <string name="back">Back</string>
+    <string name="buy_me_a_coffee">Buy me a coffee</string>
     <string name="cannot_move_explanation">You have sorted stations by state</string>
     <string name="choose_stations">Choose stations to view in the app</string>
     <string name="closest_station">The closest station (requires location access)</string>
     <string name="confirm">Confirm</string>
+    <string name="complete_widget_setup">Complete widget setup</string>
     <string name="delay_time">Delayed - </string>
     <string name="delete">Delete</string>
     <string name="done">Done</string>
@@ -63,4 +65,5 @@
     <string name="updated_at_time">Updated at %1$s</string>
     <string name="updating">Updating…</string>
     <string name="welcome_text">Welcome to the Departures widget for PATH app. To add a widget, press and hold your home screen and search for this app.</string>
+    <string name="widget_configuration">Widget configuration</string>
 </resources>

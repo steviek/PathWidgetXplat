@@ -1,6 +1,5 @@
 package com.sixbynine.transit.path.app.external
 
-import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import androidx.core.net.toUri
@@ -28,6 +27,14 @@ object AndroidExternalRoutingManager : ExternalRoutingManager {
         return runCatching { activity.startActivity(intent) }.isSuccess
     }
 
+    override suspend fun openUrl(url: String): Boolean {
+        val activity = ActivityRegistry.peekCreatedActivity() ?: return false
+
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.data = url.toUri()
+        return runCatching { activity.startActivity(intent) }.isSuccess
+    }
+
     override fun shareTextToSystem(text: String): Boolean {
         val activity = ActivityRegistry.peekCreatedActivity() ?: return false
         val intent = Intent().apply {
@@ -48,7 +55,7 @@ object AndroidExternalRoutingManager : ExternalRoutingManager {
                 manager.requestReviewFlow().await()
             }.getOrElse {
                 Firebase.crashlytics.recordException(ReviewFlowFailedException(it))
-                return@withContext activity.openPlayStoreUrl()
+                return@withContext openPlayStoreUrl()
             }
 
             suspendRunCatching { manager.launchReviewFlow(activity, request).await() }
@@ -56,21 +63,21 @@ object AndroidExternalRoutingManager : ExternalRoutingManager {
                     onSuccess = { true },
                     onFailure = {
                         Firebase.crashlytics.recordException(ReviewFlowFailedException(it))
-                        activity.openPlayStoreUrl()
+                        openUrl(
+                            "https://play.google.com/store/apps/details?id=com.sixbynine" +
+                                    ".transit.path"
+                        )
+                        openPlayStoreUrl()
                     }
                 )
         }
     }
+
+    private suspend fun openPlayStoreUrl(): Boolean {
+        return openUrl("https://play.google.com/store/apps/details?id=com.sixbynine.transit.path")
+    }
 }
 
-private fun Activity.openPlayStoreUrl(): Boolean {
-    val intent = Intent(Intent.ACTION_VIEW)
-    intent.data =
-        "https://play.google.com/store/apps/details?id=com.sixbynine.transit.path".toUri()
-    return runCatching { startActivity(intent) }.isSuccess
-}
-
-class FailedToLaunchRatingException(cause: Throwable?) : RuntimeException(cause)
 class ReviewFlowFailedException(cause: Throwable?) : RuntimeException(cause)
 
 

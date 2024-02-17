@@ -37,6 +37,7 @@ object SettingsContract {
         data object SendFeedbackClicked : Intent
         data object RateAppClicked : Intent
         data object ShareAppClicked : Intent
+        data object BuyMeACoffeeClicked : Intent
     }
 
     sealed interface Effect {

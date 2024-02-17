@@ -58,9 +58,12 @@
     <string name="station_order_ny_am_title">Pendolero/a de Nueva York</string>
     <string name="stations">Estaciones</string>
     <string name="to_destination">%1$s</string>
+    <string name="buy_me_a_coffee">Cómprame un café</string>
     <string name="update_footer_text">Se actualizó a las %1$s, va actualizarse de nuevo en %2$s</string>
     <string name="update_now">Actualizar ahora</string>
     <string name="updated_at_time">Se actualizó a las %1$s</string>
+    <string name="complete_widget_setup">Arreglar el widget</string>
     <string name="updating">Actualizando…</string>
     <string name="welcome_text">Bienvenido al widget de Salidas para la aplicación PATH. Para añadir un widget, mantenga presionada la pantalla de inicio y busque esta aplicación.</string>
+    <string name="widget_configuration">Configuración del widget</string>
 </resources>

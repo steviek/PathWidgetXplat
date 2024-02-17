@@ -24,6 +24,7 @@ import com.sixbynine.transit.path.app.ui.icon.IconType
 import com.sixbynine.transit.path.app.ui.icon.NativeIconButton
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.BottomSheetType
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Effect.GoBack
+import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.BuyMeACoffeeClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.RateAppClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.SendFeedbackClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.ShareAppClicked
@@ -77,11 +78,13 @@ fun SettingsScope.Content() {
 
             Divider()
 
-            SettingsItem(stringResource(strings.send_feedback)) { onIntent(SendFeedbackClicked) }
-
             SettingsItem(stringResource(strings.rate_app)) { onIntent(RateAppClicked) }
 
             SettingsItem(stringResource(strings.share_app)) { onIntent(ShareAppClicked) }
+
+            SettingsItem(stringResource(strings.send_feedback)) { onIntent(SendFeedbackClicked) }
+
+            SettingsItem(stringResource(strings.buy_me_a_coffee)) { onIntent(BuyMeACoffeeClicked) }
         }
 
         StationLimitBottomSheet(

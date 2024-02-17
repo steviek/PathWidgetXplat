@@ -16,6 +16,8 @@ import androidx.glance.appwidget.updateAll
 import androidx.glance.currentState
 import com.sixbynine.transit.path.MR.strings
 import com.sixbynine.transit.path.PathApplication
+import com.sixbynine.transit.path.api.Stations
+import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.resources.getString
 import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.time.today
@@ -74,6 +76,19 @@ class DepartureBoardWidget : GlanceAppWidget() {
             newStations.removeAll { it.id == closestStation.pathApiName }
             widgetData.stations.find { it.id == closestStation.pathApiName }?.let {
                 newStations.add(0, it)
+            }
+        }
+
+        if (configuration.filter == TrainFilter.Interstate) {
+            newStations.forEachIndexed { index, stationData ->
+                val station =
+                    Stations.All.find { it.pathApiName == stationData.id } ?: return@forEachIndexed
+                newStations[index] = stationData.copy(
+                    signs = stationData.signs.filter { sign ->
+                        val destination = Stations.fromHeadSign(sign.title) ?: return@filter true
+                        TrainFilter.matchesFilter(station, destination, TrainFilter.Interstate)
+                    }
+                )
             }
         }
 

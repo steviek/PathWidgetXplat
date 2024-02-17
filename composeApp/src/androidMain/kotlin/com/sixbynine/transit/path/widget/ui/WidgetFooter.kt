@@ -1,23 +1,16 @@
 package com.sixbynine.transit.path.widget.ui
 
-import android.appwidget.AppWidgetManager
-import android.content.Intent
 import android.os.Build.VERSION
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceModifier
-import androidx.glance.LocalContext
-import androidx.glance.LocalGlanceId
 import androidx.glance.LocalSize
 import androidx.glance.Visibility.Gone
 import androidx.glance.Visibility.Invisible
 import androidx.glance.Visibility.Visible
-import androidx.glance.action.Action
 import androidx.glance.appwidget.CircularProgressIndicator
-import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.action.actionRunCallback
-import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Row
@@ -37,7 +30,7 @@ import com.sixbynine.transit.path.widget.WidgetDataFormatter
 import com.sixbynine.transit.path.widget.glance.GlanceTheme
 import com.sixbynine.transit.path.widget.glance.ImageButton
 import com.sixbynine.transit.path.widget.glance.Text
-import com.sixbynine.transit.path.widget.setup.WidgetSetupActivity
+import com.sixbynine.transit.path.widget.startConfigurationActivityAction
 
 @Composable
 fun WidgetFooter(
@@ -113,19 +106,6 @@ fun WidgetFooter(
             )
         }
     }
-}
-
-@Composable
-private fun startConfigurationActivityAction(): Action {
-    val context = LocalContext.current
-    val appWidgetManager = GlanceAppWidgetManager(context)
-    val appWidgetId = appWidgetManager.getAppWidgetId(LocalGlanceId.current)
-    val configurationIntent =
-        Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE)
-            .setClass(LocalContext.current, WidgetSetupActivity::class.java)
-            .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-    return actionStartActivity(configurationIntent)
 }
 
 internal val WidgetFooterHeight = 48.dp

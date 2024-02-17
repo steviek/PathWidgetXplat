@@ -5,6 +5,7 @@ import com.sixbynine.transit.path.api.State.NewJersey
 import com.sixbynine.transit.path.api.State.NewYork
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.Stations
+import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.api.state
 import com.sixbynine.transit.path.app.ui.ScreenScope
 import com.sixbynine.transit.path.widget.StationByDisplayNameComparator
@@ -17,6 +18,7 @@ object WidgetSetupScreenContract {
         val njStations: List<StationRow> = defaultStations(NewJersey),
         val nyStations: List<StationRow> = defaultStations(NewYork),
         val sortOrder: StationSort = StationSort.Alphabetical,
+        val filter: TrainFilter = TrainFilter.All,
         val appWidgetId: Int = INVALID_APPWIDGET_ID,
     ) {
         val isConfirmButtonEnabled =
@@ -43,6 +45,7 @@ object WidgetSetupScreenContract {
         data class UseClosestStationToggled(val checked: Boolean) : Intent
         data class StationToggled(val id: String, val checked: Boolean) : Intent
         data class SortOrderSelected(val sortOrder: StationSort) : Intent
+        data class TrainFilterSelected(val filter: TrainFilter) : Intent
         data object ConfirmClicked : Intent
     }
 

@@ -2,17 +2,19 @@ package com.sixbynine.transit.path.widget.setup
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -21,14 +23,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.sixbynine.transit.path.MR.strings
 import com.sixbynine.transit.path.api.StationSort
+import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.app.ui.CheckboxWithText
-import com.sixbynine.transit.path.app.ui.RadioButtonWithText
+import com.sixbynine.transit.path.app.ui.settings.RadioSection
 import com.sixbynine.transit.path.app.ui.settings.SettingsHeader
+import com.sixbynine.transit.path.app.ui.settings.subtext
+import com.sixbynine.transit.path.app.ui.settings.subtitle
 import com.sixbynine.transit.path.app.ui.settings.title
 import com.sixbynine.transit.path.app.ui.theme.AppTheme
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent.ConfirmClicked
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent.SortOrderSelected
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent.StationToggled
+import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent.TrainFilterSelected
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent.UseClosestStationToggled
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.StationRow
 import dev.icerock.moko.resources.compose.stringResource
@@ -43,71 +49,108 @@ fun WidgetSetupScreen(viewModel: WidgetSetupViewModel) {
 @Composable
 fun WidgetSetupScreenScope.WidgetSetupScreenContent() {
     AppTheme {
-        Surface(color = MaterialTheme.colorScheme.background) {
-            Column(
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-            ) {
-                Spacer(modifier = Modifier.height(16.dp))
-
-                SettingsHeader(text = stringResource(strings.stations))
-
-                CheckboxWithText(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    checked = state.useClosestStation,
-                    text = stringResource(strings.closest_station),
-                    onCheckedChange = { onIntent(UseClosestStationToggled(it)) }
+        Scaffold(
+            topBar = {
+                CenterAlignedTopAppBar(
+                    title = { Text(stringResource(strings.widget_configuration)) }
                 )
-
-                Text(
+            },
+            containerColor = MaterialTheme.colorScheme.background
+        ) { contentPadding ->
+            Column(Modifier.padding(contentPadding)) {
+                Column(
                     modifier = Modifier
-                        .padding(vertical = 8.dp)
-                        .padding(start = 64.dp),
-                    text = stringResource(strings.and_or),
-                )
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                Row {
-                    StationColumn(rows = state.njStations, modifier = Modifier.weight(1f))
-                    StationColumn(rows = state.nyStations, modifier = Modifier.weight(1f))
-                }
+                    SettingsHeader(
+                        text = stringResource(strings.stations),
+                        style = TitleStyle
+                    )
 
-                Column(Modifier.selectableGroup()) {
-                    SettingsHeader(text = stringResource(strings.station_order))
+                    CheckboxWithText(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        checked = state.useClosestStation,
+                        text = stringResource(strings.closest_station),
+                        onCheckedChange = { onIntent(UseClosestStationToggled(it)) }
+                    )
 
-                    if (state.useClosestStation) {
-                        Text(
-                            text = stringResource(strings.closest_always_first),
-                            modifier = Modifier.padding(horizontal = 16.dp),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                    Text(
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .padding(start = 64.dp),
+                        text = stringResource(strings.and_or),
+                    )
+
+                    Row {
+                        StationColumn(rows = state.njStations, modifier = Modifier.weight(1f))
+                        StationColumn(rows = state.nyStations, modifier = Modifier.weight(1f))
                     }
 
-                    StationSort.entries.forEach { sortOrder ->
-                        RadioButtonWithText(
-                            modifier = Modifier.padding(horizontal = 16.dp),
-                            text = stringResource(sortOrder.title),
-                            selected = sortOrder == state.sortOrder,
-                            onClick = { onIntent(SortOrderSelected(sortOrder)) }
-                        )
+                    Spacer(Modifier.height(24.dp))
+
+                    RadioSection(
+                        title = stringResource(strings.station_order),
+                        titleStyle = TitleStyle
+                    ) {
+                        if (state.useClosestStation) {
+                            Text(
+                                text = stringResource(strings.closest_always_first),
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+
+                        StationSort.entries.forEach { sortOrder ->
+                            item(
+                                text = stringResource(sortOrder.title),
+                                subtext = sortOrder.subtitle?.let { stringResource(it) },
+                                selected = sortOrder == state.sortOrder,
+                                onClick = { onIntent(SortOrderSelected(sortOrder)) }
+                            )
+                        }
+                    }
+
+                    Spacer(Modifier.height(24.dp))
+
+                    RadioSection(
+                        title = stringResource(strings.filter),
+                        titleStyle = TitleStyle
+                    ) {
+                        TrainFilter.entries.forEach { filter ->
+                            item(
+                                text = stringResource(filter.title),
+                                subtext = filter.subtext?.let { stringResource(it) },
+                                selected = filter == state.filter,
+                                onClick = { onIntent(TrainFilterSelected(filter)) }
+                            )
+                        }
                     }
                 }
+
+                Divider()
 
                 Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                     Button(
                         modifier = Modifier.fillMaxWidth(),
+                        contentPadding = PaddingValues(0.dp),
                         enabled = state.isConfirmButtonEnabled,
-                        onClick = { onIntent(ConfirmClicked) }) {
+                        onClick = { onIntent(ConfirmClicked) }
+                    ) {
                         Text(stringResource(strings.confirm))
                     }
                 }
-
-
-                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }
+
+
 }
+
+private val TitleStyle @Composable get() = MaterialTheme.typography.headlineSmall
 
 @Composable
 private fun WidgetSetupScreenScope.StationColumn(

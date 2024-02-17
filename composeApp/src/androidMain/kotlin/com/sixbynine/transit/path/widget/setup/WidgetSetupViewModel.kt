@@ -10,6 +10,7 @@ import com.sixbynine.transit.path.api.State.NewJersey
 import com.sixbynine.transit.path.api.State.NewYork
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.Stations
+import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.api.state
 import com.sixbynine.transit.path.util.suspendRunCatching
 import com.sixbynine.transit.path.widget.DepartureBoardWidget
@@ -25,6 +26,7 @@ import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent.
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent.PermissionRequestComplete
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent.SortOrderSelected
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent.StationToggled
+import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent.TrainFilterSelected
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent.UseClosestStationToggled
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.State
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.StationRow
@@ -66,6 +68,7 @@ class WidgetSetupViewModel : ViewModel() {
                             copy(
                                 useClosestStation = storedData.useClosestStation,
                                 sortOrder = storedData.sortOrder ?: StationSort.Alphabetical,
+                                filter = storedData.filter ?: TrainFilter.All,
                                 njStations = Stations.All
                                     .filter { it.state == NewJersey }
                                     .sortedWith(StationByDisplayNameComparator)
@@ -148,6 +151,10 @@ class WidgetSetupViewModel : ViewModel() {
                 setState { copy(sortOrder = intent.sortOrder) }
             }
 
+            is TrainFilterSelected -> {
+                setState { copy(filter = intent.filter) }
+            }
+
             ConfirmClicked -> {
                 viewModelScope.launch {
                     val currentState = state.value
@@ -160,7 +167,8 @@ class WidgetSetupViewModel : ViewModel() {
                         StoredWidgetConfiguration(
                             fixedStations = selectedStations.toSet(),
                             useClosestStation = currentState.useClosestStation,
-                            sortOrder = currentState.sortOrder
+                            sortOrder = currentState.sortOrder,
+                            filter = currentState.filter,
                         )
                     )
                     DepartureBoardWidget().updateAll(context)

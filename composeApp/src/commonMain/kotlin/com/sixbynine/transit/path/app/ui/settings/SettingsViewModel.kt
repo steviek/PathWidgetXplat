@@ -14,6 +14,7 @@ import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Effect.GoBack
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.BackClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.BottomSheetDismissed
+import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.BuyMeACoffeeClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.RateAppClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.SendFeedbackClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.ShareAppClicked
@@ -134,6 +135,13 @@ class SettingsViewModel : BaseViewModel<State, Intent, Effect>(
             ShareAppClicked -> {
                 Analytics.shareAppClicked()
                 ExternalRoutingManager().shareAppToSystem()
+            }
+
+            BuyMeACoffeeClicked -> {
+                Analytics.buyMeACoffeeClicked()
+                viewModelScope.launch {
+                    ExternalRoutingManager().openUrl("https://www.buymeacoffee.com/kideckel")
+                }
             }
         }
     }

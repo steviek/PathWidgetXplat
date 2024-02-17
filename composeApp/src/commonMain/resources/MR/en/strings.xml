@@ -22,6 +22,7 @@
     <string name="langauge_code">en</string>
     <string name="move_down">Move down</string>
     <string name="move_up">Move up</string>
+    <string name="buy_me_a_coffee">Buy me a coffee</string>
     <string name="presumed_train">Presumed train</string>
     <string name="presumed_trains_subtext">Presumed trains are those which aren’t yet reported by RidePATH, but which should exist because of reported trains at stations earlier in the line and the usual travel time between stations.</string>
     <string name="rate_app">Rate app</string>
@@ -51,6 +52,7 @@
     <string name="station_filter_three_per_line">3 trains per line</string>
     <string name="station_filter_two_per_line">2 trains per line</string>
     <string name="station_order">Station order</string>
+    <string name="complete_widget_setup">Complete widget setup</string>
     <string name="station_order_fixed">Fixed</string>
     <string name="station_order_nj_am_subtext">Show trains from New Jersey first in the morning, and trains from New York first in the evening</string>
     <string name="station_order_nj_am_title">New Jersey commuter</string>
@@ -63,4 +65,5 @@
     <string name="updated_at_time">Updated at %1$s</string>
     <string name="updating">Updating…</string>
     <string name="welcome_text">Welcome to the Departures widget for PATH app. To add a widget, press and hold your home screen and search for this app.</string>
+    <string name="widget_configuration">Widget configuration</string>
 </resources>

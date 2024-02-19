@@ -24,7 +24,7 @@ object Logging {
             println(message)
             return
         }
-        if (IsDebug) return
+        if (!IsDebug) return
         initialize()
         Napier.d(message)
     }

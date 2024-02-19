@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceModifier
+import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.appWidgetBackground
 import androidx.glance.background
@@ -12,10 +13,12 @@ import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
+import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.text.TextAlign
 import com.sixbynine.transit.path.MR.strings
+import com.sixbynine.transit.path.MainActivity
 import com.sixbynine.transit.path.resources.getString
 import com.sixbynine.transit.path.widget.glance.GlanceTheme
 import com.sixbynine.transit.path.widget.glance.Text
@@ -30,11 +33,11 @@ fun WidgetContent(state: WidgetState) {
                 .fillMaxSize(),
             contentAlignment = Alignment.Center,
         ) {
-           if (state.needsSetup) {
+            if (state.needsSetup) {
                 SetupView()
-           } else {
+            } else {
                 MainWidgetContent(state)
-           }
+            }
         }
     }
 }
@@ -53,8 +56,15 @@ private fun MainWidgetContent(state: WidgetState) {
         )
     }
 
-    Box(GlanceModifier.padding(bottom = WidgetFooterHeight)) {
-        DepartureBoard(result = result, modifier = GlanceModifier.fillMaxSize())
+    Box(
+        GlanceModifier
+            .fillMaxSize()
+            .padding(bottom = WidgetFooterHeight),
+        contentAlignment = Alignment.TopCenter
+    ) {
+        Spacer(GlanceModifier.fillMaxSize().clickable(actionStartActivity<MainActivity>()))
+
+        DepartureBoard(result = result, modifier = GlanceModifier.fillMaxWidth())
     }
 }
 

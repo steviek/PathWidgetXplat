@@ -1,19 +1,16 @@
 package com.sixbynine.transit.path.widget.ui
 
-import android.graphics.drawable.Icon
 import android.os.Build.VERSION
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.glance.ColorFilter
+import androidx.glance.ColorFilter.Companion.tint
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
 import androidx.glance.ImageProvider
-import androidx.glance.LocalContext
 import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.lazy.LazyColumn
-import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
@@ -112,52 +109,32 @@ private fun ColorWrapper.toColorProvider(): ColorProvider {
 }
 
 @Composable
-private fun ColorBox(firstColor: ColorProvider?, secondColor: ColorProvider? = null) {
-    // We display a single color using a spacer background or two colors tinting two triangles if
-    // possible. We use visibility to choose views rather than `if` because this allows Glance to
-    // recycle views in the generated RemoteViews.
+private fun ColorBox(firstColor: ColorProvider?, secondColor: ColorProvider?) {
     Box(modifier = GlanceModifier.size(18.dp)) {
-        val context = LocalContext.current
-        val leftImageProvider: ImageProvider
-        val rightImageProvider: ImageProvider
-        if (VERSION.SDK_INT >= 23) {
-            leftImageProvider =
-                ImageProvider(
-                    Icon.createWithResource(context, drawable.circle_left)
-                )
-            rightImageProvider =
-                ImageProvider(
-                    Icon.createWithResource(context, drawable.circle_right)
-                )
-            Row(GlanceModifier.fillMaxSize()) {
-                Image(
-                    modifier = GlanceModifier.defaultWeight(),
-                    provider = leftImageProvider,
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(firstColor ?: TransparentColorProvider)
-                )
-                Image(
-                    modifier = GlanceModifier.defaultWeight(),
-                    provider = rightImageProvider,
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(
-                        secondColor ?: firstColor ?: TransparentColorProvider
-                    )
-                )
-            }
+        Image(
+            modifier = GlanceModifier.fillMaxSize(),
+            provider = ImageProvider(drawable.circle),
+            contentDescription = null,
+            colorFilter = tint(firstColor ?: TransparentColorProvider)
+        )
+
+        Row(GlanceModifier.fillMaxSize()) {
+            Spacer(GlanceModifier.defaultWeight())
+
             Image(
-                modifier = GlanceModifier.fillMaxSize(),
-                provider = ImageProvider(drawable.circle_border),
-                contentScale = ContentScale.Crop,
-                contentDescription = null
-            )
-        } else {
-            Spacer(
-                modifier = GlanceModifier
-                    .background(firstColor ?: TransparentColorProvider)
-                    .fillMaxSize()
+                modifier = GlanceModifier.defaultWeight(),
+                provider = ImageProvider(drawable.circle_right),
+                contentDescription = null,
+                colorFilter = tint(secondColor ?: firstColor ?: TransparentColorProvider)
             )
         }
+
+        Image(
+            modifier = GlanceModifier.fillMaxSize(),
+            provider = ImageProvider(drawable.circle_border),
+            contentScale = ContentScale.Crop,
+            contentDescription = null
+        )
     }
 }
 

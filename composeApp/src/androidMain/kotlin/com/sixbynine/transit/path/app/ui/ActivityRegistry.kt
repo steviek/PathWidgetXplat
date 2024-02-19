@@ -12,7 +12,7 @@ object ActivityRegistry {
     private val createdActivities = mutableSetOf<BaseActivity>()
     private val startedActivities = mutableSetOf<Activity>()
 
-    fun peekCreatedActivity() = createdActivities.firstOrNull()
+    fun peekCreatedActivity() = createdActivities.lastOrNull()
 
     fun register(application: Application) {
         application.registerActivityLifecycleCallbacks(

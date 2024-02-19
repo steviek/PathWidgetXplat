@@ -18,7 +18,6 @@ import com.sixbynine.transit.path.location.LocationPermissionRequestResult.Grant
 import com.sixbynine.transit.path.util.suspendRunCatching
 import com.sixbynine.transit.path.widget.DepartureBoardWidget
 import com.sixbynine.transit.path.widget.StationByDisplayNameComparator
-import com.sixbynine.transit.path.widget.configuration.StoredWidgetConfiguration
 import com.sixbynine.transit.path.widget.configuration.WidgetConfigurationManager
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Effect
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Effect.CompleteConfigurationIntent
@@ -104,6 +103,7 @@ class WidgetSetupViewModel : ViewModel() {
                                 copy(useClosestStation = false)
                             }
                         }
+
                         Granted -> {}
                     }
                 }
@@ -166,12 +166,10 @@ class WidgetSetupViewModel : ViewModel() {
                                 currentState.nyStations.filter { it.checked }.map { it.id }
                     WidgetConfigurationManager.setWidgetConfiguration(
                         glanceId,
-                        StoredWidgetConfiguration(
-                            fixedStations = selectedStations.toSet(),
-                            useClosestStation = currentState.useClosestStation,
-                            sortOrder = currentState.sortOrder,
-                            filter = currentState.filter,
-                        )
+                        selectedStations,
+                        currentState.useClosestStation,
+                        currentState.sortOrder,
+                        currentState.filter,
                     )
                     DepartureBoardWidget().updateAll(context)
                     sendEffect(CompleteConfigurationIntent(currentState.appWidgetId))

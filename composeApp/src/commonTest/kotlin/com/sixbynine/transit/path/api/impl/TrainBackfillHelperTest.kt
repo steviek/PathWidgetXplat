@@ -80,10 +80,10 @@ class TrainBackfillHelperTest {
         val expTrainsTimes =
             expTrains?.map { it.lineColors to it.projectedArrival.printForAssertions() }
         assertNotNull(expTrainsTimes)
-        assertContains(expTrainsTimes, Colors.NwkWtc.unwrap() to "10:04")
-        assertContains(expTrainsTimes, Colors.HobWtc.unwrap() to "10:07")
-        assertContains(expTrainsTimes, Colors.NwkWtc.unwrap() to "10:23")
-        assertContains(expTrainsTimes, Colors.HobWtc.unwrap() to "10:27")
+        assertContains(expTrainsTimes, Colors.NwkWtc to "10:04")
+        assertContains(expTrainsTimes, Colors.HobWtc to "10:07")
+        assertContains(expTrainsTimes, Colors.NwkWtc to "10:23")
+        assertContains(expTrainsTimes, Colors.HobWtc to "10:27")
     }
 
     @Test
@@ -348,7 +348,7 @@ class TrainBackfillHelperTest {
             return DepartureBoardTrain(
                 headsign = "Newark",
                 projectedArrival = projectedArrival,
-                lineColors = Colors.NwkWtc.map { it.color },
+                lineColors = Colors.NwkWtc,
                 isDelayed = false,
                 backfillSource = null,
                 directionState = NewJersey
@@ -359,7 +359,7 @@ class TrainBackfillHelperTest {
             return DepartureBoardTrain(
                 headsign = "World Trade Center",
                 projectedArrival = projectedArrival,
-                lineColors = Colors.NwkWtc.map { it.color },
+                lineColors = Colors.NwkWtc,
                 isDelayed = false,
                 backfillSource = null,
                 directionState = NewYork
@@ -370,7 +370,7 @@ class TrainBackfillHelperTest {
             return DepartureBoardTrain(
                 headsign = "World Trade Center",
                 projectedArrival = projectedArrival,
-                lineColors = Colors.HobWtc.map { it.color },
+                lineColors = Colors.HobWtc,
                 isDelayed = false,
                 backfillSource = null,
                 directionState = NewYork
@@ -381,7 +381,7 @@ class TrainBackfillHelperTest {
             return DepartureBoardTrain(
                 headsign = "Hoboken",
                 projectedArrival = projectedArrival,
-                lineColors = Colors.HobWtc.map { it.color },
+                lineColors = Colors.HobWtc,
                 isDelayed = false,
                 backfillSource = null,
                 directionState = NewJersey
@@ -392,7 +392,7 @@ class TrainBackfillHelperTest {
             return DepartureBoardTrain(
                 headsign = "Journal Square",
                 projectedArrival = projectedArrival,
-                lineColors = Colors.NwkWtc.map { it.color },
+                lineColors = Colors.NwkWtc,
                 isDelayed = false,
                 backfillSource = null,
                 directionState = NewJersey

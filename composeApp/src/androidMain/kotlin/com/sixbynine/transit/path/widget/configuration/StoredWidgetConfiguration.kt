@@ -12,6 +12,7 @@ data class StoredWidgetConfiguration(
     val useClosestStation: Boolean = false,
     val sortOrder: StationSort? = null,
     val filter: TrainFilter? = null,
+    val version: Int = 1,
 )
 
 fun StoredWidgetConfiguration?.needsSetup(): Boolean {

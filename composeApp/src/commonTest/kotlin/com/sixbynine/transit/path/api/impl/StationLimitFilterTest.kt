@@ -41,7 +41,7 @@ class StationLimitFilterTest {
         return TrainData(
             "1",
             title,
-            colors = colors.map { it.color },
+            colors = colors,
             projectedArrival = System.now() + fromNow,
             displayText = "foo"
         )

@@ -122,7 +122,7 @@ private fun getMediumWidgetSize(): DpSize {
             )
         )
     val updatedAtWidth = estimateTextWidth(context, widestUpdatedAtText, 12.sp)
-    val requiredWidth = (WidgetFooterHeight * 2) + (8.dp * 2) + updatedAtWidth
+    val requiredWidth = (WidgetFooterHeight * 2) + updatedAtWidth
     return DpSize(requiredWidth, 1.dp)
 }
 

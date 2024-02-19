@@ -5,6 +5,7 @@ import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
 
 object Logging {
+    private const val IsDebug = false
     private val hasInitialized = MutableStateFlow(false)
     private var isTest = false
 
@@ -23,6 +24,7 @@ object Logging {
             println(message)
             return
         }
+        if (IsDebug) return
         initialize()
         Napier.d(message)
     }

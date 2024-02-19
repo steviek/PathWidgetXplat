@@ -1,6 +1,6 @@
 [versions]
-compose = "1.5.4"
-compose-plugin = "1.5.10"
+compose = "1.6.1"
+compose-plugin = "1.6.0-rc02"
 compose-compiler = "1.5.3"
 agp = "8.2.2"
 android-minSdk = "21"
@@ -10,7 +10,7 @@ android-tools-desugar = "2.0.4"
 androidx-activityCompose = "1.8.0"
 androidx-core-ktx = "1.12.0"
 androidx-appcompat = "1.6.1"
-androidx-material = "1.10.0"
+androidx-material = "1.11.0"
 androidx-constraintlayout = "2.1.4"
 androidx-test-junit = "1.1.5"
 androidx-espresso-core = "3.5.1"
@@ -45,6 +45,7 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
+compose-animation = { module = "androidx.compose.animation:animation", version.ref = "compose" }
 compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
 compose-material = { module = "androidx.compose.material:material", version.ref = "compose" }
 android-tools-desugar = { module = "com.android.tools:desugar_jdk_libs", version.ref = "android-tools-desugar" }

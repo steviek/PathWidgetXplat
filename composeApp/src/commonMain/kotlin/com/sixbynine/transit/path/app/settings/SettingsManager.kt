@@ -4,7 +4,8 @@ import com.sixbynine.transit.path.analytics.Analytics
 import com.sixbynine.transit.path.api.LocationSetting
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.TrainFilter
-import com.sixbynine.transit.path.location.LocationPermissionRequestResult
+import com.sixbynine.transit.path.location.LocationPermissionRequestResult.Denied
+import com.sixbynine.transit.path.location.LocationPermissionRequestResult.Granted
 import com.sixbynine.transit.path.location.LocationProvider
 import com.sixbynine.transit.path.util.combineStates
 import kotlinx.coroutines.Dispatchers
@@ -47,23 +48,32 @@ object SettingsManager {
             }
 
             LocationProvider().locationPermissionResults.collectLatest {
-                if (it is LocationPermissionRequestResult.Denied) {
-                    locationSettingPersister.update(LocationSetting.Disabled)
+                when (it) {
+                    Denied -> {
+                        locationSettingPersister.update(LocationSetting.Disabled)
+                    }
+                    Granted -> {
+                        if (locationSettingPersister.flow.value ==
+                            LocationSetting.EnabledPendingPermission
+                        ) {
+                            locationSettingPersister.update(LocationSetting.Enabled)
+                        }
+                    }
                 }
             }
         }
     }
 
     fun updateLocationSetting(enabled: Boolean) {
-        val setting = if (enabled) {
-            LocationSetting.Enabled
-        } else {
-            LocationSetting.Disabled
+        val setting = when {
+            !enabled -> LocationSetting.Disabled
+            LocationProvider().hasLocationPermission() -> LocationSetting.Enabled
+            else -> LocationSetting.EnabledPendingPermission
         }
         Analytics.locationSettingSet(setting)
         locationSettingPersister.update(setting)
 
-        if (enabled && !LocationProvider().hasLocationPermission()) {
+        if (setting == LocationSetting.EnabledPendingPermission) {
             LocationProvider().requestLocationPermission()
         }
     }

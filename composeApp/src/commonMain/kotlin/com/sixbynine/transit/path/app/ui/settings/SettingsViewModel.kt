@@ -3,6 +3,7 @@ package com.sixbynine.transit.path.app.ui.settings
 import com.sixbynine.transit.path.analytics.Analytics
 import com.sixbynine.transit.path.api.LocationSetting.Disabled
 import com.sixbynine.transit.path.api.LocationSetting.Enabled
+import com.sixbynine.transit.path.api.LocationSetting.EnabledPendingPermission
 import com.sixbynine.transit.path.app.external.ExternalRoutingManager
 import com.sixbynine.transit.path.app.external.shareAppToSystem
 import com.sixbynine.transit.path.app.settings.SettingsManager
@@ -49,7 +50,7 @@ class SettingsViewModel : BaseViewModel<State, Intent, Effect>(createInitialStat
         if (LocationProvider().isLocationSupportedByDevice) {
             updateStateOnEach(SettingsManager.locationSetting) {
                 copy(locationSetting = when (it) {
-                    Enabled -> LocationSettingState.Enabled
+                    Enabled, EnabledPendingPermission -> LocationSettingState.Enabled
                     Disabled -> LocationSettingState.Disabled
                 })
             }
@@ -91,6 +92,10 @@ class SettingsViewModel : BaseViewModel<State, Intent, Effect>(createInitialStat
             is ShowPresumedTrainsChanged -> {
                 SettingsManager.updateDisplayPresumedTrains(intent.show)
                 updateState { copy(bottomSheet = null) }
+            }
+
+            is LocationSettingChanged -> {
+                SettingsManager.updateLocationSetting(intent.use)
             }
 
             BackClicked -> sendEffect(GoBack)
@@ -137,10 +142,6 @@ class SettingsViewModel : BaseViewModel<State, Intent, Effect>(createInitialStat
                     ExternalRoutingManager().openUrl("https://www.buymeacoffee.com/kideckel")
                 }
             }
-
-            is LocationSettingChanged -> {
-                SettingsManager.updateLocationSetting(intent.use)
-            }
         }
     }
 
@@ -149,7 +150,7 @@ class SettingsViewModel : BaseViewModel<State, Intent, Effect>(createInitialStat
             val locationSetting = when {
                 LocationProvider().isLocationSupportedByDevice -> {
                     when(SettingsManager.locationSetting.value) {
-                        Enabled -> LocationSettingState.Enabled
+                        Enabled, EnabledPendingPermission -> LocationSettingState.Enabled
                         Disabled -> LocationSettingState.Disabled
                     }
                 }

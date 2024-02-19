@@ -22,7 +22,6 @@ object Colors {
 
     fun background(isDark: Boolean): ColorWrapper {
         Logging.initialize()
-        Napier.d("Get background: isDark=$isDark")
         return if (isDark) {
             md_theme_dark_background.wrap()
         } else {

@@ -18,7 +18,6 @@ import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.size
-import androidx.glance.layout.width
 import androidx.glance.visibility
 import com.sixbynine.transit.path.MR.strings
 import com.sixbynine.transit.path.R.drawable
@@ -70,9 +69,6 @@ fun WidgetFooter(
         )
 
         Spacer(modifier = GlanceModifier.defaultWeight().height(1.dp))
-
-        Spacer(GlanceModifier.width(8.dp))
-
 
         Box(
             modifier = GlanceModifier.size(WidgetFooterHeight),

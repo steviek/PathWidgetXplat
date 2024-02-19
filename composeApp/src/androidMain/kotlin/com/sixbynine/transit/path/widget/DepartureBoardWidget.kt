@@ -27,6 +27,7 @@ import com.sixbynine.transit.path.widget.configuration.StoredWidgetConfiguration
 import com.sixbynine.transit.path.widget.configuration.WidgetConfigurationManager
 import com.sixbynine.transit.path.widget.configuration.needsSetup
 import com.sixbynine.transit.path.widget.ui.WidgetContent
+import com.sixbynine.transit.path.widget.ui.WidgetFooterHeight
 import com.sixbynine.transit.path.widget.ui.WidgetState
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -121,7 +122,7 @@ private fun getMediumWidgetSize(): DpSize {
             )
         )
     val updatedAtWidth = estimateTextWidth(context, widestUpdatedAtText, 12.sp)
-    val requiredWidth = 16.dp * 2 + 8.dp + 32.dp + updatedAtWidth
+    val requiredWidth = (WidgetFooterHeight * 2) + (8.dp * 2) + updatedAtWidth
     return DpSize(requiredWidth, 1.dp)
 }
 

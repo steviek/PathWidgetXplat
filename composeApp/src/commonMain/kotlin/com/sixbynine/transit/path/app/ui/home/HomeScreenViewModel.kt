@@ -3,11 +3,11 @@ package com.sixbynine.transit.path.app.ui.home
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.sixbynine.transit.path.MR.strings
+import com.sixbynine.transit.path.api.LocationSetting.Enabled
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.StationSort.Alphabetical
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.TrainFilter.Companion.matchesFilter
-import com.sixbynine.transit.path.api.isEnabled
 import com.sixbynine.transit.path.api.isInNewJersey
 import com.sixbynine.transit.path.api.isInNewYork
 import com.sixbynine.transit.path.app.lifecycle.AppLifecycleObserver
@@ -306,7 +306,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
                             )
                         },
                     isClosest = data.id == closestStationId &&
-                            SettingsManager.locationSetting.value.isEnabled
+                            SettingsManager.locationSetting.value == Enabled
                 )
                 stationData
             }

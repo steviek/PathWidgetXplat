@@ -21,7 +21,6 @@ import com.sixbynine.transit.path.location.LocationProvider
 import com.sixbynine.transit.path.preferences.Preferences
 import com.sixbynine.transit.path.preferences.StringPreferencesKey
 import com.sixbynine.transit.path.util.DataResult
-import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
@@ -70,10 +69,10 @@ object WidgetDataFetcher {
                     lastFetchTime in (now - 10.seconds)..now &&
                     !force
                 ) {
-                    Napier.d("Reuse existing fetch")
+                    Logging.d("Reuse existing fetch")
                     lastFetch
                 } else {
-                    Napier.d("New fetch")
+                    Logging.d("New fetch")
                     async { PathApi.instance.fetchUpcomingDepartures() }
                         .also {
                             WidgetDataFetcher.lastFetch = it
@@ -95,7 +94,6 @@ object WidgetDataFetcher {
                     null
                 }
 
-
             result
                 .await()
                 .onSuccess {
@@ -111,7 +109,7 @@ object WidgetDataFetcher {
                     )
                 }
                 .onFailure {
-                    Napier.e("Failed to fetch", it)
+                    Logging.e("Failed to fetch", it)
                     val lastResults = PathApi.instance.getLastSuccessfulUpcomingDepartures()
                     onFailure(
                         it,

@@ -191,7 +191,7 @@ private fun HomeScreenScope.DepartureBoard() {
     val gridState = rememberLazyGridState()
     LazyVerticalGrid(
         modifier = Modifier.fillMaxSize(),
-        columns = GridCells.Adaptive(minSize = 300.dp),
+        columns = GridCells.Fixed(1), // TODO: support grid nicely
         state = gridState,
         horizontalArrangement = Arrangement.spacedBy(Dimensions.gutter(isTablet = isTablet)),
         contentPadding = PaddingValues(bottom = 16.dp),

@@ -14,6 +14,7 @@ data class WidgetData(
     val stations: List<StationData>,
     val fetchTime: Instant,
     val nextFetchTime: Instant,
+    val closestStationId: String?
 ) {
     @Serializable
     data class StationData(

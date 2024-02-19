@@ -13,6 +13,13 @@ import com.sixbynine.transit.path.api.isInNewJersey
 import com.sixbynine.transit.path.api.isInNewYork
 import com.sixbynine.transit.path.api.isWestOf
 import com.sixbynine.transit.path.api.state
+import com.sixbynine.transit.path.location.LocationCheckResult.Failure
+import com.sixbynine.transit.path.location.LocationCheckResult.NoPermission
+import com.sixbynine.transit.path.location.LocationCheckResult.NoProvider
+import com.sixbynine.transit.path.location.LocationCheckResult.Success
+import com.sixbynine.transit.path.location.LocationProvider
+import com.sixbynine.transit.path.preferences.Preferences
+import com.sixbynine.transit.path.preferences.StringPreferencesKey
 import com.sixbynine.transit.path.util.DataResult
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Deferred
@@ -31,12 +38,23 @@ object WidgetDataFetcher {
     private var lastFetchTime: Instant? = null
     private var lastFetch: Deferred<Result<Map<Station, List<DepartureBoardTrain>>>>? = null
 
+    private val lastClosestStationKey = StringPreferencesKey("fetcher_lastClosestStation")
+    private var lastClosestStation: Station?
+        get() {
+            val id = Preferences()[lastClosestStationKey] ?: return null
+            return Stations.All.find { it.pathApiName == id }
+        }
+        set(value) {
+            Preferences()[lastClosestStationKey] = value?.pathApiName
+        }
+
     fun fetchWidgetData(
         limit: Int,
         stations: List<Station>,
         sort: StationSort,
         filter: TrainFilter,
         force: Boolean,
+        includeClosestStation: Boolean,
         onSuccess: (WidgetData) -> Unit,
         onFailure: (Throwable, WidgetData?) -> Unit,
     ) {
@@ -56,21 +74,57 @@ object WidgetDataFetcher {
                     lastFetch
                 } else {
                     Napier.d("New fetch")
-                    GlobalScope.async { PathApi.instance.fetchUpcomingDepartures() }
+                    async { PathApi.instance.fetchUpcomingDepartures() }
                         .also {
                             WidgetDataFetcher.lastFetch = it
                             WidgetDataFetcher.lastFetchTime = now
                         }
                 }
+
+            val closestStationToUse =
+                if (includeClosestStation) {
+                    when (val locationResult = LocationProvider().tryToGetLocation(3.seconds)) {
+                        NoPermission, NoProvider -> null
+                        is Failure -> lastClosestStation
+                        is Success -> {
+                            Stations.closestTo(locationResult.location)
+                                .also { lastClosestStation = it }
+                        }
+                    }
+                } else {
+                    null
+                }
+
+
             result
                 .await()
-                .onSuccess { onSuccess(createWidgetData(limit, stations, sort, filter, it)) }
+                .onSuccess {
+                    onSuccess(
+                        createWidgetData(
+                            limit,
+                            stations,
+                            sort,
+                            filter,
+                            closestStationToUse,
+                            it
+                        )
+                    )
+                }
                 .onFailure {
                     Napier.e("Failed to fetch", it)
                     val lastResults = PathApi.instance.getLastSuccessfulUpcomingDepartures()
                     onFailure(
                         it,
-                        lastResults?.let { createWidgetData(limit, stations, sort, filter, it) }
+                        lastResults?.let {
+                            createWidgetData(
+                                limit,
+                                stations,
+                                sort,
+                                filter,
+                                closestStationToUse,
+                                it
+                            )
+                        }
                     )
                 }
         }
@@ -81,11 +135,19 @@ object WidgetDataFetcher {
         stations: List<Station>,
         sort: StationSort,
         filter: TrainFilter,
+        closestStationToUse: Station?,
         data: Map<Station, List<DepartureBoardTrain>>
     ): WidgetData {
+        val adjustedStations = stations.toMutableList()
         val stationDatas = arrayListOf<WidgetData.StationData>()
-        val comparator = StationComparator(sort)
-        for (station in stations.sortedWith(comparator)) {
+
+        adjustedStations.sortWith(StationComparator(sort))
+        if (closestStationToUse != null) {
+            adjustedStations.remove(closestStationToUse)
+            adjustedStations.add(0, closestStationToUse)
+        }
+
+        for (station in adjustedStations) {
             val apiTrains = data[station] ?: continue
             val signs =
                 apiTrains
@@ -117,7 +179,7 @@ object WidgetDataFetcher {
                         backfillSource = it.backfillSource,
                     )
                 }
-                .filter { matchesFilter(station, it, filter) }
+                .filter { station == closestStationToUse || matchesFilter(station, it, filter) }
                 .distinctBy { it.title to it.projectedArrival }
                 .sortedBy { it.projectedArrival }
 
@@ -141,7 +203,8 @@ object WidgetDataFetcher {
         return WidgetData(
             fetchTime = Clock.System.now(),
             stations = stationDatas.take(limit),
-            nextFetchTime = nextFetchTime
+            nextFetchTime = nextFetchTime,
+            closestStationId = closestStationToUse?.pathApiName,
         )
     }
 
@@ -168,7 +231,8 @@ suspend fun WidgetDataFetcher.fetchWidgetDataSuspending(
     stations: List<Station>,
     sort: StationSort,
     filter: TrainFilter,
-    force: Boolean
+    force: Boolean,
+    includeClosestStation: Boolean,
 ): DataResult<WidgetData> {
     return suspendCancellableCoroutine { continuation ->
         fetchWidgetData(
@@ -177,6 +241,7 @@ suspend fun WidgetDataFetcher.fetchWidgetDataSuspending(
             sort,
             filter,
             force,
+            includeClosestStation,
             { continuation.resume(DataResult.success(it)) },
             { e, data -> continuation.resume(DataResult.failure(e, data)) }
         )

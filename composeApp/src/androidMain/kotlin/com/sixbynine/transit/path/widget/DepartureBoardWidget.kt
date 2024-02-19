@@ -23,12 +23,13 @@ import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.time.today
 import com.sixbynine.transit.path.util.DataResult
 import com.sixbynine.transit.path.util.map
-import com.sixbynine.transit.path.widget.AndroidWidgetDataRepository.WidgetDataWithClosestStation
 import com.sixbynine.transit.path.widget.configuration.StoredWidgetConfiguration
 import com.sixbynine.transit.path.widget.configuration.WidgetConfigurationManager
 import com.sixbynine.transit.path.widget.configuration.needsSetup
 import com.sixbynine.transit.path.widget.ui.WidgetContent
 import com.sixbynine.transit.path.widget.ui.WidgetState
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atTime
@@ -38,7 +39,9 @@ class DepartureBoardWidget : GlanceAppWidget() {
 
     override val sizeMode = SizeMode.Responsive(setOf(SmallWidgetSize, getMediumWidgetSize()))
 
-    override suspend fun provideGlance(context: Context, id: GlanceId) {
+    override suspend fun provideGlance(context: Context, id: GlanceId) = coroutineScope {
+        launch { WidgetRefreshWorker.schedule() }
+
         provideContent {
             val updateTime =
                 currentState(key = LastUpdateKey)
@@ -63,18 +66,18 @@ class DepartureBoardWidget : GlanceAppWidget() {
         }
     }
 
-    private fun WidgetDataWithClosestStation.adjustForConfiguration(
+    private fun WidgetData.adjustForConfiguration(
         configuration: StoredWidgetConfiguration
     ): WidgetData {
-        val newStations = widgetData.stations.toMutableList()
+        val newStations = stations.toMutableList()
 
         newStations.removeAll { it.id !in configuration.fixedStations.orEmpty() }
 
         newStations.sortWith(StationDataComparator(configuration.sortOrder))
 
-        if (configuration.useClosestStation && closestStation != null) {
-            newStations.removeAll { it.id == closestStation.pathApiName }
-            widgetData.stations.find { it.id == closestStation.pathApiName }?.let {
+        if (configuration.useClosestStation && closestStationId != null) {
+            newStations.removeAll { it.id == closestStationId }
+            stations.find { it.id == closestStationId }?.let {
                 newStations.add(0, it)
             }
         }
@@ -92,7 +95,7 @@ class DepartureBoardWidget : GlanceAppWidget() {
             }
         }
 
-        return widgetData.copy(stations = newStations)
+        return copy(stations = newStations)
     }
 
     companion object {

@@ -4,12 +4,12 @@ import android.app.Activity
 import android.app.Application
 import android.app.Application.ActivityLifecycleCallbacks
 import android.os.Bundle
-import androidx.activity.ComponentActivity
+import com.sixbynine.transit.path.BaseActivity
 import com.sixbynine.transit.path.app.lifecycle.AppLifecycleObserver
 
 object ActivityRegistry {
 
-    private val createdActivities = mutableSetOf<ComponentActivity>()
+    private val createdActivities = mutableSetOf<BaseActivity>()
     private val startedActivities = mutableSetOf<Activity>()
 
     fun peekCreatedActivity() = createdActivities.firstOrNull()
@@ -18,7 +18,7 @@ object ActivityRegistry {
         application.registerActivityLifecycleCallbacks(
             object : ActivityLifecycleCallbacks {
                 override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-                    if (activity is ComponentActivity) {
+                    if (activity is BaseActivity) {
                         createdActivities += activity
                     }
                 }
@@ -40,7 +40,7 @@ object ActivityRegistry {
                 override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
 
                 override fun onActivityDestroyed(activity: Activity) {
-                    if (activity is ComponentActivity) {
+                    if (activity is BaseActivity) {
                         createdActivities -= activity
                     }
                 }

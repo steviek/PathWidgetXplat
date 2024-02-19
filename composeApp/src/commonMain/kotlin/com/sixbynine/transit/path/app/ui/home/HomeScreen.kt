@@ -198,6 +198,7 @@ private fun HomeScreenScope.DepartureBoard() {
     ) {
         data.stations.forEachIndexed { index, station ->
             val canMoveUp = run {
+                if (station.isClosest) return@run false
                 val prevStation = data.stations.getOrNull(index - 1) ?: return@run false
                 if (state.stationSort == StationSort.Alphabetical) return@run true
                 prevStation.state == station.state
@@ -205,6 +206,7 @@ private fun HomeScreenScope.DepartureBoard() {
 
             val nextStation = data.stations.getOrNull(index + 1)
             val canMoveDown = run {
+                if (station.isClosest) return@run false
                 nextStation ?: return@run false
                 if (state.stationSort == StationSort.Alphabetical) return@run true
                 nextStation.state == station.state
@@ -216,6 +218,7 @@ private fun HomeScreenScope.DepartureBoard() {
                         .padding(top = if (index == 0) 0.dp else 16.dp),
                     canMoveDown = canMoveDown,
                     canMoveUp = canMoveUp,
+                    canDelete = !station.isClosest,
                     data = station
                 )
             }
@@ -230,13 +233,17 @@ private fun HomeScreenScope.DepartureBoard() {
                 }
             }
 
-            if (state.isEditing &&
-                state.stationSort != StationSort.Alphabetical &&
-                nextStation != null &&
-                station.state != nextStation.state
-            ) {
+            if (state.isEditing && nextStation != null && !canMoveDown) {
                 item {
-                    CannotMoveExplanation()
+                    val text = if (station.isClosest) {
+                        stringResource(
+                            strings.cannot_move_explanation_closest,
+                            station.station.displayName
+                        )
+                    } else {
+                        stringResource(strings.cannot_move_explanation_state)
+                    }
+                    CannotMoveExplanation(text)
                 }
             }
         }
@@ -260,6 +267,7 @@ private fun HomeScreenScope.StationHeader(
     data: StationData,
     canMoveDown: Boolean,
     canMoveUp: Boolean,
+    canDelete: Boolean,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -299,11 +307,13 @@ private fun HomeScreenScope.StationHeader(
                     Spacer(Modifier.width(48.dp))
                 }
 
-                NativeIconButton(
-                    icon = IconType.Delete,
-                    contentDescription = stringResource(strings.delete),
-                    onClick = { onIntent(RemoveStationClicked(data.id)) }
-                )
+                if (canDelete) {
+                    NativeIconButton(
+                        icon = IconType.Delete,
+                        contentDescription = stringResource(strings.delete),
+                        onClick = { onIntent(RemoveStationClicked(data.id)) }
+                    )
+                }
             }
         }
     }
@@ -351,10 +361,13 @@ private fun HomeScreenScope.TrainLine(
 }
 
 @Composable
-private fun HomeScreenScope.CannotMoveExplanation() {
-    Box(Modifier.fillMaxWidth().padding(gutter()), contentAlignment = Alignment.Center) {
+private fun HomeScreenScope.CannotMoveExplanation(text: String) {
+    Box(
+        Modifier.fillMaxWidth().padding(horizontal = gutter()).padding(top = 8.dp),
+        contentAlignment = Alignment.Center
+    ) {
         Text(
-            text = stringResource(strings.cannot_move_explanation),
+            text = text,
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

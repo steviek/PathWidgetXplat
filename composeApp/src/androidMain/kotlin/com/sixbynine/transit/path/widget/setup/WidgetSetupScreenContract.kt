@@ -8,12 +8,15 @@ import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.api.state
 import com.sixbynine.transit.path.app.ui.ScreenScope
+import com.sixbynine.transit.path.location.AndroidLocationProvider
 import com.sixbynine.transit.path.widget.StationByDisplayNameComparator
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.State
 
 object WidgetSetupScreenContract {
     data class State(
+        val isClosestStationAvailable: Boolean =
+            AndroidLocationProvider.isLocationSupportedByDevice,
         val useClosestStation: Boolean = false,
         val njStations: List<StationRow> = defaultStations(NewJersey),
         val nyStations: List<StationRow> = defaultStations(NewYork),
@@ -41,7 +44,6 @@ object WidgetSetupScreenContract {
     )
 
     sealed interface Intent {
-        data class PermissionRequestComplete(val results: Map<String, Boolean>) : Intent
         data class UseClosestStationToggled(val checked: Boolean) : Intent
         data class StationToggled(val id: String, val checked: Boolean) : Intent
         data class SortOrderSelected(val sortOrder: StationSort) : Intent
@@ -50,16 +52,6 @@ object WidgetSetupScreenContract {
     }
 
     sealed interface Effect {
-        data class LaunchLocationPermissionRequest(val permissions: Array<String>) : Effect {
-            override fun equals(other: Any?): Boolean {
-                if (other !is LaunchLocationPermissionRequest) return false
-
-                return other.permissions contentEquals permissions
-            }
-
-            override fun hashCode(): Int = permissions.contentHashCode()
-        }
-
         data class CompleteConfigurationIntent(val appWidgetId: Int) : Effect
     }
 }

@@ -25,6 +25,7 @@ import com.sixbynine.transit.path.app.ui.icon.NativeIconButton
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.BottomSheetType
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Effect.GoBack
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.BuyMeACoffeeClicked
+import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.LocationSettingChanged
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.RateAppClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.SendFeedbackClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.ShareAppClicked
@@ -33,6 +34,7 @@ import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.Statio
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.StationSortClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.TimeDisplayChanged
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.TimeDisplayClicked
+import com.sixbynine.transit.path.app.ui.settings.SettingsContract.LocationSettingState
 import dev.icerock.moko.resources.compose.stringResource
 
 @Composable
@@ -68,6 +70,10 @@ fun SettingsScope.Content() {
         Column(
             modifier = Modifier.padding(contentPadding).verticalScroll(rememberScrollState()),
         ) {
+            if (state.locationSetting != LocationSettingState.NotAvailable) {
+                LocationSettingSection()
+            }
+
             TimeDisplaySection()
 
             FilterSection()
@@ -161,6 +167,22 @@ private fun SettingsScope.ShowPresumedTrainsSection() {
         subtext = stringResource(strings.presumed_trains_subtext),
         checked = state.showPresumedTrains,
         onCheckedChange = { onIntent(ShowPresumedTrainsChanged(it)) },
+        textStyle = MaterialTheme.typography.titleMedium,
+        textColor = MaterialTheme.colorScheme.onSurface,
+        subtextStyle = MaterialTheme.typography.bodyLarge,
+        subtextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+}
+
+@Composable
+private fun SettingsScope.LocationSettingSection() {
+    SwitchWithText(
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+        text = stringResource(strings.closest_station_setting_title),
+        subtext = stringResource(strings.closest_station_setting_subtitle)
+            .takeUnless { state.hasLocationPermission },
+        checked = state.locationSetting == LocationSettingState.Enabled,
+        onCheckedChange = { onIntent(LocationSettingChanged(it)) },
         textStyle = MaterialTheme.typography.titleMedium,
         textColor = MaterialTheme.colorScheme.onSurface,
         subtextStyle = MaterialTheme.typography.bodyLarge,

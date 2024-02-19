@@ -72,6 +72,8 @@ kotlin {
             implementation(libs.firebase.crashlytics)
             implementation(libs.google.play.review)
             implementation(libs.google.play.review.ktx)
+            implementation(libs.androidx.work.runtime.ktx)
+            implementation(libs.google.accompanist)
         }
 
         commonTest.dependencies {
@@ -92,6 +94,7 @@ kotlin {
             languageSettings.optIn("kotlinx.cinterop.ExperimentalForeignApi")
             languageSettings.optIn("kotlinx.coroutines.DelicateCoroutinesApi")
             languageSettings.optIn("kotlinx.serialization.ExperimentalSerializationApi")
+            languageSettings.optIn("com.google.accompanist.permissions.ExperimentalPermissionsApi")
         }
     }
 }

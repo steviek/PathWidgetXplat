@@ -12,11 +12,19 @@ import android.os.CancellationSignal
 import androidx.annotation.RequiresPermission
 import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.PathApplication
+import com.sixbynine.transit.path.app.ui.ActivityRegistry
 import com.sixbynine.transit.path.location.LocationCheckResult.Failure
 import com.sixbynine.transit.path.location.LocationCheckResult.NoPermission
 import com.sixbynine.transit.path.location.LocationCheckResult.NoProvider
 import com.sixbynine.transit.path.location.LocationCheckResult.Success
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
 import kotlin.time.Duration
@@ -26,11 +34,48 @@ object AndroidLocationProvider : LocationProvider {
 
     private val context = PathApplication.instance
 
+    private val locationPermissions = listOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION)
+
     private val locationManager =
         context.getSystemService(Context.LOCATION_SERVICE) as LocationManager?
 
     override val isLocationSupportedByDevice: Boolean
         get() = locationManager != null && VERSION.SDK_INT >= 23
+
+    private val _locationPermissionResultsChannel = Channel<LocationPermissionRequestResult>()
+    override val locationPermissionResults: SharedFlow<LocationPermissionRequestResult> =
+        _locationPermissionResultsChannel.receiveAsFlow().shareIn(GlobalScope, WhileSubscribed())
+
+    override fun hasLocationPermission(): Boolean {
+        if (VERSION.SDK_INT < 23 || !isLocationSupportedByDevice) return false
+        return locationPermissions.any {
+            context.checkSelfPermission(it) == PackageManager.PERMISSION_GRANTED
+        }
+    }
+
+    fun onLocationPermissionResult(granted: Boolean) {
+        GlobalScope.launch {
+            _locationPermissionResultsChannel.send(
+                if (granted) {
+                    LocationPermissionRequestResult.Granted
+                } else {
+                    LocationPermissionRequestResult.Denied
+                }
+            )
+        }
+    }
+
+    override fun requestLocationPermission() {
+        val activity = ActivityRegistry.peekCreatedActivity()
+        if (VERSION.SDK_INT < 23 || activity == null) {
+            GlobalScope.launch {
+                _locationPermissionResultsChannel.send(LocationPermissionRequestResult.Denied)
+            }
+            return
+        }
+
+        activity.requestLocationPermissions()
+    }
 
     override suspend fun tryToGetLocation(timeout: Duration): LocationCheckResult {
         if (locationManager == null || VERSION.SDK_INT < 23) {
@@ -39,8 +84,9 @@ object AndroidLocationProvider : LocationProvider {
 
         // This is duplicated code, but it prevents Android Studio lint complaining.
         if (
-            context.checkSelfPermission(ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-            context.checkSelfPermission(ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+            locationPermissions.none {
+                context.checkSelfPermission(it) == PackageManager.PERMISSION_GRANTED
+            }
         ) {
             Logging.d("Don't have permission to get the user's location")
             return NoPermission
@@ -104,7 +150,6 @@ object AndroidLocationProvider : LocationProvider {
 
     private fun Location.toSharedLocation() = Location(latitude, longitude)
 }
-
 
 
 var Location.elapsedRealtime: Duration

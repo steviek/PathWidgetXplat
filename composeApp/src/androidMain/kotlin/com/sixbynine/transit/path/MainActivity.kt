@@ -2,7 +2,6 @@ package com.sixbynine.transit.path
 
 import App
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
@@ -11,7 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import com.sixbynine.transit.path.widget.DepartureBoardWidget
 import kotlinx.coroutines.launch
 
-class MainActivity : ComponentActivity() {
+class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

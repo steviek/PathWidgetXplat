@@ -142,6 +142,7 @@ object Fixtures {
             ).take(limit),
             fetchTime = now,
             nextFetchTime = now + 12.minutes,
+            closestStationId = null,
         )
     }
 }

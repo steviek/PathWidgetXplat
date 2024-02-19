@@ -2,12 +2,12 @@ package com.sixbynine.transit.path.app.ui.home
 
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.MR.strings
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.StationSort.Alphabetical
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.TrainFilter.Companion.matchesFilter
+import com.sixbynine.transit.path.api.isEnabled
 import com.sixbynine.transit.path.api.isInNewJersey
 import com.sixbynine.transit.path.api.isInNewYork
 import com.sixbynine.transit.path.app.lifecycle.AppLifecycleObserver
@@ -93,7 +93,6 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
     init {
         viewModelScope.launch(Dispatchers.Default) {
             fetchingUseCase.fetchData.collectLatest { fetchData ->
-                Logging.d("Latest fetch data: now=${now()}, isFetching=${fetchData.isFetching}, hasError=${fetchData.hasError}, lastFetchTime=${fetchData.lastFetchTime}, nextFetchTime=${fetchData.nextFetchTime}, dataIsNull:${fetchData.data == null}")
                 repeatEvery(250.milliseconds) {
                     AppLifecycleObserver.isActive.first { it } // Make sure the UI is visible
 
@@ -221,6 +220,8 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
             stations = stations
                 .sortedBy { stationToIndex[it.station.pathApiName] }
                 .sortedBy {
+                    if (it.isClosest) return@sortedBy -1
+
                     val station = it.station
                     val isFirst = when (SettingsManager.stationSort.value) {
                         StationSort.NjAm -> isMorning == station.isInNewJersey
@@ -303,7 +304,9 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
                                     )
                                 },
                             )
-                        }
+                        },
+                    isClosest = data.id == closestStationId &&
+                            SettingsManager.locationSetting.value.isEnabled
                 )
                 stationData
             }

@@ -1,6 +1,8 @@
 package com.sixbynine.transit.path.app.ui.settings
 
 import com.sixbynine.transit.path.analytics.Analytics
+import com.sixbynine.transit.path.api.LocationSetting.Disabled
+import com.sixbynine.transit.path.api.LocationSetting.Enabled
 import com.sixbynine.transit.path.app.external.ExternalRoutingManager
 import com.sixbynine.transit.path.app.external.shareAppToSystem
 import com.sixbynine.transit.path.app.settings.SettingsManager
@@ -15,6 +17,7 @@ import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.BackClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.BottomSheetDismissed
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.BuyMeACoffeeClicked
+import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.LocationSettingChanged
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.RateAppClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.SendFeedbackClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.ShareAppClicked
@@ -27,44 +30,35 @@ import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.TimeDi
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.TimeDisplayClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.TrainFilterChanged
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.TrainFilterClicked
+import com.sixbynine.transit.path.app.ui.settings.SettingsContract.LocationSettingState
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.State
+import com.sixbynine.transit.path.location.LocationPermissionRequestResult
+import com.sixbynine.transit.path.location.LocationProvider
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
-class SettingsViewModel : BaseViewModel<State, Intent, Effect>(
-    State(
-        timeDisplay = SettingsManager.timeDisplay.value,
-        trainFilter = SettingsManager.trainFilter.value,
-        stationLimit = SettingsManager.stationLimit.value,
-        stationSort = SettingsManager.stationSort.value,
-        showPresumedTrains = SettingsManager.displayPresumedTrains.value
-    )
-) {
+class SettingsViewModel : BaseViewModel<State, Intent, Effect>(createInitialState()) {
     init {
         updateStateOnEach(SettingsManager.timeDisplay) { copy(timeDisplay = it) }
         updateStateOnEach(SettingsManager.trainFilter) { copy(trainFilter = it) }
         updateStateOnEach(SettingsManager.stationLimit) { copy(stationLimit = it) }
         updateStateOnEach(SettingsManager.stationSort) { copy(stationSort = it) }
         updateStateOnEach(SettingsManager.displayPresumedTrains) { copy(showPresumedTrains = it) }
+        if (LocationProvider().isLocationSupportedByDevice) {
+            updateStateOnEach(SettingsManager.locationSetting) {
+                copy(locationSetting = when (it) {
+                    Enabled -> LocationSettingState.Enabled
+                    Disabled -> LocationSettingState.Disabled
+                })
+            }
+        }
 
-
-        combine(
-            SettingsManager.timeDisplay,
-            SettingsManager.trainFilter,
-            SettingsManager.stationLimit,
-            SettingsManager.stationSort,
-            SettingsManager.displayPresumedTrains
-        ) { timeDisplay, trainFilter, stationLimit, stationSort, showPresumedTrains ->
-            State(
-                timeDisplay = timeDisplay,
-                trainFilter = trainFilter,
-                stationLimit = stationLimit,
-                stationSort = stationSort,
-                showPresumedTrains = showPresumedTrains
-            )
+        if (LocationProvider().isLocationSupportedByDevice) {
+            updateStateOnEach(LocationProvider().locationPermissionResults) {
+                copy(hasLocationPermission = it is LocationPermissionRequestResult.Granted)
+            }
         }
     }
 
@@ -143,6 +137,33 @@ class SettingsViewModel : BaseViewModel<State, Intent, Effect>(
                     ExternalRoutingManager().openUrl("https://www.buymeacoffee.com/kideckel")
                 }
             }
+
+            is LocationSettingChanged -> {
+                SettingsManager.updateLocationSetting(intent.use)
+            }
+        }
+    }
+
+    private companion object {
+        fun createInitialState(): State {
+            val locationSetting = when {
+                LocationProvider().isLocationSupportedByDevice -> {
+                    when(SettingsManager.locationSetting.value) {
+                        Enabled -> LocationSettingState.Enabled
+                        Disabled -> LocationSettingState.Disabled
+                    }
+                }
+                else -> LocationSettingState.NotAvailable
+            }
+            return State(
+                locationSetting = locationSetting,
+                timeDisplay = SettingsManager.timeDisplay.value,
+                trainFilter = SettingsManager.trainFilter.value,
+                stationLimit = SettingsManager.stationLimit.value,
+                stationSort = SettingsManager.stationSort.value,
+                showPresumedTrains = SettingsManager.displayPresumedTrains.value,
+                hasLocationPermission = LocationProvider().hasLocationPermission(),
+            )
         }
     }
 }

@@ -3,9 +3,12 @@
     <string name="and_or">y/o</string>
     <string name="app_name">Salidas para PATH</string>
     <string name="back">Atrás</string>
-    <string name="cannot_move_explanation">Las estaciones están organizadas por estado</string>
+    <string name="cannot_move_explanation_state">Las estaciones están organizadas por estado</string>
+    <string name="cannot_move_explanation_closest">%1$s está la estación más cercana</string>
     <string name="choose_stations">Choose stations to view in the app</string>
     <string name="closest_station">La estación más cercana (require acceso a la ubicación)</string>
+    <string name="closest_station_setting_title">Mostrar la estación más cercana en primero</string>
+    <string name="closest_station_setting_subtitle">Require acceso a la ubicación</string>
     <string name="confirm">Confirmar</string>
     <string name="delay_time">Retrasado - </string>
     <string name="delete">Eliminar</string>

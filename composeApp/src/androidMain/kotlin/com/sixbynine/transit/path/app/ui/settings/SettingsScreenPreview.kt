@@ -11,6 +11,7 @@ import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.TrainFilter.Interstate
 import com.sixbynine.transit.path.app.settings.StationLimit
 import com.sixbynine.transit.path.app.settings.TimeDisplay.Relative
+import com.sixbynine.transit.path.app.ui.settings.SettingsContract.LocationSettingState
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.State
 
 @PathWidgetPreview
@@ -20,11 +21,13 @@ fun SettingsScreenPreview() {
         var timeDisplay by remember { mutableStateOf(Relative) }
         val settingsScope = SettingsScope(
             state = State(
+                locationSetting = LocationSettingState.Disabled,
                 timeDisplay = timeDisplay,
                 trainFilter = Interstate,
                 stationLimit = StationLimit.None,
                 stationSort = StationSort.Alphabetical,
                 showPresumedTrains = false,
+                hasLocationPermission = false,
             ),
             onIntent = { intent ->
                 when (intent) {

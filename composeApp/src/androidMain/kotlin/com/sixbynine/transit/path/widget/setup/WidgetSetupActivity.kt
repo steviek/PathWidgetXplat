@@ -4,42 +4,27 @@ import android.appwidget.AppWidgetManager.EXTRA_APPWIDGET_ID
 import android.appwidget.AppWidgetManager.INVALID_APPWIDGET_ID
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions
 import androidx.activity.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.sixbynine.transit.path.BaseActivity
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Effect.CompleteConfigurationIntent
-import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Effect.LaunchLocationPermissionRequest
-import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent.PermissionRequestComplete
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-class WidgetSetupActivity : ComponentActivity() {
+class WidgetSetupActivity : BaseActivity() {
 
     private val viewModel: WidgetSetupViewModel by viewModels()
 
-    private lateinit var locationPermissionRequest: ActivityResultLauncher<Array<String>>
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        locationPermissionRequest =
-            registerForActivityResult(RequestMultiplePermissions()) { permissions ->
-                viewModel.onIntent(PermissionRequestComplete(permissions))
-            }
 
         viewModel.setAppWidgetId(intent.getAppWidgetId())
 
         viewModel.effects
             .onEach { effect ->
                 when (effect) {
-                    is LaunchLocationPermissionRequest -> {
-                        locationPermissionRequest.launch(effect.permissions)
-                    }
-
                     is CompleteConfigurationIntent -> {
                         val resultValue = Intent().putExtra(EXTRA_APPWIDGET_ID, effect.appWidgetId)
                         setResult(RESULT_OK, resultValue)

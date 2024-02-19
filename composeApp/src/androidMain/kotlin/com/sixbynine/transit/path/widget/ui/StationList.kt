@@ -17,6 +17,7 @@ import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
+import androidx.glance.layout.ContentScale
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
@@ -144,6 +145,12 @@ private fun ColorBox(firstColor: ColorProvider?, secondColor: ColorProvider? = n
                     )
                 )
             }
+            Image(
+                modifier = GlanceModifier.fillMaxSize(),
+                provider = ImageProvider(drawable.circle_border),
+                contentScale = ContentScale.Crop,
+                contentDescription = null
+            )
         } else {
             Spacer(
                 modifier = GlanceModifier

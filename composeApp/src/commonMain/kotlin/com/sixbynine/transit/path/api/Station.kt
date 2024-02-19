@@ -1,5 +1,6 @@
 package com.sixbynine.transit.path.api
 
+import com.sixbynine.transit.path.location.Location
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -116,4 +117,13 @@ object Stations {
         TwentyThirdStreet,
         ThirtyThirdStreet
     )
+
+    fun closestTo(location: Location): Station {
+        return All
+            .minBy { station ->
+                val dLatitude = station.coordinates.latitude - location.latitude
+                val dLongitude = station.coordinates.longitude - location.longitude
+                dLatitude * dLatitude + dLongitude * dLongitude
+            }
+    }
 }

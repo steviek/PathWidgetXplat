@@ -1,5 +1,6 @@
 package com.sixbynine.transit.path.analytics
 
+import com.sixbynine.transit.path.api.LocationSetting
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.TrainFilter
@@ -23,6 +24,10 @@ object Analytics {
 
     fun timeDisplaySet(timeDisplay: TimeDisplay) {
         strategy.logEvent("set_time_display", mapOf("time_display" to timeDisplay.name.lowercase()))
+    }
+
+    fun locationSettingSet(setting: LocationSetting) {
+        strategy.logEvent("set_location_setting", mapOf("setting" to setting.name.lowercase()))
     }
 
     fun filterSet(filter: TrainFilter) {

@@ -7,4 +7,5 @@
     <color name="widget_accent_color">@color/path_blue_500</color>
     <color name="widget_text_primary">@android:color/black</color>
     <color name="widget_text_secondary">@android:color/darker_gray</color>
+    <color name="border_color">@android:color/transparent</color>
 </resources>

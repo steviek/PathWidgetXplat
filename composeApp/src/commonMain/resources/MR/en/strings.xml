@@ -3,9 +3,12 @@
     <string name="and_or">and/or</string>
     <string name="app_name">Departures for PATH</string>
     <string name="back">Back</string>
-    <string name="cannot_move_explanation">You have sorted stations by state</string>
+    <string name="cannot_move_explanation_state">You have sorted stations by state</string>
+    <string name="cannot_move_explanation_closest">%1$s is the closest station</string>
     <string name="choose_stations">Choose stations to view in the app</string>
     <string name="closest_station">The closest station (requires location access)</string>
+    <string name="closest_station_setting_title">Display the closest station first</string>
+    <string name="closest_station_setting_subtitle">Requires location access</string>
     <string name="confirm">Confirm</string>
     <string name="delay_time">Delayed - </string>
     <string name="delete">Delete</string>

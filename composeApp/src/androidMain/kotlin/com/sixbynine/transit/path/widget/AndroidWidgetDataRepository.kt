@@ -10,19 +10,16 @@ import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.StationSort.Alphabetical
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.TrainFilter
-import com.sixbynine.transit.path.location.LocationCheckResult.Success
-import com.sixbynine.transit.path.location.LocationProvider
 import com.sixbynine.transit.path.util.DataResult
 import com.sixbynine.transit.path.util.JsonFormat
 import com.sixbynine.transit.path.util.isFailure
+import com.sixbynine.transit.path.widget.configuration.WidgetConfigurationManager
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
-import kotlin.time.Duration.Companion.seconds
 
 @SuppressLint("StaticFieldLeak") // application context
 object AndroidWidgetDataRepository {
@@ -30,7 +27,6 @@ object AndroidWidgetDataRepository {
     private const val WidgetDataKey = "widget_data"
     private const val IsLoadingKey = "is_loading"
     private const val HasErrorKey = "has_error"
-    private const val ClosestStationKey = "closest_station"
 
     private val context: Context = PathApplication.instance
     private val prefs = context.getSharedPreferences("widget_data_store", Context.MODE_PRIVATE)
@@ -53,19 +49,6 @@ object AndroidWidgetDataRepository {
             storeWidgetData(value)
         }
 
-    private var closestStation: Station?
-        get() {
-            val id = prefs.getString(ClosestStationKey, null) ?: return null
-            return Stations.All.find { it.pathApiName == id }
-        }
-        set(value) {
-            if (value == null) {
-                prefs.edit().remove(ClosestStationKey).apply()
-            } else {
-                prefs.edit().putString(ClosestStationKey, value.pathApiName).apply()
-            }
-        }
-
     private var hasLoadedOnce = false
 
     private var _data = MutableStateFlow(getData())
@@ -79,14 +62,14 @@ object AndroidWidgetDataRepository {
         }
     }
 
-    private fun getData(): DataResult<WidgetDataWithClosestStation> {
-        val data = widgetData?.let { WidgetDataWithClosestStation(closestStation, it) }
+    private fun getData(): DataResult<WidgetData> {
+        val widgetData = widgetData
         return if (isLoading) {
-            DataResult.loading(data)
-        } else if (hasError || data == null) {
-            DataResult.failure(Exception("Error loading widget data"), data)
+            DataResult.loading(widgetData)
+        } else if (hasError || widgetData == null) {
+            DataResult.failure(Exception("Error loading widget data"), widgetData)
         } else {
-            DataResult.success(data)
+            DataResult.success(widgetData)
         }
     }
 
@@ -101,7 +84,8 @@ object AndroidWidgetDataRepository {
         _data.value = getData()
         DepartureBoardWidget.onDataChanged()
 
-        val locationAsync = async { LocationProvider().tryToGetLocation(timeout = 3.seconds) }
+        val anyWidgetsUseLocation =
+            WidgetConfigurationManager.getWidgetConfigurations().values.any { it.useClosestStation }
 
         val result = WidgetDataFetcher.fetchWidgetDataSuspending(
             limit = Int.MAX_VALUE,
@@ -109,26 +93,14 @@ object AndroidWidgetDataRepository {
             sort = Alphabetical,
             filter = TrainFilter.All,
             force = force,
+            includeClosestStation = anyWidgetsUseLocation
         )
-
-        val locationResult = locationAsync.await()
-        if (locationResult is Success) {
-            val (latitude, longitude) = locationResult.location
-            closestStation =
-                Stations.All
-                    .minBy { station ->
-                        val dLatitude = station.coordinates.latitude - latitude
-                        val dLongitude = station.coordinates.longitude - longitude
-                        dLatitude * dLatitude + dLongitude * dLongitude
-                    }
-        }
 
         isLoading = false
         hasError = result.isFailure()
         widgetData = result.data
         _data.value = getData()
         DepartureBoardWidget.onDataChanged()
-        Logging.d("DataRepo: done refreshing widget data")
     }
 
     private fun readWidgetData(): WidgetData? {

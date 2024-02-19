@@ -4,12 +4,14 @@ import androidx.compose.runtime.Composable
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.glance.GlanceId
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.state.getAppWidgetState
 import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.glance.currentState
 import androidx.glance.state.PreferencesGlanceStateDefinition
 import com.sixbynine.transit.path.PathApplication
 import com.sixbynine.transit.path.util.JsonFormat
+import com.sixbynine.transit.path.widget.DepartureBoardWidget
 import kotlinx.serialization.encodeToString
 
 object WidgetConfigurationManager {
@@ -23,6 +25,13 @@ object WidgetConfigurationManager {
         val json = state[DEPARTURE_WIDGET_PREFS_KEY] ?: return null
 
         return deserializeConfiguration(json)
+    }
+
+    suspend fun getWidgetConfigurations(): Map<GlanceId, StoredWidgetConfiguration> {
+        return GlanceAppWidgetManager(context)
+            .getGlanceIds(DepartureBoardWidget::class.java)
+            .mapNotNull { id -> getWidgetConfiguration(id)?.let { id to it } }
+            .toMap()
     }
 
     @Composable

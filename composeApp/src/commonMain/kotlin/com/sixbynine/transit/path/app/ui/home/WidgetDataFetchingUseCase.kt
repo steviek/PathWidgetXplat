@@ -2,6 +2,7 @@ package com.sixbynine.transit.path.app.ui.home
 
 import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.api.TrainFilter
+import com.sixbynine.transit.path.api.isEnabled
 import com.sixbynine.transit.path.app.lifecycle.AppLifecycleObserver
 import com.sixbynine.transit.path.app.settings.SettingsManager
 import com.sixbynine.transit.path.app.station.StationSelectionManager
@@ -12,6 +13,7 @@ import com.sixbynine.transit.path.preferences.StringPreferencesKey
 import com.sixbynine.transit.path.preferences.persisting
 import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.util.DataResult
+import com.sixbynine.transit.path.util.JsonFormat
 import com.sixbynine.transit.path.util.awaitTrue
 import com.sixbynine.transit.path.widget.WidgetData
 import com.sixbynine.transit.path.widget.WidgetDataFetcher
@@ -55,6 +57,14 @@ class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
             .flowOn(Dispatchers.Default)
             .launchIn(scope)
 
+        SettingsManager
+            .locationSetting
+            .drop(1)
+            .distinctUntilChanged()
+            .onEach { fetchData(force = true) }
+            .flowOn(Dispatchers.Default)
+            .launchIn(scope)
+
 
         scope.launch {
             fetchData.collectLatest {
@@ -82,12 +92,10 @@ class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
     }
 
     private fun fetchData(force: Boolean = false) {
-        Logging.d("Fetching widget data: force=$force")
         scope.launch(Dispatchers.Default) {
             _fetchData.value = _fetchData.value.copy(isFetching = true, hasError = false)
 
             fun completeFetch(data: WidgetData?, error: Boolean) {
-                Logging.d("Fetching widget data: error=$error, hasData=${data != null}")
                 val now = now()
                 storeWidgetData(data)
                 hadError = false
@@ -109,6 +117,7 @@ class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
                     sort = SettingsManager.stationSort.value,
                     filter = TrainFilter.All, // filtering happens downstream
                     force = force,
+                    includeClosestStation = SettingsManager.locationSetting.value.isEnabled
                 )
                 completeFetch(result.data, error = result is DataResult.Failure)
             } ?: run { completeFetch(_fetchData.value.data, error = true)}
@@ -168,7 +177,7 @@ class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
         fun getStoredWidgetData(): WidgetData? {
             val raw = Preferences()[LatestWidgetDataKey] ?: return null
             return try {
-                Json.decodeFromString(raw)
+                JsonFormat.decodeFromString(raw)
             } catch (e: SerializationException) {
                 Logging.e("Failed to deseralize widget data", e)
                 null

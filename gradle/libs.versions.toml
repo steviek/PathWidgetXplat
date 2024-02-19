@@ -31,6 +31,8 @@ ktor = "2.3.3"
 precompose = "1.5.7"
 glance = "1.0.0"
 google-play-review = "2.0.1"
+workRuntimeKtx = "2.9.0"
+accompanist = "0.35.0-alpha"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -71,6 +73,8 @@ ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 ktor-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 google-play-review = { module = "com.google.android.play:review", version.ref = "google-play-review" }
 google-play-review-ktx = { module = "com.google.android.play:review-ktx", version.ref = "google-play-review" }
+androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntimeKtx" }
+google-accompanist = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
 
 [plugins]
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }

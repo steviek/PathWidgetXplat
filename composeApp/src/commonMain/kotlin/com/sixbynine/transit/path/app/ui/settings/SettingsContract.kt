@@ -10,16 +10,22 @@ import com.sixbynine.transit.path.app.ui.settings.SettingsContract.State
 
 object SettingsContract {
     data class State(
+        val locationSetting: LocationSettingState,
         val timeDisplay: TimeDisplay,
         val trainFilter: TrainFilter,
         val stationLimit: StationLimit,
         val stationSort: StationSort,
         val showPresumedTrains: Boolean,
         val bottomSheet: BottomSheetType? = null,
+        val hasLocationPermission: Boolean,
     )
 
     enum class BottomSheetType {
         StationLimit, StationSort, TimeDisplay, TrainFilter
+    }
+
+    enum class LocationSettingState {
+        NotAvailable, Disabled, Enabled
     }
 
     sealed interface Intent {
@@ -28,6 +34,7 @@ object SettingsContract {
         data class StationSortSelected(val sort: StationSort) : Intent
         data class StationLimitSelected(val limit: StationLimit) : Intent
         data class ShowPresumedTrainsChanged(val show: Boolean) : Intent
+        data class LocationSettingChanged(val use: Boolean) : Intent
         data object StationLimitClicked : Intent
         data object StationSortClicked : Intent
         data object TimeDisplayClicked : Intent

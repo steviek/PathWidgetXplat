@@ -24,13 +24,35 @@ fun <T, R> StateFlow<T>.mapState(block: (T) -> R): StateFlow<R> {
     }
 }
 
-fun <A, B, C, D, E, T> combineStates(
+inline fun <A, B, T> combineStates(
+    flow1: StateFlow<A>,
+    flow2: StateFlow<B>,
+    crossinline block: (A, B) -> T
+): StateFlow<T> {
+    return object : StateFlow<T> {
+        override val replayCache: List<T>
+            get() = listOf(value)
+
+        override val value: T
+            get() = block(flow1.value, flow2.value)
+
+        override suspend fun collect(collector: FlowCollector<T>): Nothing {
+            combine(flow1, flow2) { a, b ->
+                block(a, b)
+            }
+                .collect { collector.emit(it) }
+            awaitCancellation()
+        }
+    }
+}
+
+inline fun <A, B, C, D, E, T> combineStates(
     flow1: StateFlow<A>,
     flow2: StateFlow<B>,
     flow3: StateFlow<C>,
     flow4: StateFlow<D>,
     flow5: StateFlow<E>,
-    block: (A, B, C, D, E) -> T
+    crossinline block: (A, B, C, D, E) -> T
 ): StateFlow<T> {
     return object : StateFlow<T> {
         override val replayCache: List<T>
@@ -47,4 +69,22 @@ fun <A, B, C, D, E, T> combineStates(
             awaitCancellation()
         }
     }
+}
+
+inline fun <A, B, C, D, E, F, T> combineStates(
+    flow1: StateFlow<A>,
+    flow2: StateFlow<B>,
+    flow3: StateFlow<C>,
+    flow4: StateFlow<D>,
+    flow5: StateFlow<E>,
+    flow6: StateFlow<F>,
+    crossinline block: (A, B, C, D, E, F) -> T
+): StateFlow<T> {
+    return combineStates(
+        flow1,
+        flow2,
+        flow3,
+        flow4,
+        combineStates(flow5, flow6, ::Pair)
+    ) { a, b, c, d, (e, f) -> block(a, b, c, d, e, f) }
 }

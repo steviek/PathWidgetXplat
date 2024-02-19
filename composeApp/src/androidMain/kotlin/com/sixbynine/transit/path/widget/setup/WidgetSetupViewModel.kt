@@ -12,18 +12,18 @@ import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.api.state
+import com.sixbynine.transit.path.location.AndroidLocationProvider
+import com.sixbynine.transit.path.location.LocationPermissionRequestResult.Denied
+import com.sixbynine.transit.path.location.LocationPermissionRequestResult.Granted
 import com.sixbynine.transit.path.util.suspendRunCatching
 import com.sixbynine.transit.path.widget.DepartureBoardWidget
 import com.sixbynine.transit.path.widget.StationByDisplayNameComparator
 import com.sixbynine.transit.path.widget.configuration.StoredWidgetConfiguration
 import com.sixbynine.transit.path.widget.configuration.WidgetConfigurationManager
-import com.sixbynine.transit.path.widget.setup.PermissionHelper.LOCATION_PERMISSIONS
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Effect
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Effect.CompleteConfigurationIntent
-import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Effect.LaunchLocationPermissionRequest
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent.ConfirmClicked
-import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent.PermissionRequestComplete
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent.SortOrderSelected
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent.StationToggled
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent.TrainFilterSelected
@@ -95,6 +95,19 @@ class WidgetSetupViewModel : ViewModel() {
                 }
         }
 
+        viewModelScope.launch {
+            AndroidLocationProvider.locationPermissionResults
+                .collectLatest { result ->
+                    when (result) {
+                        Denied -> {
+                            setState {
+                                copy(useClosestStation = false)
+                            }
+                        }
+                        Granted -> {}
+                    }
+                }
+        }
     }
 
     fun setAppWidgetId(appWidgetId: Int) {
@@ -105,24 +118,13 @@ class WidgetSetupViewModel : ViewModel() {
 
     fun onIntent(intent: Intent) {
         when (intent) {
-            is PermissionRequestComplete -> {
-                val wasPermissionRejected = LOCATION_PERMISSIONS.none { intent.results[it] == true }
-                if (wasPermissionRejected) {
-                    // If they clicked "use closest station" and then denied a permission request,
-                    // uncheck the box...
-                    setState {
-                        copy(useClosestStation = false)
-                    }
-                }
-            }
-
             is UseClosestStationToggled -> {
                 setState {
                     copy(useClosestStation = intent.checked)
                 }
 
-                if (intent.checked && !PermissionHelper.hasLocationPermission()) {
-                    sendEffect(LaunchLocationPermissionRequest(LOCATION_PERMISSIONS))
+                if (intent.checked && !AndroidLocationProvider.hasLocationPermission()) {
+                    AndroidLocationProvider.requestLocationPermission()
                 }
             }
 

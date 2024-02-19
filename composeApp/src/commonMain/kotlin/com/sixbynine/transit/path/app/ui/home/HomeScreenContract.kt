@@ -30,12 +30,13 @@ object HomeScreenContract {
     )
 
     data class DepartureBoardData(
-        val stations: List<StationData>,
+        val stations: List<StationData>
     )
 
     data class StationData(
         val station: Station,
         val trains: List<TrainData>,
+        val isClosest: Boolean,
     ) {
         val id get() = station.pathApiName
         val state get() = station.state

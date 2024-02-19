@@ -70,19 +70,21 @@ fun WidgetSetupScreenScope.WidgetSetupScreenContent() {
                         style = TitleStyle
                     )
 
-                    CheckboxWithText(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        checked = state.useClosestStation,
-                        text = stringResource(strings.closest_station),
-                        onCheckedChange = { onIntent(UseClosestStationToggled(it)) }
-                    )
+                    if (state.isClosestStationAvailable) {
+                        CheckboxWithText(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            checked = state.useClosestStation,
+                            text = stringResource(strings.closest_station),
+                            onCheckedChange = { onIntent(UseClosestStationToggled(it)) }
+                        )
 
-                    Text(
-                        modifier = Modifier
-                            .padding(vertical = 8.dp)
-                            .padding(start = 64.dp),
-                        text = stringResource(strings.and_or),
-                    )
+                        Text(
+                            modifier = Modifier
+                                .padding(vertical = 8.dp)
+                                .padding(start = 64.dp),
+                            text = stringResource(strings.and_or),
+                        )
+                    }
 
                     Row {
                         StationColumn(rows = state.njStations, modifier = Modifier.weight(1f))

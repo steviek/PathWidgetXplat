@@ -3,16 +3,18 @@
     <string name="and_or">and/or</string>
     <string name="app_name">Departures for PATH</string>
     <string name="back">Back</string>
-    <string name="cannot_move_explanation_state">You have sorted stations by state</string>
+    <string name="buy_me_a_coffee">Buy me a coffee</string>
     <string name="cannot_move_explanation_closest">%1$s is the closest station</string>
+    <string name="cannot_move_explanation_state">You have sorted stations by state</string>
     <string name="choose_stations">Choose stations to view in the app</string>
+    <string name="closest_always_first">Note: the closest station will always be displayed first</string>
     <string name="closest_station">The closest station (requires location access)</string>
-    <string name="closest_station_setting_title">Display the closest station first</string>
     <string name="closest_station_setting_subtitle">Requires location access</string>
+    <string name="closest_station_setting_title">Display the closest station first</string>
+    <string name="complete_widget_setup">Complete widget setup</string>
     <string name="confirm">Confirm</string>
     <string name="delay_time">Delayed - </string>
     <string name="delete">Delete</string>
-    <string name="closest_always_first">Note: the closest station will always be displayed first</string>
     <string name="done">Done</string>
     <string name="due_now">due</string>
     <string name="edit">Edit</string>
@@ -25,7 +27,6 @@
     <string name="langauge_code">en</string>
     <string name="move_down">Move down</string>
     <string name="move_up">Move up</string>
-    <string name="buy_me_a_coffee">Buy me a coffee</string>
     <string name="presumed_train">Presumed train</string>
     <string name="presumed_trains_subtext">Presumed trains are those which aren’t yet reported by RidePATH, but which should exist because of reported trains at stations earlier in the line and the usual travel time between stations.</string>
     <string name="rate_app">Rate app</string>
@@ -55,7 +56,6 @@
     <string name="station_filter_three_per_line">3 trains per line</string>
     <string name="station_filter_two_per_line">2 trains per line</string>
     <string name="station_order">Station order</string>
-    <string name="complete_widget_setup">Complete widget setup</string>
     <string name="station_order_fixed">Fixed</string>
     <string name="station_order_nj_am_subtext">Show trains from New Jersey first in the morning, and trains from New York first in the evening</string>
     <string name="station_order_nj_am_title">New Jersey commuter</string>

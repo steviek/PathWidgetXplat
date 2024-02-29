@@ -18,6 +18,7 @@ import com.sixbynine.transit.path.location.LocationCheckResult.NoPermission
 import com.sixbynine.transit.path.location.LocationCheckResult.NoProvider
 import com.sixbynine.transit.path.location.LocationCheckResult.Success
 import com.sixbynine.transit.path.location.LocationProvider
+import com.sixbynine.transit.path.network.NetworkManager
 import com.sixbynine.transit.path.preferences.Preferences
 import com.sixbynine.transit.path.preferences.StringPreferencesKey
 import com.sixbynine.transit.path.util.DataResult
@@ -55,7 +56,7 @@ object WidgetDataFetcher {
         force: Boolean,
         includeClosestStation: Boolean,
         onSuccess: (WidgetData) -> Unit,
-        onFailure: (Throwable, WidgetData?) -> Unit,
+        onFailure: (error: Throwable, hadInternet: Boolean, data: WidgetData?) -> Unit,
     ) {
         Logging.initialize()
         GlobalScope.launch {
@@ -94,6 +95,8 @@ object WidgetDataFetcher {
                     null
                 }
 
+            var hadInternet = NetworkManager().isConnectedToInternet()
+
             result
                 .await()
                 .onSuccess {
@@ -110,9 +113,15 @@ object WidgetDataFetcher {
                 }
                 .onFailure {
                     Logging.e("Failed to fetch", it)
+
+                    if ("Unable to resolve host" in it.message.toString()) {
+                        hadInternet = false
+                    }
+
                     val lastResults = PathApi.instance.getLastSuccessfulUpcomingDepartures()
                     onFailure(
                         it,
+                        hadInternet,
                         lastResults?.let {
                             createWidgetData(
                                 limit,
@@ -241,7 +250,7 @@ suspend fun WidgetDataFetcher.fetchWidgetDataSuspending(
             force,
             includeClosestStation,
             { continuation.resume(DataResult.success(it)) },
-            { e, data -> continuation.resume(DataResult.failure(e, data)) }
+            { e, hadInternet, data -> continuation.resume(DataResult.failure(e, hadInternet, data)) }
         )
     }
 }

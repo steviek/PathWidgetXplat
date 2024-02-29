@@ -22,11 +22,13 @@
     <string name="error_long">Error al actualizar</string>
     <string name="error_short">Error</string>
     <string name="failed_to_fetch">Error al obtener los horarios de los trenes</string>
+    <string name="failed_to_update">Un error se encontró</string>
     <string name="filter">Filtro</string>
     <string name="interstate_explanation">Los trenes interstatales incluyen trenes que van hacia Nueva York desde estaciones de Nueva Jersey, y viceversa</string>
     <string name="langauge_code">es</string>
     <string name="move_down">Bajar</string>
     <string name="move_up">Subir</string>
+    <string name="no_internet">Sin Internet</string>
     <string name="presumed_train">Tren supuesto</string>
     <string name="presumed_trains_subtext">Trenes supuestos son los que aún no están reportados por RidePATH, pero que deberían existir debido a trenes reportados en estaciones anteriores de la línea y el tiempo habitual de viaje entre estaciones</string>
     <string name="rate_app">Calificar la aplicación</string>

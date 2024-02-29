@@ -32,11 +32,12 @@ extension Bool {
 }
 
 extension ColorWrapper {
-    func toColor() -> SwiftUI.Color {
-        SwiftUI.Color(
-            red: Double(self.red),
-            green: Double(self.green),
-            blue: Double(self.blue)
+    func toColor(isDark: Bool) -> SwiftUI.Color {
+        let adjusted = adjustForDarkMode(isDark: isDark)
+        return SwiftUI.Color(
+            red: Double(adjusted.red),
+            green: Double(adjusted.green),
+            blue: Double(adjusted.blue)
         )
     }
 }

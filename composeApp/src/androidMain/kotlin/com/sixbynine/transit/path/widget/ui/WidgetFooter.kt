@@ -22,6 +22,7 @@ import androidx.glance.visibility
 import com.sixbynine.transit.path.MR.strings
 import com.sixbynine.transit.path.R.drawable
 import com.sixbynine.transit.path.resources.getString
+import com.sixbynine.transit.path.util.isFailure
 import com.sixbynine.transit.path.util.isLoading
 import com.sixbynine.transit.path.widget.SmallWidgetSize
 import com.sixbynine.transit.path.widget.UpdateWidgetAction
@@ -54,6 +55,9 @@ fun WidgetFooter(
 
         val isSmallSize = LocalSize.current == SmallWidgetSize
         val updatedAtText = when {
+            result.isFailure() && !result.hadInternet -> getString(strings.no_internet)
+            result.isFailure() && isSmallSize -> getString(strings.error_short)
+            result.isFailure() -> getString(strings.error_long)
             result.isLoading() && isSmallSize -> getString(strings.refreshing_short)
             result.isLoading() -> getString(strings.refreshing)
             isSmallSize -> WidgetDataFormatter.formatTime(updateTime)

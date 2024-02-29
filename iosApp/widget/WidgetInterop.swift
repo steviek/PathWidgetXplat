@@ -81,10 +81,11 @@ extension WidgetDataFetcher {
                     sort: sort,
                     filter: filter,
                     force: false,
+                    includeClosestStation: false,
                     onSuccess: { data in
                         continuation.resume(returning: FetchResult(data: data, hasError: false))
                     },
-                    onFailure: { data in
+                    onFailure: { (e, data) in
                         continuation.resume(returning: FetchResult(data: data, hasError: true))
                     }
                 )

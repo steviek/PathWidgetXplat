@@ -22,11 +22,13 @@
     <string name="error_long">Failed to update</string>
     <string name="error_short">Error</string>
     <string name="failed_to_fetch">Failed to fetch train times</string>
+    <string name="failed_to_update">Failed to update</string>
     <string name="filter">Filter</string>
     <string name="interstate_explanation">Interstate trains includes trains heading toward New York from New Jersey stations, and vice versa.</string>
     <string name="langauge_code">en</string>
     <string name="move_down">Move down</string>
     <string name="move_up">Move up</string>
+    <string name="no_internet">No internet</string>
     <string name="presumed_train">Presumed train</string>
     <string name="presumed_trains_subtext">Presumed trains are those which aren’t yet reported by RidePATH, but which should exist because of reported trains at stations earlier in the line and the usual travel time between stations.</string>
     <string name="rate_app">Rate app</string>

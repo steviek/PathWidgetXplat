@@ -18,10 +18,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
@@ -62,7 +60,6 @@ import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.TrainData
 import com.sixbynine.transit.path.app.ui.icon.IconType
 import com.sixbynine.transit.path.app.ui.icon.NativeIconButton
 import com.sixbynine.transit.path.app.ui.station.AddStationBottomSheet
-import com.sixbynine.transit.path.app.ui.theme.Dimensions
 import dev.icerock.moko.resources.compose.stringResource
 
 class HomeScreenScope(
@@ -188,12 +185,10 @@ private fun HomeScreenScope.ErrorState() {
 @Composable
 private fun HomeScreenScope.DepartureBoard() {
     val data = state.data ?: return
-    val gridState = rememberLazyGridState()
-    LazyVerticalGrid(
+    val gridState = rememberLazyListState()
+    LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        columns = GridCells.Fixed(1), // TODO: support grid nicely
         state = gridState,
-        horizontalArrangement = Arrangement.spacedBy(Dimensions.gutter(isTablet = isTablet)),
         contentPadding = PaddingValues(bottom = 16.dp),
     ) {
         data.stations.forEachIndexed { index, station ->
@@ -249,7 +244,7 @@ private fun HomeScreenScope.DepartureBoard() {
         }
 
         if (state.unselectedStations.isNotEmpty()) {
-            item("add", span = { GridItemSpan(maxLineSpan) }) {
+            item("add") {
                 Box(Modifier.padding(horizontal = gutter(), vertical = 16.dp)) {
                     Button(
                         modifier = Modifier.fillMaxWidth(),

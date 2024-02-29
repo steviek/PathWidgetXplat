@@ -10,6 +10,9 @@ import SwiftUI
 import ComposeApp
 
 struct DepartureBoardView: View {
+    
+    @Environment(\.colorScheme) var colorScheme
+    
     let entry: SimpleEntry
     
     private func measureRowCount(initialHeight: CGFloat, pad: Bool, rowSpacing: CGFloat) -> Int {
@@ -182,7 +185,7 @@ struct DepartureBoardView: View {
                     Spacer().frame(height: rowSpacing)
                     HStack(alignment: .center, spacing: 0) {
                         let destination = WidgetDataFormatter().formatHeadSign(title: train.title, width: HeadSignWidth.narrow)
-                        colorCircle(size: 12, colors: train.colors)
+                        colorCircle(size: 12, colors: train.colors, isDark: colorScheme == .dark)
                         Spacer().frame(width: 4)
                         Text(getString(strings().to_destination, arg1: destination))
                             .font(Font.system(size: 12))
@@ -205,19 +208,20 @@ struct DepartureBoardView: View {
     }
     
     @ViewBuilder
-    private func colorCircle(size: CGFloat, colors: [ColorWrapper]) -> some View {
-        let color1 = colors.first?.toColor() ?? Color.black
-        let color2 = colors.count > 1 ? colors[1].toColor() : color1
+    private func colorCircle(size: CGFloat, colors: [ColorWrapper], isDark: Bool) -> some View {
+        let color1 = colors.first?.toColor(isDark: isDark) ?? Color.black
+        let color2 = colors.count > 1 ? colors[1].toColor(isDark: isDark) : color1
         ZStack {
-            SemiCircle()
+            Circle()
                 .fill(color1)
                 .frame(width: size, height: size)
             
             SemiCircle()
                 .fill(color2)
-                .rotationEffect(.degrees(180))
+                .rotationEffect(.degrees(90))
                 .frame(width: size, height: size)
         }
+        .overlay(isDark ? Circle().stroke(Color.white, lineWidth: 1) : nil)
     }
     
     

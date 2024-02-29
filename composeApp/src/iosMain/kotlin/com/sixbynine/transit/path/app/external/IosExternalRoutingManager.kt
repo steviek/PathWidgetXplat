@@ -14,7 +14,7 @@ class IosExternalRoutingManager : ExternalRoutingManager {
     }
 
     override suspend fun openUrl(url: String): Boolean {
-        val nsUrl = NSURL.URLWithString("url") ?: return false
+        val nsUrl = NSURL.URLWithString(url) ?: return false
         return suspendCancellableCoroutine { continuation ->
             UIApplication.sharedApplication.openURL(
                 url = nsUrl,

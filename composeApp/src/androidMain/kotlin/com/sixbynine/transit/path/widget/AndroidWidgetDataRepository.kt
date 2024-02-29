@@ -27,6 +27,7 @@ object AndroidWidgetDataRepository {
     private const val WidgetDataKey = "widget_data"
     private const val IsLoadingKey = "is_loading"
     private const val HasErrorKey = "has_error"
+    private const val HadInternetKey = "had_internet"
 
     private val context: Context = PathApplication.instance
     private val prefs = context.getSharedPreferences("widget_data_store", Context.MODE_PRIVATE)
@@ -41,6 +42,12 @@ object AndroidWidgetDataRepository {
         get() = prefs.getBoolean(HasErrorKey, false)
         set(value) {
             prefs.edit().putBoolean(HasErrorKey, value).apply()
+        }
+
+    private var hadInternet: Boolean
+        get() = prefs.getBoolean(HadInternetKey, true)
+        set(value) {
+            prefs.edit().putBoolean(HadInternetKey, value).apply()
         }
 
     private var widgetData: WidgetData? = readWidgetData()
@@ -67,7 +74,11 @@ object AndroidWidgetDataRepository {
         return if (isLoading) {
             DataResult.loading(widgetData)
         } else if (hasError || widgetData == null) {
-            DataResult.failure(Exception("Error loading widget data"), widgetData)
+            DataResult.failure(
+                Exception("Error loading widget data"),
+                hadInternet = hadInternet,
+                widgetData
+            )
         } else {
             DataResult.success(widgetData)
         }
@@ -81,6 +92,7 @@ object AndroidWidgetDataRepository {
         hasLoadedOnce = true
         isLoading = true
         hasError = false
+        hadInternet = true
         _data.value = getData()
         DepartureBoardWidget.onDataChanged()
 
@@ -97,7 +109,10 @@ object AndroidWidgetDataRepository {
         )
 
         isLoading = false
-        hasError = result.isFailure()
+        if (result.isFailure()) {
+            hasError = true
+            hadInternet = result.hadInternet
+        }
         widgetData = result.data
         _data.value = getData()
         DepartureBoardWidget.onDataChanged()
@@ -130,6 +145,9 @@ object AndroidWidgetDataRepository {
         prefs.edit().putString(WidgetDataKey, json).apply()
     }
 
-    data class WidgetDataWithClosestStation(val closestStation: Station?, val widgetData: WidgetData)
+    data class WidgetDataWithClosestStation(
+        val closestStation: Station?,
+        val widgetData: WidgetData
+    )
 
 }

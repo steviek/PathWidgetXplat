@@ -47,10 +47,11 @@ class WidgetRefreshWorker(
             val workManager = WorkManager.getInstance(context)
             val workRequest =
                 PeriodicWorkRequestBuilder<WidgetRefreshWorker>(15.minutes.toJavaDuration())
-                    .setConstraints(Constraints.Builder()
-                        .setRequiresBatteryNotLow(true)
-                        .setRequiredNetworkType(UNMETERED)
-                        .build()
+                    .setConstraints(
+                        Constraints.Builder()
+                            .setRequiresBatteryNotLow(true)
+                            .setRequiredNetworkType(UNMETERED)
+                            .build()
                     )
                     .build()
             workManager.enqueueUniquePeriodicWork(WORK_TAG, KEEP, workRequest)

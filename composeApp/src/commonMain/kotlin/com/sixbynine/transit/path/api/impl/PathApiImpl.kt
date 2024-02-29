@@ -15,6 +15,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.isSuccess
+import kotlinx.coroutines.withTimeout
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
@@ -78,17 +79,17 @@ class PathClient {
 
     suspend fun getResults(): Result<PathServiceResults> {
         return suspendRunCatching {
-            httpClient.get("https://www.panynj.gov/bin/portauthority/ridepath.json")
-        }
-            .mapCatching { response ->
+            withTimeout(5.seconds) {
+                val response = httpClient.get("https://www.panynj.gov/bin/portauthority/ridepath.json")
                 if (response.status.isSuccess()) {
                     val responseText = response.bodyAsText()
                     widgetDataStore()["last_success"] = responseText
                     JsonFormat.decodeFromString<PathServiceResults>(responseText)
                 } else {
-                    return Result.failure(NetworkException(response.status.toString()))
+                    throw NetworkException(response.status.toString())
                 }
             }
+        }
     }
 
     fun getLastSuccessfulResults(): PathServiceResults? {

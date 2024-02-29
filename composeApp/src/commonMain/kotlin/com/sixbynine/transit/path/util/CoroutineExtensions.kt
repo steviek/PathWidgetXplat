@@ -37,5 +37,5 @@ inline fun <T> Flow<T>.collectLatest(
     scope: CoroutineScope,
     crossinline action: suspend (T) -> Unit
 ) {
-    scope.launch { this@collectLatest.collectLatest { action(it) } }
+    scope.launch { collectLatest { action(it) } }
 }

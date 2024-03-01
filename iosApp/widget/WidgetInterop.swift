@@ -80,18 +80,24 @@ extension WidgetDataFetcher {
                     stations: stations,
                     sort: sort,
                     filter: filter,
-                    force: false,
+                     force: false,
                     includeClosestStation: false,
                     onSuccess: { data in
-                        continuation.resume(returning: FetchResult(data: data, hasError: false))
+                        continuation.resume(returning: FetchResult(data: data, hadInternet: true, hasError: false))
                     },
-                    onFailure: { (e, data) in
-                        continuation.resume(returning: FetchResult(data: data, hasError: true))
+                    onFailure: { (e, hadInternet, data) in
+                        continuation.resume(
+                            returning: FetchResult(
+                                data: data,
+                                hadInternet: hadInternet.toBool(),
+                                hasError: true
+                            )
+                        )
                     }
                 )
             }
         } catch {
-            return FetchResult(data: nil, hasError: true)
+            return FetchResult(data: nil, hadInternet: true, hasError: true)
         }
         
     }

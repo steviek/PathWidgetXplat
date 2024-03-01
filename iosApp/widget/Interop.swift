@@ -31,6 +31,12 @@ extension Bool {
     }
 }
 
+extension KotlinBoolean {
+    func toBool() -> Bool {
+        self.boolValue
+    }
+}
+
 extension ColorWrapper {
     func toColor(isDark: Bool) -> SwiftUI.Color {
         let adjusted = adjustForDarkMode(isDark: isDark)

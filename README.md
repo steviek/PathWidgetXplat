@@ -8,7 +8,7 @@ This is a [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplat
 
 [Xcode](https://developer.apple.com/xcode/) 15 or newer for editing the Swift code natively.
 
-You _can_ run the iOS app from Android Studio, but usually you'd want to run the widget extension target in Xcode, and I don't think you can do that from AS.
+You can run the iOS app from Android Studio, as long as your target deployment and such is already set up properly. If you encounter issues, try running from Xcode.
 
 ## App store links
 

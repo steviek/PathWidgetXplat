@@ -7,15 +7,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.sixbynine.transit.path.MR.strings
-import com.sixbynine.transit.path.api.LineFilter
+import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.app.ui.PathBottomSheet
 import dev.icerock.moko.resources.compose.stringResource
 
 @Composable
 fun LineFilterBottomSheet(
     isShown: Boolean,
-    lines: Set<LineFilter>,
-    onLineCheckedChange: (LineFilter, Boolean) -> Unit,
+    lines: Set<Line>,
+    onLineCheckedChange: (Line, Boolean) -> Unit,
     onDismiss: () -> Unit,
 ) {
     PathBottomSheet(
@@ -24,7 +24,7 @@ fun LineFilterBottomSheet(
         title = stringResource(strings.lines)
     ) {
         Column(Modifier.fillMaxWidth().padding(bottom = 16.dp)) {
-            LineFilter.entries.forEach { line ->
+            Line.entries.forEach { line ->
                 TrainLineCheckboxRow(
                     line = line,
                     checked = line in lines,

@@ -48,16 +48,20 @@ internal class PathApiImpl : PathApi {
                             "ToNY" -> State.NewYork
                             else -> null
                         }
+                        val colors = it.lineColor.split(",").map(Colors::parse).map(::ColorWrapper)
                         DepartureBoardTrain(
                             headsign = it.headSign,
                             projectedArrival = (it.lastUpdated + it.durationToArrival)
                                 .coerceAtLeast(Clock.System.now()),
-                            lineColors = it.lineColor.split(",")
-                                .map { Colors.parse(it) }
-                                .map { ColorWrapper(it) },
+                            lineColors = colors,
                             isDelayed = it.arrivalTimeMessage == "Delayed",
                             backfillSource = null,
-                            directionState = directionState
+                            directionState = directionState,
+                            lines = LineComputer.computeLines(
+                                station = result.consideredStation,
+                                target = it.target,
+                                colors = colors,
+                            )
                         )
                     }
                 }
@@ -80,7 +84,8 @@ class PathClient {
     suspend fun getResults(): Result<PathServiceResults> {
         return suspendRunCatching {
             withTimeout(5.seconds) {
-                val response = httpClient.get("https://www.panynj.gov/bin/portauthority/ridepath.json")
+                val response =
+                    httpClient.get("https://www.panynj.gov/bin/portauthority/ridepath.json")
                 if (response.status.isSuccess()) {
                     val responseText = response.bodyAsText()
                     widgetDataStore()["last_success"] = responseText

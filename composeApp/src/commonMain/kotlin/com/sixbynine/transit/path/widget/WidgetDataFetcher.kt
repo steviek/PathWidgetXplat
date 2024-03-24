@@ -3,6 +3,7 @@ package com.sixbynine.transit.path.widget
 import androidx.compose.ui.graphics.toArgb
 import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.api.DepartureBoardTrain
+import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.PathApi
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.StationSort
@@ -51,6 +52,7 @@ object WidgetDataFetcher {
     fun fetchWidgetData(
         limit: Int,
         stations: List<Station>,
+        lines: Collection<Line>,
         sort: StationSort,
         filter: TrainFilter,
         force: Boolean,
@@ -104,6 +106,7 @@ object WidgetDataFetcher {
                         createWidgetData(
                             limit,
                             stations,
+                            lines,
                             sort,
                             filter,
                             closestStationToUse,
@@ -126,6 +129,7 @@ object WidgetDataFetcher {
                             createWidgetData(
                                 limit,
                                 stations,
+                                lines,
                                 sort,
                                 filter,
                                 closestStationToUse,
@@ -140,11 +144,13 @@ object WidgetDataFetcher {
     private fun createWidgetData(
         limit: Int,
         stations: List<Station>,
+        lines: Collection<Line>,
         sort: StationSort,
         filter: TrainFilter,
         closestStationToUse: Station?,
         data: Map<Station, List<DepartureBoardTrain>>
     ): WidgetData {
+        Logging.d("createWidgetData, stations = ${stations.map { it.pathApiName }}, lines=$lines")
         val adjustedStations = stations.toMutableList()
         val stationDatas = arrayListOf<WidgetData.StationData>()
 
@@ -184,7 +190,16 @@ object WidgetDataFetcher {
                         projectedArrival = it.projectedArrival,
                         isDelayed = it.isDelayed,
                         backfillSource = it.backfillSource,
+                        lines = it.lines,
                     )
+                }
+                .filter { train ->
+                    (train.lines == null || train.lines.any { line -> line in lines })
+                        .also {
+                            if (!it) {
+                                Logging.d("Filtering out train ${train} because it's not in the right lines")
+                            }
+                        }
                 }
                 .filter { station == closestStationToUse || matchesFilter(station, it, filter) }
                 .distinctBy { it.title to it.projectedArrival }
@@ -236,6 +251,7 @@ object WidgetDataFetcher {
 suspend fun WidgetDataFetcher.fetchWidgetDataSuspending(
     limit: Int,
     stations: List<Station>,
+    lines: Collection<Line>,
     sort: StationSort,
     filter: TrainFilter,
     force: Boolean,
@@ -245,12 +261,21 @@ suspend fun WidgetDataFetcher.fetchWidgetDataSuspending(
         fetchWidgetData(
             limit,
             stations,
+            lines,
             sort,
             filter,
             force,
             includeClosestStation,
             { continuation.resume(DataResult.success(it)) },
-            { e, hadInternet, data -> continuation.resume(DataResult.failure(e, hadInternet, data)) }
+            { e, hadInternet, data ->
+                continuation.resume(
+                    DataResult.failure(
+                        e,
+                        hadInternet,
+                        data
+                    )
+                )
+            }
         )
     }
 }

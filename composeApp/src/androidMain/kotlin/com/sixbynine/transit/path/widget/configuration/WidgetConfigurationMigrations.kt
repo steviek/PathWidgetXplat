@@ -1,6 +1,6 @@
 package com.sixbynine.transit.path.widget.configuration
 
-import com.sixbynine.transit.path.api.LineFilter
+import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.preferences.IntPersistable
 
@@ -35,7 +35,7 @@ fun StoredWidgetConfiguration.migrateToCurrentVersion(): StoredWidgetConfigurati
     if (version < 3) {
         configuration = configuration.copy(
             version = 3,
-            linesBitmask = IntPersistable.createBitmask(LineFilter.entries)
+            linesBitmask = IntPersistable.createBitmask(Line.entries)
         )
     }
 

@@ -30,10 +30,10 @@ data class ColorWrapper(val color: Color) {
     fun unwrap(isDark: Boolean): Color {
         if (!isDark) return color
         return when (this) {
-            Colors.Jsq33s.first() -> Color(240, 171, 67)
-            Colors.NwkWtc.first() -> Color(213, 61, 46)
-            Colors.Hob33s.first() -> Color(43, 133, 187)
-            Colors.HobWtc.first() -> Color(70, 156, 35)
+            Colors.Jsq33sSingle -> Color(240, 171, 67)
+            Colors.NwkWtcSingle -> Color(213, 61, 46)
+            Colors.Hob33sSingle -> Color(43, 133, 187)
+            Colors.HobWtcSingle -> Color(70, 156, 35)
             else -> color
         }
     }

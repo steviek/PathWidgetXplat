@@ -3,11 +3,11 @@ package com.sixbynine.transit.path.app.ui.settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import com.sixbynine.transit.path.MR.strings
-import com.sixbynine.transit.path.api.LineFilter
-import com.sixbynine.transit.path.api.LineFilter.Hoboken33rd
-import com.sixbynine.transit.path.api.LineFilter.HobokenWtc
-import com.sixbynine.transit.path.api.LineFilter.JournalSquare33rd
-import com.sixbynine.transit.path.api.LineFilter.NewarkWtc
+import com.sixbynine.transit.path.api.Line
+import com.sixbynine.transit.path.api.Line.Hoboken33rd
+import com.sixbynine.transit.path.api.Line.HobokenWtc
+import com.sixbynine.transit.path.api.Line.JournalSquare33rd
+import com.sixbynine.transit.path.api.Line.NewarkWtc
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.StationSort.Alphabetical
 import com.sixbynine.transit.path.api.StationSort.NjAm
@@ -77,19 +77,14 @@ fun TimeDisplay.subtitle(): String = when (this) {
     )
 }
 
-val LineFilter.title: StringResource get() = when (this) {
-    NewarkWtc -> strings.lines_nwk_wtc
-    HobokenWtc -> strings.lines_hob_wtc
-    JournalSquare33rd -> strings.lines_jsq_33
-    Hoboken33rd -> strings.lines_hob_33
+val Line.title: String get() = when (this) {
+    NewarkWtc -> "Newark ⇆ World Trade Center"
+    HobokenWtc -> "Hoboken ⇆ World Trade Center"
+    JournalSquare33rd -> "Journal Square ⇆ 33rd Street"
+    Hoboken33rd -> "Hoboken ⇆ 33rd Street"
 }
 
-val LineFilter.subtitle: StringResource? get() = when (this) {
-    NewarkWtc, HobokenWtc -> null
-    JournalSquare33rd, Hoboken33rd -> strings.lines_includes_weekend_service
-}
-
-val LineFilter.colors: List<ColorWrapper> get() = when (this) {
+val Line.colors: List<ColorWrapper> get() = when (this) {
     NewarkWtc -> Colors.NwkWtc
     HobokenWtc -> Colors.HobWtc
     JournalSquare33rd -> Colors.Jsq33s
@@ -97,14 +92,14 @@ val LineFilter.colors: List<ColorWrapper> get() = when (this) {
 
 }
 
-val Set<LineFilter>.title: String
+val Set<Line>.title: String
     @Composable
     get() = remember(this) {
-        if (size == LineFilter.entries.size) {
+        if (size == Line.entries.size) {
             return@remember getString(strings.lines_show_all)
         }
 
-        joinToString(separator = "\n") { getString(it.title) }
+        joinToString(separator = "\n") { it.title }
     }
 
 @Composable

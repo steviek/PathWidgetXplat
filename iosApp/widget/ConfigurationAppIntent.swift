@@ -33,6 +33,19 @@ enum StationChoice : String, AppEnum {
     ]
 }
 
+enum LineChoice : String, AppEnum {
+    case nwkWtc, hobWtc, jsq33, hob33
+    
+    static var typeDisplayRepresentation: TypeDisplayRepresentation = "Lines"
+    
+    static var caseDisplayRepresentations: [LineChoice : DisplayRepresentation] = [
+        .nwkWtc: "Newark ⇆ World Trade Center",
+        .hobWtc: "Hoboken ⇆ World Trade Center",
+        .jsq33: "Journal Square ⇆ 33rd Street",
+        .hob33: "Hoboken ⇆ 33rd Street",
+    ]
+}
+
 enum SortOrder : String, AppEnum {
     case alphabetical, njAm, nyAm
     
@@ -65,6 +78,9 @@ struct ConfigurationAppIntent: WidgetConfigurationIntent {
     @Parameter(title: "Stations", default: [])
     var stations: [StationChoice]
     
+    @Parameter(title: "Lines", default: [LineChoice.nwkWtc, LineChoice.hobWtc, LineChoice.jsq33, LineChoice.hob33])
+    var lines: [LineChoice]
+    
     @Parameter(title: "Order", default: SortOrder.alphabetical)
     var sortOrder: SortOrder
     
@@ -73,12 +89,19 @@ struct ConfigurationAppIntent: WidgetConfigurationIntent {
     
     init() {
         self.stations = []
+        self.lines = LineChoice.allCases
         self.sortOrder = .alphabetical
         self.filter = .all
     }
     
-    init(stations: [StationChoice] = [], sortOrder: SortOrder = .alphabetical, filter: Filter = .all) {
+    init(
+        stations: [StationChoice] = [],
+        lines: [LineChoice] = LineChoice.allCases,
+        sortOrder: SortOrder = .alphabetical,
+        filter: Filter = .all
+    ) {
         self.stations = stations
+        self.lines = lines
         self.sortOrder = sortOrder
         self.filter = filter
     }

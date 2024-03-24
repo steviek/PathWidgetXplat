@@ -59,6 +59,7 @@ struct Provider: AppIntentTimelineProvider {
             let fetchResult = await WidgetDataFetcher().fetchWidgetDataAsync(
                 limit: Int32(limit),
                 stations: configuration.stations.map { $0.toStation()},
+                lines: configuration.lines.map { $0.toLine() },
                 filter: configuration.filter.toTrainFilter(),
                 sort: configuration.sortOrder.toStationSort()
             )

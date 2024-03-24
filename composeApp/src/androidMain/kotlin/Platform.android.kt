@@ -1,5 +1,6 @@
 import PlatformType.ANDROID
 import android.os.Build
+import com.sixbynine.transit.path.BuildConfig
 
 class AndroidPlatform : Platform {
     override val name: String = "Android ${Build.VERSION.SDK_INT}"
@@ -8,3 +9,5 @@ class AndroidPlatform : Platform {
 }
 
 actual fun getPlatform(): Platform = AndroidPlatform()
+
+actual val IsDebug: Boolean = BuildConfig.DEBUG

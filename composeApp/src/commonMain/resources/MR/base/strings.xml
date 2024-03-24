@@ -28,11 +28,6 @@
     <string name="langauge_code">en</string>
     <string name="lines">Lines</string>
     <string name="lines_show_all">Show all lines</string>
-    <string name="lines_hob_wtc">Hoboken ⇆ World Trade Center</string>
-    <string name="lines_hob_33">Hoboken ⇆ 33 St</string>
-    <string name="lines_jsq_33">Journal Square ⇆ 33 St</string>
-    <string name="lines_nwk_wtc">Newark ⇆ World Trade Center</string>
-    <string name="lines_includes_weekend_service">Includes weekend service</string>
     <string name="move_down">Move down</string>
     <string name="move_up">Move up</string>
     <string name="no_internet">No internet</string>

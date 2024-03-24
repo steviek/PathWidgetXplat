@@ -1,6 +1,7 @@
 package com.sixbynine.transit.path.widget
 
 import com.sixbynine.transit.path.api.BackfillSource
+import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.State
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.app.ui.ColorWrapper
@@ -29,7 +30,8 @@ data class WidgetData(
     data class SignData(
         val title: String,
         val colors: List<ColorWrapper>,
-        val projectedArrivals: List<Instant>
+        val projectedArrivals: List<Instant>,
+        val lines: Set<Line>? = null,
     )
 
     @Serializable
@@ -40,6 +42,7 @@ data class WidgetData(
         val projectedArrival: Instant,
         val isDelayed: Boolean = false,
         val backfillSource: BackfillSource? = null,
+        val lines: Set<Line>? = null,
     ) {
         fun isPast(now: Instant): Boolean {
             return projectedArrival < now - 1.minutes

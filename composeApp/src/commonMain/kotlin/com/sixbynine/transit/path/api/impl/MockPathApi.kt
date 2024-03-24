@@ -1,13 +1,15 @@
 package com.sixbynine.transit.path.api.impl
 
-import androidx.compose.ui.graphics.Color
 import com.sixbynine.transit.path.api.DepartureBoardTrain
+import com.sixbynine.transit.path.api.Line.Hoboken33rd
+import com.sixbynine.transit.path.api.Line.HobokenWtc
+import com.sixbynine.transit.path.api.Line.NewarkWtc
 import com.sixbynine.transit.path.api.PathApi
 import com.sixbynine.transit.path.api.State.NewJersey
 import com.sixbynine.transit.path.api.State.NewYork
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.Stations
-import com.sixbynine.transit.path.app.ui.ColorWrapper
+import com.sixbynine.transit.path.app.ui.Colors
 import kotlinx.datetime.Clock
 import kotlin.time.Duration.Companion.minutes
 
@@ -19,28 +21,31 @@ internal class MockPathApi : PathApi {
         val stationsToDepartures = Stations.All.associateWith { station ->
             listOf(
                 DepartureBoardTrain(
-                    headsign = "Hoboken",
+                    headsign = "World Trade Center",
                     projectedArrival = now + 2.minutes,
-                    lineColors = listOf(Color.Green).map { ColorWrapper((it)) },
+                    lineColors = Colors.HobWtc,
                     isDelayed = false,
                     backfillSource = null,
-                    directionState = NewJersey
+                    directionState = NewYork,
+                    lines = setOf(HobokenWtc)
                 ),
                 DepartureBoardTrain(
                     headsign = "Newark",
                     projectedArrival = now + 4.minutes,
-                    lineColors = listOf(Color.Red).map { ColorWrapper((it)) },
+                    lineColors = Colors.NwkWtc,
                     isDelayed = false,
                     backfillSource = null,
-                    directionState = NewJersey
+                    directionState = NewJersey,
+                    lines = setOf(NewarkWtc)
                 ),
                 DepartureBoardTrain(
-                    headsign = "World Trade Center",
+                    headsign = "Hoboken",
                     projectedArrival = now + 7.minutes,
-                    lineColors = listOf(Color.Blue).map { ColorWrapper((it)) },
+                    lineColors = Colors.Hob33s,
                     isDelayed = false,
                     backfillSource = null,
-                    directionState = NewYork
+                    directionState = NewJersey,
+                    lines = setOf(Hoboken33rd)
                 )
             )
         }

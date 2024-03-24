@@ -1,6 +1,6 @@
 package com.sixbynine.transit.path.analytics
 
-import com.sixbynine.transit.path.api.LineFilter
+import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.LocationSetting
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.StationSort
@@ -35,7 +35,7 @@ object Analytics {
         strategy.logEvent("set_filter", mapOf("filter" to filter.name.lowercase()))
     }
 
-    fun lineFiltersSet(filters: Set<LineFilter>) {
+    fun lineFiltersSet(filters: Set<Line>) {
         strategy.logEvent(
             "set_line_filter",
             mapOf("filters" to filters.joinToString { it.name.lowercase() })
@@ -56,6 +56,13 @@ object Analytics {
 
     fun rateAppClicked() {
         strategy.logEvent("rate_app_clicked")
+    }
+
+    fun iosStoreReviewControllerIssue(deviceName: String, iosVersion: String) {
+        strategy.logEvent(
+            "ios_store_review_controller_issue",
+            mapOf("device_name" to deviceName, "ios_version" to iosVersion)
+        )
     }
 
     fun buyMeACoffeeClicked() {

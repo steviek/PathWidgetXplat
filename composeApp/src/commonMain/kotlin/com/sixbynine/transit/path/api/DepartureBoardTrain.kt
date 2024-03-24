@@ -11,6 +11,7 @@ data class DepartureBoardTrain(
     val isDelayed: Boolean,
     val backfillSource: BackfillSource?,
     val directionState: State?,
+    val lines: Set<Line>,
 )
 
 @Serializable

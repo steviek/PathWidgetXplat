@@ -12,15 +12,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.sixbynine.transit.path.api.LineFilter
+import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.app.ui.CheckboxWithContent
 import com.sixbynine.transit.path.app.ui.ColorCircle
 import com.sixbynine.transit.path.app.ui.RowPosition.Start
-import dev.icerock.moko.resources.compose.stringResource
 
 @Composable
 fun TrainLineCheckboxRow(
-    line: LineFilter,
+    line: Line,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
 ) {
@@ -36,7 +35,7 @@ fun TrainLineCheckboxRow(
             ) {
                 Text(
                     modifier = Modifier.weight(1f),
-                    text = stringResource(line.title),
+                    text = line.title,
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurface
                 )

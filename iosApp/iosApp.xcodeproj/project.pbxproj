@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557BA273AAA24004C7B11 /* Assets.xcassets */; };
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
@@ -15,7 +14,6 @@
 		AAB47C1B2B15A46400079022 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AAB47C1A2B15A46400079022 /* SwiftUI.framework */; };
 		AAB47C1E2B15A46400079022 /* widgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB47C1D2B15A46400079022 /* widgetBundle.swift */; };
 		AAB47C202B15A46400079022 /* widget.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB47C1F2B15A46400079022 /* widget.swift */; };
-		AAB47C242B15A46500079022 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AAB47C232B15A46500079022 /* Assets.xcassets */; };
 		AAB47C282B15A46500079022 /* widgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AAB47C172B15A46400079022 /* widgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		AAB47C2E2B15A64900079022 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB47C2D2B15A64800079022 /* HomeView.swift */; };
 		AAB47C392B15AB7700079022 /* WidgetConfigurationUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB47C382B15AB7700079022 /* WidgetConfigurationUtils.swift */; };
@@ -36,6 +34,7 @@
 		AAD5000C2B72768800D6F505 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD5000B2B72768800D6F505 /* AppDelegate.swift */; };
 		AAD500102B72782000D6F505 /* FirebaseAnalyticsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = AAD5000F2B72782000D6F505 /* FirebaseAnalyticsSwift */; };
 		AAD500122B72783400D6F505 /* FirebasePerformance in Frameworks */ = {isa = PBXBuildFile; productRef = AAD500112B72783400D6F505 /* FirebasePerformance */; };
+		AAF769D62BB0729B00290E92 /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AAF769D52BB0729B00290E92 /* Media.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,7 +62,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		058557BA273AAA24004C7B11 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		2152FB032600AC8F00CF470E /* iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSApp.swift; sourceTree = "<group>"; };
 		7555FF7B242A565900829871 /* Departures for PATH.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Departures for PATH.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -74,7 +72,6 @@
 		AAB47C1A2B15A46400079022 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		AAB47C1D2B15A46400079022 /* widgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = widgetBundle.swift; sourceTree = "<group>"; };
 		AAB47C1F2B15A46400079022 /* widget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = widget.swift; sourceTree = "<group>"; };
-		AAB47C232B15A46500079022 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AAB47C252B15A46500079022 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AAB47C2D2B15A64800079022 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		AAB47C322B15AAF500079022 /* DepartureBoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepartureBoardView.swift; sourceTree = "<group>"; };
@@ -89,6 +86,7 @@
 		AAB47C492B16625300079022 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		AAD500052B7275F400D6F505 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		AAD5000B2B72768800D6F505 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		AAF769D52BB0729B00290E92 /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Media.xcassets; sourceTree = "<group>"; };
 		AB3632DC29227652001CCB65 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -157,7 +155,6 @@
 			isa = PBXGroup;
 			children = (
 				AAD500052B7275F400D6F505 /* GoogleService-Info.plist */,
-				058557BA273AAA24004C7B11 /* Assets.xcassets */,
 				7555FF82242A565900829871 /* ContentView.swift */,
 				7555FF8C242A565B00829871 /* Info.plist */,
 				2152FB032600AC8F00CF470E /* iOSApp.swift */,
@@ -174,7 +171,6 @@
 			children = (
 				AAB47C1D2B15A46400079022 /* widgetBundle.swift */,
 				AAB47C1F2B15A46400079022 /* widget.swift */,
-				AAB47C232B15A46500079022 /* Assets.xcassets */,
 				AAB47C252B15A46500079022 /* Info.plist */,
 				AAB47C322B15AAF500079022 /* DepartureBoardView.swift */,
 				AAB47C342B15AB4200079022 /* ConfigurationAppIntent.swift */,
@@ -185,6 +181,7 @@
 				AAB47C412B15AD3200079022 /* WidgetInterop.swift */,
 				AAB47C432B15AD4000079022 /* FetchResult.swift */,
 				AAB47C472B1660D800079022 /* Localizable.xcstrings */,
+				AAF769D52BB0729B00290E92 /* Media.xcassets */,
 			);
 			path = widget;
 			sourceTree = "<group>";
@@ -207,10 +204,10 @@
 				F36B1CEB2AD83DDC00CB74D5 /* Compile Kotlin Framework */,
 				7555FF77242A565900829871 /* Sources */,
 				7555FF79242A565900829871 /* Resources */,
-				AA34A9B62B15A19A007D933F /* Copy Shared Resources */,
 				AAD5000E2B72781500D6F505 /* Frameworks */,
 				AAB47C2C2B15A46500079022 /* Embed Foundation Extensions */,
 				AAD5000D2B72774E00D6F505 /* Upload DYSM to Crashlytics */,
+				AA0C336D2BB08656001408F4 /* Copy shared resources */,
 			);
 			buildRules = (
 			);
@@ -236,7 +233,7 @@
 				AAB47C132B15A46400079022 /* Sources */,
 				AAB47C142B15A46400079022 /* Frameworks */,
 				AAB47C152B15A46400079022 /* Resources */,
-				AAB47C452B165A5800079022 /* Copy Shared Resources */,
+				AA0C336E2BB0870E001408F4 /* Copy Shared Resources */,
 			);
 			buildRules = (
 			);
@@ -295,7 +292,6 @@
 			files = (
 				AAB47C4A2B16625300079022 /* InfoPlist.xcstrings in Resources */,
 				058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */,
-				058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */,
 				AAD500062B7275F400D6F505 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -305,16 +301,36 @@
 			buildActionMask = 2147483647;
 			files = (
 				AAB47C482B1660D800079022 /* Localizable.xcstrings in Resources */,
+				AAF769D62BB0729B00290E92 /* Media.xcassets in Resources */,
 				AAD500072B7275F400D6F505 /* GoogleService-Info.plist in Resources */,
-				AAB47C242B15A46500079022 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		AA34A9B62B15A19A007D933F /* Copy Shared Resources */ = {
+		AA0C336D2BB08656001408F4 /* Copy shared resources */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy shared resources";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/../gradlew\" -p \"$SRCROOT/../\" :composeApp:copyFrameworkResourcesToApp \\\n    -Pmoko.resources.PLATFORM_NAME=\"$PLATFORM_NAME\" \\\n    -Pmoko.resources.CONFIGURATION=\"$CONFIGURATION\" \\\n    -Pmoko.resources.ARCHS=\"$ARCHS\" \\\n    -Pmoko.resources.BUILT_PRODUCTS_DIR=\"$BUILT_PRODUCTS_DIR\" \\\n    -Pmoko.resources.CONTENTS_FOLDER_PATH=\"$CONTENTS_FOLDER_PATH\" \n";
+		};
+		AA0C336E2BB0870E001408F4 /* Copy Shared Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -329,7 +345,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\"$SRCROOT/../gradlew\" -p \"$SRCROOT/../\" :composeApp:copyFrameworkResourcesToApp \\\n    -Pmoko.resources.BUILT_PRODUCTS_DIR=\"$BUILT_PRODUCTS_DIR\" \\\n    -Pmoko.resources.CONTENTS_FOLDER_PATH=\"$CONTENTS_FOLDER_PATH\" \\\n    -Pkotlin.native.cocoapods.platform=\"$PLATFORM_NAME\" \\\n    -Pkotlin.native.cocoapods.archs=\"$ARCHS\" \\\n    -Pkotlin.native.cocoapods.configuration=\"$CONFIGURATION\" \n";
+			shellScript = "\"$SRCROOT/../gradlew\" -p \"$SRCROOT/../\" :composeApp:copyFrameworkResourcesToApp \\\n    -Pmoko.resources.PLATFORM_NAME=\"$PLATFORM_NAME\" \\\n    -Pmoko.resources.CONFIGURATION=\"$CONFIGURATION\" \\\n    -Pmoko.resources.ARCHS=\"$ARCHS\" \\\n    -Pmoko.resources.BUILT_PRODUCTS_DIR=\"$BUILT_PRODUCTS_DIR\" \\\n    -Pmoko.resources.CONTENTS_FOLDER_PATH=\"$CONTENTS_FOLDER_PATH\" \n";
 		};
 		AAB47C312B15A7FA00079022 /* Compile Kotlin Framework */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -348,24 +364,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "if [ \"YES\" = \"$OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED\" ]; then\n  echo \"Skipping Gradle build task invocation due to OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED environment variable set to \\\"YES\\\"\"\n  exit 0\nfi\ncd \"$SRCROOT/..\"\n./gradlew :composeApp:embedAndSignAppleFrameworkForXcode\n";
-		};
-		AAB47C452B165A5800079022 /* Copy Shared Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Copy Shared Resources";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\"$SRCROOT/../gradlew\" -p \"$SRCROOT/../\" :composeApp:copyFrameworkResourcesToApp \\\n    -Pmoko.resources.BUILT_PRODUCTS_DIR=\"$BUILT_PRODUCTS_DIR\" \\\n    -Pmoko.resources.CONTENTS_FOLDER_PATH=\"$CONTENTS_FOLDER_PATH\" \\\n    -Pkotlin.native.cocoapods.platform=\"$PLATFORM_NAME\" \\\n    -Pkotlin.native.cocoapods.archs=\"$ARCHS\" \\\n    -Pkotlin.native.cocoapods.configuration=\"$CONFIGURATION\" \n";
 		};
 		AAD5000D2B72774E00D6F505 /* Upload DYSM to Crashlytics */ = {
 			isa = PBXShellScriptBuildPhase;

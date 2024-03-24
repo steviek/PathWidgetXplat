@@ -55,6 +55,21 @@ extension StationChoice {
     }
 }
 
+extension LineChoice {
+    func toLine() -> Line {
+        return switch (self) {
+        case .hob33:
+            Line.hoboken33rd
+        case .hobWtc:
+            Line.hobokenwtc
+        case .jsq33:
+            Line.journalsquare33rd
+        case .nwkWtc:
+            Line.newarkwtc
+        }
+    }
+}
+
 extension Filter {
     func toTrainFilter() -> TrainFilter {
         return switch (self) {
@@ -70,6 +85,7 @@ extension WidgetDataFetcher {
     func fetchWidgetDataAsync(
         limit: Int32,
         stations: [Station],
+        lines: [Line],
         filter: TrainFilter,
         sort: StationSort
     ) async -> FetchResult {
@@ -78,6 +94,7 @@ extension WidgetDataFetcher {
                 fetchWidgetData(
                     limit: limit,
                     stations: stations,
+                    lines: lines,
                     sort: sort,
                     filter: filter,
                      force: false,

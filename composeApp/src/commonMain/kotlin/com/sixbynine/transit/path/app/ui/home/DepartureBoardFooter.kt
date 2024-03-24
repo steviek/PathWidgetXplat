@@ -24,8 +24,25 @@ private val MinHeight = 76.dp
 
 @Composable
 fun HomeScreenScope.DepartureBoardFooter() {
-    if (state.updateFooterText != null) {
-        if (state.useColumnForFooter) {
+    when {
+        state.isLoading && state.data != null -> {
+            Column(
+                modifier = Modifier.heightIn(MinHeight),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                Text(
+                    modifier = Modifier.padding(8.dp),
+                    text = stringResource(strings.updating),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
+        }
+
+        state.updateFooterText == null -> {}
+
+        state.useColumnForFooter -> {
             Column(
                 modifier =
                 Modifier.fillMaxWidth()
@@ -38,7 +55,9 @@ fun HomeScreenScope.DepartureBoardFooter() {
                 UpdatedText()
                 UpdateNowButton()
             }
-        } else {
+        }
+
+        else -> {
             FlowRow(
                 modifier = Modifier
                     .heightIn(MinHeight)
@@ -51,19 +70,6 @@ fun HomeScreenScope.DepartureBoardFooter() {
                 UpdatedText(modifier = Modifier.align(Alignment.CenterVertically))
                 UpdateNowButton(modifier = Modifier.align(Alignment.CenterVertically))
             }
-        }
-    } else if (state.isLoading && state.data != null) {
-        Column(
-            modifier = Modifier.heightIn(MinHeight),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-            Text(
-                modifier = Modifier.padding(8.dp),
-                text = stringResource(strings.updating),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.bodyMedium,
-            )
         }
     }
 }

@@ -26,6 +26,8 @@
     <string name="filter">Filter</string>
     <string name="interstate_explanation">Interstate trains includes trains heading toward New York from New Jersey stations, and vice versa.</string>
     <string name="langauge_code">en</string>
+    <string name="lines">Lines</string>
+    <string name="lines_show_all">Show all lines</string>
     <string name="move_down">Move down</string>
     <string name="move_up">Move up</string>
     <string name="no_internet">No internet</string>

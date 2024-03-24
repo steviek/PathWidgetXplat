@@ -1,11 +1,11 @@
 package com.sixbynine.transit.path
 
+import IsDebug
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
 
 object Logging {
-    private const val IsDebug = false
     private val hasInitialized = MutableStateFlow(false)
     private var isTest = false
 

@@ -1,9 +1,9 @@
 package com.sixbynine.transit.path.api
 
-import com.sixbynine.transit.path.api.LineFilter.Hoboken33rd
-import com.sixbynine.transit.path.api.LineFilter.HobokenWtc
-import com.sixbynine.transit.path.api.LineFilter.JournalSquare33rd
-import com.sixbynine.transit.path.api.LineFilter.NewarkWtc
+import com.sixbynine.transit.path.api.Line.Hoboken33rd
+import com.sixbynine.transit.path.api.Line.HobokenWtc
+import com.sixbynine.transit.path.api.Line.JournalSquare33rd
+import com.sixbynine.transit.path.api.Line.NewarkWtc
 import com.sixbynine.transit.path.app.ui.ColorWrapper
 import com.sixbynine.transit.path.app.ui.Colors
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract
@@ -11,11 +11,19 @@ import com.sixbynine.transit.path.preferences.IntPersistable
 import com.sixbynine.transit.path.widget.WidgetData.SignData
 import com.sixbynine.transit.path.widget.WidgetData.TrainData
 
-enum class LineFilter(override val number: Int) : IntPersistable {
+enum class Line(override val number: Int) : IntPersistable {
     NewarkWtc(1), HobokenWtc(2), JournalSquare33rd(3), Hoboken33rd(4);
 }
 
-private fun LineFilter.matches(colors: Collection<ColorWrapper>, title: String): Boolean {
+val Line.colors: List<ColorWrapper>
+    get() = when (this) {
+        NewarkWtc -> Colors.NwkWtc
+        HobokenWtc -> Colors.HobWtc
+        JournalSquare33rd -> Colors.Jsq33s
+        Hoboken33rd -> Colors.Hob33s
+    }
+
+private fun Line.matches(colors: Collection<ColorWrapper>, title: String): Boolean {
     when (this) {
         NewarkWtc -> {
             if (colors.any { it in Colors.NwkWtc }) return true
@@ -36,20 +44,20 @@ private fun LineFilter.matches(colors: Collection<ColorWrapper>, title: String):
     }
 }
 
-fun LineFilter.matches(data: TrainData): Boolean {
+fun Line.matches(data: TrainData): Boolean {
     return matches(data.colors, data.title)
 }
 
-fun Collection<LineFilter>.anyMatch(data: TrainData): Boolean {
-    if (size == LineFilter.entries.size) return true
+fun Collection<Line>.anyMatch(data: TrainData): Boolean {
+    if (size == Line.entries.size) return true
     return any { it.matches(data) }
 }
 
-fun Collection<LineFilter>.anyMatch(data: SignData): Boolean {
-    if (size == LineFilter.entries.size) return true
+fun Collection<Line>.anyMatch(data: SignData): Boolean {
+    if (size == Line.entries.size) return true
     return any { it.matches(data.colors, data.title) }
 }
 
-fun LineFilter.matches(data: HomeScreenContract.TrainData): Boolean {
+fun Line.matches(data: HomeScreenContract.TrainData): Boolean {
     return matches(data.colors, data.title)
 }

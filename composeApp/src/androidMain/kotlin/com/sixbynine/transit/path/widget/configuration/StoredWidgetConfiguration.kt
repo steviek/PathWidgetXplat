@@ -1,6 +1,6 @@
 package com.sixbynine.transit.path.widget.configuration
 
-import com.sixbynine.transit.path.api.LineFilter
+import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.preferences.IntPersistable
@@ -17,7 +17,7 @@ data class StoredWidgetConfiguration(
     val filter: TrainFilter? = null,
     val version: Int = 1,
 ) {
-    val lines: Set<LineFilter>
+    val lines: Set<Line>
         get() = IntPersistable.fromBitmask(linesBitmask ?: 0)
 }
 

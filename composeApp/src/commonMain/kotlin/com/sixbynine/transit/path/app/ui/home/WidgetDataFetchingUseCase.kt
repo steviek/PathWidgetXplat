@@ -1,6 +1,7 @@
 package com.sixbynine.transit.path.app.ui.home
 
 import com.sixbynine.transit.path.Logging
+import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.LocationSetting.Disabled
 import com.sixbynine.transit.path.api.LocationSetting.Enabled
 import com.sixbynine.transit.path.api.LocationSetting.EnabledPendingPermission
@@ -24,6 +25,7 @@ import com.sixbynine.transit.path.widget.WidgetDataFetcher
 import com.sixbynine.transit.path.widget.fetchWidgetDataSuspending
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -126,14 +128,24 @@ class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
             }
 
             withTimeoutOrNull(5000) {
-                val result = WidgetDataFetcher.fetchWidgetDataSuspending(
-                    limit = Int.MAX_VALUE,
-                    stations = StationSelectionManager.selection.value.selectedStations,
-                    sort = SettingsManager.stationSort.value,
-                    filter = TrainFilter.All, // filtering happens downstream
-                    force = force,
-                    includeClosestStation = SettingsManager.locationSetting.value == Enabled
-                )
+                val result = coroutineScope {
+                    if (force) {
+                        // This is a bit silly, but it feels really unsatisfying to click
+                        // 'update now' and not see any sort of loading progress, so make this take
+                        // at least half a second.
+                        launch { delay(500) }
+                    }
+
+                    WidgetDataFetcher.fetchWidgetDataSuspending(
+                        limit = Int.MAX_VALUE,
+                        stations = StationSelectionManager.selection.value.selectedStations,
+                        sort = SettingsManager.stationSort.value,
+                        lines = Line.entries, // filtering happens downstream
+                        filter = TrainFilter.All, // filtering happens downstream
+                        force = force,
+                        includeClosestStation = SettingsManager.locationSetting.value == Enabled
+                    )
+                }
                 completeFetch(result.data, error = result is DataResult.Failure)
             } ?: run { completeFetch(_fetchData.value.data, error = true)}
         }

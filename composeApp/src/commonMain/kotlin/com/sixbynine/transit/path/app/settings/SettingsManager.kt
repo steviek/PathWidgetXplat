@@ -1,7 +1,7 @@
 package com.sixbynine.transit.path.app.settings
 
 import com.sixbynine.transit.path.analytics.Analytics
-import com.sixbynine.transit.path.api.LineFilter
+import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.LocationSetting
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.TrainFilter
@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 object SettingsManager {
     private val trainFilterPersister = SettingPersister("train_filter", TrainFilter.All)
-    private val lineFilterPersister = BitFlagSettingPersister("line_filter", LineFilter.entries)
+    private val lineFilterPersister = BitFlagSettingPersister("line_filter", Line.entries)
     private val timeDisplayPersister = SettingPersister("time_display", TimeDisplay.Relative)
     private val stationLimitPersister = SettingPersister("station_limit", StationLimit.ThreePerLine)
     private val stationSortPersister = SettingPersister("station_sort", StationSort.Alphabetical)
@@ -87,7 +87,7 @@ object SettingsManager {
         trainFilterPersister.update(trainFilter)
     }
 
-    fun updateLineFilters(lineFilters: Set<LineFilter>) {
+    fun updateLineFilters(lineFilters: Set<Line>) {
         Analytics.lineFiltersSet(lineFilters)
         lineFilterPersister.update(lineFilters)
     }

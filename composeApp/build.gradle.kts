@@ -87,6 +87,7 @@ kotlin {
             languageSettings.optIn("androidx.compose.material3.ExperimentalMaterial3Api")
             languageSettings.optIn("kotlin.ExperimentalStdlibApi")
             languageSettings.optIn("kotlin.contracts.ExperimentalContracts")
+            languageSettings.optIn("kotlin.experimental.ExperimentalNativeApi")
             languageSettings.optIn("kotlin.time.ExperimentalTime")
             languageSettings.optIn("kotlinx.cinterop.ExperimentalForeignApi")
             languageSettings.optIn("kotlinx.coroutines.DelicateCoroutinesApi")
@@ -114,6 +115,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
@@ -145,6 +147,6 @@ dependencies {
 }
 
 multiplatformResources {
-    multiplatformResourcesPackage = "com.sixbynine.transit.path"
+    resourcesPackage = "com.sixbynine.transit.path"
     iosBaseLocalizationRegion = "en"
 }

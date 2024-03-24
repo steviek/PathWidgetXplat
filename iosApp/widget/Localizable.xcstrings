@@ -159,12 +159,32 @@
         }
       }
     },
+    "Hoboken ⇆ 33rd Street" : {
+
+    },
+    "Hoboken ⇆ World Trade Center" : {
+
+    },
     "Journal Square" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Journal Square"
+          }
+        }
+      }
+    },
+    "Journal Square ⇆ 33rd Street" : {
+
+    },
+    "Lines" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Líneas"
           }
         }
       }
@@ -178,6 +198,9 @@
           }
         }
       }
+    },
+    "Newark ⇆ World Trade Center" : {
+
     },
     "Newport" : {
       "localizations" : {

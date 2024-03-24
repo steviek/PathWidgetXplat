@@ -22,7 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.sixbynine.transit.path.MR.strings
-import com.sixbynine.transit.path.api.LineFilter
+import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.app.ui.CheckboxWithText
@@ -188,7 +188,7 @@ private fun WidgetSetupScreenScope.LinesSection() {
             style = TitleStyle
         )
 
-        LineFilter.entries.forEach { line ->
+        Line.entries.forEach { line ->
             TrainLineCheckboxRow(
                 line = line,
                 checked = line in state.lines,

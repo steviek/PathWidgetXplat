@@ -10,7 +10,7 @@ import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.glance.currentState
 import androidx.glance.state.PreferencesGlanceStateDefinition
 import com.sixbynine.transit.path.PathApplication
-import com.sixbynine.transit.path.api.LineFilter
+import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.preferences.IntPersistable
@@ -81,7 +81,7 @@ object WidgetConfigurationManager {
     suspend fun setWidgetConfiguration(
         id: GlanceId?,
         stations: Collection<String>,
-        lines: Collection<LineFilter>,
+        lines: Collection<Line>,
         useClosestStation: Boolean,
         sort: StationSort,
         filter: TrainFilter,

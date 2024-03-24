@@ -2,7 +2,6 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
-    id("dev.icerock.mobile.multiplatform-resources")
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.google.services)
     alias(libs.plugins.crashlytics)
@@ -42,8 +41,6 @@ kotlin {
                 implementation(libs.kotlin.date.time)
                 implementation(libs.kotlin.coroutines)
                 implementation(libs.kotlin.serialization.json)
-                implementation(libs.moko.resources)
-                implementation(libs.moko.resources.compose)
                 implementation(libs.moko.mvvm)
                 implementation(libs.napier)
                 implementation(libs.ktor.core)
@@ -93,6 +90,7 @@ kotlin {
             languageSettings.optIn("kotlinx.coroutines.DelicateCoroutinesApi")
             languageSettings.optIn("kotlinx.serialization.ExperimentalSerializationApi")
             languageSettings.optIn("com.google.accompanist.permissions.ExperimentalPermissionsApi")
+            languageSettings.optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
         }
     }
 }
@@ -103,7 +101,7 @@ android {
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].res.srcDirs("src/androidMain/res")
-    sourceSets["main"].resources.srcDirs("src/commonMain/resources")
+    sourceSets["main"].res.srcDirs("src/commonMain/composeResources")
 
     defaultConfig {
         applicationId = "com.sixbynine.transit.path"
@@ -144,9 +142,4 @@ android {
 
 dependencies {
     implementation(libs.androidx.ui.tooling.preview.android)
-}
-
-multiplatformResources {
-    resourcesPackage = "com.sixbynine.transit.path"
-    iosBaseLocalizationRegion = "en"
 }

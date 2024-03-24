@@ -37,7 +37,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.sixbynine.transit.path.MR.strings
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.app.ui.AppUiScope
@@ -60,7 +59,19 @@ import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.TrainData
 import com.sixbynine.transit.path.app.ui.icon.IconType
 import com.sixbynine.transit.path.app.ui.icon.NativeIconButton
 import com.sixbynine.transit.path.app.ui.station.AddStationBottomSheet
-import dev.icerock.moko.resources.compose.stringResource
+import org.jetbrains.compose.resources.stringResource
+import pathwidgetxplat.composeapp.generated.resources.Res.string
+import pathwidgetxplat.composeapp.generated.resources.add_station
+import pathwidgetxplat.composeapp.generated.resources.cannot_move_explanation_closest
+import pathwidgetxplat.composeapp.generated.resources.cannot_move_explanation_state
+import pathwidgetxplat.composeapp.generated.resources.delete
+import pathwidgetxplat.composeapp.generated.resources.done
+import pathwidgetxplat.composeapp.generated.resources.edit
+import pathwidgetxplat.composeapp.generated.resources.failed_to_fetch
+import pathwidgetxplat.composeapp.generated.resources.move_down
+import pathwidgetxplat.composeapp.generated.resources.move_up
+import pathwidgetxplat.composeapp.generated.resources.retry
+import pathwidgetxplat.composeapp.generated.resources.settings
 
 class HomeScreenScope(
     val state: State,
@@ -139,7 +150,7 @@ private fun HomeScreenScope.MainContent(modifier: Modifier) {
                             onIntent(SettingsClicked)
                         }
                     ) {
-                        Text(stringResource(strings.settings))
+                        Text(stringResource(string.settings))
                     }
 
                     Spacer(Modifier.weight(1f))
@@ -149,7 +160,7 @@ private fun HomeScreenScope.MainContent(modifier: Modifier) {
                             onIntent(if (state.isEditing) StopEditingClicked else EditClicked)
                         }
                     ) {
-                        Text(stringResource(if (state.isEditing) strings.done else strings.edit))
+                        Text(stringResource(if (state.isEditing) string.done else string.edit))
                     }
                 }
 
@@ -168,7 +179,7 @@ private fun HomeScreenScope.ErrorState() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = stringResource(strings.failed_to_fetch),
+            text = stringResource(string.failed_to_fetch),
             style = MaterialTheme.typography.headlineSmall,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurface,
@@ -176,7 +187,7 @@ private fun HomeScreenScope.ErrorState() {
         Spacer(Modifier.height(8.dp))
         Button(onClick = { onIntent(RetryClicked) }) {
             Text(
-                text = stringResource(strings.retry)
+                text = stringResource(string.retry)
             )
         }
     }
@@ -232,11 +243,11 @@ private fun HomeScreenScope.DepartureBoard() {
                 item {
                     val text = if (station.isClosest) {
                         stringResource(
-                            strings.cannot_move_explanation_closest,
+                            string.cannot_move_explanation_closest,
                             station.station.displayName
                         )
                     } else {
-                        stringResource(strings.cannot_move_explanation_state)
+                        stringResource(string.cannot_move_explanation_state)
                     }
                     CannotMoveExplanation(text)
                 }
@@ -249,7 +260,7 @@ private fun HomeScreenScope.DepartureBoard() {
                     Button(
                         modifier = Modifier.fillMaxWidth(),
                         onClick = { onIntent(AddStationClicked) }) {
-                        Text(stringResource(strings.add_station))
+                        Text(stringResource(string.add_station))
                     }
                 }
             }
@@ -285,7 +296,7 @@ private fun HomeScreenScope.StationHeader(
                 if (canMoveDown) {
                     NativeIconButton(
                         icon = IconType.ArrowDown,
-                        contentDescription = stringResource(strings.move_down),
+                        contentDescription = stringResource(string.move_down),
                         onClick = { onIntent(MoveStationDownClicked(data.id)) }
                     )
                 } else {
@@ -295,7 +306,7 @@ private fun HomeScreenScope.StationHeader(
                 if (canMoveUp) {
                     NativeIconButton(
                         icon = IconType.ArrowUp,
-                        contentDescription = stringResource(strings.move_up),
+                        contentDescription = stringResource(string.move_up),
                         onClick = { onIntent(MoveStationUpClicked(data.id)) }
                     )
                 } else {
@@ -305,7 +316,7 @@ private fun HomeScreenScope.StationHeader(
                 if (canDelete) {
                     NativeIconButton(
                         icon = IconType.Delete,
-                        contentDescription = stringResource(strings.delete),
+                        contentDescription = stringResource(string.delete),
                         onClick = { onIntent(RemoveStationClicked(data.id)) }
                     )
                 }

@@ -28,15 +28,12 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     @objc
     func handleNotification(notification: NSNotification) {
         guard var userInfo = notification.userInfo as? [String: Any] else {
-            print("No data found in notification")
             return
         }
     
         let eventName = userInfo["event_name"] as! String
         userInfo.removeValue(forKey: "event_name")
-        
-        print("Logged \(eventName)")
-    
+
         FirebaseAnalytics.Analytics.logEvent(eventName, parameters: userInfo)
     }
 }

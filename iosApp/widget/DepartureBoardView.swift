@@ -104,16 +104,16 @@ struct DepartureBoardView: View {
                         
                         let maxUpdatedWidth = entry.size.width - 64 - 24 - 8
                         let formattedFetchTime = WidgetDataFormatter().formatTime(instant: data.fetchTime)
-                        let longText = getString(strings().updated_at_time, arg1: formattedFetchTime)
+                        let longText = IosResourceProvider().getUpdatedAtTime(formattedFetchTime: formattedFetchTime)
                         let updatedText =
                         if entry.hasError {
                             if measureTextWidth(
-                                text: getString(strings().error_long),
+                                text: IosResourceProvider().getErrorLong(),
                                 font: UIFont.systemFont(ofSize: 12)
                             ) <= maxUpdatedWidth {
-                                getString(strings().error_long)
+                                IosResourceProvider().getErrorLong()
                             } else {
-                                getString(strings().error_short)
+                                IosResourceProvider().getErrorShort()
                             }
                         } else
                             if measureTextWidth(
@@ -187,7 +187,7 @@ struct DepartureBoardView: View {
                         let destination = WidgetDataFormatter().formatHeadSign(title: train.title, width: HeadSignWidth.narrow)
                         colorCircle(size: 12, colors: train.colors, isDark: colorScheme == .dark)
                         Spacer().frame(width: 4)
-                        Text(getString(strings().to_destination, arg1: destination))
+                        Text(destination)
                             .font(Font.system(size: 12))
                             .lineLimit(1)
                         let arrivalTime = (train.isBackfilled ? "~" : "") + WidgetDataFormatter().formatTime(instant: train.projectedArrival)

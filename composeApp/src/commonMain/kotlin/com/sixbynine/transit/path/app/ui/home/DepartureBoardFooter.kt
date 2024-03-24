@@ -15,10 +15,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.sixbynine.transit.path.MR.strings
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.UpdateNowClicked
 import com.sixbynine.transit.path.app.ui.theme.Dimensions
-import dev.icerock.moko.resources.compose.stringResource
+import org.jetbrains.compose.resources.stringResource
+import pathwidgetxplat.composeapp.generated.resources.Res.string
+import pathwidgetxplat.composeapp.generated.resources.update_now
+import pathwidgetxplat.composeapp.generated.resources.updating
 
 private val MinHeight = 76.dp
 
@@ -33,7 +35,7 @@ fun HomeScreenScope.DepartureBoardFooter() {
                 LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
                 Text(
                     modifier = Modifier.padding(8.dp),
-                    text = stringResource(strings.updating),
+                    text = stringResource(string.updating),
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodyMedium,
                 )
@@ -90,6 +92,6 @@ private fun HomeScreenScope.UpdateNowButton(modifier: Modifier = Modifier) {
         modifier = modifier,
         onClick = { onIntent(UpdateNowClicked) }
     ) {
-        Text(stringResource(strings.update_now))
+        Text(stringResource(string.update_now))
     }
 }

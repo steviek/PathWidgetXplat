@@ -12,7 +12,7 @@ import ComposeApp
 struct EmptyDepartureBoardView: View {
     var body: some View {
         ZStack(alignment: .center) {
-            Text(getString(strings().edit_to_add_stations))
+            Text(IosResourceProvider().getEmptyStateString())
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

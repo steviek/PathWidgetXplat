@@ -4,10 +4,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.sixbynine.transit.path.MR.strings
 import com.sixbynine.transit.path.app.settings.TimeDisplay
 import com.sixbynine.transit.path.app.ui.PathBottomSheet
-import dev.icerock.moko.resources.compose.stringResource
+import org.jetbrains.compose.resources.stringResource
+import pathwidgetxplat.composeapp.generated.resources.Res.string
+import pathwidgetxplat.composeapp.generated.resources.setting_header_time_display
 
 @Composable
 fun TimeDisplayBottomSheet(
@@ -19,7 +20,7 @@ fun TimeDisplayBottomSheet(
     PathBottomSheet(
         isShown = isShown,
         onDismissRequest = onDismiss,
-        title = stringResource(strings.setting_header_time_display)
+        title = stringResource(string.setting_header_time_display)
     ) {
         RadioSection(modifier = Modifier.padding(bottom = 16.dp)) {
             TimeDisplay.entries.forEach {

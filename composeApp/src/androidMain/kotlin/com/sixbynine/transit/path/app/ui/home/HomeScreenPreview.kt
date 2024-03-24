@@ -18,6 +18,7 @@ import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.State
 import com.sixbynine.transit.path.app.ui.home.HomeScreenViewModel.Companion.toDepartureBoardData
 import com.sixbynine.transit.path.app.ui.layout.LayoutOption.TwoColumns
 import com.sixbynine.transit.path.widget.Fixtures
+import kotlinx.coroutines.runBlocking
 
 @PathWidgetPreview
 @Composable
@@ -33,7 +34,7 @@ fun HomeScreenPreview() {
                 layoutOption = TwoColumns,
                 isLoading = false,
                 hasError = false,
-                data = Fixtures.widgetData().toDepartureBoardData(TimeDisplay.Relative),
+                data = runBlocking { Fixtures.widgetData().toDepartureBoardData(TimeDisplay.Relative) },
                 timeDisplay = TimeDisplay.Relative,
             ),
             onIntent = {

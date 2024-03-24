@@ -24,15 +24,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.sixbynine.transit.path.MR.strings
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.app.ui.HandleEffects
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
-import dev.icerock.moko.resources.compose.stringResource
 import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.PopUpTo
+import org.jetbrains.compose.resources.stringResource
+import pathwidgetxplat.composeapp.generated.resources.Res.string
+import pathwidgetxplat.composeapp.generated.resources.choose_stations
+import pathwidgetxplat.composeapp.generated.resources.confirm
 
 @Composable
 fun SetupScreen() {
@@ -61,7 +63,7 @@ fun SetupScreen(state: SetupScreenContract.State, onIntent: (SetupScreenContract
         ) {
             Spacer(Modifier.height(16.dp))
             Text(
-                text = stringResource(strings.choose_stations),
+                text = stringResource(string.choose_stations),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(horizontal = 16.dp)
@@ -81,7 +83,7 @@ fun SetupScreen(state: SetupScreenContract.State, onIntent: (SetupScreenContract
                 modifier = Modifier.fillMaxWidth().padding(16.dp),
                 enabled = state.selectedStations.isNotEmpty()
             ) {
-                Text(stringResource(strings.confirm))
+                Text(stringResource(string.confirm))
             }
         }
     }

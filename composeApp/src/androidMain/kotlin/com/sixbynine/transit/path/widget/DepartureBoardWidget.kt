@@ -14,12 +14,10 @@ import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.provideContent
 import androidx.glance.appwidget.updateAll
 import androidx.glance.currentState
-import com.sixbynine.transit.path.MR.strings
 import com.sixbynine.transit.path.PathApplication
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.api.anyMatch
-import com.sixbynine.transit.path.resources.getString
 import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.time.today
 import com.sixbynine.transit.path.util.DataResult
@@ -36,6 +34,7 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atTime
 import kotlinx.datetime.toInstant
+import java.util.Locale
 
 class DepartureBoardWidget : GlanceAppWidget() {
 
@@ -125,14 +124,16 @@ val SmallWidgetSize = DpSize(1.dp, 1.dp)
 
 private fun getMediumWidgetSize(): DpSize {
     val context = PathApplication.instance
-    val widestUpdatedAtText =
-        getString(
-            strings.updated_at_time,
-            WidgetDataFormatter.formatTime(
-                today().atTime(22, 20)
-                    .toInstant(TimeZone.currentSystemDefault())
-            )
+
+    val widestTime =
+        WidgetDataFormatter.formatTime(
+            today().atTime(22, 20).toInstant(TimeZone.currentSystemDefault())
         )
+
+    val widestUpdatedAtText = when (Locale.getDefault().language) {
+        "es" -> "Se actualizó a las $widestTime"
+        else -> "Updated at $widestTime"
+    }
     val updatedAtWidth = estimateTextWidth(context, widestUpdatedAtText, 12.sp)
     val requiredWidth = (WidgetFooterHeight * 2) + updatedAtWidth
     return DpSize(requiredWidth, 1.dp)

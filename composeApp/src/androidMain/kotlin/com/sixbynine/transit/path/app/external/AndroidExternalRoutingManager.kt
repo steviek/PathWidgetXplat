@@ -7,12 +7,14 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.firebase.Firebase
 import com.google.firebase.crashlytics.crashlytics
-import com.sixbynine.transit.path.MR.strings
 import com.sixbynine.transit.path.app.ui.ActivityRegistry
-import com.sixbynine.transit.path.resources.getString
 import com.sixbynine.transit.path.util.suspendRunCatching
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import org.jetbrains.compose.resources.getString
+import pathwidgetxplat.composeapp.generated.resources.Res.string
+import pathwidgetxplat.composeapp.generated.resources.app_name
+import pathwidgetxplat.composeapp.generated.resources.share
 
 object AndroidExternalRoutingManager : ExternalRoutingManager {
 
@@ -21,7 +23,7 @@ object AndroidExternalRoutingManager : ExternalRoutingManager {
         val intent = Intent(Intent.ACTION_SENDTO).apply {
             data = Uri.parse("mailto:")
             putExtra(Intent.EXTRA_EMAIL, arrayOf(FeedbackEmail))
-            putExtra(Intent.EXTRA_SUBJECT, getString(strings.app_name))
+            putExtra(Intent.EXTRA_SUBJECT, getString(string.app_name))
         }
 
         return runCatching { activity.startActivity(intent) }.isSuccess
@@ -35,14 +37,14 @@ object AndroidExternalRoutingManager : ExternalRoutingManager {
         return runCatching { activity.startActivity(intent) }.isSuccess
     }
 
-    override fun shareTextToSystem(text: String): Boolean {
+    override suspend fun shareTextToSystem(text: String): Boolean {
         val activity = ActivityRegistry.peekCreatedActivity() ?: return false
         val intent = Intent().apply {
             action = Intent.ACTION_SEND
             putExtra(Intent.EXTRA_TEXT, text)
             type = "text/plain"
         }
-        val chooserIntent = Intent.createChooser(intent, getString(strings.share))
+        val chooserIntent = Intent.createChooser(intent, getString(string.share))
 
         return runCatching { activity.startActivity(chooserIntent) }.isSuccess
     }

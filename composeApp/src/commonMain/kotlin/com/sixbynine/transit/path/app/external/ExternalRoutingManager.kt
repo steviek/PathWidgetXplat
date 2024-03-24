@@ -1,26 +1,27 @@
 package com.sixbynine.transit.path.app.external
 
 import PlatformType
-import com.sixbynine.transit.path.MR.strings
-import com.sixbynine.transit.path.resources.getString
 import getPlatform
+import org.jetbrains.compose.resources.getString
+import pathwidgetxplat.composeapp.generated.resources.Res.string
+import pathwidgetxplat.composeapp.generated.resources.sharing_message
 
 interface ExternalRoutingManager {
     suspend fun openEmail(): Boolean
 
     suspend fun openUrl(url: String): Boolean
 
-    fun shareTextToSystem(text: String): Boolean
+    suspend fun shareTextToSystem(text: String): Boolean
 
     suspend fun launchAppRating(): Boolean
 }
 
 expect fun ExternalRoutingManager(): ExternalRoutingManager
 
-fun ExternalRoutingManager.shareAppToSystem(): Boolean {
+suspend fun ExternalRoutingManager.shareAppToSystem(): Boolean {
     val text = StringBuilder()
 
-    text.appendLine(getString(strings.sharing_message))
+    text.appendLine(getString(string.sharing_message))
     text.appendLine()
 
     listOf(AndroidSharingLine, "", IosSharingLine)

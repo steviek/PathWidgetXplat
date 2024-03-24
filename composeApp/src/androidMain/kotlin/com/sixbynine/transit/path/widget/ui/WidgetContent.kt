@@ -17,12 +17,13 @@ import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.text.TextAlign
-import com.sixbynine.transit.path.MR.strings
 import com.sixbynine.transit.path.MainActivity
-import com.sixbynine.transit.path.resources.getString
 import com.sixbynine.transit.path.widget.glance.GlanceTheme
 import com.sixbynine.transit.path.widget.glance.Text
+import com.sixbynine.transit.path.widget.glance.stringResource
 import com.sixbynine.transit.path.widget.startConfigurationActivityAction
+import pathwidgetxplat.composeapp.generated.resources.Res.string
+import pathwidgetxplat.composeapp.generated.resources.complete_widget_setup
 
 @Composable
 fun WidgetContent(state: WidgetState) {
@@ -74,7 +75,7 @@ private fun SetupView() {
         modifier = GlanceModifier
             .clickable(startConfigurationActivityAction())
             .padding(16.dp),
-        text = getString(strings.complete_widget_setup),
+        text = stringResource(string.complete_widget_setup),
         color = GlanceTheme.colors.primary,
         fontSize = 18.sp,
         textAlign = TextAlign.Center

@@ -19,7 +19,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.sixbynine.transit.path.MR.strings
 import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.api.TrainFilter.All
 import com.sixbynine.transit.path.api.TrainFilter.Interstate
@@ -27,7 +26,10 @@ import com.sixbynine.transit.path.app.settings.SettingsManager
 import com.sixbynine.transit.path.app.ui.AppUiScope
 import com.sixbynine.transit.path.app.ui.PathBottomSheet
 import com.sixbynine.transit.path.app.ui.gutter
-import dev.icerock.moko.resources.compose.stringResource
+import org.jetbrains.compose.resources.stringResource
+import pathwidgetxplat.composeapp.generated.resources.Res.string
+import pathwidgetxplat.composeapp.generated.resources.show_all_trains
+import pathwidgetxplat.composeapp.generated.resources.show_interstate_trains
 
 @Composable
 fun AppUiScope.FilterBottomSheet(onDismiss: () -> Unit) {
@@ -82,8 +84,8 @@ private fun AppUiScope.FilterRow(
         Spacer(Modifier.width(8.dp))
 
         val text = when (filter) {
-            All -> stringResource(strings.show_all_trains)
-            Interstate -> stringResource(strings.show_interstate_trains)
+            All -> stringResource(string.show_all_trains)
+            Interstate -> stringResource(string.show_interstate_trains)
         }
 
         Text(

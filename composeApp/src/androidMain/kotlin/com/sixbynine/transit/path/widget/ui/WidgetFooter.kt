@@ -19,9 +19,7 @@ import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.size
 import androidx.glance.visibility
-import com.sixbynine.transit.path.MR.strings
 import com.sixbynine.transit.path.R.drawable
-import com.sixbynine.transit.path.resources.getString
 import com.sixbynine.transit.path.util.isFailure
 import com.sixbynine.transit.path.util.isLoading
 import com.sixbynine.transit.path.widget.SmallWidgetSize
@@ -30,7 +28,17 @@ import com.sixbynine.transit.path.widget.WidgetDataFormatter
 import com.sixbynine.transit.path.widget.glance.GlanceTheme
 import com.sixbynine.transit.path.widget.glance.ImageButton
 import com.sixbynine.transit.path.widget.glance.Text
+import com.sixbynine.transit.path.widget.glance.stringResource
 import com.sixbynine.transit.path.widget.startConfigurationActivityAction
+import pathwidgetxplat.composeapp.generated.resources.Res.string
+import pathwidgetxplat.composeapp.generated.resources.edit
+import pathwidgetxplat.composeapp.generated.resources.error_long
+import pathwidgetxplat.composeapp.generated.resources.error_short
+import pathwidgetxplat.composeapp.generated.resources.no_internet
+import pathwidgetxplat.composeapp.generated.resources.refreshing
+import pathwidgetxplat.composeapp.generated.resources.refreshing_short
+import pathwidgetxplat.composeapp.generated.resources.update_now
+import pathwidgetxplat.composeapp.generated.resources.updated_at_time
 
 @Composable
 fun WidgetFooter(
@@ -47,7 +55,7 @@ fun WidgetFooter(
             GlanceModifier
                 .visibility(if (VERSION.SDK_INT >= 31) Invisible else Visible),
             srcResId = drawable.ic_edit_inset,
-            contentDesc = strings.edit,
+            contentDesc = string.edit,
             onClick = startConfigurationActivityAction()
         )
 
@@ -55,14 +63,14 @@ fun WidgetFooter(
 
         val isSmallSize = LocalSize.current == SmallWidgetSize
         val updatedAtText = when {
-            result.isFailure() && !result.hadInternet -> getString(strings.no_internet)
-            result.isFailure() && isSmallSize -> getString(strings.error_short)
-            result.isFailure() -> getString(strings.error_long)
-            result.isLoading() && isSmallSize -> getString(strings.refreshing_short)
-            result.isLoading() -> getString(strings.refreshing)
+            result.isFailure() && !result.hadInternet -> stringResource(string.no_internet)
+            result.isFailure() && isSmallSize -> stringResource(string.error_short)
+            result.isFailure() -> stringResource(string.error_long)
+            result.isLoading() && isSmallSize -> stringResource(string.refreshing_short)
+            result.isLoading() -> stringResource(string.refreshing)
             isSmallSize -> WidgetDataFormatter.formatTime(updateTime)
             else -> {
-                getString(strings.updated_at_time, WidgetDataFormatter.formatTime(updateTime))
+                stringResource(string.updated_at_time, WidgetDataFormatter.formatTime(updateTime))
             }
         }
 
@@ -92,7 +100,7 @@ fun WidgetFooter(
 
             ImageButton(
                 srcResId = drawable.ic_refresh_inset,
-                contentDesc = strings.update_now,
+                contentDesc = string.update_now,
                 onClick = actionRunCallback<UpdateWidgetAction>(),
                 modifier = GlanceModifier
                     .size(WidgetFooterHeight)

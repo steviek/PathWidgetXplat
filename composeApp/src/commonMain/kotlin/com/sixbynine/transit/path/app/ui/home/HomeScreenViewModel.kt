@@ -2,7 +2,6 @@ package com.sixbynine.transit.path.app.ui.home
 
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.sixbynine.transit.path.MR.strings
 import com.sixbynine.transit.path.api.LocationSetting.Enabled
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.StationSort.Alphabetical
@@ -41,8 +40,8 @@ import com.sixbynine.transit.path.app.ui.layout.LayoutOption.OneColumn
 import com.sixbynine.transit.path.app.ui.layout.LayoutOption.ThreeColumns
 import com.sixbynine.transit.path.app.ui.layout.LayoutOption.TwoColumns
 import com.sixbynine.transit.path.app.ui.layout.LayoutOptionManager
-import com.sixbynine.transit.path.resources.getString
 import com.sixbynine.transit.path.time.now
+import com.sixbynine.transit.path.util.launchAndReturnUnit
 import com.sixbynine.transit.path.util.repeatEvery
 import com.sixbynine.transit.path.widget.WidgetData
 import com.sixbynine.transit.path.widget.WidgetDataFormatter
@@ -62,6 +61,10 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.compose.resources.getString
+import pathwidgetxplat.composeapp.generated.resources.Res.string
+import pathwidgetxplat.composeapp.generated.resources.delay_time
+import pathwidgetxplat.composeapp.generated.resources.update_footer_text
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 
@@ -82,8 +85,8 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
             isEditing = false,
             timeDisplay = SettingsManager.timeDisplay.value,
             stationSort = SettingsManager.stationSort.value,
-            updateFooterText = createFooterText(),
-            data = fetchData.data?.toDepartureBoardData()?.adjustedForLatestSettings()
+            updateFooterText = null,
+            data = null
         )
     )
     override val state = _state.asStateFlow()
@@ -92,6 +95,17 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
     override val effects = _effects.receiveAsFlow()
 
     init {
+        viewModelScope.launch {
+            val footerText = createFooterText()
+            val initialData = fetchData.data?.toDepartureBoardData()?.adjustedForLatestSettings()
+            updateState {
+                copy(
+                    updateFooterText = updateFooterText ?: footerText,
+                    data = data ?: initialData
+                )
+            }
+        }
+
         viewModelScope.launch(Dispatchers.Default) {
             fetchingUseCase.fetchData.collectLatest { fetchData ->
                 repeatEvery(250.milliseconds) {
@@ -125,7 +139,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
         }
     }
 
-    override fun onIntent(intent: Intent) {
+    override fun onIntent(intent: Intent) = viewModelScope.launchAndReturnUnit {
         when (intent) {
             RetryClicked, UpdateNowClicked -> fetchingUseCase.fetchNow()
             EditClicked -> updateState { copy(isEditing = true) }
@@ -180,34 +194,34 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
         }
     }
 
-    private fun createFooterText(): String? = with(fetchData) {
+    private suspend fun createFooterText(): String? = with(fetchData) {
         val formattedFetchTime =
             WidgetDataFormatter.formatTimeWithSeconds(lastFetchTime ?: return@with null)
         // could be localized better, but this works for en and es
         return getString(
-            strings.update_footer_text,
+            string.update_footer_text,
             formattedFetchTime,
             "${timeUntilNextFetch.inWholeSeconds}s"
         )
     }
 
-    private fun createDepartureBoardData(): DepartureBoardData? {
+    private suspend fun createDepartureBoardData(): DepartureBoardData? {
         return fetchData.data
             ?.toDepartureBoardData()
             ?.adjustedForLatestSettings()
     }
 
-    private inline fun <T> updateStateOnEach(flow: Flow<T>, crossinline block: State.(T) -> State) {
+    private inline fun <T> updateStateOnEach(flow: Flow<T>, crossinline block: suspend State.(T) -> State) {
         flow.onEach { updateState { block(it) } }
             .flowOn(Dispatchers.Default)
             .launchIn(viewModelScope)
     }
 
-    private fun updateState(operation: State.() -> State) {
+    private suspend fun updateState(operation: suspend State.() -> State) {
         _state.value = operation(state.value)
     }
 
-    private fun DepartureBoardData.adjustedForLatestSettings(): DepartureBoardData {
+    private suspend fun DepartureBoardData.adjustedForLatestSettings(): DepartureBoardData {
         val stationToIndex =
             StationSelectionManager
                 .selection
@@ -271,7 +285,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
     }
 
     companion object {
-        fun WidgetData.toDepartureBoardData(
+        suspend fun WidgetData.toDepartureBoardData(
             timeDisplay: TimeDisplay = SettingsManager.timeDisplay.value
         ): DepartureBoardData {
             val stations = stations.mapNotNull { data ->
@@ -317,7 +331,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
             return DepartureBoardData(stations = stations)
         }
 
-        private fun trainDisplayTime(
+        private suspend fun trainDisplayTime(
             timeDisplay: TimeDisplay,
             isDelayed: Boolean,
             isBackfilled: Boolean,
@@ -326,7 +340,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
             return with(StringBuilder()) {
                 if (isBackfilled) append("~")
 
-                if (isDelayed) append(getString(strings.delay_time))
+                if (isDelayed) append(getString(string.delay_time))
 
                 val time = when (timeDisplay) {
                     TimeDisplay.Relative -> WidgetDataFormatter.formatRelativeTime(

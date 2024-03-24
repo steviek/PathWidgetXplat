@@ -32,7 +32,7 @@ object IosExternalRoutingManager : ExternalRoutingManager {
         }
     }
 
-    override fun shareTextToSystem(text: String): Boolean {
+    override suspend fun shareTextToSystem(text: String): Boolean {
         val activityVC = UIActivityViewController(
             activityItems = listOf(text),
             applicationActivities = null

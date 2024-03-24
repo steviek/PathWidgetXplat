@@ -15,7 +15,6 @@
 		AAB47C1E2B15A46400079022 /* widgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB47C1D2B15A46400079022 /* widgetBundle.swift */; };
 		AAB47C202B15A46400079022 /* widget.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB47C1F2B15A46400079022 /* widget.swift */; };
 		AAB47C282B15A46500079022 /* widgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AAB47C172B15A46400079022 /* widgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		AAB47C2E2B15A64900079022 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB47C2D2B15A64800079022 /* HomeView.swift */; };
 		AAB47C392B15AB7700079022 /* WidgetConfigurationUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB47C382B15AB7700079022 /* WidgetConfigurationUtils.swift */; };
 		AAB47C3A2B15AB9600079022 /* DepartureBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB47C322B15AAF500079022 /* DepartureBoardView.swift */; };
 		AAB47C3B2B15AB9600079022 /* ConfigurationAppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB47C342B15AB4200079022 /* ConfigurationAppIntent.swift */; };
@@ -73,7 +72,6 @@
 		AAB47C1D2B15A46400079022 /* widgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = widgetBundle.swift; sourceTree = "<group>"; };
 		AAB47C1F2B15A46400079022 /* widget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = widget.swift; sourceTree = "<group>"; };
 		AAB47C252B15A46500079022 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		AAB47C2D2B15A64800079022 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		AAB47C322B15AAF500079022 /* DepartureBoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepartureBoardView.swift; sourceTree = "<group>"; };
 		AAB47C342B15AB4200079022 /* ConfigurationAppIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationAppIntent.swift; sourceTree = "<group>"; };
 		AAB47C362B15AB5D00079022 /* Interop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Interop.swift; sourceTree = "<group>"; };
@@ -159,7 +157,6 @@
 				7555FF8C242A565B00829871 /* Info.plist */,
 				2152FB032600AC8F00CF470E /* iOSApp.swift */,
 				058557D7273AAEEB004C7B11 /* Preview Content */,
-				AAB47C2D2B15A64800079022 /* HomeView.swift */,
 				AAB47C492B16625300079022 /* InfoPlist.xcstrings */,
 				AAD5000B2B72768800D6F505 /* AppDelegate.swift */,
 			);
@@ -207,7 +204,6 @@
 				AAD5000E2B72781500D6F505 /* Frameworks */,
 				AAB47C2C2B15A46500079022 /* Embed Foundation Extensions */,
 				AAD5000D2B72774E00D6F505 /* Upload DYSM to Crashlytics */,
-				AA0C336D2BB08656001408F4 /* Copy shared resources */,
 			);
 			buildRules = (
 			);
@@ -233,7 +229,6 @@
 				AAB47C132B15A46400079022 /* Sources */,
 				AAB47C142B15A46400079022 /* Frameworks */,
 				AAB47C152B15A46400079022 /* Resources */,
-				AA0C336E2BB0870E001408F4 /* Copy Shared Resources */,
 			);
 			buildRules = (
 			);
@@ -309,44 +304,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		AA0C336D2BB08656001408F4 /* Copy shared resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Copy shared resources";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"$SRCROOT/../gradlew\" -p \"$SRCROOT/../\" :composeApp:copyFrameworkResourcesToApp \\\n    -Pmoko.resources.PLATFORM_NAME=\"$PLATFORM_NAME\" \\\n    -Pmoko.resources.CONFIGURATION=\"$CONFIGURATION\" \\\n    -Pmoko.resources.ARCHS=\"$ARCHS\" \\\n    -Pmoko.resources.BUILT_PRODUCTS_DIR=\"$BUILT_PRODUCTS_DIR\" \\\n    -Pmoko.resources.CONTENTS_FOLDER_PATH=\"$CONTENTS_FOLDER_PATH\" \n";
-		};
-		AA0C336E2BB0870E001408F4 /* Copy Shared Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Copy Shared Resources";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"$SRCROOT/../gradlew\" -p \"$SRCROOT/../\" :composeApp:copyFrameworkResourcesToApp \\\n    -Pmoko.resources.PLATFORM_NAME=\"$PLATFORM_NAME\" \\\n    -Pmoko.resources.CONFIGURATION=\"$CONFIGURATION\" \\\n    -Pmoko.resources.ARCHS=\"$ARCHS\" \\\n    -Pmoko.resources.BUILT_PRODUCTS_DIR=\"$BUILT_PRODUCTS_DIR\" \\\n    -Pmoko.resources.CONTENTS_FOLDER_PATH=\"$CONTENTS_FOLDER_PATH\" \n";
-		};
 		AAB47C312B15A7FA00079022 /* Compile Kotlin Framework */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -414,7 +371,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				AAB47C462B165AC300079022 /* Interop.swift in Sources */,
-				AAB47C2E2B15A64900079022 /* HomeView.swift in Sources */,
 				2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */,
 				AAD5000C2B72768800D6F505 /* AppDelegate.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
@@ -649,7 +605,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = VT9SJH7UKQ;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SRCROOT)/../shared/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)\n$(SRCROOT)/../composeApp/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
 				);

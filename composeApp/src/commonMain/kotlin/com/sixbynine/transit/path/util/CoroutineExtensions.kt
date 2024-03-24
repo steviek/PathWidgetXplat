@@ -10,6 +10,10 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlin.time.Duration
 
+fun CoroutineScope.launchAndReturnUnit(block: suspend () -> Unit): Unit {
+    launch { block() }
+}
+
 suspend fun <T> suspendRunCatching(block: suspend () -> T): Result<T> {
     return try {
         Result.success(block())

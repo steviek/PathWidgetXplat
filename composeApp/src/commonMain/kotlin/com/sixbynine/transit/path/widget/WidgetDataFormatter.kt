@@ -1,11 +1,12 @@
 package com.sixbynine.transit.path.widget
 
-import com.sixbynine.transit.path.MR.strings
-import com.sixbynine.transit.path.resources.getString
 import com.sixbynine.transit.path.time.is24HourClock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.compose.resources.getString
+import pathwidgetxplat.composeapp.generated.resources.Res.string
+import pathwidgetxplat.composeapp.generated.resources.due_now
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
@@ -130,10 +131,10 @@ object WidgetDataFormatter {
                 ":" + time.second.toString().padStart(2, '0')
     }
 
-    fun formatRelativeTime(now: Instant, time: Instant): String {
+    suspend fun formatRelativeTime(now: Instant, time: Instant): String {
         val duration = time - now
         return if (duration < 1.minutes) {
-            getString(strings.due_now)
+            getString(string.due_now)
         } else if (duration < 1.hours) {
             duration.inWholeMinutes.toString() + " min"
         } else {

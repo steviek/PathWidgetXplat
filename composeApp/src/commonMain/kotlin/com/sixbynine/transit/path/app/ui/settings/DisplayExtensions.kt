@@ -2,7 +2,6 @@ package com.sixbynine.transit.path.app.ui.settings
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import com.sixbynine.transit.path.MR.strings
 import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.Line.Hoboken33rd
 import com.sixbynine.transit.path.api.Line.HobokenWtc
@@ -19,60 +18,79 @@ import com.sixbynine.transit.path.app.settings.StationLimit
 import com.sixbynine.transit.path.app.settings.TimeDisplay
 import com.sixbynine.transit.path.app.ui.ColorWrapper
 import com.sixbynine.transit.path.app.ui.Colors
-import com.sixbynine.transit.path.resources.getString
 import com.sixbynine.transit.path.widget.WidgetDataFormatter
-import dev.icerock.moko.resources.StringResource
-import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.datetime.Clock.System
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
+import pathwidgetxplat.composeapp.generated.resources.Res.string
+import pathwidgetxplat.composeapp.generated.resources.interstate_explanation
+import pathwidgetxplat.composeapp.generated.resources.lines_show_all
+import pathwidgetxplat.composeapp.generated.resources.setting_time_display_clock
+import pathwidgetxplat.composeapp.generated.resources.setting_time_display_clock_subtitle
+import pathwidgetxplat.composeapp.generated.resources.setting_time_display_relative
+import pathwidgetxplat.composeapp.generated.resources.setting_time_display_relative_subtitle
+import pathwidgetxplat.composeapp.generated.resources.show_all_trains
+import pathwidgetxplat.composeapp.generated.resources.show_interstate_trains
+import pathwidgetxplat.composeapp.generated.resources.station_filter_four
+import pathwidgetxplat.composeapp.generated.resources.station_filter_none
+import pathwidgetxplat.composeapp.generated.resources.station_filter_one_per_line
+import pathwidgetxplat.composeapp.generated.resources.station_filter_six
+import pathwidgetxplat.composeapp.generated.resources.station_filter_three_per_line
+import pathwidgetxplat.composeapp.generated.resources.station_filter_two_per_line
+import pathwidgetxplat.composeapp.generated.resources.station_order_fixed
+import pathwidgetxplat.composeapp.generated.resources.station_order_nj_am_subtext
+import pathwidgetxplat.composeapp.generated.resources.station_order_nj_am_title
+import pathwidgetxplat.composeapp.generated.resources.station_order_ny_am_subtext
+import pathwidgetxplat.composeapp.generated.resources.station_order_ny_am_title
 import kotlin.time.Duration.Companion.minutes
 
 val StationLimit.displayName: StringResource
     get() = when (this) {
-        StationLimit.None -> strings.station_filter_none
-        StationLimit.Four -> strings.station_filter_four
-        StationLimit.Six -> strings.station_filter_six
-        StationLimit.OnePerLine -> strings.station_filter_one_per_line
-        StationLimit.TwoPerLine -> strings.station_filter_two_per_line
-        StationLimit.ThreePerLine -> strings.station_filter_three_per_line
+        StationLimit.None -> string.station_filter_none
+        StationLimit.Four -> string.station_filter_four
+        StationLimit.Six -> string.station_filter_six
+        StationLimit.OnePerLine -> string.station_filter_one_per_line
+        StationLimit.TwoPerLine -> string.station_filter_two_per_line
+        StationLimit.ThreePerLine -> string.station_filter_three_per_line
     }
 
 val StationSort.title: StringResource
     get() = when (this) {
-        Alphabetical -> strings.station_order_fixed
-        NjAm -> strings.station_order_nj_am_title
-        NyAm -> strings.station_order_ny_am_title
+        Alphabetical -> string.station_order_fixed
+        NjAm -> string.station_order_nj_am_title
+        NyAm -> string.station_order_ny_am_title
     }
 
 val StationSort.subtitle: StringResource?
     get() = when (this) {
         Alphabetical -> null
-        NjAm -> strings.station_order_nj_am_subtext
-        NyAm -> strings.station_order_ny_am_subtext
+        NjAm -> string.station_order_nj_am_subtext
+        NyAm -> string.station_order_ny_am_subtext
     }
 
 val TimeDisplay.title: StringResource
     get() = when (this) {
-        TimeDisplay.Relative -> strings.setting_time_display_relative
-        TimeDisplay.Clock -> strings.setting_time_display_clock
+        TimeDisplay.Relative -> string.setting_time_display_relative
+        TimeDisplay.Clock -> string.setting_time_display_clock
     }
 
 val TrainFilter.title: StringResource
     get() = when (this) {
-        All -> strings.show_all_trains
-        Interstate -> strings.show_interstate_trains
+        All -> string.show_all_trains
+        Interstate -> string.show_interstate_trains
     }
 
 val TrainFilter.subtext: StringResource?
     get() = when (this) {
         All -> null
-        Interstate -> strings.interstate_explanation
+        Interstate -> string.interstate_explanation
     }
 
 @Composable
 fun TimeDisplay.subtitle(): String = when (this) {
-    TimeDisplay.Relative -> stringResource(strings.setting_time_display_relative_subtitle)
+    TimeDisplay.Relative -> stringResource(string.setting_time_display_relative_subtitle)
     TimeDisplay.Clock -> stringResource(
-        strings.setting_time_display_clock_subtitle,
+        string.setting_time_display_clock_subtitle,
         getClockDisplayTimeLabel()
     )
 }
@@ -94,12 +112,12 @@ val Line.colors: List<ColorWrapper> get() = when (this) {
 
 val Set<Line>.title: String
     @Composable
-    get() = remember(this) {
+    get() {
         if (size == Line.entries.size) {
-            return@remember getString(strings.lines_show_all)
+            return stringResource(string.lines_show_all)
         }
 
-        joinToString(separator = "\n") { it.title }
+        return remember(this) { joinToString(separator = "\n") { it.title } }
     }
 
 @Composable

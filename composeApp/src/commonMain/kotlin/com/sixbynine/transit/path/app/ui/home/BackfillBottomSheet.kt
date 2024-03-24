@@ -23,17 +23,19 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.sixbynine.transit.path.MR.images
-import com.sixbynine.transit.path.MR.strings
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.app.settings.TimeDisplay
 import com.sixbynine.transit.path.app.ui.PathBottomSheet
 import com.sixbynine.transit.path.app.ui.gutter
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.HomeBackfillSource
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.TrainData
-import com.sixbynine.transit.path.resources.getString
-import dev.icerock.moko.resources.compose.painterResource
-import dev.icerock.moko.resources.compose.stringResource
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+import pathwidgetxplat.composeapp.generated.resources.Res.drawable
+import pathwidgetxplat.composeapp.generated.resources.Res.string
+import pathwidgetxplat.composeapp.generated.resources.langauge_code
+import pathwidgetxplat.composeapp.generated.resources.presumed_train
+import pathwidgetxplat.composeapp.generated.resources.train_track
 
 @Composable
 fun HomeScreenScope.BackfillBottomSheet(
@@ -52,7 +54,7 @@ fun HomeScreenScope.BackfillBottomSheet(
         ) {
             Text(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                text = stringResource(strings.presumed_train),
+                text = stringResource(string.presumed_train),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface,
             )
@@ -70,7 +72,7 @@ fun HomeScreenScope.BackfillBottomSheet(
             )
 
             Image(
-                painter = painterResource(images.train_track),
+                painter = painterResource(drawable.train_track),
                 contentDescription = null,
                 modifier = Modifier.align(Alignment.CenterHorizontally).size(24.dp),
                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface)
@@ -94,12 +96,13 @@ fun HomeScreenScope.BackfillBottomSheet(
     }
 }
 
+@Composable
 private fun HomeScreenScope.createSubtext(
     station: Station,
     trainData: TrainData,
     source: HomeBackfillSource,
 ): AnnotatedString {
-    return when (getString(strings.langauge_code)) {
+    return when (stringResource(string.langauge_code)) {
         "es" -> createSpanishSubtext(station, trainData, source)
         else -> createEnglishSubtext(station, trainData, source)
     }

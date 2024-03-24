@@ -4,10 +4,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.sixbynine.transit.path.MR.strings
 import com.sixbynine.transit.path.app.settings.StationLimit
 import com.sixbynine.transit.path.app.ui.PathBottomSheet
-import dev.icerock.moko.resources.compose.stringResource
+import org.jetbrains.compose.resources.stringResource
+import pathwidgetxplat.composeapp.generated.resources.Res.string
+import pathwidgetxplat.composeapp.generated.resources.settings_header_station_filter
 
 @Composable
 fun StationLimitBottomSheet(
@@ -19,7 +20,7 @@ fun StationLimitBottomSheet(
     PathBottomSheet(
         isShown = isShown,
         onDismissRequest = onDismiss,
-        title = stringResource(strings.settings_header_station_filter)
+        title = stringResource(string.settings_header_station_filter)
     ) {
         RadioSection(modifier = Modifier.padding(bottom = 16.dp)) {
             StationLimit.entries.forEach {

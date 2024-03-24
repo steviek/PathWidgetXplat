@@ -8,9 +8,3 @@ plugins {
     alias(libs.plugins.google.services) apply false
     alias(libs.plugins.crashlytics) apply false
 }
-
-buildscript {
-    dependencies {
-        classpath(libs.resources.generator)
-    }
-}

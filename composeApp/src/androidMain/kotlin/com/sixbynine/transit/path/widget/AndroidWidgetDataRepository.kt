@@ -6,6 +6,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.crashlytics.crashlytics
 import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.PathApplication
+import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.StationSort.Alphabetical
 import com.sixbynine.transit.path.api.Stations
@@ -102,6 +103,7 @@ object AndroidWidgetDataRepository {
         val result = WidgetDataFetcher.fetchWidgetDataSuspending(
             limit = Int.MAX_VALUE,
             stations = Stations.All,
+            lines = Line.entries,
             sort = Alphabetical,
             filter = TrainFilter.All,
             force = force,

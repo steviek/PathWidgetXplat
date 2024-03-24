@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -17,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.sixbynine.transit.path.MR.strings
 import com.sixbynine.transit.path.app.ui.SwitchWithText
 import com.sixbynine.transit.path.app.ui.ViewModelScreen
 import com.sixbynine.transit.path.app.ui.icon.IconType
@@ -35,7 +34,23 @@ import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.Statio
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.TimeDisplayChanged
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.TimeDisplayClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.LocationSettingState
-import dev.icerock.moko.resources.compose.stringResource
+import org.jetbrains.compose.resources.stringResource
+import pathwidgetxplat.composeapp.generated.resources.Res.string
+import pathwidgetxplat.composeapp.generated.resources.back
+import pathwidgetxplat.composeapp.generated.resources.buy_me_a_coffee
+import pathwidgetxplat.composeapp.generated.resources.closest_station_setting_subtitle
+import pathwidgetxplat.composeapp.generated.resources.closest_station_setting_title
+import pathwidgetxplat.composeapp.generated.resources.filter
+import pathwidgetxplat.composeapp.generated.resources.lines
+import pathwidgetxplat.composeapp.generated.resources.presumed_trains_subtext
+import pathwidgetxplat.composeapp.generated.resources.rate_app
+import pathwidgetxplat.composeapp.generated.resources.send_feedback
+import pathwidgetxplat.composeapp.generated.resources.setting_header_time_display
+import pathwidgetxplat.composeapp.generated.resources.settings
+import pathwidgetxplat.composeapp.generated.resources.settings_header_station_filter
+import pathwidgetxplat.composeapp.generated.resources.share_app
+import pathwidgetxplat.composeapp.generated.resources.show_presumed_trains
+import pathwidgetxplat.composeapp.generated.resources.station_order
 
 @Composable
 fun SettingScreen() {
@@ -57,11 +72,11 @@ fun SettingsScope.Content() {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(stringResource(strings.settings)) },
+                title = { Text(stringResource(string.settings)) },
                 navigationIcon = {
                     NativeIconButton(
                         IconType.Back,
-                        contentDescription = stringResource(strings.back),
+                        contentDescription = stringResource(string.back),
                         onClick = { onIntent(SettingsContract.Intent.BackClicked) })
                 }
             )
@@ -84,15 +99,15 @@ fun SettingsScope.Content() {
 
             StationLimitSection()
 
-            Divider()
+            HorizontalDivider()
 
-            SettingsItem(stringResource(strings.rate_app)) { onIntent(RateAppClicked) }
+            SettingsItem(stringResource(string.rate_app)) { onIntent(RateAppClicked) }
 
-            SettingsItem(stringResource(strings.share_app)) { onIntent(ShareAppClicked) }
+            SettingsItem(stringResource(string.share_app)) { onIntent(ShareAppClicked) }
 
-            SettingsItem(stringResource(strings.send_feedback)) { onIntent(SendFeedbackClicked) }
+            SettingsItem(stringResource(string.send_feedback)) { onIntent(SendFeedbackClicked) }
 
-            SettingsItem(stringResource(strings.buy_me_a_coffee)) { onIntent(BuyMeACoffeeClicked) }
+            SettingsItem(stringResource(string.buy_me_a_coffee)) { onIntent(BuyMeACoffeeClicked) }
         }
 
         StationLimitBottomSheet(
@@ -137,7 +152,7 @@ fun SettingsScope.Content() {
 @Composable
 private fun SettingsScope.FilterSection() {
     SettingsItem(
-        title = stringResource(strings.filter),
+        title = stringResource(string.filter),
         subtitle = stringResource(state.trainFilter.title),
         onClick = { onIntent(SettingsContract.Intent.TrainFilterClicked) }
     )
@@ -146,7 +161,7 @@ private fun SettingsScope.FilterSection() {
 @Composable
 private fun SettingsScope.LineFilterSection() {
     SettingsItem(
-        title = stringResource(strings.lines),
+        title = stringResource(string.lines),
         subtitle = state.lines.title,
         onClick = { onIntent(SettingsContract.Intent.LinesClicked) }
     )
@@ -155,7 +170,7 @@ private fun SettingsScope.LineFilterSection() {
 @Composable
 private fun SettingsScope.TimeDisplaySection() {
     SettingsItem(
-        title = stringResource(strings.setting_header_time_display),
+        title = stringResource(string.setting_header_time_display),
         subtitle = stringResource(state.timeDisplay.title),
         onClick = { onIntent(TimeDisplayClicked) }
     )
@@ -164,7 +179,7 @@ private fun SettingsScope.TimeDisplaySection() {
 @Composable
 private fun SettingsScope.StationOrderSection() {
     SettingsItem(
-        title = stringResource(strings.station_order),
+        title = stringResource(string.station_order),
         subtitle = stringResource(state.stationSort.title),
         onClick = { onIntent(StationSortClicked) }
     )
@@ -173,7 +188,7 @@ private fun SettingsScope.StationOrderSection() {
 @Composable
 private fun SettingsScope.StationLimitSection() {
     SettingsItem(
-        title = stringResource(strings.settings_header_station_filter),
+        title = stringResource(string.settings_header_station_filter),
         subtitle = stringResource(state.stationLimit.displayName),
         onClick = { onIntent(StationLimitClicked) }
     )
@@ -183,8 +198,8 @@ private fun SettingsScope.StationLimitSection() {
 private fun SettingsScope.ShowPresumedTrainsSection() {
     SwitchWithText(
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-        text = stringResource(strings.show_presumed_trains),
-        subtext = stringResource(strings.presumed_trains_subtext),
+        text = stringResource(string.show_presumed_trains),
+        subtext = stringResource(string.presumed_trains_subtext),
         checked = state.showPresumedTrains,
         onCheckedChange = { onIntent(ShowPresumedTrainsChanged(it)) },
         textStyle = MaterialTheme.typography.titleMedium,
@@ -198,8 +213,8 @@ private fun SettingsScope.ShowPresumedTrainsSection() {
 private fun SettingsScope.LocationSettingSection() {
     SwitchWithText(
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-        text = stringResource(strings.closest_station_setting_title),
-        subtext = stringResource(strings.closest_station_setting_subtitle)
+        text = stringResource(string.closest_station_setting_title),
+        subtext = stringResource(string.closest_station_setting_subtitle)
             .takeUnless { state.hasLocationPermission },
         checked = state.locationSetting == LocationSettingState.Enabled,
         onCheckedChange = { onIntent(LocationSettingChanged(it)) },

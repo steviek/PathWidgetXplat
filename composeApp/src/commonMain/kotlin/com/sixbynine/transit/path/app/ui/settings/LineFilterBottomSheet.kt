@@ -6,10 +6,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.sixbynine.transit.path.MR.strings
 import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.app.ui.PathBottomSheet
-import dev.icerock.moko.resources.compose.stringResource
+import org.jetbrains.compose.resources.stringResource
+import pathwidgetxplat.composeapp.generated.resources.Res.string
+import pathwidgetxplat.composeapp.generated.resources.lines
 
 @Composable
 fun LineFilterBottomSheet(
@@ -21,7 +22,7 @@ fun LineFilterBottomSheet(
     PathBottomSheet(
         isShown = isShown,
         onDismissRequest = onDismiss,
-        title = stringResource(strings.lines)
+        title = stringResource(string.lines)
     ) {
         Column(Modifier.fillMaxWidth().padding(bottom = 16.dp)) {
             Line.entries.forEach { line ->

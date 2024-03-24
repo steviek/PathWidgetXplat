@@ -21,7 +21,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.sixbynine.transit.path.MR.strings
 import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.TrainFilter
@@ -40,7 +39,17 @@ import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent.
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent.TrainFilterSelected
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent.UseClosestStationToggled
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.StationRow
-import dev.icerock.moko.resources.compose.stringResource
+import org.jetbrains.compose.resources.stringResource
+import pathwidgetxplat.composeapp.generated.resources.Res.string
+import pathwidgetxplat.composeapp.generated.resources.and_or
+import pathwidgetxplat.composeapp.generated.resources.closest_always_first
+import pathwidgetxplat.composeapp.generated.resources.closest_station
+import pathwidgetxplat.composeapp.generated.resources.confirm
+import pathwidgetxplat.composeapp.generated.resources.filter
+import pathwidgetxplat.composeapp.generated.resources.lines
+import pathwidgetxplat.composeapp.generated.resources.station_order
+import pathwidgetxplat.composeapp.generated.resources.stations
+import pathwidgetxplat.composeapp.generated.resources.widget_configuration
 
 @Composable
 fun WidgetSetupScreen(viewModel: WidgetSetupViewModel) {
@@ -55,7 +64,7 @@ fun WidgetSetupScreenScope.WidgetSetupScreenContent() {
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(
-                    title = { Text(stringResource(strings.widget_configuration)) }
+                    title = { Text(stringResource(string.widget_configuration)) }
                 )
             },
             containerColor = MaterialTheme.colorScheme.background
@@ -69,7 +78,7 @@ fun WidgetSetupScreenScope.WidgetSetupScreenContent() {
                     Spacer(modifier = Modifier.height(16.dp))
 
                     SettingsHeader(
-                        text = stringResource(strings.stations),
+                        text = stringResource(string.stations),
                         style = TitleStyle
                     )
 
@@ -77,7 +86,7 @@ fun WidgetSetupScreenScope.WidgetSetupScreenContent() {
                         CheckboxWithText(
                             modifier = Modifier.padding(horizontal = 16.dp),
                             checked = state.useClosestStation,
-                            text = stringResource(strings.closest_station),
+                            text = stringResource(string.closest_station),
                             onCheckedChange = { onIntent(UseClosestStationToggled(it)) }
                         )
 
@@ -85,7 +94,7 @@ fun WidgetSetupScreenScope.WidgetSetupScreenContent() {
                             modifier = Modifier
                                 .padding(vertical = 8.dp)
                                 .padding(start = 64.dp),
-                            text = stringResource(strings.and_or),
+                            text = stringResource(string.and_or),
                         )
                     }
 
@@ -97,12 +106,12 @@ fun WidgetSetupScreenScope.WidgetSetupScreenContent() {
                     Spacer(Modifier.height(24.dp))
 
                     RadioSection(
-                        title = stringResource(strings.station_order),
+                        title = stringResource(string.station_order),
                         titleStyle = TitleStyle
                     ) {
                         if (state.useClosestStation) {
                             Text(
-                                text = stringResource(strings.closest_always_first),
+                                text = stringResource(string.closest_always_first),
                                 modifier = Modifier.padding(horizontal = 16.dp),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -122,7 +131,7 @@ fun WidgetSetupScreenScope.WidgetSetupScreenContent() {
                     Spacer(Modifier.height(24.dp))
 
                     RadioSection(
-                        title = stringResource(strings.filter),
+                        title = stringResource(string.filter),
                         titleStyle = TitleStyle
                     ) {
                         TrainFilter.entries.forEach { filter ->
@@ -149,7 +158,7 @@ fun WidgetSetupScreenScope.WidgetSetupScreenContent() {
                         enabled = state.isConfirmButtonEnabled,
                         onClick = { onIntent(ConfirmClicked) }
                     ) {
-                        Text(stringResource(strings.confirm))
+                        Text(stringResource(string.confirm))
                     }
                 }
             }
@@ -184,7 +193,7 @@ private fun WidgetSetupScreenScope.StationColumn(
 private fun WidgetSetupScreenScope.LinesSection() {
     Column {
         SettingsHeader(
-            text = stringResource(strings.lines),
+            text = stringResource(string.lines),
             style = TitleStyle
         )
 

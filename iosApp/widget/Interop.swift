@@ -47,17 +47,3 @@ extension ColorWrapper {
         )
     }
 }
-
-extension View {
-    func strings() -> MR.strings {
-        MR.strings()
-    }
-    
-    func getString(_ res: ResourcesStringResource) -> String {
-        IosResourcesKt.getString(resource: res)
-    }
-    
-    func getString(_ res: ResourcesStringResource, arg1: String) -> String {
-        IosResourcesKt.getString(resource: res, arg1: arg1)
-    }
-}

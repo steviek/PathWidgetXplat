@@ -38,11 +38,11 @@ import com.sixbynine.transit.path.app.ui.settings.SettingsContract.LocationSetti
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.State
 import com.sixbynine.transit.path.location.LocationPermissionRequestResult
 import com.sixbynine.transit.path.location.LocationProvider
+import com.sixbynine.transit.path.util.launchAndReturnUnit
 import com.sixbynine.transit.path.util.withElementPresent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 
 class SettingsViewModel : BaseViewModel<State, Intent, Effect>(createInitialState()) {
     init {
@@ -74,7 +74,7 @@ class SettingsViewModel : BaseViewModel<State, Intent, Effect>(createInitialStat
         flow.onEach { updateState { block(it) } }.launchIn(viewModelScope)
     }
 
-    override fun onIntent(intent: Intent) {
+    override fun onIntent(intent: Intent) = viewModelScope.launchAndReturnUnit {
         when (intent) {
             is TimeDisplayChanged -> {
                 SettingsManager.updateTimeDisplay(intent.display)
@@ -138,13 +138,11 @@ class SettingsViewModel : BaseViewModel<State, Intent, Effect>(createInitialStat
 
             RateAppClicked -> {
                 Analytics.rateAppClicked()
-                viewModelScope.launch { ExternalRoutingManager().launchAppRating() }
+                ExternalRoutingManager().launchAppRating()
             }
 
             SendFeedbackClicked -> {
-                viewModelScope.launch {
-                    ExternalRoutingManager().openEmail()
-                }
+                ExternalRoutingManager().openEmail()
             }
 
             ShareAppClicked -> {
@@ -154,9 +152,7 @@ class SettingsViewModel : BaseViewModel<State, Intent, Effect>(createInitialStat
 
             BuyMeACoffeeClicked -> {
                 Analytics.buyMeACoffeeClicked()
-                viewModelScope.launch {
-                    ExternalRoutingManager().openUrl("https://www.buymeacoffee.com/kideckel")
-                }
+                ExternalRoutingManager().openUrl("https://www.buymeacoffee.com/kideckel")
             }
         }
     }

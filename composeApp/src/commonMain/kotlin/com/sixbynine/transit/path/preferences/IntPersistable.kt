@@ -6,11 +6,22 @@ interface IntPersistable {
     val number: Int
 
     companion object {
-        @OptIn(ExperimentalStdlibApi::class)
         inline fun <reified E> fromPersistence(
             number: Int
         ): E? where E : Enum<E>, E : IntPersistable {
             return enumEntries<E>().find { it.number == number }
+        }
+
+        inline fun <reified E> createBitmask(
+            values: Collection<E>
+        ): Int where E : Enum<E>, E : IntPersistable {
+            return values.fold(0) { acc, e -> acc or (1 shl e.number) }
+        }
+
+        inline fun <reified E> fromBitmask(
+            mask: Int
+        ): Set<E> where E : Enum<E>, E : IntPersistable {
+            return enumEntries<E>().filter { (1 shl it.number) and mask != 0 }.toSet()
         }
     }
 }

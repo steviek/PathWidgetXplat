@@ -1,5 +1,6 @@
 package com.sixbynine.transit.path.analytics
 
+import com.sixbynine.transit.path.api.LineFilter
 import com.sixbynine.transit.path.api.LocationSetting
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.StationSort
@@ -32,6 +33,13 @@ object Analytics {
 
     fun filterSet(filter: TrainFilter) {
         strategy.logEvent("set_filter", mapOf("filter" to filter.name.lowercase()))
+    }
+
+    fun lineFiltersSet(filters: Set<LineFilter>) {
+        strategy.logEvent(
+            "set_line_filter",
+            mapOf("filters" to filters.joinToString { it.name.lowercase() })
+        )
     }
 
     fun stationSortSet(sort: StationSort) {

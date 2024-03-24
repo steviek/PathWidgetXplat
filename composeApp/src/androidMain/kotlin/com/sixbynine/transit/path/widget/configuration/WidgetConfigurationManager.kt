@@ -10,8 +10,10 @@ import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.glance.currentState
 import androidx.glance.state.PreferencesGlanceStateDefinition
 import com.sixbynine.transit.path.PathApplication
+import com.sixbynine.transit.path.api.LineFilter
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.TrainFilter
+import com.sixbynine.transit.path.preferences.IntPersistable
 import com.sixbynine.transit.path.util.JsonFormat
 import com.sixbynine.transit.path.widget.DepartureBoardWidget
 import kotlinx.coroutines.Dispatchers
@@ -25,7 +27,7 @@ object WidgetConfigurationManager {
 
     private val context get() = PathApplication.instance
     private val DEPARTURE_WIDGET_PREFS_KEY = stringPreferencesKey("departure_widget_data")
-    private const val SCHEMA_VERSION = 2
+    private const val SCHEMA_VERSION = 3
 
     init {
         GlobalScope.launch(Dispatchers.IO) {
@@ -79,6 +81,7 @@ object WidgetConfigurationManager {
     suspend fun setWidgetConfiguration(
         id: GlanceId?,
         stations: Collection<String>,
+        lines: Collection<LineFilter>,
         useClosestStation: Boolean,
         sort: StationSort,
         filter: TrainFilter,
@@ -87,6 +90,7 @@ object WidgetConfigurationManager {
 
         val configuration = StoredWidgetConfiguration(
             fixedStations = stations.toSet(),
+            linesBitmask = IntPersistable.createBitmask(lines),
             useClosestStation = useClosestStation,
             sortOrder = sort,
             filter = filter,

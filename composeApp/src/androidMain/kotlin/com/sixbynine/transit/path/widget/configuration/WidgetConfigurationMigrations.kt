@@ -1,6 +1,8 @@
 package com.sixbynine.transit.path.widget.configuration
 
+import com.sixbynine.transit.path.api.LineFilter
 import com.sixbynine.transit.path.api.Stations
+import com.sixbynine.transit.path.preferences.IntPersistable
 
 fun StoredWidgetConfiguration.migrateToCurrentVersion(): StoredWidgetConfiguration {
     var configuration = this
@@ -27,6 +29,13 @@ fun StoredWidgetConfiguration.migrateToCurrentVersion(): StoredWidgetConfigurati
                 }
                 station.pathApiName
             }?.toSet()
+        )
+    }
+
+    if (version < 3) {
+        configuration = configuration.copy(
+            version = 3,
+            linesBitmask = IntPersistable.createBitmask(LineFilter.entries)
         )
     }
 

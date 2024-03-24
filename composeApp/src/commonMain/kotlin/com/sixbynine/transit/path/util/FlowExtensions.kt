@@ -88,3 +88,22 @@ inline fun <A, B, C, D, E, F, T> combineStates(
         combineStates(flow5, flow6, ::Pair)
     ) { a, b, c, d, (e, f) -> block(a, b, c, d, e, f) }
 }
+
+inline fun <A, B, C, D, E, F, G, T> combineStates(
+    flow1: StateFlow<A>,
+    flow2: StateFlow<B>,
+    flow3: StateFlow<C>,
+    flow4: StateFlow<D>,
+    flow5: StateFlow<E>,
+    flow6: StateFlow<F>,
+    flow7: StateFlow<G>,
+    crossinline block: (A, B, C, D, E, F, G) -> T
+): StateFlow<T> {
+    return combineStates(
+        flow1,
+        flow2,
+        flow3,
+        combineStates(flow4, flow5, ::Pair),
+        combineStates(flow6, flow7, ::Pair)
+    ) { a, b, c, (d, e), (f, g) -> block(a, b, c, d, e, f, g) }
+}

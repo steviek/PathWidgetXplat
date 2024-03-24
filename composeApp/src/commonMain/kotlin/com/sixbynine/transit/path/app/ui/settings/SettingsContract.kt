@@ -1,5 +1,6 @@
 package com.sixbynine.transit.path.app.ui.settings
 
+import com.sixbynine.transit.path.api.LineFilter
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.app.settings.StationLimit
@@ -13,6 +14,7 @@ object SettingsContract {
         val locationSetting: LocationSettingState,
         val timeDisplay: TimeDisplay,
         val trainFilter: TrainFilter,
+        val lines: Set<LineFilter>,
         val stationLimit: StationLimit,
         val stationSort: StationSort,
         val showPresumedTrains: Boolean,
@@ -21,7 +23,7 @@ object SettingsContract {
     )
 
     enum class BottomSheetType {
-        StationLimit, StationSort, TimeDisplay, TrainFilter
+        StationLimit, StationSort, TimeDisplay, TrainFilter, Lines
     }
 
     enum class LocationSettingState {
@@ -30,6 +32,7 @@ object SettingsContract {
 
     sealed interface Intent {
         data class TrainFilterChanged(val filter: TrainFilter) : Intent
+        data class LineFilterToggled(val filter: LineFilter, val isChecked: Boolean) : Intent
         data class TimeDisplayChanged(val display: TimeDisplay) : Intent
         data class StationSortSelected(val sort: StationSort) : Intent
         data class StationLimitSelected(val limit: StationLimit) : Intent
@@ -39,6 +42,7 @@ object SettingsContract {
         data object StationSortClicked : Intent
         data object TimeDisplayClicked : Intent
         data object TrainFilterClicked : Intent
+        data object LinesClicked : Intent
         data object BottomSheetDismissed : Intent
         data object BackClicked : Intent
         data object SendFeedbackClicked : Intent

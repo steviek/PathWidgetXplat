@@ -43,6 +43,26 @@ inline fun <reified E> SettingPersister(
     return SettingPersister(IntPreferencesKey(key), defaultValue)
 }
 
+// This is very extra, but as long as all the numbers are in [0, 32), this works nicely.
+inline fun <reified E> BitFlagSettingPersister(
+    key: IntPreferencesKey,
+    defaultValue: Collection<E>
+): SettingPersister<Int, Set<E>> where E : Enum<E>, E : IntPersistable {
+    return SettingPersister(
+        key = key,
+        serialize = { IntPersistable.createBitmask(it) },
+        deserialize = { IntPersistable.fromBitmask(it) },
+        defaultValue = defaultValue.toSet()
+    )
+}
+
+inline fun <reified E> BitFlagSettingPersister(
+    key: String,
+    defaultValue: Collection<E>
+): SettingPersister<Int, Set<E>> where E : Enum<E>, E : IntPersistable {
+    return BitFlagSettingPersister(IntPreferencesKey(key), defaultValue)
+}
+
 inline fun SettingPersister(
     key: String,
     defaultValue: Boolean
@@ -51,7 +71,8 @@ inline fun SettingPersister(
         key = IntPreferencesKey(key),
         serialize = { if (it) 1 else 0 },
         deserialize = { it != 0 },
-        defaultValue = defaultValue)
+        defaultValue = defaultValue
+    )
 }
 
 private class PreferencesSerializer<T, R>(

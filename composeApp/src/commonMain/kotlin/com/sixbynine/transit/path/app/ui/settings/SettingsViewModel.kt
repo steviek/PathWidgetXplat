@@ -8,6 +8,7 @@ import com.sixbynine.transit.path.app.external.ExternalRoutingManager
 import com.sixbynine.transit.path.app.external.shareAppToSystem
 import com.sixbynine.transit.path.app.settings.SettingsManager
 import com.sixbynine.transit.path.app.ui.BaseViewModel
+import com.sixbynine.transit.path.app.ui.settings.SettingsContract.BottomSheetType.Lines
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.BottomSheetType.StationLimit
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.BottomSheetType.StationSort
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.BottomSheetType.TimeDisplay
@@ -18,6 +19,8 @@ import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.BackClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.BottomSheetDismissed
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.BuyMeACoffeeClicked
+import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.LineFilterToggled
+import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.LinesClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.LocationSettingChanged
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.RateAppClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.SendFeedbackClicked
@@ -35,6 +38,7 @@ import com.sixbynine.transit.path.app.ui.settings.SettingsContract.LocationSetti
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.State
 import com.sixbynine.transit.path.location.LocationPermissionRequestResult
 import com.sixbynine.transit.path.location.LocationProvider
+import com.sixbynine.transit.path.util.withElementPresent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -44,15 +48,18 @@ class SettingsViewModel : BaseViewModel<State, Intent, Effect>(createInitialStat
     init {
         updateStateOnEach(SettingsManager.timeDisplay) { copy(timeDisplay = it) }
         updateStateOnEach(SettingsManager.trainFilter) { copy(trainFilter = it) }
+        updateStateOnEach(SettingsManager.lineFilter) { copy(lines = it) }
         updateStateOnEach(SettingsManager.stationLimit) { copy(stationLimit = it) }
         updateStateOnEach(SettingsManager.stationSort) { copy(stationSort = it) }
         updateStateOnEach(SettingsManager.displayPresumedTrains) { copy(showPresumedTrains = it) }
         if (LocationProvider().isLocationSupportedByDevice) {
             updateStateOnEach(SettingsManager.locationSetting) {
-                copy(locationSetting = when (it) {
-                    Enabled, EnabledPendingPermission -> LocationSettingState.Enabled
-                    Disabled -> LocationSettingState.Disabled
-                })
+                copy(
+                    locationSetting = when (it) {
+                        Enabled, EnabledPendingPermission -> LocationSettingState.Enabled
+                        Disabled -> LocationSettingState.Disabled
+                    }
+                )
             }
         }
 
@@ -77,6 +84,11 @@ class SettingsViewModel : BaseViewModel<State, Intent, Effect>(createInitialStat
             is TrainFilterChanged -> {
                 SettingsManager.updateTrainFilter(intent.filter)
                 updateState { copy(bottomSheet = null) }
+            }
+
+            is LineFilterToggled -> {
+                val newLineFilters = state.value.lines.withElementPresent(intent.filter, intent.isChecked)
+                SettingsManager.updateLineFilters(newLineFilters)
             }
 
             is StationLimitSelected -> {
@@ -120,6 +132,10 @@ class SettingsViewModel : BaseViewModel<State, Intent, Effect>(createInitialStat
                 updateState { copy(bottomSheet = TrainFilter) }
             }
 
+            LinesClicked -> {
+                updateState { copy(bottomSheet = Lines) }
+            }
+
             RateAppClicked -> {
                 Analytics.rateAppClicked()
                 viewModelScope.launch { ExternalRoutingManager().launchAppRating() }
@@ -149,17 +165,19 @@ class SettingsViewModel : BaseViewModel<State, Intent, Effect>(createInitialStat
         fun createInitialState(): State {
             val locationSetting = when {
                 LocationProvider().isLocationSupportedByDevice -> {
-                    when(SettingsManager.locationSetting.value) {
+                    when (SettingsManager.locationSetting.value) {
                         Enabled, EnabledPendingPermission -> LocationSettingState.Enabled
                         Disabled -> LocationSettingState.Disabled
                     }
                 }
+
                 else -> LocationSettingState.NotAvailable
             }
             return State(
                 locationSetting = locationSetting,
                 timeDisplay = SettingsManager.timeDisplay.value,
                 trainFilter = SettingsManager.trainFilter.value,
+                lines = SettingsManager.lineFilter.value,
                 stationLimit = SettingsManager.stationLimit.value,
                 stationSort = SettingsManager.stationSort.value,
                 showPresumedTrains = SettingsManager.displayPresumedTrains.value,

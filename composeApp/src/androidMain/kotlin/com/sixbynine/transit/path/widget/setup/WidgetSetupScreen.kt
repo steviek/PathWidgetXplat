@@ -12,7 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -22,16 +22,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.sixbynine.transit.path.MR.strings
+import com.sixbynine.transit.path.api.LineFilter
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.app.ui.CheckboxWithText
 import com.sixbynine.transit.path.app.ui.settings.RadioSection
 import com.sixbynine.transit.path.app.ui.settings.SettingsHeader
+import com.sixbynine.transit.path.app.ui.settings.TrainLineCheckboxRow
 import com.sixbynine.transit.path.app.ui.settings.subtext
 import com.sixbynine.transit.path.app.ui.settings.subtitle
 import com.sixbynine.transit.path.app.ui.settings.title
 import com.sixbynine.transit.path.app.ui.theme.AppTheme
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent.ConfirmClicked
+import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent.LineToggled
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent.SortOrderSelected
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent.StationToggled
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent.TrainFilterSelected
@@ -131,9 +134,13 @@ fun WidgetSetupScreenScope.WidgetSetupScreenContent() {
                             )
                         }
                     }
+
+                    Spacer(Modifier.height(8.dp))
+
+                    LinesSection()
                 }
 
-                Divider()
+                HorizontalDivider()
 
                 Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                     Button(
@@ -168,6 +175,24 @@ private fun WidgetSetupScreenScope.StationColumn(
                 onCheckedChange = { checked ->
                     onIntent(StationToggled(station.id, checked))
                 }
+            )
+        }
+    }
+}
+
+@Composable
+private fun WidgetSetupScreenScope.LinesSection() {
+    Column {
+        SettingsHeader(
+            text = stringResource(strings.lines),
+            style = TitleStyle
+        )
+
+        LineFilter.entries.forEach { line ->
+            TrainLineCheckboxRow(
+                line = line,
+                checked = line in state.lines,
+                onCheckedChange = { isChecked -> onIntent(LineToggled(line, isChecked)) },
             )
         }
     }

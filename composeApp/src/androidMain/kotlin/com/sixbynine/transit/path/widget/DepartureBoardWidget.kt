@@ -18,6 +18,7 @@ import com.sixbynine.transit.path.MR.strings
 import com.sixbynine.transit.path.PathApplication
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.TrainFilter
+import com.sixbynine.transit.path.api.anyMatch
 import com.sixbynine.transit.path.resources.getString
 import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.time.today
@@ -75,6 +76,17 @@ class DepartureBoardWidget : GlanceAppWidget() {
         newStations.removeAll { it.id !in configuration.fixedStations.orEmpty() }
 
         newStations.sortWith(StationDataComparator(configuration.sortOrder))
+
+        newStations.forEachIndexed { index, stationData ->
+            newStations[index] = stationData.copy(
+                trains = stationData.trains.filter { trainData ->
+                    configuration.lines.anyMatch(trainData)
+                },
+                signs = stationData.signs.filter {
+                    configuration.lines.anyMatch(it)
+                }
+            )
+        }
 
         if (configuration.useClosestStation && closestStationId != null) {
             newStations.removeAll { it.id == closestStationId }

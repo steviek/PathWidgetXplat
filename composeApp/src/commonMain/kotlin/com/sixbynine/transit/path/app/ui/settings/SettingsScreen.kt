@@ -78,6 +78,8 @@ fun SettingsScope.Content() {
 
             FilterSection()
 
+            LineFilterSection()
+
             StationOrderSection()
 
             StationLimitSection()
@@ -120,6 +122,15 @@ fun SettingsScope.Content() {
             onDismiss = { onIntent(SettingsContract.Intent.BottomSheetDismissed) },
             onFilterClicked = { onIntent(SettingsContract.Intent.TrainFilterChanged(it)) },
         )
+
+        LineFilterBottomSheet(
+            isShown = state.bottomSheet == BottomSheetType.Lines,
+            lines = state.lines,
+            onDismiss = { onIntent(SettingsContract.Intent.BottomSheetDismissed) },
+            onLineCheckedChange = { line, isChecked ->
+                onIntent(SettingsContract.Intent.LineFilterToggled(line, isChecked))
+            },
+        )
     }
 }
 
@@ -129,6 +140,15 @@ private fun SettingsScope.FilterSection() {
         title = stringResource(strings.filter),
         subtitle = stringResource(state.trainFilter.title),
         onClick = { onIntent(SettingsContract.Intent.TrainFilterClicked) }
+    )
+}
+
+@Composable
+private fun SettingsScope.LineFilterSection() {
+    SettingsItem(
+        title = stringResource(strings.lines),
+        subtitle = state.lines.title,
+        onClick = { onIntent(SettingsContract.Intent.LinesClicked) }
     )
 }
 

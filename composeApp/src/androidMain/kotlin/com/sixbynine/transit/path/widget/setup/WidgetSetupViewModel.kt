@@ -16,6 +16,7 @@ import com.sixbynine.transit.path.location.AndroidLocationProvider
 import com.sixbynine.transit.path.location.LocationPermissionRequestResult.Denied
 import com.sixbynine.transit.path.location.LocationPermissionRequestResult.Granted
 import com.sixbynine.transit.path.util.suspendRunCatching
+import com.sixbynine.transit.path.util.withElementPresent
 import com.sixbynine.transit.path.widget.DepartureBoardWidget
 import com.sixbynine.transit.path.widget.StationByDisplayNameComparator
 import com.sixbynine.transit.path.widget.configuration.WidgetConfigurationManager
@@ -23,6 +24,7 @@ import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Effect
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Effect.CompleteConfigurationIntent
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent.ConfirmClicked
+import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent.LineToggled
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent.SortOrderSelected
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent.StationToggled
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent.TrainFilterSelected
@@ -68,6 +70,7 @@ class WidgetSetupViewModel : ViewModel() {
                                 useClosestStation = storedData.useClosestStation,
                                 sortOrder = storedData.sortOrder ?: StationSort.Alphabetical,
                                 filter = storedData.filter ?: TrainFilter.All,
+                                lines = storedData.lines,
                                 njStations = Stations.All
                                     .filter { it.state == NewJersey }
                                     .sortedWith(StationByDisplayNameComparator)
@@ -157,6 +160,10 @@ class WidgetSetupViewModel : ViewModel() {
                 setState { copy(filter = intent.filter) }
             }
 
+            is LineToggled -> {
+                setState { copy(lines = lines.withElementPresent(intent.line, intent.checked)) }
+            }
+
             ConfirmClicked -> {
                 viewModelScope.launch {
                     val currentState = state.value
@@ -167,6 +174,7 @@ class WidgetSetupViewModel : ViewModel() {
                     WidgetConfigurationManager.setWidgetConfiguration(
                         glanceId,
                         selectedStations,
+                        currentState.lines,
                         currentState.useClosestStation,
                         currentState.sortOrder,
                         currentState.filter,

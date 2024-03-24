@@ -1,7 +1,9 @@
 package com.sixbynine.transit.path.widget.configuration
 
+import com.sixbynine.transit.path.api.LineFilter
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.TrainFilter
+import com.sixbynine.transit.path.preferences.IntPersistable
 import kotlinx.serialization.Serializable
 import kotlin.contracts.contract
 
@@ -9,13 +11,17 @@ import kotlin.contracts.contract
 @Serializable
 data class StoredWidgetConfiguration(
     val fixedStations: Set<String>? = null,
+    private val linesBitmask: Int? = null,
     val useClosestStation: Boolean = false,
     val sortOrder: StationSort? = null,
     val filter: TrainFilter? = null,
     val version: Int = 1,
-)
+) {
+    val lines: Set<LineFilter>
+        get() = IntPersistable.fromBitmask(linesBitmask ?: 0)
+}
 
 fun StoredWidgetConfiguration?.needsSetup(): Boolean {
-    contract { returns(false) implies (this@needsSetup != null)}
+    contract { returns(false) implies (this@needsSetup != null) }
     return this == null || (fixedStations.isNullOrEmpty() && !useClosestStation)
 }

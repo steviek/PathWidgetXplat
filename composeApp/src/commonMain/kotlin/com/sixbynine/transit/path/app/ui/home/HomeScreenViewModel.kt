@@ -10,6 +10,7 @@ import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.TrainFilter.Companion.matchesFilter
 import com.sixbynine.transit.path.api.isInNewJersey
 import com.sixbynine.transit.path.api.isInNewYork
+import com.sixbynine.transit.path.api.matches
 import com.sixbynine.transit.path.app.lifecycle.AppLifecycleObserver
 import com.sixbynine.transit.path.app.settings.SettingsManager
 import com.sixbynine.transit.path.app.settings.TimeDisplay
@@ -234,6 +235,9 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
                     data.copy(
                         trains = data.trains
                             .filterNot { it.shouldHideForPresumption() }
+                            .filter { train ->
+                                SettingsManager.lineFilter.value.any { it.matches(train) }
+                            }
                             .filter(StationLimitFilter(SettingsManager.stationLimit.value))
                             .map { train ->
                                 train.copy(

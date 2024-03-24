@@ -1,6 +1,7 @@
 package com.sixbynine.transit.path.widget.setup
 
 import android.appwidget.AppWidgetManager.INVALID_APPWIDGET_ID
+import com.sixbynine.transit.path.api.LineFilter
 import com.sixbynine.transit.path.api.State.NewJersey
 import com.sixbynine.transit.path.api.State.NewYork
 import com.sixbynine.transit.path.api.StationSort
@@ -22,6 +23,7 @@ object WidgetSetupScreenContract {
         val nyStations: List<StationRow> = defaultStations(NewYork),
         val sortOrder: StationSort = StationSort.Alphabetical,
         val filter: TrainFilter = TrainFilter.All,
+        val lines: Set<LineFilter> = LineFilter.entries.toSet(),
         val appWidgetId: Int = INVALID_APPWIDGET_ID,
     ) {
         val isConfirmButtonEnabled =
@@ -46,6 +48,7 @@ object WidgetSetupScreenContract {
     sealed interface Intent {
         data class UseClosestStationToggled(val checked: Boolean) : Intent
         data class StationToggled(val id: String, val checked: Boolean) : Intent
+        data class LineToggled(val line: LineFilter, val checked: Boolean) : Intent
         data class SortOrderSelected(val sortOrder: StationSort) : Intent
         data class TrainFilterSelected(val filter: TrainFilter) : Intent
         data object ConfirmClicked : Intent

@@ -10,6 +10,8 @@
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
+		AA34DA372BB0F7F600DB50A0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA34DA362BB0F7F600DB50A0 /* Assets.xcassets */; };
+		AA34DA382BB0F7F600DB50A0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA34DA362BB0F7F600DB50A0 /* Assets.xcassets */; };
 		AAB47C192B15A46400079022 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AAB47C182B15A46400079022 /* WidgetKit.framework */; };
 		AAB47C1B2B15A46400079022 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AAB47C1A2B15A46400079022 /* SwiftUI.framework */; };
 		AAB47C1E2B15A46400079022 /* widgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB47C1D2B15A46400079022 /* widgetBundle.swift */; };
@@ -33,7 +35,6 @@
 		AAD5000C2B72768800D6F505 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD5000B2B72768800D6F505 /* AppDelegate.swift */; };
 		AAD500102B72782000D6F505 /* FirebaseAnalyticsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = AAD5000F2B72782000D6F505 /* FirebaseAnalyticsSwift */; };
 		AAD500122B72783400D6F505 /* FirebasePerformance in Frameworks */ = {isa = PBXBuildFile; productRef = AAD500112B72783400D6F505 /* FirebasePerformance */; };
-		AAF769D62BB0729B00290E92 /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AAF769D52BB0729B00290E92 /* Media.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,6 +67,7 @@
 		7555FF7B242A565900829871 /* Departures for PATH.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Departures for PATH.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FF82242A565900829871 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AA34DA362BB0F7F600DB50A0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AAB47C172B15A46400079022 /* widgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = widgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		AAB47C182B15A46400079022 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		AAB47C1A2B15A46400079022 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -84,7 +86,6 @@
 		AAB47C492B16625300079022 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		AAD500052B7275F400D6F505 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		AAD5000B2B72768800D6F505 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		AAF769D52BB0729B00290E92 /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Media.xcassets; sourceTree = "<group>"; };
 		AB3632DC29227652001CCB65 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -159,6 +160,7 @@
 				058557D7273AAEEB004C7B11 /* Preview Content */,
 				AAB47C492B16625300079022 /* InfoPlist.xcstrings */,
 				AAD5000B2B72768800D6F505 /* AppDelegate.swift */,
+				AA34DA362BB0F7F600DB50A0 /* Assets.xcassets */,
 			);
 			path = iosApp;
 			sourceTree = "<group>";
@@ -178,7 +180,6 @@
 				AAB47C412B15AD3200079022 /* WidgetInterop.swift */,
 				AAB47C432B15AD4000079022 /* FetchResult.swift */,
 				AAB47C472B1660D800079022 /* Localizable.xcstrings */,
-				AAF769D52BB0729B00290E92 /* Media.xcassets */,
 			);
 			path = widget;
 			sourceTree = "<group>";
@@ -287,6 +288,7 @@
 			files = (
 				AAB47C4A2B16625300079022 /* InfoPlist.xcstrings in Resources */,
 				058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */,
+				AA34DA372BB0F7F600DB50A0 /* Assets.xcassets in Resources */,
 				AAD500062B7275F400D6F505 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -296,7 +298,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AAB47C482B1660D800079022 /* Localizable.xcstrings in Resources */,
-				AAF769D62BB0729B00290E92 /* Media.xcassets in Resources */,
+				AA34DA382BB0F7F600DB50A0 /* Assets.xcassets in Resources */,
 				AAD500072B7275F400D6F505 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -648,7 +650,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = VT9SJH7UKQ;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SRCROOT)/../shared/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)\n$(SRCROOT)/../composeApp/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
 				);

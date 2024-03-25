@@ -20,6 +20,6 @@ You can run the iOS app from Android Studio, as long as your target deployment a
 
 English and Spanish currently. If you want to contribute something else feel free. Translations are found in the following files:
 
-- composeApp/src/commonMain/resources/MR/{locale}/strings.xml
+- composeApp/src/commonMain/composeResources/values-{locale}/strings.xml
 - iosApp/widget/Localizable.xcstrings (edit in Xcode)
 - iosApp/iosApp/InfoPlist.xcstrings (edit in Xcode)

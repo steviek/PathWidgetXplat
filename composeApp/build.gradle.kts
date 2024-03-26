@@ -10,14 +10,6 @@ plugins {
 kotlin {
     applyDefaultHierarchyTemplate()
 
-    androidTarget {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "17"
-            }
-        }
-    }
-    
     listOf(
         iosX64(),
         iosArm64(),
@@ -28,29 +20,32 @@ kotlin {
             isStatic = true
         }
     }
-    
-    sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation(compose.animation)
-                implementation(compose.runtime)
-                implementation(compose.foundation)
-                implementation(compose.material3)
-                implementation(compose.components.resources)
 
-                implementation(libs.kotlin.date.time)
-                implementation(libs.kotlin.coroutines)
-                implementation(libs.kotlin.serialization.json)
-                implementation(libs.moko.mvvm)
-                implementation(libs.napier)
-                implementation(libs.ktor.core)
-                implementation(libs.ktor.logging)
-                implementation(libs.precompose)
-            }
+    androidTarget()
+
+    sourceSets {
+        commonMain.dependencies {
+            implementation(projects.logging)
+            implementation(projects.api)
+
+            implementation(compose.animation)
+            implementation(compose.runtime)
+            implementation(compose.foundation)
+            implementation(compose.material3)
+            implementation(compose.components.resources)
+
+            implementation(libs.kotlin.date.time)
+            implementation(libs.kotlin.coroutines)
+            implementation(libs.kotlin.serialization.json)
+            implementation(libs.moko.mvvm)
+            implementation(libs.napier)
+            implementation(libs.ktor.core)
+            implementation(libs.ktor.logging)
+            implementation(libs.precompose)
         }
 
         androidMain.configure {
-            dependsOn(commonMain)
+            dependsOn(commonMain.get())
         }
 
         androidMain.dependencies {
@@ -97,7 +92,6 @@ kotlin {
 
 android {
     namespace = "com.sixbynine.transit.path"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].res.srcDirs("src/androidMain/res")
@@ -131,8 +125,6 @@ android {
     }
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
     }
     dependencies {
         coreLibraryDesugaring(libs.android.tools.desugar)

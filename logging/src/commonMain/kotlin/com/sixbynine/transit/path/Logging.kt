@@ -1,6 +1,6 @@
 package com.sixbynine.transit.path
 
-import IsDebug
+import com.sixbynine.transit.path.platform.IsDebug
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow

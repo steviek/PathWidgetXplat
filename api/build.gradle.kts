@@ -1,0 +1,68 @@
+plugins {
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinSerialization)
+}
+
+kotlin {
+    applyDefaultHierarchyTemplate()
+
+    androidTarget {
+        compilations.all {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
+    }
+
+
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
+
+    sourceSets {
+        commonMain.dependencies {
+            implementation(libs.ktor.core)
+            implementation(libs.ktor.logging)
+
+            api(libs.kotlin.date.time)
+            implementation(libs.kotlin.coroutines)
+            implementation(libs.kotlin.serialization.json)
+        }
+
+        androidMain.dependencies {
+            implementation(libs.ktor.okhttp)
+
+        }
+
+        iosMain.dependencies {
+            implementation(libs.ktor.darwin)
+        }
+
+        all {
+            languageSettings.optIn("kotlinx.serialization.ExperimentalSerializationApi")
+        }
+    }
+}
+
+android {
+    namespace = "com.sixbynine.transit.path.api"
+    compileSdk = libs.versions.android.compileSdk.get().toInt()
+    defaultConfig {
+        minSdk = libs.versions.android.minSdk.get().toInt()
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
+    }
+
+    compileOptions {
+        isCoreLibraryDesugaringEnabled = true
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    dependencies {
+        coreLibraryDesugaring(libs.android.tools.desugar)
+    }
+}

@@ -9,7 +9,7 @@ import androidx.glance.appwidget.state.getAppWidgetState
 import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.glance.currentState
 import androidx.glance.state.PreferencesGlanceStateDefinition
-import com.sixbynine.transit.path.PathApplication
+import com.sixbynine.transit.path.MobilePathApplication
 import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.TrainFilter
@@ -25,7 +25,7 @@ import kotlin.time.Duration.Companion.seconds
 
 object WidgetConfigurationManager {
 
-    private val context get() = PathApplication.instance
+    private val context get() = MobilePathApplication.instance
     private val DEPARTURE_WIDGET_PREFS_KEY = stringPreferencesKey("departure_widget_data")
     private const val SCHEMA_VERSION = 3
 

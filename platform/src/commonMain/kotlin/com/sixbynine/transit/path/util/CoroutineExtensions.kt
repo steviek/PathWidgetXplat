@@ -14,7 +14,7 @@ fun CoroutineScope.launchAndReturnUnit(block: suspend () -> Unit): Unit {
     launch { block() }
 }
 
-suspend fun <T> suspendRunCatching(block: suspend () -> T): Result<T> {
+suspend inline fun <T> suspendRunCatching(block: () -> T): Result<T> {
     return try {
         Result.success(block())
     } catch (e: TimeoutCancellationException) {

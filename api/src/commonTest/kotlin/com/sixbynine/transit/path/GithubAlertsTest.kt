@@ -1,14 +1,14 @@
 package com.sixbynine.transit.path
 
-import com.sixbynine.transit.path.api.Alert
-import com.sixbynine.transit.path.api.AlertText
-import com.sixbynine.transit.path.api.GithubAlerts
-import com.sixbynine.transit.path.api.Schedule
 import com.sixbynine.transit.path.api.Stations.GroveStreet
 import com.sixbynine.transit.path.api.Stations.NinthStreet
 import com.sixbynine.transit.path.api.Stations.TwentyThirdStreet
-import com.sixbynine.transit.path.api.TrainFilter
-import com.sixbynine.transit.path.api.isActiveAt
+import com.sixbynine.transit.path.api.alerts.Alert
+import com.sixbynine.transit.path.api.alerts.AlertText
+import com.sixbynine.transit.path.api.alerts.GithubAlerts
+import com.sixbynine.transit.path.api.alerts.Schedule
+import com.sixbynine.transit.path.api.alerts.TrainFilter
+import com.sixbynine.transit.path.api.alerts.isActiveAt
 import com.sixbynine.transit.path.util.JsonFormat
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.DayOfWeek.FRIDAY

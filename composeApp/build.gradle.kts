@@ -16,6 +16,7 @@ kotlin {
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
+            export(projects.api)
             baseName = "ComposeApp"
             isStatic = true
         }
@@ -26,7 +27,8 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(projects.logging)
-            implementation(projects.api)
+            api(projects.api)
+            implementation(projects.platform)
 
             implementation(compose.animation)
             implementation(compose.runtime)

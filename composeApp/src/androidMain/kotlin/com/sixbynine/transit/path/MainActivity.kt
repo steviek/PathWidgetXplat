@@ -16,7 +16,7 @@ class MainActivity : BaseActivity() {
 
         if (savedInstanceState == null) {
             lifecycleScope.launch {
-                DepartureBoardWidget().updateAll(PathApplication.instance)
+                DepartureBoardWidget().updateAll(MobilePathApplication.instance)
             }
         }
 

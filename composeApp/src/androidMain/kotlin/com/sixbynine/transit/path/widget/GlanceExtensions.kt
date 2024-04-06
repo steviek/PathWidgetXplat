@@ -7,12 +7,12 @@ import androidx.glance.GlanceId
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.state.updateAppWidgetState
-import com.sixbynine.transit.path.PathApplication
+import com.sixbynine.transit.path.MobilePathApplication
 
 suspend inline fun <reified T : GlanceAppWidget> updateAppWidgetStates(
     crossinline updateState: suspend (MutablePreferences, GlanceId) -> Unit,
 ) {
-    val context = PathApplication.instance
+    val context = MobilePathApplication.instance
     GlanceAppWidgetManager(context)
         .getGlanceIds(T::class.java)
         .forEach { glanceId ->

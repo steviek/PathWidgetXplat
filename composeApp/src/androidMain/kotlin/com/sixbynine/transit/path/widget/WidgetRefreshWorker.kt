@@ -9,7 +9,7 @@ import androidx.work.NetworkType.UNMETERED
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.sixbynine.transit.path.PathApplication
+import com.sixbynine.transit.path.MobilePathApplication
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.toJavaDuration
 
@@ -32,7 +32,7 @@ class WidgetRefreshWorker(
 
     companion object {
         private const val WORK_TAG = "path_widget_refresh"
-        private val context get() = PathApplication.instance
+        private val context get() = MobilePathApplication.instance
         private val glanceAppWidgetManager get() = GlanceAppWidgetManager(context)
 
         private suspend fun getGlanceIds() =

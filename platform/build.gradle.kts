@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinSerialization)
 }
 
 kotlin {
@@ -15,7 +16,12 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(libs.kotlin.coroutines)
-            implementation(libs.napier)
+            implementation(libs.kotlin.date.time)
+            implementation(libs.kotlin.serialization.json)
+        }
+
+        all {
+            languageSettings.optIn("kotlin.ExperimentalStdlibApi")
         }
     }
 }
@@ -23,7 +29,19 @@ kotlin {
 android {
     namespace = "com.sixbynine.transit.path.platform"
 
+    defaultConfig {
+        minSdk = libs.versions.android.minSdk.get().toInt()
+    }
+
     buildFeatures {
         buildConfig = true
+    }
+
+    compileOptions {
+        isCoreLibraryDesugaringEnabled = true
+    }
+
+    dependencies {
+        coreLibraryDesugaring(libs.android.tools.desugar)
     }
 }

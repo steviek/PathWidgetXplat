@@ -22,6 +22,8 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            implementation(projects.platform)
+
             implementation(libs.ktor.core)
             implementation(libs.ktor.logging)
 

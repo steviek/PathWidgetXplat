@@ -11,7 +11,7 @@ import android.os.Build.VERSION
 import android.os.CancellationSignal
 import androidx.annotation.RequiresPermission
 import com.sixbynine.transit.path.Logging
-import com.sixbynine.transit.path.PathApplication
+import com.sixbynine.transit.path.MobilePathApplication
 import com.sixbynine.transit.path.app.ui.ActivityRegistry
 import com.sixbynine.transit.path.location.LocationCheckResult.Failure
 import com.sixbynine.transit.path.location.LocationCheckResult.NoPermission
@@ -32,7 +32,7 @@ import kotlin.time.Duration.Companion.nanoseconds
 
 object AndroidLocationProvider : LocationProvider {
 
-    private val context = PathApplication.instance
+    private val context = MobilePathApplication.instance
 
     private val locationPermissions = listOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION)
 

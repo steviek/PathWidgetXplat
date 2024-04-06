@@ -1,5 +1,6 @@
-package com.sixbynine.transit.path.api
+package com.sixbynine.transit.path.api.alerts
 
+import com.sixbynine.transit.path.api.Station
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime

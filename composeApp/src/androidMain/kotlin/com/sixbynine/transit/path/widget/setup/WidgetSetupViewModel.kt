@@ -5,7 +5,7 @@ import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.updateAll
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sixbynine.transit.path.PathApplication
+import com.sixbynine.transit.path.MobilePathApplication
 import com.sixbynine.transit.path.api.State.NewJersey
 import com.sixbynine.transit.path.api.State.NewYork
 import com.sixbynine.transit.path.api.StationSort
@@ -43,7 +43,7 @@ import kotlinx.coroutines.launch
 
 class WidgetSetupViewModel : ViewModel() {
 
-    private val context = PathApplication.instance
+    private val context = MobilePathApplication.instance
     private val appWidgetManager get() = GlanceAppWidgetManager(context)
 
     private val _state = MutableStateFlow(State())

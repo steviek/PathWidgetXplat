@@ -1,6 +1,5 @@
 package com.sixbynine.transit.path
 
-import android.app.Application
 import com.sixbynine.transit.path.analytics.Analytics
 import com.sixbynine.transit.path.app.ui.ActivityRegistry
 import com.sixbynine.transit.path.native.NativeHolder
@@ -11,7 +10,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
 
-class PathApplication : Application() {
+class MobilePathApplication : PathApplication() {
     override fun onCreate() {
         super.onCreate()
         instance = this
@@ -35,6 +34,6 @@ class PathApplication : Application() {
     }
 
     companion object {
-        lateinit var instance: PathApplication
+        lateinit var instance: MobilePathApplication
     }
 }

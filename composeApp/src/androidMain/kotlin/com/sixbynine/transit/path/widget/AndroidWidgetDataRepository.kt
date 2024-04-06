@@ -5,7 +5,7 @@ import android.content.Context
 import com.google.firebase.Firebase
 import com.google.firebase.crashlytics.crashlytics
 import com.sixbynine.transit.path.Logging
-import com.sixbynine.transit.path.PathApplication
+import com.sixbynine.transit.path.MobilePathApplication
 import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.StationSort.Alphabetical
@@ -30,7 +30,7 @@ object AndroidWidgetDataRepository {
     private const val HasErrorKey = "has_error"
     private const val HadInternetKey = "had_internet"
 
-    private val context: Context = PathApplication.instance
+    private val context: Context = MobilePathApplication.instance
     private val prefs = context.getSharedPreferences("widget_data_store", Context.MODE_PRIVATE)
 
     private var isLoading: Boolean

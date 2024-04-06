@@ -14,7 +14,7 @@ import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.provideContent
 import androidx.glance.appwidget.updateAll
 import androidx.glance.currentState
-import com.sixbynine.transit.path.PathApplication
+import com.sixbynine.transit.path.MobilePathApplication
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.api.anyMatch
@@ -115,7 +115,7 @@ class DepartureBoardWidget : GlanceAppWidget() {
             updateAppWidgetStates<DepartureBoardWidget> { prefs, _ ->
                 prefs[LastUpdateKey] = System.currentTimeMillis()
             }
-            DepartureBoardWidget().updateAll(PathApplication.instance)
+            DepartureBoardWidget().updateAll(MobilePathApplication.instance)
         }
     }
 }
@@ -123,7 +123,7 @@ class DepartureBoardWidget : GlanceAppWidget() {
 val SmallWidgetSize = DpSize(1.dp, 1.dp)
 
 private fun getMediumWidgetSize(): DpSize {
-    val context = PathApplication.instance
+    val context = MobilePathApplication.instance
 
     val widestTime =
         WidgetDataFormatter.formatTime(

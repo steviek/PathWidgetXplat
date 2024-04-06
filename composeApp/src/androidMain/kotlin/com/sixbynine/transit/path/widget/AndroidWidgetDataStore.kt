@@ -2,11 +2,11 @@ package com.sixbynine.transit.path.widget
 
 import android.content.Context
 import androidx.core.content.edit
-import com.sixbynine.transit.path.PathApplication
+import com.sixbynine.transit.path.MobilePathApplication
 
 object AndroidWidgetDataStore : WidgetDataStore {
     private val prefs =
-        PathApplication.instance.getSharedPreferences("widget_data", Context.MODE_PRIVATE)
+        MobilePathApplication.instance.getSharedPreferences("widget_data", Context.MODE_PRIVATE)
 
     override fun set(key: String, value: String) = prefs.edit { putString(key, value) }
 

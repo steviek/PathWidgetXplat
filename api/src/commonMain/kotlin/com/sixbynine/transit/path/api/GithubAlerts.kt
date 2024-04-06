@@ -144,11 +144,15 @@ data class OnceSchedule(
 
 @Serializable
 data class AlertText(val localizations: List<TextAndLocale>) {
-    constructor(en: String, es: String? = null) : this(
+    constructor(en: String, es: String) : this(
         listOf(
             TextAndLocale(text = en, locale = "en"),
             TextAndLocale(text = es, locale = "es")
         )
+    )
+
+    constructor(en: String) : this(
+        listOf(TextAndLocale(text = en, locale = "en"))
     )
 }
 

@@ -30,6 +30,10 @@ kotlin {
             implementation(libs.kotlin.serialization.json)
         }
 
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+        }
+
         androidMain.dependencies {
             implementation(libs.ktor.okhttp)
 
@@ -64,5 +68,6 @@ android {
 
     dependencies {
         coreLibraryDesugaring(libs.android.tools.desugar)
+        testImplementation(libs.junit)
     }
 }

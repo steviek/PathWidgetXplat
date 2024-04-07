@@ -2,14 +2,14 @@ package com.sixbynine.transit.path.api.impl
 
 import com.sixbynine.transit.path.api.DepartureBoardTrain
 import com.sixbynine.transit.path.api.PathApi
-import com.sixbynine.transit.path.api.State
-import com.sixbynine.transit.path.api.Stations
+import com.sixbynine.transit.path.api.State.NewJersey
+import com.sixbynine.transit.path.api.State.NewYork
 import com.sixbynine.transit.path.api.path.PathRepository
 import com.sixbynine.transit.path.api.path.PathRepository.PathServiceResults
 import com.sixbynine.transit.path.app.ui.ColorWrapper
 import com.sixbynine.transit.path.app.ui.Colors
 import com.sixbynine.transit.path.util.suspendRunCatching
-import kotlinx.datetime.Clock
+import kotlinx.datetime.Clock.System
 
 internal class PathApiImpl : PathApi {
 
@@ -24,24 +24,21 @@ internal class PathApiImpl : PathApi {
         return suspendRunCatching { resultsToMap(cachedResults) }.getOrNull()
     }
 
-    private fun resultsToMap(
-        results: PathServiceResults
-    ): Map<String, List<DepartureBoardTrain>> {
-        val stationsToCheck = Stations.All.associateBy { it.pathApiName }
-        return results.results.mapNotNull { result ->
+    private fun resultsToMap(results: PathServiceResults): Map<String, List<DepartureBoardTrain>> {
+        return results.results.associate { result ->
             val trains = result.destinations
                 .flatMap { destination ->
                     destination.messages.map {
                         val directionState = when (destination.label) {
-                            "ToNJ" -> State.NewJersey
-                            "ToNY" -> State.NewYork
+                            "ToNJ" -> NewJersey
+                            "ToNY" -> NewYork
                             else -> null
                         }
                         val colors = it.lineColor.split(",").map(Colors::parse).map(::ColorWrapper)
                         DepartureBoardTrain(
                             headsign = it.headSign,
                             projectedArrival = (it.lastUpdated + it.durationToArrival)
-                                .coerceAtLeast(Clock.System.now()),
+                                .coerceAtLeast(System.now()),
                             lineColors = colors,
                             isDelayed = it.arrivalTimeMessage == "Delayed",
                             backfillSource = null,
@@ -57,7 +54,6 @@ internal class PathApiImpl : PathApi {
 
             result.consideredStation to trains
         }
-            .toMap()
             .let { TrainBackfillHelper.withBackfill(it) }
     }
 }

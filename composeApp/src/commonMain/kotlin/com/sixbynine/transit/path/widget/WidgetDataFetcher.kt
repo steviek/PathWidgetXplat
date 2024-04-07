@@ -11,7 +11,7 @@ import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.api.alerts.GithubAlerts
 import com.sixbynine.transit.path.api.alerts.GithubAlertsRepository
-import com.sixbynine.transit.path.api.alerts.hidesTrain
+import com.sixbynine.transit.path.api.alerts.hidesTrainNow
 import com.sixbynine.transit.path.api.isEastOf
 import com.sixbynine.transit.path.api.isInNewJersey
 import com.sixbynine.transit.path.api.isInNewYork
@@ -145,7 +145,7 @@ object WidgetDataFetcher {
                 data[station.pathApiName]
                     ?.filterNot { train ->
                         stationAlerts.any { alert ->
-                            alert.hidesTrain(
+                            alert.hidesTrainNow(
                                 stationName = station.pathApiName,
                                 headSign = train.headsign
                             )

@@ -39,6 +39,18 @@
             "locale": "en"
           }
         ]
+      },
+      "displaySchedule": {
+        "repeatingDaily": {
+          "days": [
+            "SATURDAY",
+            "SUNDAY"
+          ],
+          "start": "00:00",
+          "end": "00:00",
+          "from": "2024-04-06",
+          "to": "2024-06-30"
+        }
       }
     },
     {
@@ -85,6 +97,23 @@
             "locale": "en"
           }
         ]
+      },
+      "displaySchedule": {
+        "repeatingDaily": {
+          "days": [
+            "MONDAY",
+            "TUESDAY",
+            "WEDNESDAY",
+            "THURSDAY",
+            "FRIDAY",
+            "SATURDAY",
+            "SUNDAY"
+          ],
+          "start": "17:00",
+          "end": "05:00",
+          "from": "2024-04-06",
+          "to": "2024-06-30"
+        }
       }
     }
   ]

@@ -27,6 +27,8 @@ data class Alert(
     val message: AlertText? = null,
     /** Optional web link where the user can read more. */
     val url: AlertText? = null,
+    /** When the alert should display in the app. */
+    val displaySchedule: Schedule? = null,
 )
 
 fun Alert(
@@ -35,9 +37,11 @@ fun Alert(
     trains: TrainFilter,
     message: AlertText? = null,
     url: AlertText? = null,
+    displaySchedule: Schedule? = null,
 ): Alert {
     return Alert(
         stations = stations.map { it.pathApiName },
+        displaySchedule = displaySchedule,
         schedule = schedule,
         trains = trains,
         message = message,
@@ -176,7 +180,16 @@ data class TrainFilter(
 }
 
 fun Alert.isActiveAt(dateTime: LocalDateTime): Boolean {
-    schedule.repeatingWeekly?.run {
+    return schedule.isActiveAt(dateTime)
+}
+
+fun Alert.isDisplayedNow(): Boolean {
+    val dateTime = now().toLocalDateTime(NewYorkTimeZone)
+    return displaySchedule?.isActiveAt(dateTime) == true || isActiveAt(dateTime)
+}
+
+fun Schedule.isActiveAt(dateTime: LocalDateTime): Boolean {
+    repeatingWeekly?.run {
         if (dateTime.date !in from..to) return false
 
         val day = dateTime.dayOfWeek
@@ -192,7 +205,7 @@ fun Alert.isActiveAt(dateTime: LocalDateTime): Boolean {
         }
     }
 
-    schedule.repeatingDaily?.run {
+    repeatingDaily?.run {
         if (dateTime.date !in from..to) return false
 
         val day = dateTime.dayOfWeek
@@ -213,7 +226,7 @@ fun Alert.isActiveAt(dateTime: LocalDateTime): Boolean {
         return false
     }
 
-    schedule.once?.run {
+    once?.run {
         return dateTime in from..to
     }
 

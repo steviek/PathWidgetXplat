@@ -15,6 +15,7 @@ import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.DayOfWeek.FRIDAY
 import kotlinx.datetime.DayOfWeek.MONDAY
 import kotlinx.datetime.DayOfWeek.SATURDAY
+import kotlinx.datetime.DayOfWeek.SUNDAY
 import kotlinx.datetime.DayOfWeek.WEDNESDAY
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
@@ -44,6 +45,13 @@ class GithubAlertsTest {
                     from = LocalDate(2024, APRIL, 6),
                     to = LocalDate(2024, JUNE, 30),
                 ),
+                displaySchedule = Schedule.repeatingDaily(
+                    days = listOf(SATURDAY, SUNDAY),
+                    start = LocalTime(0, 0),
+                    end = LocalTime(0, 0),
+                    from = LocalDate(2024, APRIL, 6),
+                    to = LocalDate(2024, JUNE, 30),
+                ),
                 trains = TrainFilter.headSigns("33rd", "World Trade"),
                 message = AlertText(
                     en = "Due to construction, World Trade Center- and 33 St.-bound trains will not stop at Grove Street Station for most weekends between April 6 and June 30, 2024 from 6 AM Saturday - 11:59 PM Sunday, requiring customers to take detours for service to that station.",
@@ -61,6 +69,13 @@ class GithubAlertsTest {
                     end = LocalTime(5, 0),
                     from = LocalDate(2024, JANUARY, 1),
                     to = LocalDate(2025, DECEMBER, 31),
+                ),
+                displaySchedule = Schedule.repeatingDaily(
+                    days = DayOfWeek.values().toList(),
+                    start = LocalTime(17, 0),
+                    end = LocalTime(5, 0),
+                    from = LocalDate(2024, APRIL, 6),
+                    to = LocalDate(2024, JUNE, 30),
                 ),
                 trains = TrainFilter.all(),
                 message = AlertText(
@@ -119,6 +134,50 @@ class GithubAlertsTest {
 
         assertTrue(alert.isActiveAt(LocalDateTime(2024, APRIL, 10, 6, 0)))
         assertFalse(alert.isActiveAt(LocalDateTime(2024, APRIL, 10, 10, 0)))
+    }
+
+    @Test
+    fun `active at same start and end time`() {
+        val alert = Alert(
+            stations = listOf(GroveStreet),
+            schedule = Schedule.repeatingDaily(
+                days = listOf(SATURDAY),
+                start = LocalTime(0, 0),
+                end = LocalTime(0, 0),
+                from = LocalDate(2024, APRIL, 6),
+                to = LocalDate(2024, JUNE, 30),
+            ),
+            trains = TrainFilter.headSigns("33rd", "World Trade"),
+        )
+
+        assertTrue(alert.isActiveAt(LocalDateTime(2024, APRIL, 6, 0, 0)))
+        assertTrue(alert.isActiveAt(LocalDateTime(2024, APRIL, 6, 6, 0)))
+        assertTrue(alert.isActiveAt(LocalDateTime(2024, APRIL, 6, 23, 0)))
+        assertFalse(alert.isActiveAt(LocalDateTime(2024, APRIL, 5, 23, 0)))
+        assertFalse(alert.isActiveAt(LocalDateTime(2024, APRIL, 7, 0, 0)))
+    }
+
+    @Test
+    fun `active at same start and end time not midnight`() {
+        val alert = Alert(
+            stations = listOf(GroveStreet),
+            schedule = Schedule.repeatingDaily(
+                days = listOf(SATURDAY),
+                start = LocalTime(4, 0),
+                end = LocalTime(4, 0),
+                from = LocalDate(2024, APRIL, 6),
+                to = LocalDate(2024, JUNE, 30),
+            ),
+            trains = TrainFilter.headSigns("33rd", "World Trade"),
+        )
+
+        assertFalse(alert.isActiveAt(LocalDateTime(2024, APRIL, 5, 23, 0)))
+        assertFalse(alert.isActiveAt(LocalDateTime(2024, APRIL, 6, 0, 0)))
+        assertTrue(alert.isActiveAt(LocalDateTime(2024, APRIL, 6, 6, 0)))
+        assertTrue(alert.isActiveAt(LocalDateTime(2024, APRIL, 6, 23, 0)))
+        assertTrue(alert.isActiveAt(LocalDateTime(2024, APRIL, 7, 0, 0)))
+        assertTrue(alert.isActiveAt(LocalDateTime(2024, APRIL, 7, 3, 0)))
+        assertFalse(alert.isActiveAt(LocalDateTime(2024, APRIL, 7, 4, 0)))
     }
 
     @Test

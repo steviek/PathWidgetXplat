@@ -62,26 +62,7 @@ object WidgetDataFetcher {
     ) {
         Logging.initialize()
         GlobalScope.launch {
-            val lastFetch = lastFetch
-            val lastFetchTime = lastFetchTime
-            val now = Clock.System.now()
-            val result =
-                if (lastFetch != null &&
-                    !(lastFetch.isCompleted && lastFetch.getCompleted().isFailure) &&
-                    lastFetchTime != null &&
-                    lastFetchTime in (now - 10.seconds)..now &&
-                    !force
-                ) {
-                    Logging.d("Reuse existing fetch")
-                    lastFetch
-                } else {
-                    Logging.d("New fetch")
-                    async { PathApi.instance.fetchUpcomingDepartures() }
-                        .also {
-                            WidgetDataFetcher.lastFetch = it
-                            WidgetDataFetcher.lastFetchTime = now
-                        }
-                }
+            val result = async { PathApi.instance.fetchUpcomingDepartures(force) }
 
             val closestStationToUse =
                 if (includeClosestStation) {

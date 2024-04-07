@@ -16,6 +16,7 @@ import kotlin.time.Duration.Companion.minutes
 internal class MockPathApi : PathApi {
 
     override suspend fun fetchUpcomingDepartures(
+        force: Boolean,
     ): Result<Map<Station, List<DepartureBoardTrain>>> {
         val now = Clock.System.now()
         val stationsToDepartures = Stations.All.associateWith { station ->
@@ -52,7 +53,7 @@ internal class MockPathApi : PathApi {
         return Result.success(stationsToDepartures)
     }
 
-    override fun getLastSuccessfulUpcomingDepartures(): Map<Station, List<DepartureBoardTrain>>? {
+    override suspend fun getLastSuccessfulUpcomingDepartures(): Map<Station, List<DepartureBoardTrain>>? {
         return null
     }
 }

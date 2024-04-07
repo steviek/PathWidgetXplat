@@ -1,5 +1,6 @@
 package com.sixbynine.transit.path.preferences
 
+import kotlinx.datetime.Instant
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -69,6 +70,20 @@ class LongPreferenceDelegate(private val key: LongPreferencesKey) {
     }
 }
 
+fun persisting(key: StringPreferencesKey): StringPreferenceDelegate = StringPreferenceDelegate(key)
+
+class StringPreferenceDelegate(private val key: StringPreferencesKey) {
+    private val preferences: Preferences = Preferences()
+
+    operator fun getValue(thisRef: Any?, property: Any?): String? {
+        return preferences[key]
+    }
+
+    operator fun setValue(thisRef: Any?, property: Any?, value: String?) {
+        preferences[key] = value
+    }
+}
+
 fun persisting(key: LongPreferencesKey): LongPreferenceDelegate = LongPreferenceDelegate(key)
 
 // stores a list of strings as a json array
@@ -92,3 +107,23 @@ class StringListPreferenceDelegate(private val key: StringPreferencesKey) {
 
 fun persistingList(key: StringPreferencesKey): StringListPreferenceDelegate =
     StringListPreferenceDelegate(key)
+
+fun persistingInstant(key: String): InstantPreferenceDelegate =
+    InstantPreferenceDelegate(LongPreferencesKey(key))
+
+class InstantPreferenceDelegate(private val key: LongPreferencesKey) {
+    private val preferences: Preferences = Preferences()
+
+    operator fun getValue(thisRef: Any?, property: Any?): Instant? {
+        return preferences[key]?.let { Instant.fromEpochMilliseconds(it) }
+    }
+
+    operator fun setValue(thisRef: Any?, property: Any?, value: Instant?) {
+        if (value == null) {
+            preferences[key] = null
+            return
+        }
+
+        preferences[key] = value.toEpochMilliseconds()
+    }
+}

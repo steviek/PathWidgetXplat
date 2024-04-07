@@ -85,7 +85,7 @@ object WidgetDataFetcher {
             var hadInternet = NetworkManager().isConnectedToInternet()
             val githubAlerts = deferredGithubAlerts.await().getOrNull()
 
-            fun createWidgetData(data: Map<Station, List<DepartureBoardTrain>>): WidgetData {
+            fun createWidgetData(data: Map<String, List<DepartureBoardTrain>>): WidgetData {
                 return createWidgetData(
                     limit,
                     stations,
@@ -126,7 +126,7 @@ object WidgetDataFetcher {
         filter: TrainFilter,
         closestStationToUse: Station?,
         githubAlerts: GithubAlerts?,
-        data: Map<Station, List<DepartureBoardTrain>>
+        data: Map<String, List<DepartureBoardTrain>>
     ): WidgetData {
         Logging.d("createWidgetData, stations = ${stations.map { it.pathApiName }}, lines=$lines")
         val adjustedStations = stations.toMutableList()
@@ -142,7 +142,7 @@ object WidgetDataFetcher {
             val stationAlerts =
                 githubAlerts?.alerts?.filter { station.pathApiName in it.stations }.orEmpty()
             val apiTrains =
-                data[station]
+                data[station.pathApiName]
                     ?.filterNot { train ->
                         stationAlerts.any { alert ->
                             alert.hidesTrain(
@@ -195,16 +195,14 @@ object WidgetDataFetcher {
                 .distinctBy { it.title to it.projectedArrival }
                 .sortedBy { it.projectedArrival }
 
-            if (signs.isNotEmpty()) {
-                stationDatas += WidgetData.StationData(
-                    id = station.pathApiName,
-                    displayName = station.displayName,
-                    signs = signs,
-                    trains = trains,
-                    state = station.state,
-                    alerts = stationAlerts.mapNotNull { it.message },
-                )
-            }
+            stationDatas += WidgetData.StationData(
+                id = station.pathApiName,
+                displayName = station.displayName,
+                signs = signs,
+                trains = trains,
+                state = station.state,
+                alerts = stationAlerts,
+            )
         }
         val nextFetchTime =
             stationDatas

@@ -7,7 +7,6 @@ import com.sixbynine.transit.path.api.Line.NewarkWtc
 import com.sixbynine.transit.path.api.PathApi
 import com.sixbynine.transit.path.api.State.NewJersey
 import com.sixbynine.transit.path.api.State.NewYork
-import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.app.ui.Colors
 import kotlinx.datetime.Clock
@@ -17,7 +16,7 @@ internal class MockPathApi : PathApi {
 
     override suspend fun fetchUpcomingDepartures(
         force: Boolean,
-    ): Result<Map<Station, List<DepartureBoardTrain>>> {
+    ): Result<Map<String, List<DepartureBoardTrain>>> {
         val now = Clock.System.now()
         val stationsToDepartures = Stations.All.associateWith { station ->
             listOf(
@@ -49,11 +48,11 @@ internal class MockPathApi : PathApi {
                     lines = setOf(Hoboken33rd)
                 )
             )
-        }
+        }.mapKeys { it.key.pathApiName }
         return Result.success(stationsToDepartures)
     }
 
-    override suspend fun getLastSuccessfulUpcomingDepartures(): Map<Station, List<DepartureBoardTrain>>? {
+    override suspend fun getLastSuccessfulUpcomingDepartures(): Map<String, List<DepartureBoardTrain>>? {
         return null
     }
 }

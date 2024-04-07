@@ -7,9 +7,11 @@ import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.StationSort.Alphabetical
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.TrainFilter.Companion.matchesFilter
+import com.sixbynine.transit.path.api.alerts.AlertText
 import com.sixbynine.transit.path.api.isInNewJersey
 import com.sixbynine.transit.path.api.isInNewYork
 import com.sixbynine.transit.path.api.matches
+import com.sixbynine.transit.path.app.external.ExternalRoutingManager
 import com.sixbynine.transit.path.app.lifecycle.AppLifecycleObserver
 import com.sixbynine.transit.path.app.settings.SettingsManager
 import com.sixbynine.transit.path.app.settings.TimeDisplay
@@ -21,6 +23,7 @@ import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Effect.Navigate
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.HomeBackfillSource
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.AddStationClicked
+import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.AlertUrlClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.ConstraintsChanged
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.EditClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.MoveStationDownClicked
@@ -64,6 +67,7 @@ import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.getString
 import pathwidgetxplat.composeapp.generated.resources.Res.string
 import pathwidgetxplat.composeapp.generated.resources.delay_time
+import pathwidgetxplat.composeapp.generated.resources.langauge_code
 import pathwidgetxplat.composeapp.generated.resources.update_footer_text
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -190,6 +194,10 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
                         layoutOption = LayoutOptionManager.layoutOption ?: defaultLayout(maxWidth),
                     )
                 }
+            }
+
+            is AlertUrlClicked -> {
+                ExternalRoutingManager().openUrl(intent.url)
             }
         }
     }
@@ -324,7 +332,9 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
                             )
                         },
                     isClosest = data.id == closestStationId &&
-                            SettingsManager.locationSetting.value == Enabled
+                            SettingsManager.locationSetting.value == Enabled,
+                    alertText = data.alerts?.firstOrNull()?.message?.unpack(),
+                    alertUrl = data.alerts?.firstOrNull()?.url?.unpack(),
                 )
                 stationData
             }
@@ -354,6 +364,12 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
 
                 toString()
             }
+        }
+
+        private suspend fun AlertText.unpack(): String? {
+            val languageCode = getString(string.langauge_code)
+            return localizations.find { it.locale == languageCode }?.text
+                ?: localizations.firstOrNull()?.text
         }
     }
 }

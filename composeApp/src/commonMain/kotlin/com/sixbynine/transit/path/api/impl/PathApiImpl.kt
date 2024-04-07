@@ -3,7 +3,6 @@ package com.sixbynine.transit.path.api.impl
 import com.sixbynine.transit.path.api.DepartureBoardTrain
 import com.sixbynine.transit.path.api.PathApi
 import com.sixbynine.transit.path.api.State
-import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.path.PathRepository
 import com.sixbynine.transit.path.api.path.PathRepository.PathServiceResults
@@ -16,23 +15,20 @@ internal class PathApiImpl : PathApi {
 
     override suspend fun fetchUpcomingDepartures(
         force: Boolean
-    ): Result<Map<Station, List<DepartureBoardTrain>>> {
+    ): Result<Map<String, List<DepartureBoardTrain>>> {
         return PathRepository.getResults(force).mapCatching { results -> resultsToMap(results) }
     }
 
-    override suspend fun getLastSuccessfulUpcomingDepartures(): Map<Station, List<DepartureBoardTrain>>? {
+    override suspend fun getLastSuccessfulUpcomingDepartures(): Map<String, List<DepartureBoardTrain>>? {
         val cachedResults = PathRepository.getCachedResults() ?: return null
         return suspendRunCatching { resultsToMap(cachedResults) }.getOrNull()
     }
 
     private fun resultsToMap(
         results: PathServiceResults
-    ): Map<Station, List<DepartureBoardTrain>> {
+    ): Map<String, List<DepartureBoardTrain>> {
         val stationsToCheck = Stations.All.associateBy { it.pathApiName }
         return results.results.mapNotNull { result ->
-            val station =
-                stationsToCheck[result.consideredStation] ?: return@mapNotNull null
-
             val trains = result.destinations
                 .flatMap { destination ->
                     destination.messages.map {
@@ -59,7 +55,7 @@ internal class PathApiImpl : PathApi {
                     }
                 }
 
-            station to trains
+            result.consideredStation to trains
         }
             .toMap()
             .let { TrainBackfillHelper.withBackfill(it) }

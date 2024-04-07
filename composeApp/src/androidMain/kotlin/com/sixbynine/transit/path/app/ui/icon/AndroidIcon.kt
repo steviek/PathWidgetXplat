@@ -15,7 +15,9 @@ import com.sixbynine.transit.path.app.ui.icon.IconType.ArrowUp
 import com.sixbynine.transit.path.app.ui.icon.IconType.Back
 import com.sixbynine.transit.path.app.ui.icon.IconType.Delete
 import com.sixbynine.transit.path.app.ui.icon.IconType.Edit
+import com.sixbynine.transit.path.app.ui.icon.IconType.ExpandDown
 import com.sixbynine.transit.path.app.ui.icon.IconType.Filter
+import com.sixbynine.transit.path.app.ui.icon.IconType.Internet
 import com.sixbynine.transit.path.app.ui.icon.IconType.LayoutOneColumn
 import com.sixbynine.transit.path.app.ui.icon.IconType.Settings
 import com.sixbynine.transit.path.app.ui.icon.IconType.Sort
@@ -34,5 +36,7 @@ actual fun IconPainter(icon: IconType): Painter {
         Settings -> rememberVectorPainter(Filled.Settings)
         Delete -> rememberVectorPainter(Filled.Delete)
         Back -> rememberVectorPainter(Filled.ArrowBack)
+        ExpandDown -> painterResource(R.drawable.ic_down)
+        Internet -> painterResource(R.drawable.ic_open_in_new)
     }
 }

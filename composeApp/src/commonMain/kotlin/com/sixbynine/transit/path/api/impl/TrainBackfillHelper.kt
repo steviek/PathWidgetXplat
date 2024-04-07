@@ -6,7 +6,7 @@ import com.sixbynine.transit.path.api.DepartureBoardTrain
 import com.sixbynine.transit.path.api.State
 import com.sixbynine.transit.path.api.State.NewJersey
 import com.sixbynine.transit.path.api.State.NewYork
-import com.sixbynine.transit.path.api.Station
+import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.Stations.ChristopherStreet
 import com.sixbynine.transit.path.api.Stations.ExchangePlace
 import com.sixbynine.transit.path.api.Stations.FourteenthStreet
@@ -199,15 +199,18 @@ object TrainBackfillHelper {
     }
 
     fun withBackfill(
-        trains: Map<Station, List<DepartureBoardTrain>>,
-    ): Map<Station, List<DepartureBoardTrain>> {
+        trains: Map<String, List<DepartureBoardTrain>>,
+    ): Map<String, List<DepartureBoardTrain>> {
         val backfilled = trains.toMutableMap()
-        trains.keys.forEach eachStation@{ station ->
+        trains.keys.forEach eachStation@{ stationKey ->
+            val station =
+                Stations.All.firstOrNull { it.pathApiName == stationKey }
+                ?: return@eachStation
             if (ShouldLog) {
                 Logging.d("Backfill station: ${station.displayName}")
             }
             val lineIds =
-                (trains[station]?.map { it.lineId } ?: return@eachStation).toMutableSet()
+                (trains[stationKey]?.map { it.lineId } ?: return@eachStation).toMutableSet()
             if (station == ExchangePlace) {
                 // We avoid backfilling from lines that aren't already on the departure board for
                 // the station. But Exchange Place is a special case, if we have a train going there
@@ -232,7 +235,7 @@ object TrainBackfillHelper {
                     .sortedByDescending { (_, checkpoint) -> checkpoint }
                     .forEach { (priorStation, priorStationCheckpoint) ->
                         val travelTimeBetweenStations = stationCheckpoint - priorStationCheckpoint
-                        trains[priorStation]
+                        trains[priorStation.pathApiName]
                             ?.filter { it.lineId == lineId }
                             ?.map {
                                 it.copy(
@@ -252,7 +255,7 @@ object TrainBackfillHelper {
                                             .absoluteValue
                                     timeDelta <= getCloseTrainThreshold()
                                 }
-                                val currentTrains = backfilled[station] ?: return@eachStation
+                                val currentTrains = backfilled[station.pathApiName] ?: return@eachStation
                                 if (currentTrains.none { trainMatches(it) }) {
                                     if (ShouldLog) {
                                         Logging.d(
@@ -263,7 +266,7 @@ object TrainBackfillHelper {
                                         )
                                     }
 
-                                    backfilled[station] = currentTrains + hypotheticalTrain
+                                    backfilled[station.pathApiName] = currentTrains + hypotheticalTrain
                                 } else {
                                     if (ShouldLog) {
                                         Logging.d(

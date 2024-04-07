@@ -4,7 +4,7 @@ import com.sixbynine.transit.path.api.BackfillSource
 import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.State
 import com.sixbynine.transit.path.api.Stations
-import com.sixbynine.transit.path.api.alerts.AlertText
+import com.sixbynine.transit.path.api.alerts.Alert
 import com.sixbynine.transit.path.app.ui.ColorWrapper
 import com.sixbynine.transit.path.widget.WidgetData.StationData
 import kotlinx.datetime.Instant
@@ -25,7 +25,7 @@ data class WidgetData(
         val signs: List<SignData>,
         val trains: List<TrainData>,
         val state: State,
-        val alerts: List<AlertText>? = null,
+        val alerts: List<Alert>? = null,
     )
 
     @Serializable

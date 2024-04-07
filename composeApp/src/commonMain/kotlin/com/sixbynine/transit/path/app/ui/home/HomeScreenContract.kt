@@ -37,6 +37,8 @@ object HomeScreenContract {
         val station: Station,
         val trains: List<TrainData>,
         val isClosest: Boolean,
+        val alertText: String?,
+        val alertUrl: String?
     ) {
         val id get() = station.pathApiName
         val state get() = station.state
@@ -80,6 +82,7 @@ object HomeScreenContract {
         data class StationBottomSheetSelection(val station: Station) : Intent
         data object AddStationClicked : Intent
         data class ConstraintsChanged(val maxWidth: Dp, val maxHeight: Dp) : Intent
+        data class AlertUrlClicked(val url: String) : Intent
     }
 
     sealed interface Effect {

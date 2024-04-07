@@ -229,6 +229,13 @@ private fun HomeScreenScope.DepartureBoard() {
                 )
             }
 
+            item(station.id + "-alerts") {
+                StationAlertBox(
+                    text = station.alertText,
+                    url = station.alertUrl
+                )
+            }
+
             station.trains.forEach { train ->
                 item(station.id + train.id) {
                     StationTrain(

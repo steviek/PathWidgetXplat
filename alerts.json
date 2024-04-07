@@ -81,11 +81,11 @@
       "message": {
         "localizations": [
           {
-            "text": "9 St. & 23 St. stations are closed daily from 11:59 PM – 5 AM for maintenance-related activity. Please use Christopher St., 14 St., or 33 St. station.",
+            "text": "9 St. & 23 St. stations are closed daily from midnight – 5 AM for maintenance-related activity. Please use Christopher St., 14 St., or 33 St. station.",
             "locale": "en"
           },
           {
-            "text": "Las estaciones de 9 St. y 23 St. están cerradas diariamente de 11:59 p. m. a 5 a. m. para actividades relacionadas con el mantenimiento. Utilice las estaciones de Christopher St., 14 St. o 33 St.",
+            "text": "Las estaciones de 9 St. y 23 St. están cerradas diariamente de medianoche a 5 a. m. para actividades relacionadas con el mantenimiento. Utilice las estaciones de Christopher St., 14 St. o 33 St.",
             "locale": "es"
           }
         ]

@@ -28,6 +28,11 @@ import com.sixbynine.transit.path.app.ui.gutter
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.AlertUrlClicked
 import com.sixbynine.transit.path.app.ui.icon.IconType
 import com.sixbynine.transit.path.app.ui.icon.NativeIconButton
+import org.jetbrains.compose.resources.stringResource
+import pathwidgetxplat.composeapp.generated.resources.Res.string
+import pathwidgetxplat.composeapp.generated.resources.collapse
+import pathwidgetxplat.composeapp.generated.resources.expand
+import pathwidgetxplat.composeapp.generated.resources.open_in_browser
 
 @Composable
 fun HomeScreenScope.StationAlertBox(text: String?, url: String?) {
@@ -57,7 +62,13 @@ fun HomeScreenScope.StationAlertBox(text: String?, url: String?) {
             val rotation by animateFloatAsState(if (isExpanded) 180f else 0f)
             NativeIconButton(
                 icon = IconType.ExpandDown,
-                contentDescription = null,
+                contentDescription = stringResource(
+                    if (isExpanded) {
+                        string.collapse
+                    } else {
+                        string.expand
+                    }
+                ),
                 onClick = { isExpanded = !isExpanded },
                 buttonSize = 40.dp,
                 modifier = Modifier.rotate(rotation)
@@ -70,7 +81,7 @@ fun HomeScreenScope.StationAlertBox(text: String?, url: String?) {
         ) {
             NativeIconButton(
                 icon = IconType.Internet,
-                contentDescription = null,
+                contentDescription = stringResource(string.open_in_browser),
                 onClick = { onIntent(AlertUrlClicked(url ?: return@NativeIconButton)) },
                 buttonSize = 40.dp,
             )

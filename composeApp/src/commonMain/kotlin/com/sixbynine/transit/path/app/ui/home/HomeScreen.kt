@@ -72,6 +72,7 @@ import pathwidgetxplat.composeapp.generated.resources.move_down
 import pathwidgetxplat.composeapp.generated.resources.move_up
 import pathwidgetxplat.composeapp.generated.resources.retry
 import pathwidgetxplat.composeapp.generated.resources.settings
+import pathwidgetxplat.composeapp.generated.resources.station_empty
 
 class HomeScreenScope(
     val state: State,
@@ -243,6 +244,22 @@ private fun HomeScreenScope.DepartureBoard() {
                         train = train,
                         modifier = Modifier.fillMaxSize().animateItemPlacement()
                     )
+                }
+            }
+
+            if (station.trains.isEmpty()) {
+                item(station.id + "-empty") {
+                    Box(
+                        Modifier.fillMaxWidth().padding(horizontal = gutter()),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(string.station_empty),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                    }
                 }
             }
 

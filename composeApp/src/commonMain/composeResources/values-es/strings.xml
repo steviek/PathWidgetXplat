@@ -11,6 +11,7 @@
     <string name="closest_station">La estación más cercana (require acceso a la ubicación)</string>
     <string name="closest_station_setting_subtitle">Require acceso a la ubicación</string>
     <string name="closest_station_setting_title">Mostrar la estación más cercana en primero</string>
+    <string name="collapse">Colapsar</string>
     <string name="complete_widget_setup">Arreglar el widget</string>
     <string name="confirm">Confirmar</string>
     <string name="delay_time">Retrasado - </string>
@@ -21,6 +22,7 @@
     <string name="edit_to_add_stations">Mantén presionado y edita el widget para añadir estaciones</string>
     <string name="error_long">Error al actualizar</string>
     <string name="error_short">Error</string>
+    <string name="expand">Expandir</string>
     <string name="failed_to_fetch">Error al obtener los horarios de los trenes</string>
     <string name="failed_to_update">Un error se encontró</string>
     <string name="filter">Filtro</string>
@@ -31,6 +33,7 @@
     <string name="move_down">Bajar</string>
     <string name="move_up">Subir</string>
     <string name="no_internet">Sin Internet</string>
+    <string name="open_in_browser">Abrir en navegador</string>
     <string name="presumed_train">Tren supuesto</string>
     <string name="presumed_trains_subtext">Trenes supuestos son los que aún no están reportados por RidePATH, pero que deberían existir debido a trenes reportados en estaciones anteriores de la línea y el tiempo habitual de viaje entre estaciones</string>
     <string name="rate_app">Calificar la aplicación</string>
@@ -53,6 +56,7 @@
     <string name="show_interstate_trains">Mostrar solo los trenes entre los dos estados</string>
     <string name="show_presumed_trains">Mostrar trenes supuestos</string>
     <string name="sort">Ordenar</string>
+    <string name="station_empty">No se anuncian trenes para la estación</string>
     <string name="station_filter_four">4 trenes</string>
     <string name="station_filter_none">Sin límite</string>
     <string name="station_filter_one_per_line">1 tren por ruta</string>

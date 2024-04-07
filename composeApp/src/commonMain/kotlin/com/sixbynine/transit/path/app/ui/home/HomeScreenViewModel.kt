@@ -8,6 +8,7 @@ import com.sixbynine.transit.path.api.StationSort.Alphabetical
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.TrainFilter.Companion.matchesFilter
 import com.sixbynine.transit.path.api.alerts.AlertText
+import com.sixbynine.transit.path.api.alerts.isDisplayedNow
 import com.sixbynine.transit.path.api.isInNewJersey
 import com.sixbynine.transit.path.api.isInNewYork
 import com.sixbynine.transit.path.api.matches
@@ -300,6 +301,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
                 val station =
                     Stations.All.firstOrNull { it.pathApiName == data.id }
                         ?: return@mapNotNull null
+                val alertToDisplay = data.alerts?.firstOrNull()?.takeIf { it.isDisplayedNow() }
                 val stationData = StationData(
                     station = station,
                     trains = data.trains
@@ -333,8 +335,8 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
                         },
                     isClosest = data.id == closestStationId &&
                             SettingsManager.locationSetting.value == Enabled,
-                    alertText = data.alerts?.firstOrNull()?.message?.unpack(),
-                    alertUrl = data.alerts?.firstOrNull()?.url?.unpack(),
+                    alertText = alertToDisplay?.message?.unpack(),
+                    alertUrl = alertToDisplay?.url?.unpack(),
                 )
                 stationData
             }

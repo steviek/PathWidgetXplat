@@ -3,6 +3,7 @@ package com.sixbynine.transit.path.api.impl
 import androidx.compose.ui.graphics.Color
 import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.api.DepartureBoardTrain
+import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.State.NewJersey
 import com.sixbynine.transit.path.api.State.NewYork
 import com.sixbynine.transit.path.api.Station
@@ -49,7 +50,7 @@ class TrainBackfillHelperTest {
 
         val backfilled = TrainBackfillHelper.withBackfill(trains)
 
-        val expTrains = backfilled[ExchangePlace]
+        val expTrains = backfilled[ExchangePlace.pathApiName]
         val expTrainsTimes = expTrains?.map { it.projectedArrival.printForAssertions() }
         assertNotNull(expTrainsTimes)
         assertContains(expTrainsTimes, "10:03")
@@ -76,7 +77,7 @@ class TrainBackfillHelperTest {
         }
 
         val backfilled = TrainBackfillHelper.withBackfill(trains)
-        val expTrains = backfilled[ExchangePlace]
+        val expTrains = backfilled[ExchangePlace.pathApiName]
         val expTrainsTimes =
             expTrains?.map { it.lineColors to it.projectedArrival.printForAssertions() }
         assertNotNull(expTrainsTimes)
@@ -99,7 +100,7 @@ class TrainBackfillHelperTest {
         }
 
         val backfilled = TrainBackfillHelper.withBackfill(trains)
-        val expTrains = backfilled[ExchangePlace]
+        val expTrains = backfilled[ExchangePlace.pathApiName]
         assertTrue(expTrains?.size == 1)
     }
 
@@ -122,14 +123,14 @@ class TrainBackfillHelperTest {
         }
 
         val backfilled = TrainBackfillHelper.withBackfill(trains)
-        val expTrains = backfilled[ExchangePlace]
+        val expTrains = backfilled[ExchangePlace.pathApiName]
         val expTrainsTimes = expTrains?.map { it.projectedArrival.printForAssertions() }
         assertNotNull(expTrainsTimes)
         assertContains(expTrainsTimes, "10:06")
         assertContains(expTrainsTimes, "10:23")
         assertContains(expTrainsTimes, "10:43")
 
-        val grvTrains = backfilled[GroveStreet]
+        val grvTrains = backfilled[GroveStreet.pathApiName]
         val grvTrainsTimes = grvTrains?.map { it.projectedArrival.printForAssertions() }
         assertNotNull(grvTrainsTimes)
         assertContains(grvTrainsTimes, "10:10")
@@ -159,12 +160,12 @@ class TrainBackfillHelperTest {
         val backfilled = TrainBackfillHelper.withBackfill(trains)
 
         val expWtcTrains =
-            backfilled[ExchangePlace]!!.filter { it.headsign == "World Trade Center" }
+            backfilled[ExchangePlace.pathApiName]!!.filter { it.headsign == "World Trade Center" }
         val expWtcTrainsTimes = expWtcTrains.map { it.projectedArrival.printForAssertions() }
         assertEquals(expWtcTrainsTimes, listOf("10:08", "10:28"))
 
         val expNwkTrains =
-            backfilled[ExchangePlace]!!.filter { it.headsign == "Newark" }
+            backfilled[ExchangePlace.pathApiName]!!.filter { it.headsign == "Newark" }
         val expNwkTrainsTimes = expNwkTrains.map { it.projectedArrival.printForAssertions() }
         assertEquals(listOf("10:03", "10:23"), expNwkTrainsTimes)
     }
@@ -189,9 +190,30 @@ class TrainBackfillHelperTest {
 
         val backfilled = TrainBackfillHelper.withBackfill(trains)
 
-        val grvTrains = backfilled[GroveStreet]
+        val grvTrains = backfilled[GroveStreet.pathApiName]
         val grvTrainsTimes = grvTrains?.map { it.projectedArrival.printForAssertions() }
         assertEquals(listOf("10:05"), grvTrainsTimes)
+    }
+
+    @Test
+    fun `do not backfill earlier train that one matching head sign`() {
+        val trains = departuresMap {
+            station(WorldTradeCenter) {
+                newarkTrainAt(10, 0)
+                newarkTrainAt(10, 20)
+                newarkTrainAt(10, 40)
+            }
+
+            station(GroveStreet) {
+                newarkTrainAt(10, 25)
+            }
+        }
+
+        val backfilled = TrainBackfillHelper.withBackfill(trains)
+
+        val grvTrains = backfilled[GroveStreet.pathApiName]
+        val grvTrainsTimes = grvTrains?.map { it.projectedArrival.printForAssertions() }
+        assertEquals(listOf("10:25", "10:46"), grvTrainsTimes)
     }
 
     @Test
@@ -211,7 +233,7 @@ class TrainBackfillHelperTest {
         }
 
         val backfilled = TrainBackfillHelper.withBackfill(trains)
-        val expHobTrains = backfilled[ExchangePlace]!!.filter { it.headsign == "Hoboken" }
+        val expHobTrains = backfilled[ExchangePlace.pathApiName]!!.filter { it.headsign == "Hoboken" }
         val expTrainsTimes = expHobTrains.map { it.projectedArrival.printForAssertions() }
         assertContains(expTrainsTimes, "21:10")
         assertContains(expTrainsTimes, "21:22")
@@ -231,7 +253,7 @@ class TrainBackfillHelperTest {
         }
 
         val backfilled = TrainBackfillHelper.withBackfill(trains)
-        val expTrains = backfilled[ExchangePlace]
+        val expTrains = backfilled[ExchangePlace.pathApiName]
         val expTrainTimes = expTrains?.map { it.projectedArrival.printForAssertions() }
         assertEquals(listOf("22:48", "23:23"), expTrainTimes)
     }
@@ -249,7 +271,7 @@ class TrainBackfillHelperTest {
         }
 
         val backfilled = TrainBackfillHelper.withBackfill(trains)
-        val expTrains = backfilled[ExchangePlace]
+        val expTrains = backfilled[ExchangePlace.pathApiName]
         val expTrainTimes = expTrains?.map { it.projectedArrival.printForAssertions() }
         assertEquals(listOf("10:30", "10:33"), expTrainTimes)
     }
@@ -267,14 +289,14 @@ class TrainBackfillHelperTest {
         }
 
         val backfilled = TrainBackfillHelper.withBackfill(trains)
-        val expTrains = backfilled[ExchangePlace]
+        val expTrains = backfilled[ExchangePlace.pathApiName]
         val expTrainTimes = expTrains?.map { it.projectedArrival.printForAssertions() }
         assertEquals(listOf("10:30", "10:35"), expTrainTimes)
     }
 
     private fun departuresMap(
         builder: DeparturesMapBuilder.() -> Unit
-    ): Map<Station, List<DepartureBoardTrain>> {
+    ): Map<String, List<DepartureBoardTrain>> {
         return DeparturesMapBuilder().apply(builder).build()
     }
 
@@ -324,8 +346,8 @@ class TrainBackfillHelperTest {
             fun wtcJsqTrainAt(hour: Int, minute: Int)
         }
 
-        fun build(): Map<Station, List<DepartureBoardTrain>> {
-            return map
+        fun build(): Map<String, List<DepartureBoardTrain>> {
+            return map.mapKeys { it.key.pathApiName }
         }
     }
 
@@ -351,7 +373,8 @@ class TrainBackfillHelperTest {
                 lineColors = Colors.NwkWtc,
                 isDelayed = false,
                 backfillSource = null,
-                directionState = NewJersey
+                directionState = NewJersey,
+                lines = setOf(Line.NewarkWtc)
             )
         }
 
@@ -362,7 +385,8 @@ class TrainBackfillHelperTest {
                 lineColors = Colors.NwkWtc,
                 isDelayed = false,
                 backfillSource = null,
-                directionState = NewYork
+                directionState = NewYork,
+                lines = setOf(Line.NewarkWtc)
             )
         }
 
@@ -373,7 +397,8 @@ class TrainBackfillHelperTest {
                 lineColors = Colors.HobWtc,
                 isDelayed = false,
                 backfillSource = null,
-                directionState = NewYork
+                directionState = NewYork,
+                lines = setOf(Line.HobokenWtc)
             )
         }
 
@@ -384,7 +409,8 @@ class TrainBackfillHelperTest {
                 lineColors = Colors.HobWtc,
                 isDelayed = false,
                 backfillSource = null,
-                directionState = NewJersey
+                directionState = NewJersey,
+                lines = setOf(Line.HobokenWtc)
             )
         }
 
@@ -395,7 +421,8 @@ class TrainBackfillHelperTest {
                 lineColors = Colors.NwkWtc,
                 isDelayed = false,
                 backfillSource = null,
-                directionState = NewJersey
+                directionState = NewJersey,
+                lines = setOf(Line.NewarkWtc)
             )
         }
 

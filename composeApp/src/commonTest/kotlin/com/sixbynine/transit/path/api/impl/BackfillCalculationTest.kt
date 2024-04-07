@@ -15,7 +15,7 @@ import com.sixbynine.transit.path.api.Stations.NinthStreet
 import com.sixbynine.transit.path.api.Stations.ThirtyThirdStreet
 import com.sixbynine.transit.path.api.Stations.TwentyThirdStreet
 import com.sixbynine.transit.path.api.Stations.WorldTradeCenter
-import com.sixbynine.transit.path.api.impl.PathClient.PathServiceResults
+import com.sixbynine.transit.path.api.path.PathRepository.PathServiceResults
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.Month.JANUARY

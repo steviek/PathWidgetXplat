@@ -33,6 +33,7 @@ import com.sixbynine.transit.path.api.impl.TrainBackfillHelper.LineId.Companion.
 import com.sixbynine.transit.path.app.ui.ColorWrapper
 import com.sixbynine.transit.path.app.ui.Colors
 import com.sixbynine.transit.path.time.NewYorkTimeZone
+import com.sixbynine.transit.path.util.orElse
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DayOfWeek.SATURDAY
 import kotlinx.datetime.DayOfWeek.SUNDAY
@@ -205,23 +206,34 @@ object TrainBackfillHelper {
         trains.keys.forEach eachStation@{ stationKey ->
             val station =
                 Stations.All.firstOrNull { it.pathApiName == stationKey }
-                ?: return@eachStation
+                    ?: return@eachStation
             if (ShouldLog) {
                 Logging.d("Backfill station: ${station.displayName}")
             }
-            val lineIds =
-                (trains[stationKey]?.map { it.lineId } ?: return@eachStation).toMutableSet()
+            val lineIdToEarliestTrain =
+                trains[stationKey]
+                    .orElse { return@eachStation }
+                    .groupBy { it.lineId }
+                    .mapValues { (_, trains) ->
+                        trains.minByOrNull { it.projectedArrival }?.projectedArrival
+                    }
+                    .toMutableMap()
             if (station == ExchangePlace) {
                 // We avoid backfilling from lines that aren't already on the departure board for
                 // the station. But Exchange Place is a special case, if we have a train going there
                 // from one of the WTC lines, we assume the other line is also stopping there.
-                if (NWK_WTC in lineIds) {
-                    lineIds += HOB_WTC
-                } else if (HOB_WTC in lineIds) {
-                    lineIds += NWK_WTC
-                }
+                lineIdToEarliestTrain[HOB_WTC] =
+                    listOfNotNull(
+                        lineIdToEarliestTrain[HOB_WTC],
+                        lineIdToEarliestTrain[NWK_WTC]
+                    ).minOrNull()
+                lineIdToEarliestTrain[NWK_WTC] =
+                    listOfNotNull(
+                        lineIdToEarliestTrain[HOB_WTC],
+                        lineIdToEarliestTrain[NWK_WTC]
+                    ).minOrNull()
             }
-            lineIds.forEach eachHeadSign@{ lineId ->
+            lineIdToEarliestTrain.forEach eachHeadSign@{ (lineId, earliestTrain) ->
                 val checkpointsInLine = LineIdToCheckpoints[lineId] ?: run {
                     if (ShouldLog) {
                         Logging.d("\tBackfill: No checkpoints for ${station.displayName} for $lineId!")
@@ -247,6 +259,7 @@ object TrainBackfillHelper {
                                     )
                                 )
                             }
+                            ?.filter { earliestTrain != null && it.projectedArrival > earliestTrain}
                             ?.forEach { hypotheticalTrain ->
                                 val trainMatches: (DepartureBoardTrain) -> Boolean = trainMatches@{
                                     if (it.lineId != lineId) return@trainMatches false
@@ -255,7 +268,8 @@ object TrainBackfillHelper {
                                             .absoluteValue
                                     timeDelta <= getCloseTrainThreshold()
                                 }
-                                val currentTrains = backfilled[station.pathApiName] ?: return@eachStation
+                                val currentTrains =
+                                    backfilled[station.pathApiName] ?: return@eachStation
                                 if (currentTrains.none { trainMatches(it) }) {
                                     if (ShouldLog) {
                                         Logging.d(
@@ -266,7 +280,8 @@ object TrainBackfillHelper {
                                         )
                                     }
 
-                                    backfilled[station.pathApiName] = currentTrains + hypotheticalTrain
+                                    backfilled[station.pathApiName] =
+                                        currentTrains + hypotheticalTrain
                                 } else {
                                     if (ShouldLog) {
                                         Logging.d(

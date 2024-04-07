@@ -8,6 +8,7 @@ import com.sixbynine.transit.path.api.alerts.AlertText
 import com.sixbynine.transit.path.api.alerts.GithubAlerts
 import com.sixbynine.transit.path.api.alerts.Schedule
 import com.sixbynine.transit.path.api.alerts.TrainFilter
+import com.sixbynine.transit.path.api.alerts.hidesTrain
 import com.sixbynine.transit.path.api.alerts.isActiveAt
 import com.sixbynine.transit.path.util.JsonFormat
 import kotlinx.datetime.DayOfWeek
@@ -165,5 +166,35 @@ class GithubAlertsTest {
         assertTrue(alert.isActiveAt(LocalDateTime(2024, APRIL, 15, 10, 0)))
         assertTrue(alert.isActiveAt(LocalDateTime(2024, JUNE, 30, 8, 0)))
         assertFalse(alert.isActiveAt(LocalDateTime(2024, JUNE, 30, 11, 0)))
+    }
+
+    @Test
+    fun `hidesTrain with headsign`() {
+        val alert = Alert(
+            stations = listOf(GroveStreet),
+            schedule = Schedule(),
+            trains = TrainFilter.headSigns("33rd", "World Trade"),
+        )
+
+        assertFalse(alert.hidesTrain("JSQ", "33rd"))
+        assertFalse(alert.hidesTrain("GRV", "Newark"))
+        assertTrue(alert.hidesTrain("GRV", "33rd"))
+        assertTrue(alert.hidesTrain("GRV", "33RD"))
+        assertTrue(alert.hidesTrain("GRV", "33rd St via Hoboken"))
+        assertTrue(alert.hidesTrain("GRV", "World Trade Center"))
+    }
+
+    @Test
+    fun `hidesTrain with all`() {
+        val alert = Alert(
+            stations = listOf(NinthStreet, TwentyThirdStreet),
+            schedule = Schedule(),
+            trains = TrainFilter.all(),
+        )
+
+        assertFalse(alert.hidesTrain("14S", "33rd St"))
+        assertTrue(alert.hidesTrain("09S", "33rd St"))
+        assertTrue(alert.hidesTrain("23S", "33rd St"))
+        assertTrue(alert.hidesTrain("23S", "Hoboken"))
     }
 }

@@ -9,6 +9,9 @@ import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.TrainFilter
+import com.sixbynine.transit.path.api.alerts.GithubAlerts
+import com.sixbynine.transit.path.api.alerts.GithubAlertsRepository
+import com.sixbynine.transit.path.api.alerts.hidesTrain
 import com.sixbynine.transit.path.api.isEastOf
 import com.sixbynine.transit.path.api.isInNewJersey
 import com.sixbynine.transit.path.api.isInNewYork
@@ -63,6 +66,7 @@ object WidgetDataFetcher {
         Logging.initialize()
         GlobalScope.launch {
             val result = async { PathApi.instance.fetchUpcomingDepartures(force) }
+            val deferredGithubAlerts = async { GithubAlertsRepository.getAlerts() }
 
             val closestStationToUse =
                 if (includeClosestStation) {
@@ -79,22 +83,24 @@ object WidgetDataFetcher {
                 }
 
             var hadInternet = NetworkManager().isConnectedToInternet()
+            val githubAlerts = deferredGithubAlerts.await().getOrNull()
+
+            fun createWidgetData(data: Map<Station, List<DepartureBoardTrain>>): WidgetData {
+                return createWidgetData(
+                    limit,
+                    stations,
+                    lines,
+                    sort,
+                    filter,
+                    closestStationToUse,
+                    githubAlerts,
+                    data
+                )
+            }
 
             result
                 .await()
-                .onSuccess {
-                    onSuccess(
-                        createWidgetData(
-                            limit,
-                            stations,
-                            lines,
-                            sort,
-                            filter,
-                            closestStationToUse,
-                            it
-                        )
-                    )
-                }
+                .onSuccess { onSuccess(createWidgetData(it)) }
                 .onFailure {
                     Logging.e("Failed to fetch", it)
 
@@ -106,17 +112,7 @@ object WidgetDataFetcher {
                     onFailure(
                         it,
                         hadInternet,
-                        lastResults?.let {
-                            createWidgetData(
-                                limit,
-                                stations,
-                                lines,
-                                sort,
-                                filter,
-                                closestStationToUse,
-                                it
-                            )
-                        }
+                        lastResults?.let { createWidgetData(it) }
                     )
                 }
         }
@@ -129,6 +125,7 @@ object WidgetDataFetcher {
         sort: StationSort,
         filter: TrainFilter,
         closestStationToUse: Station?,
+        githubAlerts: GithubAlerts?,
         data: Map<Station, List<DepartureBoardTrain>>
     ): WidgetData {
         Logging.d("createWidgetData, stations = ${stations.map { it.pathApiName }}, lines=$lines")
@@ -142,7 +139,19 @@ object WidgetDataFetcher {
         }
 
         for (station in adjustedStations) {
-            val apiTrains = data[station] ?: continue
+            val stationAlerts =
+                githubAlerts?.alerts?.filter { station.pathApiName in it.stations }.orEmpty()
+            val apiTrains =
+                data[station]
+                    ?.filterNot { train ->
+                        stationAlerts.any { alert ->
+                            alert.hidesTrain(
+                                stationName = station.pathApiName,
+                                headSign = train.headsign
+                            )
+                        }
+                    }
+                    ?: continue
             val signs =
                 apiTrains
                     .groupBy { it.headsign }
@@ -156,7 +165,7 @@ object WidgetDataFetcher {
                         WidgetData.SignData(
                             headSign,
                             colors,
-                            arrivals
+                            arrivals,
                         )
                     }
                     .sortedBy { it.projectedArrivals.min() }
@@ -193,6 +202,7 @@ object WidgetDataFetcher {
                     signs = signs,
                     trains = trains,
                     state = station.state,
+                    alerts = stationAlerts.mapNotNull { it.message },
                 )
             }
         }

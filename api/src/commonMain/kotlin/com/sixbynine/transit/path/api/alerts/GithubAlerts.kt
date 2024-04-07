@@ -1,10 +1,13 @@
 package com.sixbynine.transit.path.api.alerts
 
 import com.sixbynine.transit.path.api.Station
+import com.sixbynine.transit.path.time.NewYorkTimeZone
+import com.sixbynine.transit.path.time.now
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -164,13 +167,9 @@ data class TextAndLocale(val text: String?, val locale: String)
 data class TrainFilter(
     val all: Boolean? = null,
     val headSigns: List<String>? = null,
-    /** ARGB representation of line colors. */
-    val colors: List<String>? = null,
 ) {
     companion object {
         fun all() = TrainFilter(all = true)
-
-        fun lineColors(vararg colors: String) = TrainFilter(colors = colors.toList())
 
         fun headSigns(vararg headSigns: String) = TrainFilter(headSigns = headSigns.toList())
     }
@@ -219,6 +218,23 @@ fun Alert.isActiveAt(dateTime: LocalDateTime): Boolean {
     }
 
     return false
+}
+
+fun Alert.hidesTrain(stationName: String, headSign: String): Boolean {
+    if (stationName !in stations) return false
+
+    if (trains.all == true) return true
+
+    trains.headSigns?.forEach {
+        if (headSign.contains(it, ignoreCase = true)) return true
+    }
+
+    return false
+}
+
+fun Alert.hidesTrainNow(stationName: String, headSign: String): Boolean {
+    val dateTime = now().toLocalDateTime(NewYorkTimeZone)
+    return isActiveAt(dateTime) && hidesTrain(stationName, headSign)
 }
 
 private val DayOfWeek.previousDay: DayOfWeek

@@ -26,7 +26,6 @@ import androidx.glance.unit.ColorProvider
 import com.sixbynine.transit.path.MainActivity
 import com.sixbynine.transit.path.R.drawable
 import com.sixbynine.transit.path.app.ui.ColorWrapper
-import com.sixbynine.transit.path.app.ui.unwrap
 import com.sixbynine.transit.path.util.DataResult
 import com.sixbynine.transit.path.util.secondOrNull
 import com.sixbynine.transit.path.widget.WidgetData
@@ -88,7 +87,6 @@ fun DepartureBoard(result: DataResult<WidgetData>, modifier: GlanceModifier = Gl
                                         WidgetDataFormatter.formatTime(it)
                                     },
                                     style = GlanceTheme.typography.secondary,
-                                    maxLines = 2,
                                 )
                             }
                         }

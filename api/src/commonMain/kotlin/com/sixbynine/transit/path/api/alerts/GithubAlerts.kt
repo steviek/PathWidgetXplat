@@ -4,6 +4,7 @@ import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.time.NewYorkTimeZone
 import com.sixbynine.transit.path.time.now
 import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
@@ -245,8 +246,8 @@ fun Alert.hidesTrain(stationName: String, headSign: String): Boolean {
     return false
 }
 
-fun Alert.hidesTrainNow(stationName: String, headSign: String): Boolean {
-    val dateTime = now().toLocalDateTime(NewYorkTimeZone)
+fun Alert.hidesTrainAt(stationName: String, headSign: String, time: Instant): Boolean {
+    val dateTime = time.toLocalDateTime(NewYorkTimeZone)
     return isActiveAt(dateTime) && hidesTrain(stationName, headSign)
 }
 

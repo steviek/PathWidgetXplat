@@ -13,6 +13,7 @@ object NativeGlobalDataStore : GlobalDataStore {
             return
         }
         defaults.setObject(value, key)
+        defaults.synchronize()
     }
 
     override fun getString(key: String): String? {
@@ -25,6 +26,7 @@ object NativeGlobalDataStore : GlobalDataStore {
             return
         }
         defaults.setBool(value, key)
+        defaults.synchronize()
     }
 
     override fun set(key: String, value: Long?) {
@@ -33,6 +35,7 @@ object NativeGlobalDataStore : GlobalDataStore {
             return
         }
         defaults.setInteger(value, key)
+        defaults.synchronize()
     }
 
     override fun getLong(key: String): Long? {

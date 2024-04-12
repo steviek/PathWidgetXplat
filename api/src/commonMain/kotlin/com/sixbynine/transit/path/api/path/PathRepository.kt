@@ -81,7 +81,7 @@ object PathRepository {
 
     private fun hasRecentCachedResponse(): Boolean {
         val lastPathResponseTime = lastPathResponseTime ?: return false
-        return lastPathResponseTime < now() - 30.seconds
+        return lastPathResponseTime > now() - 15.seconds
     }
 
     @Serializable

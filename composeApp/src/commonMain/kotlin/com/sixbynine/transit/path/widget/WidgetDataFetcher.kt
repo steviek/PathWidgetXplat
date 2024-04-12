@@ -17,10 +17,11 @@ import com.sixbynine.transit.path.api.isInNewJersey
 import com.sixbynine.transit.path.api.isInNewYork
 import com.sixbynine.transit.path.api.isWestOf
 import com.sixbynine.transit.path.api.state
+import com.sixbynine.transit.path.app.settings.AvoidMissingTrains
 import com.sixbynine.transit.path.app.settings.AvoidMissingTrains.Always
 import com.sixbynine.transit.path.app.settings.AvoidMissingTrains.Disabled
 import com.sixbynine.transit.path.app.settings.AvoidMissingTrains.OffPeak
-import com.sixbynine.transit.path.app.settings.SettingsManager
+import com.sixbynine.transit.path.app.settings.SettingsManager.currentAvoidMissingTrains
 import com.sixbynine.transit.path.location.LocationCheckResult.Failure
 import com.sixbynine.transit.path.location.LocationCheckResult.NoPermission
 import com.sixbynine.transit.path.location.LocationCheckResult.NoProvider
@@ -139,6 +140,7 @@ object WidgetDataFetcher {
         Logging.d("createWidgetData, stations = ${stations.map { it.pathApiName }}, lines=$lines")
         val adjustedStations = stations.toMutableList()
         val stationDatas = arrayListOf<WidgetData.StationData>()
+        val avoidMissingTrains = currentAvoidMissingTrains()
 
         adjustedStations.sortWith(StationComparator(sort))
         if (closestStationToUse != null) {
@@ -170,7 +172,13 @@ object WidgetDataFetcher {
                                 .distinct()
                                 .sortedBy { it.color.toArgb() }
                         val arrivals =
-                            trains.map { adjustToAvoidMissingTrains(now, it.projectedArrival) }
+                            trains.map {
+                                adjustToAvoidMissingTrains(
+                                    now,
+                                    it.projectedArrival,
+                                    avoidMissingTrains
+                                )
+                            }
                                 .distinct()
                                 .sorted()
                         if (arrivals.isEmpty()) return@mapNotNull null
@@ -205,7 +213,7 @@ object WidgetDataFetcher {
                         }
                 }
                 .filter { station == closestStationToUse || matchesFilter(station, it, filter) }
-                .map { it.adjustedToAvoidMissingTrains(now) }
+                .map { it.adjustedToAvoidMissingTrains(now, avoidMissingTrains) }
                 .distinctBy { it.title to it.projectedArrival }
                 .sortedBy { it.projectedArrival }
                 .toList()
@@ -251,12 +259,25 @@ object WidgetDataFetcher {
         }
     }
 
-    private fun WidgetData.TrainData.adjustedToAvoidMissingTrains(now: Instant): WidgetData.TrainData {
-        return copy(projectedArrival = adjustToAvoidMissingTrains(now, projectedArrival))
+    private fun WidgetData.TrainData.adjustedToAvoidMissingTrains(
+        now: Instant,
+        avoidMissingTrains: AvoidMissingTrains
+    ): WidgetData.TrainData {
+        return copy(
+            projectedArrival = adjustToAvoidMissingTrains(
+                now,
+                projectedArrival,
+                avoidMissingTrains
+            )
+        )
     }
 
-    private fun adjustToAvoidMissingTrains(now: Instant, time: Instant): Instant {
-        val subtractTime = when (SettingsManager.avoidMissingTrains.value) {
+    private fun adjustToAvoidMissingTrains(
+        now: Instant,
+        time: Instant,
+        avoidMissingTrains: AvoidMissingTrains
+    ): Instant {
+        val subtractTime = when (avoidMissingTrains) {
             Disabled -> false
             OffPeak -> isOffPeak(time)
             Always -> true

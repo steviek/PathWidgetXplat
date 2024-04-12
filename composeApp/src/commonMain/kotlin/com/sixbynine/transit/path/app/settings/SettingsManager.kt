@@ -8,13 +8,17 @@ import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.location.LocationPermissionRequestResult.Denied
 import com.sixbynine.transit.path.location.LocationPermissionRequestResult.Granted
 import com.sixbynine.transit.path.location.LocationProvider
+import com.sixbynine.transit.path.preferences.IntPersistable
 import com.sixbynine.transit.path.util.combineStates
+import com.sixbynine.transit.path.widget.globalDataStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 object SettingsManager {
+    private const val AvoidMissingTrainsKey = "avoid_missing_trains"
+
     private val trainFilterPersister = SettingPersister("train_filter", TrainFilter.All)
     private val lineFilterPersister = BitFlagSettingPersister("line_filter", Line.entries)
     private val timeDisplayPersister = SettingPersister("time_display", TimeDisplay.Relative)
@@ -24,7 +28,7 @@ object SettingsManager {
     private val locationSettingPersister =
         SettingPersister("location_setting", LocationSetting.Disabled)
     private val avoidMissingTrainsPersister =
-        GlobalSettingPersister("avoid_missing_trains", AvoidMissingTrains.Disabled)
+        GlobalSettingPersister(AvoidMissingTrainsKey, AvoidMissingTrains.Disabled)
 
     val locationSetting = locationSettingPersister.flow
     val trainFilter = trainFilterPersister.flow
@@ -60,6 +64,7 @@ object SettingsManager {
                     Denied -> {
                         locationSettingPersister.update(LocationSetting.Disabled)
                     }
+
                     Granted -> {
                         if (locationSettingPersister.flow.value ==
                             LocationSetting.EnabledPendingPermission
@@ -118,5 +123,11 @@ object SettingsManager {
     fun updateAvoidMissingTrains(avoidMissingTrains: AvoidMissingTrains) {
         Analytics.avoidMissingTrainsSet(avoidMissingTrains)
         avoidMissingTrainsPersister.update(avoidMissingTrains)
+    }
+
+    fun currentAvoidMissingTrains(): AvoidMissingTrains {
+        return globalDataStore().getLong(AvoidMissingTrainsKey)
+            ?.let { IntPersistable.fromPersistence(it.toInt()) }
+            ?: AvoidMissingTrains.Disabled
     }
 }

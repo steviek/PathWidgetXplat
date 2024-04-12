@@ -10,7 +10,7 @@
           "startTime": "06:00",
           "endDay": "MONDAY",
           "endTime": "00:00",
-          "from": "2024-04-06",
+          "from": "2024-04-17",
           "to": "2024-06-30"
         }
       },
@@ -48,8 +48,51 @@
           ],
           "start": "00:00",
           "end": "00:00",
-          "from": "2024-04-06",
+          "from": "2024-04-17",
           "to": "2024-06-30"
+        }
+      }
+    },
+    {
+      "stations": [
+        "GRV"
+      ],
+      "schedule": {
+        "once": {
+          "from": "2024-04-13T06:15",
+          "to": "2024-04-14T03:00"
+        }
+      },
+      "trains": {
+        "headSigns": [
+          "World Trade",
+          "33rd"
+        ]
+      },
+      "message": {
+        "localizations": [
+          {
+            "text": "NOTE: Starting at 3 AM on Sunday, April 14, all trains will stop at Grove Street Station to accommodate riders participating in the Jersey City Marathon. Due to construction, World Trade Center- and 33 St.-bound trains will not stop at Grove Street Station for most weekends between April 6 and June 30, 2024 from 6 AM Saturday - 11:59 PM Sunday, requiring customers to take detours for service to that station.",
+            "locale": "en"
+          },
+          {
+            "text": "NOTA: A partir de las 3 a. m. del domingo 14 de abril, todos los trenes pararán en la estación Grove Street para acomodar a los pasajeros que participen en el maratón de la ciudad de Jersey. Debido a construcción, los trenes con destino al World Trade Center y a 33 Street no pararán en la estación Grove Street durante la mayoría de los fines de semana entre el 6 de abril y el 30 de junio, desde las 6 a. m. del sábado hasta las 11:59 p. m. del domingo , lo que requerirá que los clientes tomen desvíos para el servicio a esa estación.",
+            "locale": "es"
+          }
+        ]
+      },
+      "url": {
+        "localizations": [
+          {
+            "text": "https://www.panynj.gov/path/en/modernizing-path/grove-st-improvements/grove-street-bypass-schedule.html",
+            "locale": "en"
+          }
+        ]
+      },
+      "displaySchedule": {
+        "once": {
+          "from": "2024-04-12T18:00",
+          "to": "2024-04-14T23:59"
         }
       }
     },
@@ -81,11 +124,11 @@
       "message": {
         "localizations": [
           {
-            "text": "9 St. & 23 St. stations are closed daily from midnight – 5 AM for maintenance-related activity. Please use Christopher St., 14 St., or 33 St. station.",
+            "text": "9 St. & 23 St. stations are closed daily from 11:59 PM – 5 AM for maintenance-related activity. Please use Christopher St., 14 St., or 33 St. station.",
             "locale": "en"
           },
           {
-            "text": "Las estaciones de 9 St. y 23 St. están cerradas diariamente de medianoche a 5 a. m. para actividades relacionadas con el mantenimiento. Utilice las estaciones de Christopher St., 14 St. o 33 St.",
+            "text": "Las estaciones de 9 St. y 23 St. están cerradas diariamente de 11:59 p. m. a 5 a. m. para actividades relacionadas con el mantenimiento. Utilice las estaciones de Christopher St., 14 St. o 33 St.",
             "locale": "es"
           }
         ]
@@ -109,7 +152,7 @@
             "SATURDAY",
             "SUNDAY"
           ],
-          "start": "20:00",
+          "start": "17:00",
           "end": "05:00",
           "from": "2024-04-06",
           "to": "2024-06-30"

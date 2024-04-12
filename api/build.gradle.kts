@@ -24,6 +24,7 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.platform)
             implementation(projects.logging)
+            implementation(projects.flipper)
 
             implementation(libs.ktor.core)
             implementation(libs.ktor.logging)

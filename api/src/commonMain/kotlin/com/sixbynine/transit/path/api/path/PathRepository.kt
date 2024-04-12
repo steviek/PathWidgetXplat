@@ -2,13 +2,13 @@ package com.sixbynine.transit.path.api.path
 
 import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.api.NetworkException
+import com.sixbynine.transit.path.api.createHttpClient
 import com.sixbynine.transit.path.preferences.StringPreferencesKey
 import com.sixbynine.transit.path.preferences.persisting
 import com.sixbynine.transit.path.preferences.persistingInstant
 import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.util.JsonFormat
 import com.sixbynine.transit.path.util.suspendRunCatching
-import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.isSuccess
@@ -23,7 +23,7 @@ import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.seconds
 
 object PathRepository {
-    private val httpClient = HttpClient()
+    private val httpClient = createHttpClient()
     private var lastPathResponse by persisting(StringPreferencesKey("last_success"))
     private var lastPathResponseTime by persistingInstant("last_success_time")
     private var fetchJob: Job? = null

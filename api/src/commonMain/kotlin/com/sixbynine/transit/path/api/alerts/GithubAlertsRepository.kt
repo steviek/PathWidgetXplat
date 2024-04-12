@@ -1,13 +1,13 @@
 package com.sixbynine.transit.path.api.alerts
 
 import com.sixbynine.transit.path.api.NetworkException
+import com.sixbynine.transit.path.api.createHttpClient
 import com.sixbynine.transit.path.preferences.StringPreferencesKey
 import com.sixbynine.transit.path.preferences.persisting
 import com.sixbynine.transit.path.preferences.persistingInstant
 import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.util.JsonFormat
 import com.sixbynine.transit.path.util.suspendRunCatching
-import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.isSuccess
@@ -22,7 +22,7 @@ object GithubAlertsRepository {
     private var storedAlerts by persisting(StringPreferencesKey("github_alerts"))
     private var storedAlertsTime by persistingInstant("github_alerts_time")
 
-    private val httpClient = HttpClient()
+    private val httpClient = createHttpClient()
 
     suspend fun getAlerts(): Result<GithubAlerts> = withContext(Dispatchers.IO) {
         suspendRunCatching {

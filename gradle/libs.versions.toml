@@ -33,6 +33,8 @@ glance = "1.1.0-alpha01"
 google-play-review = "2.0.1"
 workRuntimeKtx = "2.9.0"
 accompanist = "0.35.0-alpha"
+flipper = "0.250.0"
+soloader = "0.10.5"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -76,6 +78,9 @@ google-play-review = { module = "com.google.android.play:review", version.ref = 
 google-play-review-ktx = { module = "com.google.android.play:review-ktx", version.ref = "google-play-review" }
 androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntimeKtx" }
 google-accompanist = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
+facebook-flipper = { module = "com.facebook.flipper:flipper", version.ref = "flipper" }
+facebook-soloader = { module = "com.facebook.soloader:soloader", version.ref = "soloader" }
+facebook-flipper-network-plugin = { module = "com.facebook.flipper:flipper-network-plugin", version.ref = "flipper" }
 
 [plugins]
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }

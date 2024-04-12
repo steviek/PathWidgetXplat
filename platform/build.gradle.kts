@@ -15,6 +15,8 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            implementation(projects.flipper)
+
             implementation(libs.kotlin.coroutines)
             implementation(libs.kotlin.date.time)
             implementation(libs.kotlin.serialization.json)

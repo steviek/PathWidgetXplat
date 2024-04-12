@@ -1,6 +1,15 @@
 <resources>
     <string name="add_station">Añadir una estación</string>
     <string name="and_or">y/o</string>
+    <string name="avoid_missing_trains">Evitar perder los trenes</string>
+    <string name="avoid_missing_trains_always">Siempre</string>
+    <string name="avoid_missing_trains_disabled">Desactivado</string>
+    <string name="avoid_missing_trains_off_peak">Fuera de las horas pico</string>
+    <string name="avoid_missing_trains_off_peak_description_12_hour">Excepto días laborables 6 AM - 10 AM y 4 PM - 8 PM</string>
+    <string name="avoid_missing_trains_off_peak_description_24_hour">Excepto días laborables de 6:00 a 10:00 horas y de 16:00 a 20:00 horas</string>
+    <string name="avoid_missing_trains_description">Según el PATH:</string>
+    <string name="avoid_missing_trains_description_2">Los trenes pueden salir hasta tres minutos antes o después de los horarios mostrados</string>
+    <string name="avoid_missing_trains_description_3">Active esta configuración para deducir tres minutos de los tiempos de llegada y ayudar a evitar perder trenes.</string>
     <string name="app_name">Salidas para PATH</string>
     <string name="back">Atrás</string>
     <string name="buy_me_a_coffee">Cómprame un café</string>
@@ -28,6 +37,7 @@
     <string name="filter">Filtro</string>
     <string name="interstate_explanation">Los trenes interstatales incluyen trenes que van hacia Nueva York desde estaciones de Nueva Jersey, y viceversa</string>
     <string name="langauge_code">es</string>
+    <string name="learn_more">Aprender más (en inglés)</string>
     <string name="lines">Líneas</string>
     <string name="lines_show_all">Mostrar todos las líneas</string>
     <string name="move_down">Bajar</string>

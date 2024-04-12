@@ -23,6 +23,8 @@ object SettingsManager {
     private val displayPresumedTrainsPersister = SettingPersister("show_presumed_trains", true)
     private val locationSettingPersister =
         SettingPersister("location_setting", LocationSetting.Disabled)
+    private val avoidMissingTrainsPersister =
+        GlobalSettingPersister("avoid_missing_trains", AvoidMissingTrains.Disabled)
 
     val locationSetting = locationSettingPersister.flow
     val trainFilter = trainFilterPersister.flow
@@ -31,6 +33,7 @@ object SettingsManager {
     val stationLimit = stationLimitPersister.flow
     val stationSort = stationSortPersister.flow
     val displayPresumedTrains = displayPresumedTrainsPersister.flow
+    val avoidMissingTrains = avoidMissingTrainsPersister.flow
 
     val settings = combineStates(
         locationSetting,
@@ -40,6 +43,7 @@ object SettingsManager {
         stationLimit,
         stationSort,
         displayPresumedTrains,
+        avoidMissingTrains,
         ::AppSettings
     )
 
@@ -109,5 +113,10 @@ object SettingsManager {
 
     fun updateDisplayPresumedTrains(displayPresumedTrains: Boolean) {
         displayPresumedTrainsPersister.update(displayPresumedTrains)
+    }
+
+    fun updateAvoidMissingTrains(avoidMissingTrains: AvoidMissingTrains) {
+        Analytics.avoidMissingTrainsSet(avoidMissingTrains)
+        avoidMissingTrainsPersister.update(avoidMissingTrains)
     }
 }

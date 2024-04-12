@@ -1,15 +1,23 @@
 package com.sixbynine.transit.path.preferences
 
+import kotlin.enums.EnumEntries
 import kotlin.enums.enumEntries
 
 interface IntPersistable {
     val number: Int
 
     companion object {
+        fun <E> fromPersistence(
+            number: Int,
+            entries: EnumEntries<E>
+        ): E? where E : Enum<E>, E : IntPersistable {
+            return entries.find { it.number == number }
+        }
+
         inline fun <reified E> fromPersistence(
             number: Int
         ): E? where E : Enum<E>, E : IntPersistable {
-            return enumEntries<E>().find { it.number == number }
+            return fromPersistence(number, enumEntries())
         }
 
         inline fun <reified E> createBitmask(

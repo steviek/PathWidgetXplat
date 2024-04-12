@@ -5,6 +5,7 @@ import com.sixbynine.transit.path.api.LocationSetting
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.TrainFilter
+import com.sixbynine.transit.path.app.settings.AvoidMissingTrains
 import com.sixbynine.transit.path.app.settings.StationLimit
 import com.sixbynine.transit.path.app.settings.TimeDisplay
 
@@ -48,6 +49,10 @@ object Analytics {
 
     fun stationLimitSet(limit: StationLimit) {
         strategy.logEvent("set_station_limit", mapOf("limit" to limit.name.lowercase()))
+    }
+
+    fun avoidMissingTrainsSet(option: AvoidMissingTrains) {
+        strategy.logEvent("avoid_missing_trains_set", mapOf("option" to option.name.lowercase()))
     }
 
     fun shareAppClicked() {

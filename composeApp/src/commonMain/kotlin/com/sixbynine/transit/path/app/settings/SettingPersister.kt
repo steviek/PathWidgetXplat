@@ -4,17 +4,16 @@ import com.sixbynine.transit.path.preferences.IntPersistable
 import com.sixbynine.transit.path.preferences.IntPreferencesKey
 import com.sixbynine.transit.path.preferences.Preferences
 import com.sixbynine.transit.path.preferences.PreferencesKey
+import com.sixbynine.transit.path.widget.globalDataStore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlin.enums.EnumEntries
+import kotlin.enums.enumEntries
 
-class SettingPersister<K, T>(
-    key: PreferencesKey<K>,
-    deserialize: (K) -> T?,
-    serialize: (T) -> K,
-    defaultValue: T
+class SettingPersister<T>(
+    defaultValue: T,
+    private val serializer: StorageSerializer<T>
 ) {
-    private val serializer = PreferencesSerializer(key, deserialize, serialize)
-
     private val _flow = MutableStateFlow(serializer.get() ?: defaultValue)
     val flow = _flow.asStateFlow()
 
@@ -27,19 +26,19 @@ class SettingPersister<K, T>(
 inline fun <reified E> SettingPersister(
     key: IntPreferencesKey,
     defaultValue: E
-): SettingPersister<Int, E> where E : Enum<E>, E : IntPersistable {
+): SettingPersister<E> where E : Enum<E>, E : IntPersistable {
+    val serialize: (E) -> Int = { it.number }
+    val deserialize: (Int) -> E? = { IntPersistable.fromPersistence(it) }
     return SettingPersister(
-        key = key,
-        serialize = { it.number },
-        deserialize = { IntPersistable.fromPersistence(it) },
-        defaultValue = defaultValue
+        defaultValue = defaultValue,
+        serializer = PreferencesSerializer(key, deserialize, serialize)
     )
 }
 
 inline fun <reified E> SettingPersister(
     key: String,
     defaultValue: E
-): SettingPersister<Int, E> where E : Enum<E>, E : IntPersistable {
+): SettingPersister<E> where E : Enum<E>, E : IntPersistable {
     return SettingPersister(IntPreferencesKey(key), defaultValue)
 }
 
@@ -47,46 +46,78 @@ inline fun <reified E> SettingPersister(
 inline fun <reified E> BitFlagSettingPersister(
     key: IntPreferencesKey,
     defaultValue: Collection<E>
-): SettingPersister<Int, Set<E>> where E : Enum<E>, E : IntPersistable {
+): SettingPersister<Set<E>> where E : Enum<E>, E : IntPersistable {
+    val serialize: (Set<E>) -> Int = { IntPersistable.createBitmask(it) }
+    val deserialize: (Int) -> Set<E> = { IntPersistable.fromBitmask(it) }
     return SettingPersister(
-        key = key,
-        serialize = { IntPersistable.createBitmask(it) },
-        deserialize = { IntPersistable.fromBitmask(it) },
-        defaultValue = defaultValue.toSet()
+        defaultValue = defaultValue.toSet(),
+        serializer = PreferencesSerializer(key, deserialize, serialize)
     )
 }
 
 inline fun <reified E> BitFlagSettingPersister(
     key: String,
     defaultValue: Collection<E>
-): SettingPersister<Int, Set<E>> where E : Enum<E>, E : IntPersistable {
+): SettingPersister<Set<E>> where E : Enum<E>, E : IntPersistable {
     return BitFlagSettingPersister(IntPreferencesKey(key), defaultValue)
+}
+
+inline fun <reified E> GlobalSettingPersister(
+    key: String,
+    defaultValue: E
+): SettingPersister<E> where E : Enum<E>, E : IntPersistable {
+    return SettingPersister(
+        defaultValue,
+        serializer = IntGlobalDataStoreSerializer(key, enumEntries())
+    )
 }
 
 inline fun SettingPersister(
     key: String,
     defaultValue: Boolean
-): SettingPersister<Int, Boolean> {
+): SettingPersister<Boolean> {
+    val serialize: (Boolean) -> Int = { if (it) 1 else 0 }
+    val deserialize: (Int) -> Boolean = { it == 1 }
+    val prefKey = IntPreferencesKey(key)
     return SettingPersister(
-        key = IntPreferencesKey(key),
-        serialize = { if (it) 1 else 0 },
-        deserialize = { it != 0 },
-        defaultValue = defaultValue
+        defaultValue = defaultValue,
+        serializer = PreferencesSerializer(prefKey, deserialize, serialize)
     )
 }
 
-private class PreferencesSerializer<T, R>(
+interface StorageSerializer<R> {
+    fun set(value: R?)
+    fun get(): R?
+}
+
+class PreferencesSerializer<T, R>(
     private val key: PreferencesKey<T>,
     private val deserialize: (T) -> R?,
     private val serialize: (R) -> T
-) {
+) : StorageSerializer<R> {
     private val preferences = Preferences()
 
-    fun set(value: R?) {
+    override fun set(value: R?) {
         preferences[key] = value?.let(serialize)
     }
 
-    fun get(): R? {
+    override fun get(): R? {
         return preferences[key]?.let(deserialize)
+    }
+}
+
+class IntGlobalDataStoreSerializer<R>(
+    private val key: String,
+    private val enumEntries: EnumEntries<R>
+) : StorageSerializer<R> where R : Enum<R>, R : IntPersistable {
+    private val dataStore = globalDataStore()
+
+    override fun set(value: R?) {
+        dataStore[key] = value?.number?.toLong()
+    }
+
+    override fun get(): R? {
+        val number = dataStore.getLong(key)?.toInt() ?: return null
+        return IntPersistable.fromPersistence(number, enumEntries)
     }
 }

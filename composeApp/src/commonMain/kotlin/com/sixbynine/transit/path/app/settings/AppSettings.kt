@@ -12,5 +12,6 @@ data class AppSettings(
     val timeDisplay: TimeDisplay,
     val stationLimit: StationLimit,
     val stationSort: StationSort,
-    val displayPresumedTrains: Boolean
+    val displayPresumedTrains: Boolean,
+    val avoidMissingTrains: AvoidMissingTrains,
 )

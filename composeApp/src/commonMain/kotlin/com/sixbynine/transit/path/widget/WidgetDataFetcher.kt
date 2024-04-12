@@ -17,6 +17,10 @@ import com.sixbynine.transit.path.api.isInNewJersey
 import com.sixbynine.transit.path.api.isInNewYork
 import com.sixbynine.transit.path.api.isWestOf
 import com.sixbynine.transit.path.api.state
+import com.sixbynine.transit.path.app.settings.AvoidMissingTrains.Always
+import com.sixbynine.transit.path.app.settings.AvoidMissingTrains.Disabled
+import com.sixbynine.transit.path.app.settings.AvoidMissingTrains.OffPeak
+import com.sixbynine.transit.path.app.settings.SettingsManager
 import com.sixbynine.transit.path.location.LocationCheckResult.Failure
 import com.sixbynine.transit.path.location.LocationCheckResult.NoPermission
 import com.sixbynine.transit.path.location.LocationCheckResult.NoProvider
@@ -25,22 +29,23 @@ import com.sixbynine.transit.path.location.LocationProvider
 import com.sixbynine.transit.path.network.NetworkManager
 import com.sixbynine.transit.path.preferences.Preferences
 import com.sixbynine.transit.path.preferences.StringPreferencesKey
+import com.sixbynine.transit.path.time.NewYorkTimeZone
+import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.util.DataResult
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.datetime.Clock
+import kotlinx.datetime.DayOfWeek.SATURDAY
+import kotlinx.datetime.DayOfWeek.SUNDAY
 import kotlinx.datetime.Instant
+import kotlinx.datetime.toLocalDateTime
 import kotlin.coroutines.resume
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 object WidgetDataFetcher {
-
-    private var lastFetchTime: Instant? = null
-    private var lastFetch: Deferred<Result<Map<Station, List<DepartureBoardTrain>>>>? = null
 
     private val lastClosestStationKey = StringPreferencesKey("fetcher_lastClosestStation")
     private var lastClosestStation: Station?
@@ -65,7 +70,8 @@ object WidgetDataFetcher {
     ) {
         Logging.initialize()
         GlobalScope.launch {
-            val result = async { PathApi.instance.fetchUpcomingDepartures(force) }
+            val now = now()
+            val result = async { PathApi.instance.fetchUpcomingDepartures(now, force) }
             val deferredGithubAlerts = async { GithubAlertsRepository.getAlerts() }
 
             val closestStationToUse =
@@ -87,6 +93,7 @@ object WidgetDataFetcher {
 
             fun createWidgetData(data: Map<String, List<DepartureBoardTrain>>): WidgetData {
                 return createWidgetData(
+                    now,
                     limit,
                     stations,
                     lines,
@@ -108,7 +115,7 @@ object WidgetDataFetcher {
                         hadInternet = false
                     }
 
-                    val lastResults = PathApi.instance.getLastSuccessfulUpcomingDepartures()
+                    val lastResults = PathApi.instance.getLastSuccessfulUpcomingDepartures(now)
                     onFailure(
                         it,
                         hadInternet,
@@ -119,6 +126,7 @@ object WidgetDataFetcher {
     }
 
     private fun createWidgetData(
+        now: Instant,
         limit: Int,
         stations: List<Station>,
         lines: Collection<Line>,
@@ -161,7 +169,10 @@ object WidgetDataFetcher {
                             trains.flatMap { it.lineColors }
                                 .distinct()
                                 .sortedBy { it.color.toArgb() }
-                        val arrivals = trains.map { it.projectedArrival }.distinct().sorted()
+                        val arrivals =
+                            trains.map { adjustToAvoidMissingTrains(now, it.projectedArrival) }
+                                .distinct()
+                                .sorted()
                         if (arrivals.isEmpty()) return@mapNotNull null
                         WidgetData.SignData(
                             headSign,
@@ -172,6 +183,7 @@ object WidgetDataFetcher {
                     .sortedBy { it.projectedArrivals.min() }
 
             val trains = apiTrains
+                .asSequence()
                 .map {
                     val colors = it.lineColors.distinct()
                     WidgetData.TrainData(
@@ -193,8 +205,10 @@ object WidgetDataFetcher {
                         }
                 }
                 .filter { station == closestStationToUse || matchesFilter(station, it, filter) }
+                .map { it.adjustedToAvoidMissingTrains(now) }
                 .distinctBy { it.title to it.projectedArrival }
                 .sortedBy { it.projectedArrival }
+                .toList()
 
             stationDatas += WidgetData.StationData(
                 id = station.pathApiName,
@@ -235,6 +249,32 @@ object WidgetDataFetcher {
             station.isInNewJersey -> destination.isInNewYork || destination isEastOf station
             else -> true // never happens, here for readability
         }
+    }
+
+    private fun WidgetData.TrainData.adjustedToAvoidMissingTrains(now: Instant): WidgetData.TrainData {
+        return copy(projectedArrival = adjustToAvoidMissingTrains(now, projectedArrival))
+    }
+
+    private fun adjustToAvoidMissingTrains(now: Instant, time: Instant): Instant {
+        val subtractTime = when (SettingsManager.avoidMissingTrains.value) {
+            Disabled -> false
+            OffPeak -> isOffPeak(time)
+            Always -> true
+        }
+        return if (subtractTime) {
+            (time - 3.minutes).coerceAtLeast(now)
+        } else {
+            time
+        }
+    }
+
+    private fun isOffPeak(time: Instant): Boolean {
+        val projectedDateTime = time.toLocalDateTime(NewYorkTimeZone)
+        if (projectedDateTime.dayOfWeek == SATURDAY || projectedDateTime.dayOfWeek == SUNDAY) {
+            return true
+        }
+
+        return projectedDateTime.hour !in 6..9 && projectedDateTime.hour !in 16..19
     }
 }
 

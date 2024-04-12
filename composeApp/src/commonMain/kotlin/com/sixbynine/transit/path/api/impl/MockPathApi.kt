@@ -9,15 +9,15 @@ import com.sixbynine.transit.path.api.State.NewJersey
 import com.sixbynine.transit.path.api.State.NewYork
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.app.ui.Colors
-import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.minutes
 
 internal class MockPathApi : PathApi {
 
     override suspend fun fetchUpcomingDepartures(
+        now: Instant,
         force: Boolean,
     ): Result<Map<String, List<DepartureBoardTrain>>> {
-        val now = Clock.System.now()
         val stationsToDepartures = Stations.All.associateWith { station ->
             listOf(
                 DepartureBoardTrain(
@@ -52,7 +52,7 @@ internal class MockPathApi : PathApi {
         return Result.success(stationsToDepartures)
     }
 
-    override suspend fun getLastSuccessfulUpcomingDepartures(): Map<String, List<DepartureBoardTrain>>? {
+    override suspend fun getLastSuccessfulUpcomingDepartures(now: Instant): Map<String, List<DepartureBoardTrain>>? {
         return null
     }
 }

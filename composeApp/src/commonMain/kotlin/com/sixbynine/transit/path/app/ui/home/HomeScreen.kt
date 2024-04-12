@@ -196,14 +196,14 @@ private fun HomeScreenScope.ErrorState() {
 
 @Composable
 private fun HomeScreenScope.DepartureBoard() {
-    val data = state.data ?: return
+    val data = state.data
     val gridState = rememberLazyListState()
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         state = gridState,
         contentPadding = PaddingValues(bottom = 16.dp),
     ) {
-        data.stations.forEachIndexed { index, station ->
+        data?.stations?.forEachIndexed { index, station ->
             val canMoveUp = run {
                 if (station.isClosest) return@run false
                 val prevStation = data.stations.getOrNull(index - 1) ?: return@run false
@@ -278,7 +278,7 @@ private fun HomeScreenScope.DepartureBoard() {
             }
         }
 
-        if (state.unselectedStations.isNotEmpty()) {
+        if (state.unselectedStations.isNotEmpty() && data != null) {
             item("add") {
                 Box(Modifier.padding(horizontal = gutter(), vertical = 16.dp)) {
                     Button(

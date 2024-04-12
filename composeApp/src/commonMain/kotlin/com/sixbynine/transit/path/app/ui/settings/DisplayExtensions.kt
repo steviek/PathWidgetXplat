@@ -14,15 +14,22 @@ import com.sixbynine.transit.path.api.StationSort.NyAm
 import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.api.TrainFilter.All
 import com.sixbynine.transit.path.api.TrainFilter.Interstate
+import com.sixbynine.transit.path.app.settings.AvoidMissingTrains
 import com.sixbynine.transit.path.app.settings.StationLimit
 import com.sixbynine.transit.path.app.settings.TimeDisplay
 import com.sixbynine.transit.path.app.ui.ColorWrapper
 import com.sixbynine.transit.path.app.ui.Colors
+import com.sixbynine.transit.path.time.is24HourClock
 import com.sixbynine.transit.path.widget.WidgetDataFormatter
 import kotlinx.datetime.Clock.System
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import pathwidgetxplat.composeapp.generated.resources.Res.string
+import pathwidgetxplat.composeapp.generated.resources.avoid_missing_trains_always
+import pathwidgetxplat.composeapp.generated.resources.avoid_missing_trains_disabled
+import pathwidgetxplat.composeapp.generated.resources.avoid_missing_trains_off_peak
+import pathwidgetxplat.composeapp.generated.resources.avoid_missing_trains_off_peak_description_12_hour
+import pathwidgetxplat.composeapp.generated.resources.avoid_missing_trains_off_peak_description_24_hour
 import pathwidgetxplat.composeapp.generated.resources.interstate_explanation
 import pathwidgetxplat.composeapp.generated.resources.lines_show_all
 import pathwidgetxplat.composeapp.generated.resources.setting_time_display_clock
@@ -118,6 +125,27 @@ val Set<Line>.title: String
         }
 
         return remember(this) { joinToString(separator = "\n") { it.title } }
+    }
+
+val AvoidMissingTrains.displayName: String
+    @Composable
+    get() = when (this) {
+        AvoidMissingTrains.Disabled -> stringResource(string.avoid_missing_trains_disabled)
+        AvoidMissingTrains.Always -> stringResource(string.avoid_missing_trains_always)
+        AvoidMissingTrains.OffPeak -> stringResource(string.avoid_missing_trains_off_peak)
+    }
+
+val AvoidMissingTrains.subtitle: StringResource?
+    get() = when (this) {
+        AvoidMissingTrains.Disabled -> null
+        AvoidMissingTrains.Always -> null
+        AvoidMissingTrains.OffPeak -> {
+            if (is24HourClock()) {
+                string.avoid_missing_trains_off_peak_description_24_hour
+            } else {
+                string.avoid_missing_trains_off_peak_description_12_hour
+            }
+        }
     }
 
 @Composable

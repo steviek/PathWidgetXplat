@@ -63,6 +63,15 @@ class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
             }
 
         SettingsManager
+            .avoidMissingTrains
+            .drop(1)
+            .distinctUntilChanged()
+            .flowOn(Dispatchers.Default)
+            .collect(scope) {
+                fetchData(force = false)
+            }
+
+        SettingsManager
             .locationSetting
             .drop(1)
             .distinctUntilChanged()
@@ -72,7 +81,6 @@ class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
                 // Force a refresh whenever location is enabled (with permission).
                 fetchData(force = true)
             }
-
 
         fetchData.collectLatest(scope) {
             if (it.isFetching || it.hasError) return@collectLatest

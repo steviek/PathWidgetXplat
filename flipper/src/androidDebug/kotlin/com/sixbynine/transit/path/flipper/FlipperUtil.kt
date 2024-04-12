@@ -7,6 +7,7 @@ import com.facebook.flipper.plugins.inspector.InspectorFlipperPlugin
 import com.facebook.flipper.plugins.network.FlipperOkhttpInterceptor
 import com.facebook.flipper.plugins.network.NetworkFlipperPlugin
 import com.facebook.flipper.plugins.sharedpreferences.SharedPreferencesFlipperPlugin
+import com.facebook.flipper.plugins.sharedpreferences.SharedPreferencesFlipperPlugin.SharedPreferencesDescriptor
 import com.facebook.soloader.SoLoader
 
 object FlipperUtil {
@@ -18,8 +19,12 @@ object FlipperUtil {
 
         val client = AndroidFlipperClient.getInstance(context)
 
+        val sharedPreferencesDescriptors =
+            listOf("path", "widget_data")
+                .map { SharedPreferencesDescriptor(it, Context.MODE_PRIVATE) }
+
         client.addPlugin(InspectorFlipperPlugin(context, DescriptorMapping.withDefaults()))
-        client.addPlugin(SharedPreferencesFlipperPlugin(context, "path"))
+        client.addPlugin(SharedPreferencesFlipperPlugin(context, sharedPreferencesDescriptors))
         client.addPlugin(networkPlugin)
 
         client.start()

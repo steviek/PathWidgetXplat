@@ -8,6 +8,7 @@ import com.sixbynine.transit.path.app.external.ExternalRoutingManager
 import com.sixbynine.transit.path.app.external.shareAppToSystem
 import com.sixbynine.transit.path.app.settings.SettingsManager
 import com.sixbynine.transit.path.app.ui.BaseViewModel
+import com.sixbynine.transit.path.app.ui.settings.SettingsContract.BottomSheetType.AvoidMissingTrains
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.BottomSheetType.Lines
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.BottomSheetType.StationLimit
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.BottomSheetType.StationSort
@@ -16,6 +17,8 @@ import com.sixbynine.transit.path.app.ui.settings.SettingsContract.BottomSheetTy
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Effect
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Effect.GoBack
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent
+import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.AvoidMissingTrainsChanged
+import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.AvoidMissingTrainsClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.BackClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.BottomSheetDismissed
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.BuyMeACoffeeClicked
@@ -52,6 +55,7 @@ class SettingsViewModel : BaseViewModel<State, Intent, Effect>(createInitialStat
         updateStateOnEach(SettingsManager.stationLimit) { copy(stationLimit = it) }
         updateStateOnEach(SettingsManager.stationSort) { copy(stationSort = it) }
         updateStateOnEach(SettingsManager.displayPresumedTrains) { copy(showPresumedTrains = it) }
+        updateStateOnEach(SettingsManager.avoidMissingTrains) { copy(avoidMissingTrains = it) }
         if (LocationProvider().isLocationSupportedByDevice) {
             updateStateOnEach(SettingsManager.locationSetting) {
                 copy(
@@ -87,7 +91,8 @@ class SettingsViewModel : BaseViewModel<State, Intent, Effect>(createInitialStat
             }
 
             is LineFilterToggled -> {
-                val newLineFilters = state.value.lines.withElementPresent(intent.filter, intent.isChecked)
+                val newLineFilters =
+                    state.value.lines.withElementPresent(intent.filter, intent.isChecked)
                 SettingsManager.updateLineFilters(newLineFilters)
             }
 
@@ -108,6 +113,11 @@ class SettingsViewModel : BaseViewModel<State, Intent, Effect>(createInitialStat
 
             is LocationSettingChanged -> {
                 SettingsManager.updateLocationSetting(intent.use)
+            }
+
+            is AvoidMissingTrainsChanged -> {
+                SettingsManager.updateAvoidMissingTrains(intent.option)
+                updateState { copy(bottomSheet = null) }
             }
 
             BackClicked -> sendEffect(GoBack)
@@ -134,6 +144,10 @@ class SettingsViewModel : BaseViewModel<State, Intent, Effect>(createInitialStat
 
             LinesClicked -> {
                 updateState { copy(bottomSheet = Lines) }
+            }
+
+            AvoidMissingTrainsClicked -> {
+                updateState { copy(bottomSheet = AvoidMissingTrains) }
             }
 
             RateAppClicked -> {
@@ -178,6 +192,7 @@ class SettingsViewModel : BaseViewModel<State, Intent, Effect>(createInitialStat
                 stationSort = SettingsManager.stationSort.value,
                 showPresumedTrains = SettingsManager.displayPresumedTrains.value,
                 hasLocationPermission = LocationProvider().hasLocationPermission(),
+                avoidMissingTrains = SettingsManager.avoidMissingTrains.value
             )
         }
     }

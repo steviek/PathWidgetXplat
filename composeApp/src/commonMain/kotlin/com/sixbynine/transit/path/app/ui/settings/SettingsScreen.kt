@@ -23,6 +23,8 @@ import com.sixbynine.transit.path.app.ui.icon.IconType
 import com.sixbynine.transit.path.app.ui.icon.NativeIconButton
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.BottomSheetType
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Effect.GoBack
+import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.AvoidMissingTrainsChanged
+import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.AvoidMissingTrainsClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.BuyMeACoffeeClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.LocationSettingChanged
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.RateAppClicked
@@ -36,6 +38,7 @@ import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.TimeDi
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.LocationSettingState
 import org.jetbrains.compose.resources.stringResource
 import pathwidgetxplat.composeapp.generated.resources.Res.string
+import pathwidgetxplat.composeapp.generated.resources.avoid_missing_trains
 import pathwidgetxplat.composeapp.generated.resources.back
 import pathwidgetxplat.composeapp.generated.resources.buy_me_a_coffee
 import pathwidgetxplat.composeapp.generated.resources.closest_station_setting_subtitle
@@ -99,6 +102,8 @@ fun SettingsScope.Content() {
 
             StationLimitSection()
 
+            AvoidMissingTrainsSection()
+
             HorizontalDivider()
 
             SettingsItem(stringResource(string.rate_app)) { onIntent(RateAppClicked) }
@@ -146,6 +151,13 @@ fun SettingsScope.Content() {
                 onIntent(SettingsContract.Intent.LineFilterToggled(line, isChecked))
             },
         )
+
+        AvoidMissingTrainsBottomSheet(
+            isShown = state.bottomSheet == BottomSheetType.AvoidMissingTrains,
+            option = state.avoidMissingTrains,
+            onDismiss = { onIntent(SettingsContract.Intent.BottomSheetDismissed) },
+            onOptionClicked = { onIntent(AvoidMissingTrainsChanged(it)) },
+        )
     }
 }
 
@@ -191,6 +203,15 @@ private fun SettingsScope.StationLimitSection() {
         title = stringResource(string.settings_header_station_filter),
         subtitle = stringResource(state.stationLimit.displayName),
         onClick = { onIntent(StationLimitClicked) }
+    )
+}
+
+@Composable
+private fun SettingsScope.AvoidMissingTrainsSection() {
+    SettingsItem(
+        title = stringResource(string.avoid_missing_trains),
+        subtitle = state.avoidMissingTrains.displayName,
+        onClick = { onIntent(AvoidMissingTrainsClicked) }
     )
 }
 

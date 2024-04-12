@@ -9,22 +9,27 @@ import com.sixbynine.transit.path.api.path.PathRepository.PathServiceResults
 import com.sixbynine.transit.path.app.ui.ColorWrapper
 import com.sixbynine.transit.path.app.ui.Colors
 import com.sixbynine.transit.path.util.suspendRunCatching
-import kotlinx.datetime.Clock.System
+import kotlinx.datetime.Instant
 
 internal class PathApiImpl : PathApi {
 
     override suspend fun fetchUpcomingDepartures(
-        force: Boolean
+        now: Instant,
+        force: Boolean,
     ): Result<Map<String, List<DepartureBoardTrain>>> {
-        return PathRepository.getResults(force).mapCatching { results -> resultsToMap(results) }
+        return PathRepository.getResults(force)
+            .mapCatching { results -> resultsToMap(now, results) }
     }
 
-    override suspend fun getLastSuccessfulUpcomingDepartures(): Map<String, List<DepartureBoardTrain>>? {
+    override suspend fun getLastSuccessfulUpcomingDepartures(now: Instant): Map<String, List<DepartureBoardTrain>>? {
         val cachedResults = PathRepository.getCachedResults() ?: return null
-        return suspendRunCatching { resultsToMap(cachedResults) }.getOrNull()
+        return suspendRunCatching { resultsToMap(now, cachedResults) }.getOrNull()
     }
 
-    private fun resultsToMap(results: PathServiceResults): Map<String, List<DepartureBoardTrain>> {
+    private fun resultsToMap(
+        now: Instant,
+        results: PathServiceResults
+    ): Map<String, List<DepartureBoardTrain>> {
         return results.results.associate { result ->
             val trains = result.destinations
                 .flatMap { destination ->
@@ -38,7 +43,7 @@ internal class PathApiImpl : PathApi {
                         DepartureBoardTrain(
                             headsign = it.headSign,
                             projectedArrival = (it.lastUpdated + it.durationToArrival)
-                                .coerceAtLeast(System.now()),
+                                .coerceAtLeast(now),
                             lineColors = colors,
                             isDelayed = it.arrivalTimeMessage == "Delayed",
                             backfillSource = null,

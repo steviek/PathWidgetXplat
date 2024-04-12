@@ -10,6 +10,7 @@ import com.sixbynine.transit.path.api.alerts.Schedule
 import com.sixbynine.transit.path.api.alerts.TrainFilter
 import com.sixbynine.transit.path.api.alerts.hidesTrain
 import com.sixbynine.transit.path.api.alerts.isActiveAt
+import com.sixbynine.transit.path.api.alerts.isDisplayedAt
 import com.sixbynine.transit.path.util.JsonFormat
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.DayOfWeek.FRIDAY
@@ -36,8 +37,8 @@ class GithubAlertsTest {
     @Test
     fun `current alerts text`() {
         val alerts = GithubAlerts(
-            GeneralGroveStAlert,
             April12GroveStAlert,
+            GeneralGroveStAlert,
             GeneralOvernightCleaning,
         )
 
@@ -178,6 +179,13 @@ class GithubAlertsTest {
         assertTrue(alert.isActiveAt(LocalDateTime(2024, APRIL, 15, 10, 0)))
         assertTrue(alert.isActiveAt(LocalDateTime(2024, JUNE, 30, 8, 0)))
         assertFalse(alert.isActiveAt(LocalDateTime(2024, JUNE, 30, 11, 0)))
+    }
+
+    @Test
+    fun `active at once with grove alert`() {
+        val alert = April12GroveStAlert
+
+        assertTrue(alert.isDisplayedAt(LocalDateTime(2024, APRIL, 12, 18, 0)))
     }
 
     @Test

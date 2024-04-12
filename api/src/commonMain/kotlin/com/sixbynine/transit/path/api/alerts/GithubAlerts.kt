@@ -186,6 +186,10 @@ fun Alert.isActiveAt(dateTime: LocalDateTime): Boolean {
 
 fun Alert.isDisplayedNow(): Boolean {
     val dateTime = now().toLocalDateTime(NewYorkTimeZone)
+    return isDisplayedAt(dateTime)
+}
+
+fun Alert.isDisplayedAt(dateTime: LocalDateTime): Boolean {
     return displaySchedule?.isActiveAt(dateTime) == true || isActiveAt(dateTime)
 }
 

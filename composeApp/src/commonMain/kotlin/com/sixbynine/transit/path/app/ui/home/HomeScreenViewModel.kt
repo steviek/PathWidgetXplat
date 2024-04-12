@@ -301,7 +301,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
                 val station =
                     Stations.All.firstOrNull { it.pathApiName == data.id }
                         ?: return@mapNotNull null
-                val alertToDisplay = data.alerts?.firstOrNull()?.takeIf { it.isDisplayedNow() }
+                val alertToDisplay = data.alerts?.firstOrNull { it.isDisplayedNow() }
                 val stationData = StationData(
                     station = station,
                     trains = data.trains

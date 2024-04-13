@@ -19,11 +19,11 @@
       "message": {
         "localizations": [
           {
-            "text": "NOTE: Starting at 3 AM on Sunday, April 14, all trains will stop at Grove Street Station to accommodate riders participating in the Jersey City Marathon. Due to construction, World Trade Center- and 33 St.-bound trains will not stop at Grove Street Station for most weekends between April 6 and June 30, 2024 from 6 AM Saturday - 11:59 PM Sunday, requiring customers to take detours for service to that station.",
+            "text": "World Trade Center- and 33 St.-bound trains will not stop at Grove Street from 6 AM Saturday - 3 AM Sunday during the weekend of April 13-14.\n\nNote: Trains will be stopping at Grove St on Sunday due to the Jersey City marathon",
             "locale": "en"
           },
           {
-            "text": "NOTA: A partir de las 3 a. m. del domingo 14 de abril, todos los trenes pararán en la estación Grove Street para acomodar a los pasajeros que participen en el maratón de la ciudad de Jersey. Debido a construcción, los trenes con destino al World Trade Center y a 33 Street no pararán en la estación Grove Street durante la mayoría de los fines de semana entre el 6 de abril y el 30 de junio, desde las 6 a. m. del sábado hasta las 11:59 p. m. del domingo , lo que requerirá que los clientes tomen desvíos para el servicio a esa estación.",
+            "text": "Los trenes con destino al World Trade Center y a 33 Street no pararán en la estación Grove Street desde las 6 de la mañana sábado hasta las 3 de la mañana domingo esta fin de semana",
             "locale": "es"
           }
         ]

@@ -258,8 +258,8 @@ class GithubAlertsTest {
             ),
             trains = TrainFilter.headSigns("World Trade", "33rd"),
             message = AlertText(
-                en = "World Trade Center- and 33 St.-bound trains will not stop at Grove Street from 6 AM Saturday - 3 AM Sunday during the weekend of April 13-14.\n\nNote: Trains will be stopping at Grove St on Sunday due to the Jersey City marathon",
-                es = "Los trenes con destino al World Trade Center y a 33 Street no pararán en la estación Grove Street desde las 6 de la mañana sábado hasta las 3 de la mañana domingo esta fin de semana"
+                en = "Note: Trains ARE stopping at Grove St on Sunday due to the Jersey City marathon\n\nWorld Trade Center- and 33 St.-bound trains will not stop at Grove Street from 6 AM Saturday - 3 AM Sunday during the weekend of April 13-14.",
+                es = "Nota: Los trenes PARAN en Grove St el domingo debido al maratón de Jersey City\n\nLos trenes con destino al World Trade Center y a 33 Street no pararán en la estación Grove Street desde las 6 de la mañana sábado hasta las 3 de la mañana domingo esta fin de semana"
             ),
             url = AlertText(
                 en = "https://www.panynj.gov/path/en/modernizing-path/grove-st-improvements/grove-street-bypass-schedule.html"

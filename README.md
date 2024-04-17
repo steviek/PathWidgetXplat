@@ -1,6 +1,6 @@
 # Departure Widget for PATH
 
-This is a [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html) project targeting Android and iOS. Currently, only the iOS implementation is in this repository, but the the data and networking logic is in the shared code and could be used for Android as well.
+This is a [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html) project targeting Android and iOS.
 
 ## Setup
 

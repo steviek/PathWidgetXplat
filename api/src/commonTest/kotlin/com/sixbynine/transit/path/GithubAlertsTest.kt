@@ -37,7 +37,6 @@ class GithubAlertsTest {
     @Test
     fun `current alerts text`() {
         val alerts = GithubAlerts(
-            April12GroveStAlert,
             GeneralGroveStAlert,
             GeneralOvernightCleaning,
         )
@@ -238,8 +237,8 @@ class GithubAlertsTest {
             ),
             trains = TrainFilter.headSigns("33rd", "World Trade"),
             message = AlertText(
-                en = "Due to construction, World Trade Center- and 33 St.-bound trains will not stop at Grove Street Station for most weekends between April 6 and June 30, 2024 from 6 AM Saturday - 11:59 PM Sunday, requiring customers to take detours for service to that station.",
-                es = "Debido a construcción, los trenes con destino al World Trade Center y a 33 Street no pararán en la estación Grove Street durante la mayoría de los fines de semana entre el 6 de abril y el 30 de junio, desde las 6 a. m. del sábado hasta las 11:59 p. m. del domingo , lo que requerirá que los clientes tomen desvíos para el servicio a esa estación."
+                en = "Due to construction, World Trade Center- and 33 St.-bound trains will not stop at Grove Street Station from 6 AM Saturday - 11:59 PM Sunday.",
+                es = "Debido a construcción, los trenes con destino al World Trade Center y a 33 Street no pararán en la estación Grove Street entre el 6 de abril y el 30 de junio, desde las 6 a. m. del sábado hasta las 11:59 p. m. del domingo."
             ),
             url = AlertText(
                 en = "https://www.panynj.gov/path/en/modernizing-path/grove-st-improvements.html"

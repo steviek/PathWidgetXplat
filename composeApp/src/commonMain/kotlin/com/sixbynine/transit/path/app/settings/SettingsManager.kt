@@ -10,7 +10,7 @@ import com.sixbynine.transit.path.location.LocationPermissionRequestResult.Grant
 import com.sixbynine.transit.path.location.LocationProvider
 import com.sixbynine.transit.path.preferences.IntPersistable
 import com.sixbynine.transit.path.util.combineStates
-import com.sixbynine.transit.path.widget.globalDataStore
+import com.sixbynine.transit.path.util.globalDataStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.collectLatest

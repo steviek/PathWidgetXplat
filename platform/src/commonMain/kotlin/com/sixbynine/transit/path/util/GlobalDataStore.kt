@@ -1,4 +1,4 @@
-package com.sixbynine.transit.path.widget
+package com.sixbynine.transit.path.util
 
 /** Like preferences, but shared between the main app and widgets. */
 // TODO: Unify with preferences and just have a boolean setting.

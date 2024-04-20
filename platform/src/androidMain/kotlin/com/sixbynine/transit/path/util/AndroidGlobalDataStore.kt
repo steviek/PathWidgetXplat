@@ -1,12 +1,12 @@
-package com.sixbynine.transit.path.widget
+package com.sixbynine.transit.path.util
 
 import android.content.Context
-import androidx.core.content.edit
-import com.sixbynine.transit.path.MobilePathApplication
+import android.content.SharedPreferences
+import com.sixbynine.transit.path.PathApplication
 
 object AndroidGlobalDataStore : GlobalDataStore {
     private val prefs =
-        MobilePathApplication.instance.getSharedPreferences("widget_data", Context.MODE_PRIVATE)
+        PathApplication.instance.getSharedPreferences("widget_data", Context.MODE_PRIVATE)
 
     override fun set(key: String, value: String?) {
         prefs.edit {
@@ -48,6 +48,10 @@ object AndroidGlobalDataStore : GlobalDataStore {
         } else {
             null
         }
+    }
+
+    private fun SharedPreferences.edit(block: SharedPreferences.Editor.() -> Unit) {
+        edit().apply { block(this) }.apply()
     }
 }
 

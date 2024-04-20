@@ -1,4 +1,4 @@
-package com.sixbynine.transit.path.widget
+package com.sixbynine.transit.path.util
 
 import platform.Foundation.NSUserDefaults
 

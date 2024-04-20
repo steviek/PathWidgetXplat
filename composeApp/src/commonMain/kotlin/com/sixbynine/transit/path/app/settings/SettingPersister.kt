@@ -4,7 +4,7 @@ import com.sixbynine.transit.path.preferences.IntPersistable
 import com.sixbynine.transit.path.preferences.IntPreferencesKey
 import com.sixbynine.transit.path.preferences.Preferences
 import com.sixbynine.transit.path.preferences.PreferencesKey
-import com.sixbynine.transit.path.widget.globalDataStore
+import com.sixbynine.transit.path.util.globalDataStore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlin.enums.EnumEntries

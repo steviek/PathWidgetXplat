@@ -1,6 +1,5 @@
 package com.sixbynine.transit.path.api.impl
 
-import androidx.compose.ui.graphics.Color
 import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.api.DepartureBoardTrain
 import com.sixbynine.transit.path.api.Line
@@ -11,7 +10,6 @@ import com.sixbynine.transit.path.api.Stations.ExchangePlace
 import com.sixbynine.transit.path.api.Stations.GroveStreet
 import com.sixbynine.transit.path.api.Stations.Newport
 import com.sixbynine.transit.path.api.Stations.WorldTradeCenter
-import com.sixbynine.transit.path.app.ui.ColorWrapper
 import com.sixbynine.transit.path.app.ui.Colors
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
@@ -424,10 +422,6 @@ class TrainBackfillHelperTest {
                 directionState = NewJersey,
                 lines = setOf(Line.NewarkWtc)
             )
-        }
-
-        private fun List<ColorWrapper>.unwrap(): List<Color> {
-            return map { it.color }
         }
     }
 }

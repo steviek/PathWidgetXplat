@@ -13,7 +13,8 @@ class StationDataComparator(
     now: LocalTime = now().toLocalDateTime(TimeZone.currentSystemDefault()).time,
 ) : Comparator<StationData> {
 
-    private val delegate = StationComparator(order, now)
+    // TODO: Fix this
+    private val delegate = StationComparator(order, null, now)
 
     override fun compare(data1: StationData, data2: StationData): Int {
         val first = Stations.All.firstOrNull { it.pathApiName == data1.id } ?: return 0

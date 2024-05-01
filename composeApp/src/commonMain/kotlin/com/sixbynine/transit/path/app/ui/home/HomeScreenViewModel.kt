@@ -47,6 +47,7 @@ import com.sixbynine.transit.path.app.ui.layout.LayoutOptionManager
 import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.util.launchAndReturnUnit
 import com.sixbynine.transit.path.util.repeatEvery
+import com.sixbynine.transit.path.util.runUnless
 import com.sixbynine.transit.path.widget.WidgetData
 import com.sixbynine.transit.path.widget.WidgetDataFormatter
 import kotlinx.coroutines.Dispatchers
@@ -220,7 +221,10 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
             ?.adjustedForLatestSettings()
     }
 
-    private inline fun <T> updateStateOnEach(flow: Flow<T>, crossinline block: suspend State.(T) -> State) {
+    private inline fun <T> updateStateOnEach(
+        flow: Flow<T>,
+        crossinline block: suspend State.(T) -> State
+    ) {
         flow.onEach { updateState { block(it) } }
             .flowOn(Dispatchers.Default)
             .launchIn(viewModelScope)
@@ -242,7 +246,9 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
         val isMorning = hour in 3 until 12
         return copy(
             stations = stations
-                .sortedBy { stationToIndex[it.station.pathApiName] }
+                .runUnless(SettingsManager.stationSort.value == StationSort.Proximity) {
+                    sortedBy { stationToIndex[it.station.pathApiName] }
+                }
                 .sortedBy {
                     if (it.isClosest) return@sortedBy -1
 
@@ -250,7 +256,8 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
                     val isFirst = when (SettingsManager.stationSort.value) {
                         StationSort.NjAm -> isMorning == station.isInNewJersey
                         StationSort.NyAm -> isMorning == station.isInNewYork
-                        else -> return@sortedBy 0
+                        StationSort.Proximity -> return@sortedBy 0
+                        Alphabetical -> return@sortedBy 0
                     }
                     if (isFirst) 0 else 1
                 }

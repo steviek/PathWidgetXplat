@@ -11,6 +11,7 @@ import kotlinx.datetime.toLocalDateTime
 
 class StationComparator(
     private val sort: StationSort?,
+    private val closestStations: List<Station>?,
     private val now: LocalTime =
         Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).time,
 ) : Comparator<Station> {
@@ -24,6 +25,17 @@ class StationComparator(
             }
             StationSort.NyAm -> {
                 compareByState(a, b, isNjFirst = now.hour >= 12)
+            }
+            StationSort.Proximity -> {
+                val aIndex = closestStations?.indexOf(a) ?: -1
+                val bIndex = closestStations?.indexOf(b) ?: -1
+                when {
+                    aIndex == -1 && bIndex == -1 -> StationByDisplayNameComparator.compare(a, b)
+                    aIndex == -1 -> 1
+                    bIndex == -1 -> -1
+                    else -> aIndex.compareTo(bIndex)
+                }
+
             }
         }
     }

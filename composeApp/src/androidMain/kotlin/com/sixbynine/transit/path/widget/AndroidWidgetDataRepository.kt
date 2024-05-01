@@ -2,30 +2,26 @@ package com.sixbynine.transit.path.widget
 
 import android.annotation.SuppressLint
 import android.content.Context
-import com.google.firebase.Firebase
-import com.google.firebase.crashlytics.crashlytics
-import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.MobilePathApplication
 import com.sixbynine.transit.path.api.Line
-import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.StationSort.Alphabetical
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.util.DataResult
-import com.sixbynine.transit.path.util.JsonFormat
+import com.sixbynine.transit.path.util.FetchWithPrevious
 import com.sixbynine.transit.path.util.isFailure
 import com.sixbynine.transit.path.widget.configuration.WidgetConfigurationManager
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.serialization.encodeToString
 
 @SuppressLint("StaticFieldLeak") // application context
 object AndroidWidgetDataRepository {
 
-    private const val WidgetDataKey = "widget_data"
     private const val IsLoadingKey = "is_loading"
     private const val HasErrorKey = "has_error"
     private const val HadInternetKey = "had_internet"
@@ -51,16 +47,15 @@ object AndroidWidgetDataRepository {
             prefs.edit().putBoolean(HadInternetKey, value).apply()
         }
 
-    private var widgetData: WidgetData? = readWidgetData()
-        private set(value) {
-            field = value
-            storeWidgetData(value)
-        }
-
     private var hasLoadedOnce = false
 
-    private var _data = MutableStateFlow(getData())
-    val data = _data.asStateFlow()
+    private val _data = GlobalScope.async {
+        MutableStateFlow(getDataResult(startFetch(force = false).previous?.value))
+
+    }
+    suspend fun getData(): StateFlow<DataResult<WidgetData>> {
+        return _data.await().asStateFlow()
+    }
 
     init {
         GlobalScope.launch {
@@ -70,8 +65,7 @@ object AndroidWidgetDataRepository {
         }
     }
 
-    private fun getData(): DataResult<WidgetData> {
-        val widgetData = widgetData
+    private fun getDataResult(widgetData: WidgetData?): DataResult<WidgetData> {
         return if (isLoading) {
             DataResult.loading(widgetData)
         } else if (hasError || widgetData == null) {
@@ -90,17 +84,31 @@ object AndroidWidgetDataRepository {
             return@coroutineScope
         }
 
+        val (fetch, previous) = startFetch(force)
+
         hasLoadedOnce = true
         isLoading = true
         hasError = false
         hadInternet = true
-        _data.value = getData()
+        _data.await().value = getDataResult(previous?.value)
         DepartureBoardWidget.onDataChanged()
 
+        val result = fetch()
+
+        isLoading = false
+        if (result.isFailure()) {
+            hasError = true
+            hadInternet = result.hadInternet
+        }
+        _data.await().value = result
+        DepartureBoardWidget.onDataChanged()
+    }
+
+    private suspend fun startFetch(force: Boolean): FetchWithPrevious<WidgetData> {
         val anyWidgetsUseLocation =
             WidgetConfigurationManager.getWidgetConfigurations().values.any { it.useClosestStation }
 
-        val result = WidgetDataFetcher.fetchWidgetDataSuspending(
+        return WidgetDataFetcher.fetchWidgetDataWithPrevious(
             limit = Int.MAX_VALUE,
             stations = Stations.All,
             lines = Line.entries,
@@ -109,47 +117,5 @@ object AndroidWidgetDataRepository {
             force = force,
             includeClosestStation = anyWidgetsUseLocation
         )
-
-        isLoading = false
-        if (result.isFailure()) {
-            hasError = true
-            hadInternet = result.hadInternet
-        }
-        widgetData = result.data
-        _data.value = getData()
-        DepartureBoardWidget.onDataChanged()
     }
-
-    private fun readWidgetData(): WidgetData? {
-        val json = prefs.getString(WidgetDataKey, null) ?: return null
-        return try {
-            JsonFormat.decodeFromString(json)
-        } catch (e: Exception) {
-            Firebase.crashlytics.recordException(e)
-            Logging.e("Error decoding widget data", e)
-            null
-        }
-    }
-
-    private fun storeWidgetData(widgetData: WidgetData?) {
-        if (widgetData == null) {
-            prefs.edit().remove(WidgetDataKey).apply()
-            return
-        }
-
-        val json = try {
-            JsonFormat.encodeToString(widgetData)
-        } catch (e: Exception) {
-            Firebase.crashlytics.recordException(e)
-            Logging.e("Error encoding widget data", e)
-            return
-        }
-        prefs.edit().putString(WidgetDataKey, json).apply()
-    }
-
-    data class WidgetDataWithClosestStation(
-        val closestStation: Station?,
-        val widgetData: WidgetData
-    )
-
 }

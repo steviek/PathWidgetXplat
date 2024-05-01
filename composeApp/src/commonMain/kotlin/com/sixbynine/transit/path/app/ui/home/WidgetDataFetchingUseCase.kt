@@ -1,28 +1,19 @@
 package com.sixbynine.transit.path.app.ui.home
 
-import com.sixbynine.transit.path.Logging
-import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.LocationSetting.Disabled
 import com.sixbynine.transit.path.api.LocationSetting.Enabled
 import com.sixbynine.transit.path.api.LocationSetting.EnabledPendingPermission
-import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.app.lifecycle.AppLifecycleObserver
 import com.sixbynine.transit.path.app.settings.SettingsManager
 import com.sixbynine.transit.path.app.station.StationSelectionManager
-import com.sixbynine.transit.path.preferences.BooleanPreferencesKey
-import com.sixbynine.transit.path.preferences.LongPreferencesKey
-import com.sixbynine.transit.path.preferences.Preferences
-import com.sixbynine.transit.path.preferences.StringPreferencesKey
-import com.sixbynine.transit.path.preferences.persisting
 import com.sixbynine.transit.path.time.now
-import com.sixbynine.transit.path.util.DataResult
-import com.sixbynine.transit.path.util.JsonFormat
+import com.sixbynine.transit.path.util.FetchWithPrevious
 import com.sixbynine.transit.path.util.awaitTrue
 import com.sixbynine.transit.path.util.collect
 import com.sixbynine.transit.path.util.collectLatest
+import com.sixbynine.transit.path.util.isFailure
 import com.sixbynine.transit.path.widget.WidgetData
 import com.sixbynine.transit.path.widget.WidgetDataFetcher
-import com.sixbynine.transit.path.widget.fetchWidgetDataSuspending
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -34,11 +25,7 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.datetime.Instant
-import kotlinx.serialization.SerializationException
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
@@ -48,7 +35,9 @@ import kotlin.time.Duration.Companion.minutes
  */
 class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
 
-    private val _fetchData = MutableStateFlow(createInitialFetchData())
+    private val initialFetch = startFetch(force = false)
+
+    private val _fetchData = MutableStateFlow(createInitialFetchData(initialFetch))
     val fetchData = _fetchData.asStateFlow()
 
     init {
@@ -116,47 +105,39 @@ class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
         }
     }
 
-    private fun fetchData(force: Boolean = false) {
-        scope.launch(Dispatchers.Default) {
-            _fetchData.value = _fetchData.value.copy(isFetching = true, hasError = false)
+    private fun fetchData(force: Boolean = false) = scope.launch(Dispatchers.Default) {
+        _fetchData.value = _fetchData.value.copy(isFetching = true, hasError = false)
 
-            fun completeFetch(data: WidgetData?, error: Boolean) {
-                val now = now()
-                storeWidgetData(data)
-                hadError = false
-                lastFetchTime = now
-
-                _fetchData.value = FetchData(
-                    lastFetchTime = now,
-                    nextFetchTime = now + FetchInterval,
-                    data = data,
-                    hasError = error,
-                    isFetching = false
-                )
+        coroutineScope {
+            if (force) {
+                // This is a bit silly, but it feels really unsatisfying to click
+                // 'update now' and not see any sort of loading progress, so make this take
+                // at least half a second.
+                launch { delay(500) }
             }
 
-            withTimeoutOrNull(5000) {
-                val result = coroutineScope {
-                    if (force) {
-                        // This is a bit silly, but it feels really unsatisfying to click
-                        // 'update now' and not see any sort of loading progress, so make this take
-                        // at least half a second.
-                        launch { delay(500) }
-                    }
+            val result = startFetch(force = force).fetch()
 
-                    WidgetDataFetcher.fetchWidgetDataSuspending(
-                        limit = Int.MAX_VALUE,
-                        stations = StationSelectionManager.selection.value.selectedStations,
-                        sort = SettingsManager.stationSort.value,
-                        lines = Line.entries, // filtering happens downstream
-                        filter = TrainFilter.All, // filtering happens downstream
-                        force = force,
-                        includeClosestStation = SettingsManager.locationSetting.value == Enabled
-                    )
-                }
-                completeFetch(result.data, error = result is DataResult.Failure)
-            } ?: run { completeFetch(_fetchData.value.data, error = true)}
+            _fetchData.value = FetchData(
+                lastFetchTime = now(),
+                nextFetchTime = now() + FetchInterval,
+                data = result.data,
+                hasError = result.isFailure(),
+                isFetching = false
+            )
         }
+    }
+
+    private fun startFetch(force: Boolean = false): FetchWithPrevious<WidgetData> {
+        return WidgetDataFetcher.fetchWidgetDataWithPrevious(
+            limit = Int.MAX_VALUE,
+            stations = StationSelectionManager.selection.value.selectedStations,
+            sort = SettingsManager.stationSort.value,
+            lines = SettingsManager.lineFilter.value,
+            filter = SettingsManager.trainFilter.value,
+            force = force,
+            includeClosestStation = SettingsManager.locationSetting.value == Enabled
+        )
     }
 
     data class FetchData(
@@ -171,24 +152,14 @@ class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
     }
 
     private companion object {
-        val LastFetchKey = LongPreferencesKey("last_fetch")
-        val LatestWidgetDataKey = StringPreferencesKey("latest_widget_data")
-        val HadError = BooleanPreferencesKey("had_error")
         val FetchInterval = 1.minutes
 
-        var storedLastFetchTime by persisting(LastFetchKey)
-        var lastFetchTime: Instant?
-            get() = storedLastFetchTime?.let { Instant.fromEpochMilliseconds(it) }
-            set(value) {
-                storedLastFetchTime = value?.toEpochMilliseconds()
-            }
-
-        var hadError by persisting(HadError)
-
-        fun createInitialFetchData(): FetchData {
-            val lastFetchTime = lastFetchTime
+        fun createInitialFetchData(data: FetchWithPrevious<WidgetData>): FetchData {
+            val lastFetch = data.previous
+            val lastFetchAge = lastFetch?.age
+            val lastFetchData = lastFetch?.value
             val now = now()
-            if (lastFetchTime == null || lastFetchTime < now - 10.minutes) {
+            if (lastFetchAge == null || lastFetchAge >= 10.minutes) {
                 return FetchData(
                     lastFetchTime = null,
                     nextFetchTime = now,
@@ -197,36 +168,15 @@ class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
                     isFetching = true,
                 )
             }
-            val nextFetchTime = lastFetchTime + FetchInterval
-            val data = getStoredWidgetData()
+            val nextFetchTime = now + FetchInterval - lastFetchAge
             val isFetching = nextFetchTime <= now
             return FetchData(
-                lastFetchTime,
-                nextFetchTime,
-                data,
-                hasError = !isFetching && hadError == true,
+                lastFetchTime = now - lastFetchAge,
+                nextFetchTime = nextFetchTime,
+                data = lastFetchData,
+                hasError = false,
                 isFetching = isFetching
             )
-        }
-
-        fun getStoredWidgetData(): WidgetData? {
-            val raw = Preferences()[LatestWidgetDataKey] ?: return null
-            return try {
-                JsonFormat.decodeFromString(raw)
-            } catch (e: SerializationException) {
-                Logging.e("Failed to deseralize widget data", e)
-                null
-            }
-        }
-
-        fun storeWidgetData(data: WidgetData?) {
-            val raw = try {
-                Json.encodeToString(data)
-            } catch (e: SerializationException) {
-                Logging.e("Failed to serialize widget data", e)
-                return
-            }
-            Preferences()[LatestWidgetDataKey] = raw
         }
     }
 }

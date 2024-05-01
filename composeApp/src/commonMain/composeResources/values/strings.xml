@@ -75,10 +75,12 @@
     <string name="station_filter_two_per_line">2 trains per line</string>
     <string name="station_order">Station order</string>
     <string name="station_order_fixed">Fixed</string>
+    <string name="station_order_proximity">Location</string>
     <string name="station_order_nj_am_subtext">Show trains from New Jersey first in the morning, and trains from New York first in the evening</string>
     <string name="station_order_nj_am_title">New Jersey commuter</string>
     <string name="station_order_ny_am_subtext">Show trains from New York first in the morning, and trains from New Jersey first in the evening</string>
     <string name="station_order_ny_am_title">New York commuter</string>
+    <string name="station_order_proximity_subtext">Order stations by distance from current location</string>
     <string name="stations">Stations</string>
     <string name="to_destination">%1$s</string>
     <string name="update_footer_text">Updated at %1$s, updating again in %2$s</string>

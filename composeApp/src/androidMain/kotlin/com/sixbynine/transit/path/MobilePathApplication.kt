@@ -20,7 +20,9 @@ class MobilePathApplication : PathApplication() {
         NativeHolder.initialize(
             object : WidgetReloader {
                 override fun reloadWidgets() {
-
+                    GlobalScope.launch {
+                        WidgetRefreshWorker.scheduleOneTime()
+                    }
                 }
             }
         )
@@ -28,7 +30,7 @@ class MobilePathApplication : PathApplication() {
         ActivityRegistry.register(this)
 
         GlobalScope.launch {
-            delay(2.seconds)
+            delay(1.seconds)
             WidgetRefreshWorker.schedule()
         }
     }

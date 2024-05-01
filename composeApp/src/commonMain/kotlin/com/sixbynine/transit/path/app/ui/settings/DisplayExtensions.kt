@@ -11,6 +11,7 @@ import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.StationSort.Alphabetical
 import com.sixbynine.transit.path.api.StationSort.NjAm
 import com.sixbynine.transit.path.api.StationSort.NyAm
+import com.sixbynine.transit.path.api.StationSort.Proximity
 import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.api.TrainFilter.All
 import com.sixbynine.transit.path.api.TrainFilter.Interstate
@@ -49,6 +50,8 @@ import pathwidgetxplat.composeapp.generated.resources.station_order_nj_am_subtex
 import pathwidgetxplat.composeapp.generated.resources.station_order_nj_am_title
 import pathwidgetxplat.composeapp.generated.resources.station_order_ny_am_subtext
 import pathwidgetxplat.composeapp.generated.resources.station_order_ny_am_title
+import pathwidgetxplat.composeapp.generated.resources.station_order_proximity
+import pathwidgetxplat.composeapp.generated.resources.station_order_proximity_subtext
 import kotlin.time.Duration.Companion.minutes
 
 val StationLimit.displayName: StringResource
@@ -66,6 +69,7 @@ val StationSort.title: StringResource
         Alphabetical -> string.station_order_fixed
         NjAm -> string.station_order_nj_am_title
         NyAm -> string.station_order_ny_am_title
+        Proximity -> string.station_order_proximity
     }
 
 val StationSort.subtitle: StringResource?
@@ -73,6 +77,7 @@ val StationSort.subtitle: StringResource?
         Alphabetical -> null
         NjAm -> string.station_order_nj_am_subtext
         NyAm -> string.station_order_ny_am_subtext
+        Proximity -> string.station_order_proximity_subtext
     }
 
 val TimeDisplay.title: StringResource

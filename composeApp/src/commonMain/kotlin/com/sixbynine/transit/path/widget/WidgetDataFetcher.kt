@@ -2,7 +2,7 @@ package com.sixbynine.transit.path.widget
 
 import androidx.compose.ui.graphics.toArgb
 import com.sixbynine.transit.path.Logging
-import com.sixbynine.transit.path.api.DepartureBoardTrain
+import com.sixbynine.transit.path.api.DepartureBoardTrainMap
 import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.PathApi
 import com.sixbynine.transit.path.api.Station
@@ -12,6 +12,7 @@ import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.api.alerts.GithubAlerts
 import com.sixbynine.transit.path.api.alerts.GithubAlertsRepository
 import com.sixbynine.transit.path.api.alerts.hidesTrainAt
+import com.sixbynine.transit.path.api.fetchUpcomingDeparturesWithPrevious
 import com.sixbynine.transit.path.api.isEastOf
 import com.sixbynine.transit.path.api.isInNewJersey
 import com.sixbynine.transit.path.api.isInNewYork
@@ -27,35 +28,41 @@ import com.sixbynine.transit.path.location.LocationCheckResult.NoPermission
 import com.sixbynine.transit.path.location.LocationCheckResult.NoProvider
 import com.sixbynine.transit.path.location.LocationCheckResult.Success
 import com.sixbynine.transit.path.location.LocationProvider
-import com.sixbynine.transit.path.network.NetworkManager
 import com.sixbynine.transit.path.preferences.Preferences
 import com.sixbynine.transit.path.preferences.StringPreferencesKey
 import com.sixbynine.transit.path.time.NewYorkTimeZone
 import com.sixbynine.transit.path.time.now
+import com.sixbynine.transit.path.util.AgedValue
 import com.sixbynine.transit.path.util.DataResult
+import com.sixbynine.transit.path.util.FetchWithPrevious
+import com.sixbynine.transit.path.util.map
+import com.sixbynine.transit.path.util.onFailure
+import com.sixbynine.transit.path.util.onSuccess
+import com.sixbynine.transit.path.util.suspendRunCatching
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.datetime.Clock
+import kotlinx.coroutines.withTimeout
 import kotlinx.datetime.DayOfWeek.SATURDAY
 import kotlinx.datetime.DayOfWeek.SUNDAY
 import kotlinx.datetime.Instant
 import kotlinx.datetime.toLocalDateTime
-import kotlin.coroutines.resume
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 object WidgetDataFetcher {
 
-    private val lastClosestStationKey = StringPreferencesKey("fetcher_lastClosestStation")
-    private var lastClosestStation: Station?
+    private val lastClosestStationsKey = StringPreferencesKey("fetcher_lastClosestStations")
+    private var lastClosestStations: List<Station>?
         get() {
-            val id = Preferences()[lastClosestStationKey] ?: return null
-            return Stations.All.find { it.pathApiName == id }
+            val ids = Preferences()[lastClosestStationsKey]
+            if (ids.isNullOrBlank()) return null
+            return ids.split(",").mapNotNull { id -> Stations.byId(id) }
         }
         set(value) {
-            Preferences()[lastClosestStationKey] = value?.pathApiName
+            Preferences()[lastClosestStationsKey] =
+                value.orEmpty().joinToString(separator = ",") { it.pathApiName }
         }
 
     fun fetchWidgetData(
@@ -68,62 +75,109 @@ object WidgetDataFetcher {
         includeClosestStation: Boolean,
         onSuccess: (WidgetData) -> Unit,
         onFailure: (error: Throwable, hadInternet: Boolean, data: WidgetData?) -> Unit,
-    ) {
-        Logging.initialize()
+    ): AgedValue<WidgetData>? {
+        val (fetch, previous) = fetchWidgetDataWithPrevious(
+            limit,
+            stations,
+            lines,
+            sort,
+            filter,
+            force,
+            includeClosestStation
+        )
         GlobalScope.launch {
-            val now = now()
-            val result = async { PathApi.instance.fetchUpcomingDepartures(now, force) }
-            val deferredGithubAlerts = async { GithubAlertsRepository.getAlerts() }
-
-            val closestStationToUse =
-                if (includeClosestStation) {
-                    when (val locationResult = LocationProvider().tryToGetLocation(3.seconds)) {
-                        NoPermission, NoProvider -> null
-                        is Failure -> lastClosestStation
-                        is Success -> {
-                            Stations.closestTo(locationResult.location)
-                                .also { lastClosestStation = it }
-                        }
-                    }
-                } else {
-                    null
-                }
-
-            var hadInternet = NetworkManager().isConnectedToInternet()
-            val githubAlerts = deferredGithubAlerts.await().getOrNull()
-
-            fun createWidgetData(data: Map<String, List<DepartureBoardTrain>>): WidgetData {
-                return createWidgetData(
-                    now,
-                    limit,
-                    stations,
-                    lines,
-                    sort,
-                    filter,
-                    closestStationToUse,
-                    githubAlerts,
-                    data
-                )
-            }
-
-            result
-                .await()
-                .onSuccess { onSuccess(createWidgetData(it)) }
-                .onFailure {
-                    Logging.e("Failed to fetch", it)
-
-                    if ("Unable to resolve host" in it.message.toString()) {
-                        hadInternet = false
-                    }
-
-                    val lastResults = PathApi.instance.getLastSuccessfulUpcomingDepartures(now)
-                    onFailure(
-                        it,
-                        hadInternet,
-                        lastResults?.let { createWidgetData(it) }
-                    )
-                }
+            fetch().onSuccess(onSuccess).onFailure(onFailure)
         }
+        return previous
+    }
+
+    fun fetchWidgetDataWithPrevious(
+        limit: Int,
+        stations: List<Station>,
+        lines: Collection<Line>,
+        sort: StationSort,
+        filter: TrainFilter,
+        force: Boolean,
+        includeClosestStation: Boolean,
+    ): FetchWithPrevious<WidgetData> {
+        Logging.initialize()
+        val now = now()
+        val (fetchDepartures, previousDepartures) =
+            PathApi.instance.fetchUpcomingDeparturesWithPrevious(now, force)
+        val (fetchGithubAlerts, previousGithubAlerts) = GithubAlertsRepository.getAlerts(now)
+
+        fun createWidgetData(
+            data: DepartureBoardTrainMap,
+            githubAlerts: GithubAlerts?,
+            closestStations: List<Station>?,
+        ): WidgetData {
+            return createWidgetData(
+                now,
+                limit,
+                stations,
+                lines,
+                sort,
+                filter,
+                closestStations,
+                githubAlerts,
+                data
+            )
+        }
+
+        val previous = previousDepartures?.value?.let {
+            AgedValue(
+                previousDepartures.age,
+                createWidgetData(
+                    it,
+                    previousGithubAlerts?.value,
+                    lastClosestStations
+                )
+            )
+        }
+
+        val fetch = suspend {
+            coroutineScope {
+                val githubAlerts = async { fetchGithubAlerts() }
+
+                val stationsByProximity =
+                    if (includeClosestStation) {
+                        when (val locationResult =
+                            LocationProvider().tryToGetLocation(3.seconds)) {
+                            NoPermission, NoProvider -> null
+                            is Failure -> lastClosestStations
+                            is Success -> {
+                                Stations.byProximityTo(locationResult.location)
+                                    .also { lastClosestStations = it }
+                            }
+                        }
+                    } else {
+                        null
+                    }
+
+                fetchDepartures()
+                    .map {
+                        createWidgetData(
+                            it,
+                            githubAlerts.await().data,
+                            stationsByProximity
+                        )
+                    }
+            }
+        }
+        val fetchWithTimeout = suspend {
+            suspendRunCatching {
+                withTimeout(5.seconds) {
+                    fetch()
+                }
+            }
+                .fold(
+                    onSuccess = { it },
+                    onFailure = { cause ->
+                        DataResult.failure(cause, hadInternet = true, data = previous?.value)
+                    }
+                )
+        }
+        return FetchWithPrevious(fetchWithTimeout, previous)
     }
 
     private fun createWidgetData(
@@ -133,16 +187,17 @@ object WidgetDataFetcher {
         lines: Collection<Line>,
         sort: StationSort,
         filter: TrainFilter,
-        closestStationToUse: Station?,
+        closestStations: List<Station>?,
         githubAlerts: GithubAlerts?,
-        data: Map<String, List<DepartureBoardTrain>>
+        data: DepartureBoardTrainMap
     ): WidgetData {
         Logging.d("createWidgetData, stations = ${stations.map { it.pathApiName }}, lines=$lines")
         val adjustedStations = stations.toMutableList()
         val stationDatas = arrayListOf<WidgetData.StationData>()
         val avoidMissingTrains = currentAvoidMissingTrains()
 
-        adjustedStations.sortWith(StationComparator(sort))
+        adjustedStations.sortWith(StationComparator(sort, closestStations))
+        val closestStationToUse = closestStations?.firstOrNull()
         if (closestStationToUse != null) {
             adjustedStations.remove(closestStationToUse)
             adjustedStations.add(0, closestStationToUse)
@@ -152,7 +207,7 @@ object WidgetDataFetcher {
             val stationAlerts =
                 githubAlerts?.alerts?.filter { station.pathApiName in it.stations }.orEmpty()
             val apiTrains =
-                data[station.pathApiName]
+                data.getTrainsAt(station)
                     ?.filterNot { train ->
                         stationAlerts.any { alert ->
                             alert.hidesTrainAt(
@@ -233,9 +288,9 @@ object WidgetDataFetcher {
                 .flatMap { it.signs }
                 .mapNotNull { it.projectedArrivals.maxOrNull() }
                 .minOrNull()
-                ?: (Clock.System.now() + 15.minutes)
+                ?: (now + 15.minutes)
         return WidgetData(
-            fetchTime = Clock.System.now(),
+            fetchTime = now,
             stations = stationDatas.take(limit),
             nextFetchTime = nextFetchTime,
             closestStationId = closestStationToUse?.pathApiName,
@@ -263,12 +318,14 @@ object WidgetDataFetcher {
         now: Instant,
         avoidMissingTrains: AvoidMissingTrains
     ): WidgetData.TrainData {
+        val adjustedArrival =
+            adjustToAvoidMissingTrains(now, projectedArrival, avoidMissingTrains)
+        val delta = projectedArrival - adjustedArrival
         return copy(
-            projectedArrival = adjustToAvoidMissingTrains(
-                now,
-                projectedArrival,
-                avoidMissingTrains
-            )
+            projectedArrival = adjustedArrival,
+            backfillSource = backfillSource?.let { source ->
+                source.copy(projectedArrival = source.projectedArrival - delta)
+            }
         )
     }
 
@@ -298,36 +355,3 @@ object WidgetDataFetcher {
         return projectedDateTime.hour !in 6..9 && projectedDateTime.hour !in 16..19
     }
 }
-
-suspend fun WidgetDataFetcher.fetchWidgetDataSuspending(
-    limit: Int,
-    stations: List<Station>,
-    lines: Collection<Line>,
-    sort: StationSort,
-    filter: TrainFilter,
-    force: Boolean,
-    includeClosestStation: Boolean,
-): DataResult<WidgetData> {
-    return suspendCancellableCoroutine { continuation ->
-        fetchWidgetData(
-            limit,
-            stations,
-            lines,
-            sort,
-            filter,
-            force,
-            includeClosestStation,
-            { continuation.resume(DataResult.success(it)) },
-            { e, hadInternet, data ->
-                continuation.resume(
-                    DataResult.failure(
-                        e,
-                        hadInternet,
-                        data
-                    )
-                )
-            }
-        )
-    }
-}
-

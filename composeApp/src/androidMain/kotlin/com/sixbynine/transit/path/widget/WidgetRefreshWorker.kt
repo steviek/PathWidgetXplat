@@ -5,11 +5,15 @@ import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy.KEEP
+import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType.UNMETERED
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.sixbynine.transit.path.MobilePathApplication
+import com.sixbynine.transit.path.api.PathApi
+import com.sixbynine.transit.path.time.now
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.toJavaDuration
 
@@ -23,6 +27,8 @@ class WidgetRefreshWorker(
             cancel()
         }
 
+        PathApi.instance.fetchUpcomingDepartures(now = now())
+
         glanceIds.forEach { glanceId ->
             DepartureBoardWidget().update(applicationContext, glanceId)
         }
@@ -32,6 +38,7 @@ class WidgetRefreshWorker(
 
     companion object {
         private const val WORK_TAG = "path_widget_refresh"
+        private const val ONE_TIME_WORK_TAG = "path_widget_refresh_one_time"
         private val context get() = MobilePathApplication.instance
         private val glanceAppWidgetManager get() = GlanceAppWidgetManager(context)
 
@@ -57,9 +64,21 @@ class WidgetRefreshWorker(
             workManager.enqueueUniquePeriodicWork(WORK_TAG, KEEP, workRequest)
         }
 
+        suspend fun scheduleOneTime() {
+            if (getGlanceIds().isEmpty()) {
+                cancel()
+                return
+            }
+
+            val workManager = WorkManager.getInstance(context)
+            val workRequest = OneTimeWorkRequestBuilder<WidgetRefreshWorker>().build()
+            workManager.enqueueUniqueWork(ONE_TIME_WORK_TAG, ExistingWorkPolicy.KEEP, workRequest)
+        }
+
         private fun cancel() {
             val workManager = WorkManager.getInstance(context)
             workManager.cancelUniqueWork(WORK_TAG)
+            workManager.cancelUniqueWork(ONE_TIME_WORK_TAG)
         }
     }
 }

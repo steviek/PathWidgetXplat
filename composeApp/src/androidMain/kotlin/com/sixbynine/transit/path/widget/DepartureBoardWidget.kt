@@ -43,6 +43,7 @@ class DepartureBoardWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) = coroutineScope {
         launch { WidgetRefreshWorker.schedule() }
 
+        val data = AndroidWidgetDataRepository.getData()
         provideContent {
             val updateTime =
                 currentState(key = LastUpdateKey)
@@ -56,7 +57,7 @@ class DepartureBoardWidget : GlanceAppWidget() {
                     needsSetup = true
                 )
             } else {
-                val result by AndroidWidgetDataRepository.data.collectAsState()
+                val result by data.collectAsState()
                 WidgetState(
                     result = result.map { it.adjustForConfiguration(configuration) },
                     updateTime,

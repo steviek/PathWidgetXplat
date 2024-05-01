@@ -7,6 +7,7 @@ import com.sixbynine.transit.path.preferences.StringPreferencesKey
 import com.sixbynine.transit.path.preferences.persisting
 import com.sixbynine.transit.path.preferences.persistingInstant
 import com.sixbynine.transit.path.time.now
+import com.sixbynine.transit.path.util.AgedValue
 import com.sixbynine.transit.path.util.JsonFormat
 import com.sixbynine.transit.path.util.suspendRunCatching
 import io.ktor.client.request.get
@@ -29,6 +30,7 @@ object PathRepository {
     private var fetchJob: Job? = null
 
     suspend fun getResults(
+        now: Instant,
         force: Boolean = false
     ): Result<PathServiceResults> = withContext(Dispatchers.IO) {
         var joinedExistingFetch = false
@@ -39,9 +41,9 @@ object PathRepository {
         }
 
         if ((!force || joinedExistingFetch) && hasRecentCachedResponse()) {
-            getCachedResults()?.let {
+            getCachedResults(now)?.let {
                 Logging.d("Returning cached results")
-                return@withContext Result.success(it)
+                return@withContext Result.success(it.value)
             }
         }
 
@@ -70,13 +72,16 @@ object PathRepository {
             .await()
     }
 
-    suspend fun getCachedResults(): PathServiceResults? = withContext(Dispatchers.IO) {
-        val result = suspendRunCatching {
-            val lastPathResponse = lastPathResponse ?: return@suspendRunCatching null
+    fun getCachedResults(
+        now: Instant,
+    ):AgedValue<PathServiceResults>? {
+        val lastPathResponseTime = lastPathResponseTime ?: return null
+        val result = runCatching {
+            val lastPathResponse = lastPathResponse ?: return null
             JsonFormat.decodeFromString<PathServiceResults>(lastPathResponse)
         }
 
-        result.getOrNull()
+       return result.getOrNull()?.let { AgedValue(now - lastPathResponseTime, it) }
     }
 
     private fun hasRecentCachedResponse(): Boolean {

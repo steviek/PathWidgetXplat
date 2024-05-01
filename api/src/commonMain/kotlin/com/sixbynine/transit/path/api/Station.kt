@@ -118,12 +118,19 @@ object Stations {
         ThirtyThirdStreet
     )
 
-    fun closestTo(location: Location): Station {
-        return All
-            .minBy { station ->
-                val dLatitude = station.coordinates.latitude - location.latitude
-                val dLongitude = station.coordinates.longitude - location.longitude
-                dLatitude * dLatitude + dLongitude * dLongitude
-            }
+    private val stationById = All.associateBy { it.pathApiName }
+
+    fun byId(id: String): Station? = stationById[id]
+
+    fun byProximityTo(location: Location): List<Station> {
+        val (sameState, otherState) = All.partition { it.state == location.state }
+        return sameState.sortedBy { it.distanceTo(location) } +
+                otherState.sortedBy { it.distanceTo(location) }
+    }
+
+    private fun Station.distanceTo(location: Location): Double {
+        val dLatitude = coordinates.latitude - location.latitude
+        val dLongitude = coordinates.longitude - location.longitude
+        return dLatitude * dLatitude + dLongitude * dLongitude
     }
 }

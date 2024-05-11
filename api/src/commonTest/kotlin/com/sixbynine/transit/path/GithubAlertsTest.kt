@@ -1,8 +1,11 @@
 package com.sixbynine.transit.path
 
+import com.sixbynine.transit.path.api.Stations.ExchangePlace
+import com.sixbynine.transit.path.api.Stations.FourteenthStreet
 import com.sixbynine.transit.path.api.Stations.GroveStreet
 import com.sixbynine.transit.path.api.Stations.NinthStreet
 import com.sixbynine.transit.path.api.Stations.TwentyThirdStreet
+import com.sixbynine.transit.path.api.Stations.WorldTradeCenter
 import com.sixbynine.transit.path.api.alerts.Alert
 import com.sixbynine.transit.path.api.alerts.AlertText
 import com.sixbynine.transit.path.api.alerts.GithubAlerts
@@ -39,6 +42,8 @@ class GithubAlertsTest {
         val alerts = GithubAlerts(
             GeneralGroveStAlert,
             GeneralOvernightCleaning,
+            FourteenthStreetOvernight,
+            MoreTrains,
         )
 
         val json = JsonFormat.encodeToString(alerts)
@@ -218,6 +223,26 @@ class GithubAlertsTest {
     }
 
     private companion object {
+        val MoreTrains = Alert(
+            stations = listOf(ExchangePlace, WorldTradeCenter),
+            schedule = Schedule(),
+            displaySchedule = Schedule.repeatingDaily(
+                days = listOf(SATURDAY, SUNDAY),
+                start = LocalTime(0, 0),
+                end = LocalTime(0, 0),
+                from = LocalDate(2024, APRIL, 17),
+                to = LocalDate(2024, JUNE, 30),
+            ),
+            trains = TrainFilter(),
+            message = AlertText(
+                en = "Additional service is being provided between World Trade Center and Exchange Place during weekends until June 30",
+                es = "Hay servicio adicional entre World Trade Center y Exchange Place durante los fines de semana hasta el 30 de junio"
+            ),
+            url = AlertText(
+                en = "https://x.com/PATHAlerts/status/1788917634077007880",
+            )
+        )
+
         val GeneralGroveStAlert = Alert(
             stations = listOf(GroveStreet),
             schedule = Schedule.repeatingWeekly(
@@ -288,6 +313,25 @@ class GithubAlertsTest {
             ),
             url = AlertText(
                 en = "https://www.panynj.gov/path/en/schedules-maps.html"
+            )
+        )
+
+        val FourteenthStreetOvernight = Alert(
+            stations = listOf(FourteenthStreet),
+            schedule = Schedule(),
+            displaySchedule = Schedule.repeatingDaily(
+                days = DayOfWeek.values().toList(),
+                start = LocalTime(22, 0),
+                end = LocalTime(7, 0),
+                from = LocalDate(2024, JANUARY, 1),
+                to = LocalDate(2025, DECEMBER, 31),
+            ),
+            trains = TrainFilter(),
+            message = AlertText(
+                en = "During overnight hours all PATH service at the 14 Street Station may operate from the station’s uptown or downtown track.  Signage is posted at the entrance of the station when this single-track operation is in effect.",
+            ),
+            url = AlertText(
+                en = "https://www.panynj.gov/path/en/planned-service-changes.html",
             )
         )
     }

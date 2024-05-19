@@ -155,46 +155,6 @@
           "to": "2025-12-31"
         }
       }
-    },
-    {
-      "stations": [
-        "EXP",
-        "WTC"
-      ],
-      "schedule": {},
-      "trains": {},
-      "message": {
-        "localizations": [
-          {
-            "text": "Additional service is being provided between World Trade Center and Exchange Place during weekends until June 30",
-            "locale": "en"
-          },
-          {
-            "text": "Hay servicio adicional entre World Trade Center y Exchange Place durante los fines de semana hasta el 30 de junio",
-            "locale": "es"
-          }
-        ]
-      },
-      "url": {
-        "localizations": [
-          {
-            "text": "https://x.com/PATHAlerts/status/1788917634077007880",
-            "locale": "en"
-          }
-        ]
-      },
-      "displaySchedule": {
-        "repeatingDaily": {
-          "days": [
-            "SATURDAY",
-            "SUNDAY"
-          ],
-          "start": "00:00",
-          "end": "00:00",
-          "from": "2024-04-17",
-          "to": "2024-06-30"
-        }
-      }
     }
   ]
 }

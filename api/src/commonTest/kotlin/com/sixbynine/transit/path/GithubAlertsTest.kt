@@ -43,7 +43,6 @@ class GithubAlertsTest {
             GeneralGroveStAlert,
             GeneralOvernightCleaning,
             FourteenthStreetOvernight,
-            MoreTrains,
         )
 
         val json = JsonFormat.encodeToString(alerts)

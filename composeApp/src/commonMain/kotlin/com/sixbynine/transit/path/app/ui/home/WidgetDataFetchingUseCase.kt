@@ -1,5 +1,6 @@
 package com.sixbynine.transit.path.app.ui.home
 
+import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.api.LocationSetting.Disabled
 import com.sixbynine.transit.path.api.LocationSetting.Enabled
 import com.sixbynine.transit.path.api.LocationSetting.EnabledPendingPermission
@@ -8,6 +9,7 @@ import com.sixbynine.transit.path.app.settings.SettingsManager
 import com.sixbynine.transit.path.app.station.StationSelectionManager
 import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.util.FetchWithPrevious
+import com.sixbynine.transit.path.util.Staleness
 import com.sixbynine.transit.path.util.awaitTrue
 import com.sixbynine.transit.path.util.collect
 import com.sixbynine.transit.path.util.collectLatest
@@ -28,6 +30,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Encapsulates the logic for what the latest fetched [WidgetData] is and when we should fetch
@@ -35,7 +38,7 @@ import kotlin.time.Duration.Companion.minutes
  */
 class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
 
-    private val initialFetch = startFetch(force = false)
+    private val initialFetch = startFetch(staleness = UnforcedStaleness)
 
     private val _fetchData = MutableStateFlow(createInitialFetchData(initialFetch))
     val fetchData = _fetchData.asStateFlow()
@@ -67,6 +70,7 @@ class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
             .filter { it == Enabled }
             .flowOn(Dispatchers.Default)
             .collect(scope) {
+                Logging.d("Fetching widget data, force for location")
                 // Force a refresh whenever location is enabled (with permission).
                 fetchData(force = true)
             }
@@ -88,11 +92,13 @@ class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
         if (fetchData.value.isFetching) {
             fetchData()
         } else if (shouldFetchForLocationSettingChange()) {
+            Logging.d("Fetching widget data, force for location2")
             fetchData(force = true)
         }
     }
 
     fun fetchNow() {
+        Logging.d("Fetching widget data, force for fetchNow")
         fetchData(force = true)
     }
 
@@ -100,7 +106,7 @@ class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
         val closestStationId = fetchData.value.data?.closestStationId
         return when (SettingsManager.locationSetting.value) {
             Enabled -> closestStationId == null
-            Disabled -> closestStationId != null
+            Disabled -> false
             EnabledPendingPermission -> false
         }
     }
@@ -108,35 +114,34 @@ class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
     private fun fetchData(force: Boolean = false) = scope.launch(Dispatchers.Default) {
         _fetchData.value = _fetchData.value.copy(isFetching = true, hasError = false)
 
-        coroutineScope {
+        val result = coroutineScope {
             if (force) {
                 // This is a bit silly, but it feels really unsatisfying to click
                 // 'update now' and not see any sort of loading progress, so make this take
                 // at least half a second.
-                launch { delay(500) }
+                delay(500)
             }
 
-            val result = startFetch(force = force).fetch()
-
-            _fetchData.value = FetchData(
-                lastFetchTime = now(),
-                nextFetchTime = now() + FetchInterval,
-                data = result.data,
-                hasError = result.isFailure(),
-                isFetching = false
-            )
+            startFetch(if (force) ForcedStaleness else UnforcedStaleness).fetch.await()
         }
+        _fetchData.value = FetchData(
+            lastFetchTime = now(),
+            nextFetchTime = now() + FetchInterval,
+            data = result.data,
+            hasError = result.isFailure(),
+            isFetching = false
+        )
     }
 
-    private fun startFetch(force: Boolean = false): FetchWithPrevious<WidgetData> {
+    private fun startFetch(staleness: Staleness): FetchWithPrevious<WidgetData> {
         return WidgetDataFetcher.fetchWidgetDataWithPrevious(
             limit = Int.MAX_VALUE,
             stations = StationSelectionManager.selection.value.selectedStations,
             sort = SettingsManager.stationSort.value,
             lines = SettingsManager.lineFilter.value,
             filter = SettingsManager.trainFilter.value,
-            force = force,
-            includeClosestStation = SettingsManager.locationSetting.value == Enabled
+            includeClosestStation = SettingsManager.locationSetting.value == Enabled,
+            staleness = staleness,
         )
     }
 
@@ -152,6 +157,8 @@ class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
     }
 
     private companion object {
+        val ForcedStaleness = Staleness(staleAfter = 10.seconds, invalidAfter = 5.minutes)
+        val UnforcedStaleness = Staleness(staleAfter = 30.seconds, invalidAfter = 5.minutes)
         val FetchInterval = 1.minutes
 
         fun createInitialFetchData(data: FetchWithPrevious<WidgetData>): FetchData {

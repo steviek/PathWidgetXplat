@@ -9,6 +9,7 @@ import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.util.DataResult
 import com.sixbynine.transit.path.util.FetchWithPrevious
+import com.sixbynine.transit.path.util.Staleness
 import com.sixbynine.transit.path.util.isFailure
 import com.sixbynine.transit.path.widget.configuration.WidgetConfigurationManager
 import kotlinx.coroutines.GlobalScope
@@ -18,6 +19,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 @SuppressLint("StaticFieldLeak") // application context
 object AndroidWidgetDataRepository {
@@ -93,7 +96,7 @@ object AndroidWidgetDataRepository {
         _data.await().value = getDataResult(previous?.value)
         DepartureBoardWidget.onDataChanged()
 
-        val result = fetch()
+        val result = fetch.await()
 
         isLoading = false
         if (result.isFailure()) {
@@ -114,8 +117,11 @@ object AndroidWidgetDataRepository {
             lines = Line.entries,
             sort = Alphabetical,
             filter = TrainFilter.All,
-            force = force,
-            includeClosestStation = anyWidgetsUseLocation
+            includeClosestStation = anyWidgetsUseLocation,
+            staleness = Staleness(
+                staleAfter = if (force) 5.seconds else 30.seconds,
+                invalidAfter = Duration.INFINITE, // Always show old data while loading widget.
+            )
         )
     }
 }

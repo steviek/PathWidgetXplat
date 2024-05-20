@@ -10,7 +10,6 @@ import com.sixbynine.transit.path.PreviewTheme
 import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.TrainFilter.Interstate
-import com.sixbynine.transit.path.app.settings.AvoidMissingTrains.OffPeak
 import com.sixbynine.transit.path.app.settings.StationLimit
 import com.sixbynine.transit.path.app.settings.TimeDisplay.Relative
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.LocationSettingState
@@ -31,7 +30,6 @@ fun SettingsScreenPreview() {
                 stationSort = StationSort.Alphabetical,
                 showPresumedTrains = false,
                 hasLocationPermission = false,
-                avoidMissingTrains = OffPeak,
             ),
             onIntent = { intent ->
                 when (intent) {

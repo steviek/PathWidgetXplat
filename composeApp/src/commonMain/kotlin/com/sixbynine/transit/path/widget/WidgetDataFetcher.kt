@@ -12,7 +12,6 @@ import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.api.alerts.GithubAlerts
 import com.sixbynine.transit.path.api.alerts.GithubAlertsRepository
 import com.sixbynine.transit.path.api.alerts.hidesTrainAt
-import com.sixbynine.transit.path.api.fetchUpcomingDeparturesWithPrevious
 import com.sixbynine.transit.path.api.isEastOf
 import com.sixbynine.transit.path.api.isInNewJersey
 import com.sixbynine.transit.path.api.isInNewYork
@@ -35,6 +34,7 @@ import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.util.AgedValue
 import com.sixbynine.transit.path.util.DataResult
 import com.sixbynine.transit.path.util.FetchWithPrevious
+import com.sixbynine.transit.path.util.Staleness
 import com.sixbynine.transit.path.util.map
 import com.sixbynine.transit.path.util.onFailure
 import com.sixbynine.transit.path.util.onSuccess
@@ -71,8 +71,8 @@ object WidgetDataFetcher {
         lines: Collection<Line>,
         sort: StationSort,
         filter: TrainFilter,
-        force: Boolean,
         includeClosestStation: Boolean,
+        staleness: Staleness,
         onSuccess: (WidgetData) -> Unit,
         onFailure: (error: Throwable, hadInternet: Boolean, data: WidgetData?) -> Unit,
     ): AgedValue<WidgetData>? {
@@ -82,11 +82,11 @@ object WidgetDataFetcher {
             lines,
             sort,
             filter,
-            force,
-            includeClosestStation
+            includeClosestStation,
+            staleness,
         )
         GlobalScope.launch {
-            fetch().onSuccess(onSuccess).onFailure(onFailure)
+            fetch.await().onSuccess(onSuccess).onFailure(onFailure)
         }
         return previous
     }
@@ -97,14 +97,14 @@ object WidgetDataFetcher {
         lines: Collection<Line>,
         sort: StationSort,
         filter: TrainFilter,
-        force: Boolean,
         includeClosestStation: Boolean,
+        staleness: Staleness,
     ): FetchWithPrevious<WidgetData> {
         Logging.initialize()
         val now = now()
-        val (fetchDepartures, previousDepartures) =
-            PathApi.instance.fetchUpcomingDeparturesWithPrevious(now, force)
-        val (fetchGithubAlerts, previousGithubAlerts) = GithubAlertsRepository.getAlerts(now)
+        val (departures, previousDepartures) =
+            PathApi.instance.getUpcomingDepartures(now, staleness)
+        val (githubAlerts, previousGithubAlerts) = GithubAlertsRepository.getAlerts(now)
 
         fun createWidgetData(
             data: DepartureBoardTrainMap,
@@ -135,10 +135,8 @@ object WidgetDataFetcher {
             )
         }
 
-        val fetch = suspend {
+        val fetch = GlobalScope.async {
             coroutineScope {
-                val githubAlerts = async { fetchGithubAlerts() }
-
                 val stationsByProximity =
                     if (includeClosestStation) {
                         when (val locationResult =
@@ -154,7 +152,7 @@ object WidgetDataFetcher {
                         null
                     }
 
-                fetchDepartures()
+                departures.await()
                     .map {
                         createWidgetData(
                             it,
@@ -164,10 +162,10 @@ object WidgetDataFetcher {
                     }
             }
         }
-        val fetchWithTimeout = suspend {
+        val fetchWithTimeout = GlobalScope.async {
             suspendRunCatching {
                 withTimeout(5.seconds) {
-                    fetch()
+                    fetch.await()
                 }
             }
                 .fold(

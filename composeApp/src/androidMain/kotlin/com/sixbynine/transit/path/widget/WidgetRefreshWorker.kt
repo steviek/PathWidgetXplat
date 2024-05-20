@@ -14,7 +14,11 @@ import androidx.work.WorkerParameters
 import com.sixbynine.transit.path.MobilePathApplication
 import com.sixbynine.transit.path.api.PathApi
 import com.sixbynine.transit.path.time.now
+import com.sixbynine.transit.path.util.Staleness
+import com.sixbynine.transit.path.util.await
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toJavaDuration
 
 class WidgetRefreshWorker(
@@ -27,7 +31,12 @@ class WidgetRefreshWorker(
             cancel()
         }
 
-        PathApi.instance.fetchUpcomingDepartures(now = now())
+        PathApi.instance
+            .getUpcomingDepartures(
+                now = now(),
+                staleness = Staleness(staleAfter = 30.seconds, invalidAfter = Duration.INFINITE)
+            )
+            .await()
 
         glanceIds.forEach { glanceId ->
             DepartureBoardWidget().update(applicationContext, glanceId)

@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
+import com.sixbynine.transit.path.app.ui.advancedsettings.AdvancedSettingsScreen
 import com.sixbynine.transit.path.app.ui.home.HomeScreen
 import com.sixbynine.transit.path.app.ui.settings.SettingScreen
 import com.sixbynine.transit.path.app.ui.setup.SetupScreen
@@ -46,6 +47,10 @@ fun App() {
 
                     scene("/settings") {
                         SettingScreen()
+                    }
+
+                    scene("/advanced_settings") {
+                        AdvancedSettingsScreen()
                     }
                 }
             }

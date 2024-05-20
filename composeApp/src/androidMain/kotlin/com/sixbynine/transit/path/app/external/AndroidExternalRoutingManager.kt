@@ -24,6 +24,7 @@ object AndroidExternalRoutingManager : ExternalRoutingManager {
             data = Uri.parse("mailto:")
             putExtra(Intent.EXTRA_EMAIL, arrayOf(FeedbackEmail))
             putExtra(Intent.EXTRA_SUBJECT, getString(string.app_name))
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }
 
         return runCatching { activity.startActivity(intent) }.isSuccess

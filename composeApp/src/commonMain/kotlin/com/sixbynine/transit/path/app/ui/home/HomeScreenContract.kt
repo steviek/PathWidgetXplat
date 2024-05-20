@@ -38,7 +38,8 @@ object HomeScreenContract {
         val trains: List<TrainData>,
         val isClosest: Boolean,
         val alertText: String?,
-        val alertUrl: String?
+        val alertUrl: String?,
+        val alertIsWarning: Boolean,
     ) {
         val id get() = station.pathApiName
         val state get() = station.state

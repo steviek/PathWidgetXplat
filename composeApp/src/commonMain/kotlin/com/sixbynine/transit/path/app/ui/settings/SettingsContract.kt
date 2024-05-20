@@ -3,7 +3,6 @@ package com.sixbynine.transit.path.app.ui.settings
 import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.TrainFilter
-import com.sixbynine.transit.path.app.settings.AvoidMissingTrains
 import com.sixbynine.transit.path.app.settings.StationLimit
 import com.sixbynine.transit.path.app.settings.TimeDisplay
 import com.sixbynine.transit.path.app.ui.ScreenScope
@@ -19,13 +18,12 @@ object SettingsContract {
         val stationLimit: StationLimit,
         val stationSort: StationSort,
         val showPresumedTrains: Boolean,
-        val avoidMissingTrains: AvoidMissingTrains,
         val bottomSheet: BottomSheetType? = null,
         val hasLocationPermission: Boolean,
     )
 
     enum class BottomSheetType {
-        StationLimit, StationSort, TimeDisplay, TrainFilter, Lines, AvoidMissingTrains
+        StationLimit, StationSort, TimeDisplay, TrainFilter, Lines
     }
 
     enum class LocationSettingState {
@@ -40,23 +38,23 @@ object SettingsContract {
         data class StationLimitSelected(val limit: StationLimit) : Intent
         data class ShowPresumedTrainsChanged(val show: Boolean) : Intent
         data class LocationSettingChanged(val use: Boolean) : Intent
-        data class AvoidMissingTrainsChanged(val option: AvoidMissingTrains) : Intent
         data object StationLimitClicked : Intent
         data object StationSortClicked : Intent
         data object TimeDisplayClicked : Intent
         data object TrainFilterClicked : Intent
         data object LinesClicked : Intent
-        data object AvoidMissingTrainsClicked : Intent
         data object BottomSheetDismissed : Intent
         data object BackClicked : Intent
         data object SendFeedbackClicked : Intent
         data object RateAppClicked : Intent
         data object ShareAppClicked : Intent
         data object BuyMeACoffeeClicked : Intent
+        data object AdvancedSettingsClicked : Intent
     }
 
     sealed interface Effect {
         data object GoBack : Effect
+        data object GoToAdvancedSettings : Effect
     }
 }
 

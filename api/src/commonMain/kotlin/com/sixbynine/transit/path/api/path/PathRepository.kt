@@ -3,21 +3,24 @@ package com.sixbynine.transit.path.api.path
 import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.api.NetworkException
 import com.sixbynine.transit.path.api.createHttpClient
+import com.sixbynine.transit.path.network.NetworkManager
 import com.sixbynine.transit.path.preferences.StringPreferencesKey
 import com.sixbynine.transit.path.preferences.persisting
 import com.sixbynine.transit.path.preferences.persistingInstant
-import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.util.AgedValue
+import com.sixbynine.transit.path.util.DataResult
+import com.sixbynine.transit.path.util.FetchWithPrevious
+import com.sixbynine.transit.path.util.IoScope
 import com.sixbynine.transit.path.util.JsonFormat
+import com.sixbynine.transit.path.util.Staleness
 import com.sixbynine.transit.path.util.suspendRunCatching
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.isSuccess
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeout
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
@@ -27,66 +30,86 @@ object PathRepository {
     private val httpClient = createHttpClient()
     private var lastPathResponse by persisting(StringPreferencesKey("last_success"))
     private var lastPathResponseTime by persistingInstant("last_success_time")
-    private var fetchJob: Job? = null
+    private var ongoingFetch: Deferred<DataResult<PathServiceResults>>? = null
+    private val mutex = Mutex()
 
-    suspend fun getResults(
-        now: Instant,
-        force: Boolean = false
-    ): Result<PathServiceResults> = withContext(Dispatchers.IO) {
-        var joinedExistingFetch = false
-        fetchJob?.takeIf { it.isActive }?.let {
-            Logging.d("Join existing fetch")
-            it.join()
-            joinedExistingFetch = true
-        }
-
-        if ((!force || joinedExistingFetch) && hasRecentCachedResponse()) {
-            getCachedResults(now)?.let {
-                Logging.d("Returning cached results")
-                return@withContext Result.success(it.value)
-            }
-        }
-
-
-        async {
-            Logging.d("Starting a new fetch")
-            suspendRunCatching {
-                withTimeout(5.seconds) {
-                    val response =
-                        httpClient.get("https://www.panynj.gov/bin/portauthority/ridepath.json")
-
-                    if (!response.status.isSuccess()) {
-                        throw NetworkException(response.status.toString())
-                    }
-
-                    val responseText = response.bodyAsText()
-
-                    lastPathResponseTime = now()
-                    lastPathResponse = responseText
-
-                    JsonFormat.decodeFromString<PathServiceResults>(responseText)
-                }
-            }
-        }
-            .also { fetchJob = it }
-            .await()
+    fun getResults(now: Instant, staleness: Staleness): FetchWithPrevious<PathServiceResults> {
+        Logging.d("getResults, staleAfter: ${staleness.staleAfter}, invalidAfter: ${staleness.invalidAfter}")
+        val previous = getCachedResults(now)
+        return FetchWithPrevious.create(
+            previous = previous,
+            fetch = { fetch(now, previous) },
+            staleness = staleness,
+        )
     }
 
-    fun getCachedResults(
+    private fun fetch(
         now: Instant,
-    ):AgedValue<PathServiceResults>? {
+        previous: AgedValue<PathServiceResults>?
+    ): Deferred<DataResult<PathServiceResults>> {
+        ongoingFetch?.takeIf { it.isActive }?.let {
+            Logging.d("Join existing fetch")
+            return it
+        }
+
+        return IoScope.async {
+            val fetch = mutex.withLock {
+                ongoingFetch?.takeIf { it.isActive }?.let {
+                    Logging.d("Join existing fetch")
+                    return@withLock it
+                }
+
+
+                Logging.d("Starting a new fetch, previous had age of ${previous?.age}")
+
+                async {
+                    suspendRunCatching {
+                        withTimeout(5.seconds) {
+                            val response =
+                                httpClient.get("https://www.panynj.gov/bin/portauthority/ridepath.json")
+
+                            if (!response.status.isSuccess()) {
+                                throw NetworkException(response.status.toString())
+                            }
+
+                            val responseText = response.bodyAsText()
+
+                            lastPathResponseTime = now
+                            lastPathResponse = responseText
+
+                            JsonFormat.decodeFromString<PathServiceResults>(responseText)
+                        }
+                    }
+                        .fold(
+                            onSuccess = { DataResult.success(it) },
+                            onFailure = { error ->
+                                var hadInternet = NetworkManager().isConnectedToInternet()
+
+                                if ("Unable to resolve host" in error.message.toString()) {
+                                    hadInternet = false
+                                }
+                                DataResult.failure(
+                                    error,
+                                    hadInternet = hadInternet,
+                                    data = previous?.value
+                                )
+                            },
+                        )
+                }
+            }
+
+            fetch.await()
+        }
+    }
+
+    private fun getCachedResults(now: Instant): AgedValue<PathServiceResults>? {
         val lastPathResponseTime = lastPathResponseTime ?: return null
         val result = runCatching {
             val lastPathResponse = lastPathResponse ?: return null
             JsonFormat.decodeFromString<PathServiceResults>(lastPathResponse)
         }
 
-       return result.getOrNull()?.let { AgedValue(now - lastPathResponseTime, it) }
-    }
-
-    private fun hasRecentCachedResponse(): Boolean {
-        val lastPathResponseTime = lastPathResponseTime ?: return false
-        return lastPathResponseTime > now() - 15.seconds
+        return result.getOrNull()?.let { AgedValue(now - lastPathResponseTime, it) }
     }
 
     @Serializable

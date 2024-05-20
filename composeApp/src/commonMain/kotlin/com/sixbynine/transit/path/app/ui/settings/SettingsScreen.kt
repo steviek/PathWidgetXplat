@@ -23,8 +23,8 @@ import com.sixbynine.transit.path.app.ui.icon.IconType
 import com.sixbynine.transit.path.app.ui.icon.NativeIconButton
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.BottomSheetType
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Effect.GoBack
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.AvoidMissingTrainsChanged
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.AvoidMissingTrainsClicked
+import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Effect.GoToAdvancedSettings
+import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.AdvancedSettingsClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.BuyMeACoffeeClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.LocationSettingChanged
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.RateAppClicked
@@ -38,7 +38,7 @@ import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.TimeDi
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.LocationSettingState
 import org.jetbrains.compose.resources.stringResource
 import pathwidgetxplat.composeapp.generated.resources.Res.string
-import pathwidgetxplat.composeapp.generated.resources.avoid_missing_trains
+import pathwidgetxplat.composeapp.generated.resources.advanced_settings
 import pathwidgetxplat.composeapp.generated.resources.back
 import pathwidgetxplat.composeapp.generated.resources.buy_me_a_coffee
 import pathwidgetxplat.composeapp.generated.resources.closest_station_setting_subtitle
@@ -63,6 +63,7 @@ fun SettingScreen() {
         onEffect = { effect ->
             when (effect) {
                 is GoBack -> navigator.goBack()
+                is GoToAdvancedSettings -> navigator.navigate("/advanced_settings")
             }
         }
     ) {
@@ -102,7 +103,11 @@ fun SettingsScope.Content() {
 
             StationLimitSection()
 
-            AvoidMissingTrainsSection()
+            SettingsItem(stringResource(string.advanced_settings)) {
+                onIntent(
+                    AdvancedSettingsClicked
+                )
+            }
 
             HorizontalDivider()
 
@@ -150,13 +155,6 @@ fun SettingsScope.Content() {
             onLineCheckedChange = { line, isChecked ->
                 onIntent(SettingsContract.Intent.LineFilterToggled(line, isChecked))
             },
-        )
-
-        AvoidMissingTrainsBottomSheet(
-            isShown = state.bottomSheet == BottomSheetType.AvoidMissingTrains,
-            option = state.avoidMissingTrains,
-            onDismiss = { onIntent(SettingsContract.Intent.BottomSheetDismissed) },
-            onOptionClicked = { onIntent(AvoidMissingTrainsChanged(it)) },
         )
     }
 }
@@ -207,15 +205,6 @@ private fun SettingsScope.StationLimitSection() {
 }
 
 @Composable
-private fun SettingsScope.AvoidMissingTrainsSection() {
-    SettingsItem(
-        title = stringResource(string.avoid_missing_trains),
-        subtitle = state.avoidMissingTrains.displayName,
-        onClick = { onIntent(AvoidMissingTrainsClicked) }
-    )
-}
-
-@Composable
 private fun SettingsScope.ShowPresumedTrainsSection() {
     SwitchWithText(
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -247,7 +236,7 @@ private fun SettingsScope.LocationSettingSection() {
 }
 
 @Composable
-private fun SettingsItem(title: String, subtitle: String? = null, onClick: () -> Unit) {
+fun SettingsItem(title: String, subtitle: String? = null, onClick: () -> Unit) {
     Column(
         Modifier.clickable(onClick = onClick)
             .padding(vertical = 8.dp)

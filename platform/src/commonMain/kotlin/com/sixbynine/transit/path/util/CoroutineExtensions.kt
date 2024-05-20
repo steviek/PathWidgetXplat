@@ -2,19 +2,40 @@ package com.sixbynine.transit.path.util
 
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.time.Duration
 
-fun CoroutineScope.launchAndReturnUnit(block: suspend () -> Unit): Unit {
+fun CoroutineScope.launchAndReturnUnit(block: suspend () -> Unit) {
     launch { block() }
 }
 
-suspend inline fun <T> suspendRunCatching(block: () -> T): Result<T> {
+inline fun <T> CoroutineScope.asyncCatching(
+    context: CoroutineContext = EmptyCoroutineContext,
+    start: CoroutineStart = CoroutineStart.DEFAULT,
+    crossinline block: suspend () -> T
+): Deferred<Result<T>> = async(context, start) {
+    suspendRunCatching { block() }
+}
+
+inline fun <T> CoroutineScope.asyncCatchingDataResult(
+    context: CoroutineContext = EmptyCoroutineContext,
+    start: CoroutineStart = CoroutineStart.DEFAULT,
+    crossinline block: suspend () -> T
+): Deferred<DataResult<T>> = async(context, start) {
+    suspendRunCatching { block() }.toDataResult()
+}
+
+inline fun <T> suspendRunCatching(block: () -> T): Result<T> {
     return try {
         Result.success(block())
     } catch (e: TimeoutCancellationException) {

@@ -8,7 +8,6 @@ import androidx.glance.ColorFilter.Companion.tint
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
 import androidx.glance.ImageProvider
-import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.layout.Alignment
@@ -46,7 +45,7 @@ fun DepartureBoard(result: DataResult<WidgetData>, modifier: GlanceModifier = Gl
             item {
                 Column(
                     GlanceModifier
-                        .clickable(actionStartActivity<MainActivity>())
+                        .clickable(MainActivity.createAppWidgetLaunchAction())
                         .padding(horizontal = 16.dp)
                 ) {
                     if (index > 0) {

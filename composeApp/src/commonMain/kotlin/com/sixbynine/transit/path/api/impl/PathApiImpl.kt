@@ -9,24 +9,18 @@ import com.sixbynine.transit.path.api.path.PathRepository
 import com.sixbynine.transit.path.api.path.PathRepository.PathServiceResults
 import com.sixbynine.transit.path.app.ui.ColorWrapper
 import com.sixbynine.transit.path.app.ui.Colors
-import com.sixbynine.transit.path.util.AgedValue
+import com.sixbynine.transit.path.util.FetchWithPrevious
+import com.sixbynine.transit.path.util.Staleness
+import com.sixbynine.transit.path.util.map
 import kotlinx.datetime.Instant
 
 internal class PathApiImpl : PathApi {
 
-    override suspend fun fetchUpcomingDepartures(
+    override fun getUpcomingDepartures(
         now: Instant,
-        force: Boolean,
-    ): Result<DepartureBoardTrainMap> {
-        return PathRepository.getResults(now, force)
-            .mapCatching { results -> resultsToMap(now, results) }
-    }
-
-    override fun getLastSuccessfulUpcomingDepartures(
-        now: Instant,
-    ): AgedValue<DepartureBoardTrainMap>? {
-        val (age, cachedResults) = PathRepository.getCachedResults(now) ?: return null
-        return runCatching { AgedValue(age, resultsToMap(now, cachedResults)) }.getOrNull()
+        staleness: Staleness
+    ): FetchWithPrevious<DepartureBoardTrainMap> {
+        return PathRepository.getResults(now, staleness).map { resultsToMap(now, it) }
     }
 
     private fun resultsToMap(

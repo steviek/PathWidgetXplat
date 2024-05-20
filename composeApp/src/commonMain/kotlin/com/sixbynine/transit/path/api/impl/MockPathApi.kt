@@ -11,15 +11,18 @@ import com.sixbynine.transit.path.api.State.NewYork
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.app.ui.Colors
 import com.sixbynine.transit.path.util.AgedValue
+import com.sixbynine.transit.path.util.FetchWithPrevious
+import com.sixbynine.transit.path.util.Staleness
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 internal class MockPathApi : PathApi {
 
-    override suspend fun fetchUpcomingDepartures(
+    override fun getUpcomingDepartures(
         now: Instant,
-        force: Boolean,
-    ): Result<DepartureBoardTrainMap> {
+        staleness: Staleness
+    ): FetchWithPrevious<DepartureBoardTrainMap> {
         val stationsToDepartures = Stations.All.associateWith { station ->
             listOf(
                 DepartureBoardTrain(
@@ -51,12 +54,6 @@ internal class MockPathApi : PathApi {
                 )
             )
         }.mapKeys { it.key.pathApiName }
-        return Result.success(DepartureBoardTrainMap(stationsToDepartures))
-    }
-
-    override fun getLastSuccessfulUpcomingDepartures(
-        now: Instant,
-    ): AgedValue<DepartureBoardTrainMap>? {
-        return null
+        return FetchWithPrevious(AgedValue(0.seconds, DepartureBoardTrainMap(stationsToDepartures)))
     }
 }

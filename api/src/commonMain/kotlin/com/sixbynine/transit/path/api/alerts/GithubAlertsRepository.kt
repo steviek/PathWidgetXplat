@@ -7,17 +7,13 @@ import com.sixbynine.transit.path.preferences.persisting
 import com.sixbynine.transit.path.preferences.persistingInstant
 import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.util.AgedValue
-import com.sixbynine.transit.path.util.DataResult
 import com.sixbynine.transit.path.util.FetchWithPrevious
+import com.sixbynine.transit.path.util.IoScope
 import com.sixbynine.transit.path.util.JsonFormat
-import com.sixbynine.transit.path.util.suspendRunCatching
-import com.sixbynine.transit.path.util.toDataResult
+import com.sixbynine.transit.path.util.asyncCatchingDataResult
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.isSuccess
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.minutes
@@ -38,32 +34,24 @@ object GithubAlertsRepository {
         }.getOrNull()
 
         if (lastResult != null && lastResult.age < 30.minutes) {
-            return FetchWithPrevious(
-                previous = lastResult,
-                fetch = { DataResult.success(lastResult.value) }
-            )
+            return FetchWithPrevious(lastResult)
         }
 
-        val fetch = suspend {
-            withContext(Dispatchers.IO) {
-                suspendRunCatching {
-                    val response = withTimeout(5.seconds) {
-                        httpClient.get(
-                            "https://raw.githubusercontent.com/steviek/PathWidgetXplat/main/alerts.json"
-                        )
-                    }
-
-                    if (!response.status.isSuccess()) {
-                        throw NetworkException(response.status.toString())
-                    }
-
-                    val responseText = response.bodyAsText()
-                    storedAlerts = responseText
-                    storedAlertsTime = now()
-                    JsonFormat.decodeFromString<GithubAlerts>(responseText)
-                }
-                    .toDataResult()
+        val fetch = IoScope.asyncCatchingDataResult {
+            val response = withTimeout(5.seconds) {
+                httpClient.get(
+                    "https://raw.githubusercontent.com/steviek/PathWidgetXplat/main/alerts.json"
+                )
             }
+
+            if (!response.status.isSuccess()) {
+                throw NetworkException(response.status.toString())
+            }
+
+            val responseText = response.bodyAsText()
+            storedAlerts = responseText
+            storedAlertsTime = now()
+            JsonFormat.decodeFromString<GithubAlerts>(responseText)
         }
         return FetchWithPrevious(
             previous = lastResult,

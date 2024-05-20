@@ -9,6 +9,7 @@ import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.TrainFilter.Companion.matchesFilter
 import com.sixbynine.transit.path.api.alerts.AlertText
 import com.sixbynine.transit.path.api.alerts.isDisplayedNow
+import com.sixbynine.transit.path.api.alerts.isWarning
 import com.sixbynine.transit.path.api.isInNewJersey
 import com.sixbynine.transit.path.api.isInNewYork
 import com.sixbynine.transit.path.api.matches
@@ -344,6 +345,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
                             SettingsManager.locationSetting.value == Enabled,
                     alertText = alertToDisplay?.message?.unpack(),
                     alertUrl = alertToDisplay?.url?.unpack(),
+                    alertIsWarning = alertToDisplay?.isWarning == true,
                 )
                 stationData
             }

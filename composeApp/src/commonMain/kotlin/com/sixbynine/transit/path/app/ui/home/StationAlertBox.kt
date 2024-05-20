@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.sixbynine.transit.path.app.ui.gutter
@@ -36,9 +37,10 @@ import pathwidgetxplat.composeapp.generated.resources.expand
 import pathwidgetxplat.composeapp.generated.resources.open_in_browser
 
 @Composable
-fun HomeScreenScope.StationAlertBox(text: String?, url: String?) {
+fun HomeScreenScope.StationAlertBox(text: String?, url: String?, colors: StationAlertBoxColors) {
     text ?: return
     var isExpanded by remember { mutableStateOf(false) }
+
     Box(
         Modifier.padding(horizontal = gutter())
             .padding(bottom = 8.dp)
@@ -46,15 +48,15 @@ fun HomeScreenScope.StationAlertBox(text: String?, url: String?) {
             .fillMaxWidth()
             .animateContentSize()
             .clip(RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.errorContainer)
-            .clickable { isExpanded = !isExpanded}
+            .background(colors.containerColor)
+            .clickable { isExpanded = !isExpanded }
             .border(1.dp, MaterialTheme.colorScheme.onSurfaceVariant, RoundedCornerShape(8.dp)),
         contentAlignment = Alignment.Center
     ) {
         Row(Modifier.fillMaxWidth()) {
             Text(
                 text = text,
-                color = MaterialTheme.colorScheme.onErrorContainer,
+                color = colors.textColor,
                 style = MaterialTheme.typography.bodySmall,
                 maxLines = if (isExpanded) Int.MAX_VALUE else 2,
                 overflow = TextOverflow.Ellipsis,
@@ -88,5 +90,22 @@ fun HomeScreenScope.StationAlertBox(text: String?, url: String?) {
                 buttonSize = 40.dp,
             )
         }
+    }
+}
+
+data class StationAlertBoxColors(val containerColor: Color, val textColor: Color) {
+    companion object {
+        val Warning: StationAlertBoxColors
+            @Composable
+            get() = StationAlertBoxColors(
+                containerColor = MaterialTheme.colorScheme.errorContainer,
+                textColor = MaterialTheme.colorScheme.onErrorContainer
+            )
+        val Info: StationAlertBoxColors
+            @Composable
+            get() = StationAlertBoxColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                textColor = MaterialTheme.colorScheme.onSecondaryContainer
+            )
     }
 }

@@ -233,7 +233,12 @@ private fun HomeScreenScope.DepartureBoard() {
             item(station.id + "-alerts") {
                 StationAlertBox(
                     text = station.alertText,
-                    url = station.alertUrl
+                    url = station.alertUrl,
+                    colors = if (station.alertIsWarning) {
+                        StationAlertBoxColors.Warning
+                    } else {
+                        StationAlertBoxColors.Info
+                    }
                 )
             }
 

@@ -30,6 +30,8 @@ data class Alert(
     val url: AlertText? = null,
     /** When the alert should display in the app. */
     val displaySchedule: Schedule? = null,
+    /** The level of the alert's value. */
+    val level: String? = null,
 )
 
 fun Alert(
@@ -192,6 +194,8 @@ fun Alert.isDisplayedNow(): Boolean {
 fun Alert.isDisplayedAt(dateTime: LocalDateTime): Boolean {
     return displaySchedule?.isActiveAt(dateTime) == true || isActiveAt(dateTime)
 }
+
+val Alert.isWarning: Boolean get() = level == null || level.startsWith("WARN", ignoreCase = true)
 
 fun Schedule.isActiveAt(dateTime: LocalDateTime): Boolean {
     repeatingWeekly?.run {

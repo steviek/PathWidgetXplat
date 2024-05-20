@@ -119,6 +119,11 @@ fun WidgetSetupScreenScope.WidgetSetupScreenContent() {
                         }
 
                         StationSort.entries.forEach { sortOrder ->
+                            if (sortOrder == StationSort.Proximity &&
+                                !StationSort.isProximityEnabled()
+                            ) {
+                                return@forEach
+                            }
                             item(
                                 text = stringResource(sortOrder.title),
                                 subtext = sortOrder.subtitle?.let { stringResource(it) },

@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceModifier
-import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.appWidgetBackground
 import androidx.glance.background
@@ -63,7 +62,7 @@ private fun MainWidgetContent(state: WidgetState) {
             .padding(bottom = WidgetFooterHeight),
         contentAlignment = Alignment.TopCenter
     ) {
-        Spacer(GlanceModifier.fillMaxSize().clickable(actionStartActivity<MainActivity>()))
+        Spacer(GlanceModifier.fillMaxSize().clickable(MainActivity.createAppWidgetLaunchAction()))
 
         DepartureBoard(result = result, modifier = GlanceModifier.fillMaxWidth())
     }

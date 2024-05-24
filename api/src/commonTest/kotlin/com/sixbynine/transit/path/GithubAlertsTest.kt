@@ -13,7 +13,6 @@ import com.sixbynine.transit.path.api.alerts.Schedule
 import com.sixbynine.transit.path.api.alerts.TrainFilter
 import com.sixbynine.transit.path.api.alerts.hidesTrain
 import com.sixbynine.transit.path.api.alerts.isActiveAt
-import com.sixbynine.transit.path.api.alerts.isDisplayedAt
 import com.sixbynine.transit.path.util.JsonFormat
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.DayOfWeek.FRIDAY
@@ -29,7 +28,7 @@ import kotlinx.datetime.Month.DECEMBER
 import kotlinx.datetime.Month.JANUARY
 import kotlinx.datetime.Month.JULY
 import kotlinx.datetime.Month.JUNE
-import kotlinx.datetime.atTime
+import kotlinx.datetime.Month.MAY
 import kotlinx.serialization.encodeToString
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -40,6 +39,8 @@ class GithubAlertsTest {
     @Test
     fun `current alerts text`() {
         val alerts = GithubAlerts(
+            MemorialDayGroveStAlert,
+            MemorialDayOvernightCleaning,
             GeneralGroveStAlert,
             GeneralOvernightCleaning,
             FourteenthStreetOvernight,
@@ -185,13 +186,6 @@ class GithubAlertsTest {
     }
 
     @Test
-    fun `active at once with grove alert`() {
-        val alert = April12GroveStAlert
-
-        assertTrue(alert.isDisplayedAt(LocalDateTime(2024, APRIL, 12, 18, 0)))
-    }
-
-    @Test
     fun `hidesTrain with headsign`() {
         val alert = Alert(
             stations = listOf(GroveStreet),
@@ -242,6 +236,24 @@ class GithubAlertsTest {
             )
         )
 
+        val MemorialDayGroveStAlert = Alert(
+            stations = listOf(GroveStreet),
+            schedule = Schedule(),
+            displaySchedule = Schedule.once(
+                from = LocalDateTime(2024, MAY, 24, 19, 0),
+                to = LocalDateTime(2024, MAY, 28, 3, 0),
+            ),
+            trains = TrainFilter(),
+            message = AlertText(
+                en = "Grove Street has service in both directions during Memorial Day Weekend",
+                es = "Grove Street tiene servicio en ambas direcciones durante el fin de semana del Memorial Day"
+            ),
+            url = AlertText(
+                en = "https://www.panynj.gov/path/en/planned-service-changes.html"
+            ),
+            level = "INFO"
+        )
+
         val GeneralGroveStAlert = Alert(
             stations = listOf(GroveStreet),
             schedule = Schedule.repeatingWeekly(
@@ -249,14 +261,14 @@ class GithubAlertsTest {
                 startTime = LocalTime(6, 0),
                 endDay = MONDAY,
                 endTime = LocalTime(0, 0),
-                from = LocalDate(2024, APRIL, 17),
+                from = LocalDate(2024, MAY, 28),
                 to = LocalDate(2024, JUNE, 30),
             ),
             displaySchedule = Schedule.repeatingDaily(
                 days = listOf(SATURDAY, SUNDAY),
                 start = LocalTime(0, 0),
                 end = LocalTime(0, 0),
-                from = LocalDate(2024, APRIL, 17),
+                from = LocalDate(2024, MAY, 28),
                 to = LocalDate(2024, JUNE, 30),
             ),
             trains = TrainFilter.headSigns("33rd", "World Trade"),
@@ -266,27 +278,26 @@ class GithubAlertsTest {
             ),
             url = AlertText(
                 en = "https://www.panynj.gov/path/en/modernizing-path/grove-st-improvements.html"
-            )
+            ),
+            level = "WARN",
         )
 
-        val April12GroveStAlert = Alert(
-            stations = listOf(GroveStreet),
-            schedule = Schedule.once(
-                from = LocalDate(2024, APRIL, 13).atTime(6, 15),
-                to = LocalDate(2024, APRIL, 14).atTime(3, 0),
-            ),
+        val MemorialDayOvernightCleaning = Alert(
+            stations = listOf(NinthStreet, TwentyThirdStreet),
+            schedule = Schedule(),
             displaySchedule = Schedule.once(
-                from = LocalDate(2024, APRIL, 12).atTime(18, 0),
-                to = LocalDate(2024, APRIL, 14).atTime(23, 59),
+                from = LocalDateTime(2024, MAY, 24, 19, 0),
+                to = LocalDateTime(2024, MAY, 28, 3, 0),
             ),
-            trains = TrainFilter.headSigns("World Trade", "33rd"),
+            trains = TrainFilter(),
             message = AlertText(
-                en = "Note: Trains ARE stopping at Grove St on Sunday due to the Jersey City marathon\n\nWorld Trade Center- and 33 St.-bound trains will not stop at Grove Street from 6 AM Saturday - 3 AM Sunday during the weekend of April 13-14.",
-                es = "Nota: Los trenes PARAN en Grove St el domingo debido al maratón de Jersey City\n\nLos trenes con destino al World Trade Center y a 33 Street no pararán en la estación Grove Street desde las 6 de la mañana sábado hasta las 3 de la mañana domingo esta fin de semana"
+                en = "9 St. & 23 St. stations will remain open overnight during Memorial Day Weekend",
+                es = "Las estaciones de 9 St. y 23 St. permanecerán abiertas durante la noche durante el fin de semana del Memorial Day"
             ),
             url = AlertText(
-                en = "https://www.panynj.gov/path/en/modernizing-path/grove-st-improvements/grove-street-bypass-schedule.html"
-            )
+                en = "https://www.panynj.gov/path/en/planned-service-changes.html"
+            ),
+            level = "INFO"
         )
 
         val GeneralOvernightCleaning = Alert(
@@ -295,7 +306,7 @@ class GithubAlertsTest {
                 days = DayOfWeek.values().toList(),
                 start = LocalTime(0, 0),
                 end = LocalTime(5, 0),
-                from = LocalDate(2024, JANUARY, 1),
+                from = LocalDate(2024, MAY, 29),
                 to = LocalDate(2025, DECEMBER, 31),
             ),
             displaySchedule = Schedule.repeatingDaily(
@@ -312,7 +323,8 @@ class GithubAlertsTest {
             ),
             url = AlertText(
                 en = "https://www.panynj.gov/path/en/schedules-maps.html"
-            )
+            ),
+            level = "WARN"
         )
 
         val FourteenthStreetOvernight = Alert(

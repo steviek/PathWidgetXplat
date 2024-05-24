@@ -41,6 +41,7 @@ fun Alert(
     message: AlertText? = null,
     url: AlertText? = null,
     displaySchedule: Schedule? = null,
+    level: String? = null,
 ): Alert {
     return Alert(
         stations = stations.map { it.pathApiName },
@@ -48,7 +49,8 @@ fun Alert(
         schedule = schedule,
         trains = trains,
         message = message,
-        url = url
+        url = url,
+        level = level,
     )
 }
 

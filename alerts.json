@@ -4,13 +4,82 @@
       "stations": [
         "GRV"
       ],
+      "schedule": {},
+      "trains": {},
+      "message": {
+        "localizations": [
+          {
+            "text": "Grove Street has service in both directions during Memorial Day Weekend",
+            "locale": "en"
+          },
+          {
+            "text": "Grove Street tiene servicio en ambas direcciones durante el fin de semana del Memorial Day",
+            "locale": "es"
+          }
+        ]
+      },
+      "url": {
+        "localizations": [
+          {
+            "text": "https://www.panynj.gov/path/en/planned-service-changes.html",
+            "locale": "en"
+          }
+        ]
+      },
+      "displaySchedule": {
+        "once": {
+          "from": "2024-05-24T19:00",
+          "to": "2024-05-28T03:00"
+        }
+      },
+      "level": "INFO"
+    },
+    {
+      "stations": [
+        "09S",
+        "23S"
+      ],
+      "schedule": {},
+      "trains": {},
+      "message": {
+        "localizations": [
+          {
+            "text": "9 St. & 23 St. stations will remain open overnight during Memorial Day Weekend",
+            "locale": "en"
+          },
+          {
+            "text": "Las estaciones de 9 St. y 23 St. permanecerán abiertas durante la noche durante el fin de semana del Memorial Day",
+            "locale": "es"
+          }
+        ]
+      },
+      "url": {
+        "localizations": [
+          {
+            "text": "https://www.panynj.gov/path/en/planned-service-changes.html",
+            "locale": "en"
+          }
+        ]
+      },
+      "displaySchedule": {
+        "once": {
+          "from": "2024-05-24T19:00",
+          "to": "2024-05-28T03:00"
+        }
+      },
+      "level": "INFO"
+    },
+    {
+      "stations": [
+        "GRV"
+      ],
       "schedule": {
         "repeatingWeekly": {
           "startDay": "SATURDAY",
           "startTime": "06:00",
           "endDay": "MONDAY",
           "endTime": "00:00",
-          "from": "2024-04-17",
+          "from": "2024-05-28",
           "to": "2024-06-30"
         }
       },
@@ -48,10 +117,11 @@
           ],
           "start": "00:00",
           "end": "00:00",
-          "from": "2024-04-17",
+          "from": "2024-05-28",
           "to": "2024-06-30"
         }
-      }
+      },
+      "level": "WARN"
     },
     {
       "stations": [
@@ -71,7 +141,7 @@
           ],
           "start": "00:00",
           "end": "05:00",
-          "from": "2024-01-01",
+          "from": "2024-05-29",
           "to": "2025-12-31"
         }
       },
@@ -114,7 +184,8 @@
           "from": "2024-04-06",
           "to": "2024-06-30"
         }
-      }
+      },
+      "level": "WARN"
     },
     {
       "stations": [

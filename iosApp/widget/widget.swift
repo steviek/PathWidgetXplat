@@ -43,7 +43,7 @@ struct Provider: AppIntentTimelineProvider {
             in: context,
             count: configuration.timeDisplay == .relative ? 16 : 1
         )
-        let refreshTime = Date().addingTimeInterval(15 * 60)
+        let refreshTime = Date().addingTimeInterval(10 * 60)
         return Timeline(entries: entries, policy: .after(refreshTime))
     }
     

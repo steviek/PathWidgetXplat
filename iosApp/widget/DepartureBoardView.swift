@@ -221,15 +221,16 @@ struct DepartureBoardView: View {
         var arrivalTime: String
         if (entry.configuration.timeDisplay == .clock) {
             arrivalTime = WidgetDataFormatter().formatTime(instant: train.projectedArrival)
+            if (train.isBackfilled) {
+                arrivalTime = "~" + arrivalTime
+            }
         } else {
             arrivalTime = WidgetDataFormatter().formatRelativeTime(
                 now: entry.date.toKotlinInstant(),
                 time: train.projectedArrival
             )
         }
-        if (train.isBackfilled) {
-            arrivalTime = "~" + arrivalTime
-        }
+        
         return arrivalTime
     }
     

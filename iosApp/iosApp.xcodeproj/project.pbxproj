@@ -12,6 +12,8 @@
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
 		AA34DA372BB0F7F600DB50A0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA34DA362BB0F7F600DB50A0 /* Assets.xcassets */; };
 		AA34DA382BB0F7F600DB50A0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA34DA362BB0F7F600DB50A0 /* Assets.xcassets */; };
+		AA9B5F7C2C1F831C00251F59 /* DepartureBoardStations.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9B5F7B2C1F831C00251F59 /* DepartureBoardStations.swift */; };
+		AA9B5F7E2C1F83C100251F59 /* ViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9B5F7D2C1F83C100251F59 /* ViewExtensions.swift */; };
 		AAB47C192B15A46400079022 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AAB47C182B15A46400079022 /* WidgetKit.framework */; };
 		AAB47C1B2B15A46400079022 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AAB47C1A2B15A46400079022 /* SwiftUI.framework */; };
 		AAB47C1E2B15A46400079022 /* widgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB47C1D2B15A46400079022 /* widgetBundle.swift */; };
@@ -70,6 +72,8 @@
 		AA34DA362BB0F7F600DB50A0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AA53B2142BC8EF920042009B /* iosApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = iosApp.entitlements; sourceTree = "<group>"; };
 		AA53B2152BC8EF9E0042009B /* widgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = widgetExtension.entitlements; sourceTree = "<group>"; };
+		AA9B5F7B2C1F831C00251F59 /* DepartureBoardStations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepartureBoardStations.swift; sourceTree = "<group>"; };
+		AA9B5F7D2C1F83C100251F59 /* ViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewExtensions.swift; sourceTree = "<group>"; };
 		AAB47C172B15A46400079022 /* widgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = widgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		AAB47C182B15A46400079022 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		AAB47C1A2B15A46400079022 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -184,6 +188,8 @@
 				AAB47C412B15AD3200079022 /* WidgetInterop.swift */,
 				AAB47C432B15AD4000079022 /* FetchResult.swift */,
 				AAB47C472B1660D800079022 /* Localizable.xcstrings */,
+				AA9B5F7B2C1F831C00251F59 /* DepartureBoardStations.swift */,
+				AA9B5F7D2C1F83C100251F59 /* ViewExtensions.swift */,
 			);
 			path = widget;
 			sourceTree = "<group>";
@@ -391,11 +397,13 @@
 				AAB47C442B15AD4000079022 /* FetchResult.swift in Sources */,
 				AAB47C422B15AD3200079022 /* WidgetInterop.swift in Sources */,
 				AAB47C3A2B15AB9600079022 /* DepartureBoardView.swift in Sources */,
+				AA9B5F7C2C1F831C00251F59 /* DepartureBoardStations.swift in Sources */,
 				AAB47C3B2B15AB9600079022 /* ConfigurationAppIntent.swift in Sources */,
 				AAB47C3C2B15AB9600079022 /* Interop.swift in Sources */,
 				AAB47C392B15AB7700079022 /* WidgetConfigurationUtils.swift in Sources */,
 				AAB47C1E2B15A46400079022 /* widgetBundle.swift in Sources */,
 				AAB47C202B15A46400079022 /* widget.swift in Sources */,
+				AA9B5F7E2C1F83C100251F59 /* ViewExtensions.swift in Sources */,
 				AAB47C402B15AD2300079022 /* RefreshIntent.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -82,6 +82,17 @@ enum TimeDisplay : String, AppEnum {
     ]
 }
 
+enum TrainGrouping : String, AppEnum {
+    case ungrouped, byHeadsign
+    
+    static var typeDisplayRepresentation: TypeDisplayRepresentation = "Train Grouping"
+    
+    static var caseDisplayRepresentations: [TrainGrouping : DisplayRepresentation] = [
+        .ungrouped: "Ungrouped",
+        .byHeadsign: "By destination",
+    ]
+}
+
 struct ConfigurationAppIntent: WidgetConfigurationIntent {
     static var title: LocalizedStringResource = "Departure board for PATH"
     static var description = IntentDescription("Departure board for PATH trains")
@@ -101,12 +112,16 @@ struct ConfigurationAppIntent: WidgetConfigurationIntent {
     @Parameter(title: "Time", default: TimeDisplay.relative)
     var timeDisplay: TimeDisplay
     
+    @Parameter(title: "Grouping", default: TrainGrouping.ungrouped)
+    var trainGrouping: TrainGrouping
+    
     init() {
         self.stations = []
         self.lines = LineChoice.allCases
         self.sortOrder = .alphabetical
         self.filter = .all
         self.timeDisplay = .relative
+        self.trainGrouping = .ungrouped
     }
     
     init(
@@ -114,12 +129,14 @@ struct ConfigurationAppIntent: WidgetConfigurationIntent {
         lines: [LineChoice] = LineChoice.allCases,
         sortOrder: SortOrder = .alphabetical,
         filter: Filter = .all,
-        timeDisplay: TimeDisplay = .relative
+        timeDisplay: TimeDisplay = .relative,
+        trainGrouping: TrainGrouping = .ungrouped
     ) {
         self.stations = stations
         self.lines = lines
         self.sortOrder = sortOrder
         self.filter = filter
         self.timeDisplay = timeDisplay
+        self.trainGrouping = trainGrouping
     }
 }

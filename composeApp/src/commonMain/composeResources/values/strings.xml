@@ -97,6 +97,8 @@
     <string name="update_footer_text">Updated at %1$s, updating again in %2$s</string>
     <string name="update_now">Update now</string>
     <string name="updated_at_time">Updated at %1$s</string>
+    <string name="updated_at_time_relative_full">Updated at %1$s with data from %2$s</string>
+    <string name="updated_at_time_relative_shorter">%1$s, data from %2$s</string>
     <string name="updating">Updating…</string>
     <string name="welcome_text">Welcome to the Departures widget for PATH app. To add a widget, press and hold your home screen and search for this app.</string>
     <string name="widget_configuration">Widget configuration</string>

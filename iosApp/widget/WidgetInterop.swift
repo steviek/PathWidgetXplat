@@ -83,7 +83,7 @@ extension Filter {
 
 extension WidgetDataFetcher {
     func fetchWidgetDataAsync(
-        limit: Int32,
+        stationLimit: Int32,
         stations: [Station],
         lines: [Line],
         filter: TrainFilter,
@@ -92,13 +92,13 @@ extension WidgetDataFetcher {
         do {
             return try await withCheckedThrowingContinuation { continuation in
                 fetchWidgetData(
-                    limit: limit,
+                    stationLimit: stationLimit,
                     stations: stations,
                     lines: lines,
                     sort: sort,
                     filter: filter,
-                     force: false,
                     includeClosestStation: false,
+                    staleness: widgetFetchStaleness(force: false),
                     onSuccess: { data in
                         continuation.resume(returning: FetchResult(data: data, hadInternet: true, hasError: false))
                     },

@@ -102,29 +102,7 @@ struct DepartureBoardView: View {
                         
                         Spacer()
                         
-                        let maxUpdatedWidth = entry.size.width - 64 - 24 - 8
-                        let formattedFetchTime = WidgetDataFormatter().formatTime(instant: data.fetchTime)
-                        let longText = IosResourceProvider().getUpdatedAtTime(formattedFetchTime: formattedFetchTime)
-                        let updatedText =
-                        if entry.hasError {
-                            if measureTextWidth(
-                                text: IosResourceProvider().getErrorLong(),
-                                font: UIFont.systemFont(ofSize: 12)
-                            ) <= maxUpdatedWidth {
-                                IosResourceProvider().getErrorLong()
-                            } else {
-                                IosResourceProvider().getErrorShort()
-                            }
-                        } else
-                            if measureTextWidth(
-                                    text: longText,
-                                    font: UIFont.systemFont(ofSize: 12)
-                                ) <= maxUpdatedWidth {
-                                longText
-                            } else {
-                                formattedFetchTime
-                            }
-                        Text(updatedText)
+                        Text(getFooterText())
                             .font(Font.system(size: 12))
                         
                         Spacer()
@@ -190,7 +168,9 @@ struct DepartureBoardView: View {
                         Text(destination)
                             .font(Font.system(size: 12))
                             .lineLimit(1)
-                        let arrivalTime = (train.isBackfilled ? "~" : "") + WidgetDataFormatter().formatTime(instant: train.projectedArrival)
+                        
+                        let arrivalTime = formatArrivalTime(train)
+                        
                         Spacer()
                         Text(arrivalTime)
                             .font(Font.system(size: 12)
@@ -235,5 +215,69 @@ struct DepartureBoardView: View {
             
             return path
         }
+    }
+    
+    private func formatArrivalTime(_ train: WidgetData.TrainData) -> String {
+        var arrivalTime: String
+        if (entry.configuration.timeDisplay == .clock) {
+            arrivalTime = WidgetDataFormatter().formatTime(instant: train.projectedArrival)
+        } else {
+            arrivalTime = WidgetDataFormatter().formatRelativeTime(
+                now: entry.date.toKotlinInstant(),
+                time: train.projectedArrival
+            )
+        }
+        if (train.isBackfilled) {
+            arrivalTime = "~" + arrivalTime
+        }
+        return arrivalTime
+    }
+    
+    private func getFooterText() -> String {
+        let maxUpdatedWidth = entry.size.width - 64 - 24 - 8
+        let formattedFetchTime = WidgetDataFormatter().formatTime(instant: entry.dataFrom.toKotlinInstant())
+        
+        if entry.hasError {
+            return if footerTextFits(IosResourceProvider().getErrorLong()) {
+                IosResourceProvider().getErrorLong()
+            } else {
+                IosResourceProvider().getErrorShort()
+            }
+        }
+        
+        if entry.configuration.timeDisplay == .clock {
+            let longText = IosResourceProvider().getUpdatedAtTime(formattedFetchTime: formattedFetchTime)
+            
+            return if footerTextFits(longText) {
+                longText
+            } else {
+                formattedFetchTime
+            }
+        }
+        
+        let displayTime = WidgetDataFormatter().formatTime(instant: entry.date.toKotlinInstant())
+        let fullText = IosResourceProvider().getFullRelativeUpdatedAtTime(
+            displayTime: displayTime,
+            dataTime: formattedFetchTime
+        )
+        if footerTextFits(fullText) {
+            return fullText
+        }
+        
+        let shorterText = IosResourceProvider().getShorterRelativeUpdatedAtTime(
+            displayTime: displayTime,
+            dataTime: formattedFetchTime
+        )
+        if footerTextFits(shorterText) {
+            return shorterText
+        }
+        
+        return displayTime
+    }
+    
+    private func footerTextFits(_ text: String) -> Bool {
+        let maxWidth = entry.size.width - 64 - 24 - 8
+        return measureTextWidth(text: text, font: UIFont.systemFont(ofSize: 12)) <= maxWidth
+        
     }
 }

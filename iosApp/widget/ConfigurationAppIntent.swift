@@ -71,6 +71,17 @@ enum Filter : String, AppEnum {
     
 }
 
+enum TimeDisplay : String, AppEnum {
+    case relative, clock
+    
+    static var typeDisplayRepresentation: TypeDisplayRepresentation = "Time Display"
+    
+    static var caseDisplayRepresentations: [TimeDisplay : DisplayRepresentation] = [
+        .relative: "5 min",
+        .clock: "12:30",
+    ]
+}
+
 struct ConfigurationAppIntent: WidgetConfigurationIntent {
     static var title: LocalizedStringResource = "Departure board for PATH"
     static var description = IntentDescription("Departure board for PATH trains")
@@ -87,22 +98,28 @@ struct ConfigurationAppIntent: WidgetConfigurationIntent {
     @Parameter(title: "Filter", default: Filter.all)
     var filter: Filter
     
+    @Parameter(title: "Time", default: TimeDisplay.relative)
+    var timeDisplay: TimeDisplay
+    
     init() {
         self.stations = []
         self.lines = LineChoice.allCases
         self.sortOrder = .alphabetical
         self.filter = .all
+        self.timeDisplay = .relative
     }
     
     init(
         stations: [StationChoice] = [],
         lines: [LineChoice] = LineChoice.allCases,
         sortOrder: SortOrder = .alphabetical,
-        filter: Filter = .all
+        filter: Filter = .all,
+        timeDisplay: TimeDisplay = .relative
     ) {
         self.stations = stations
         self.lines = lines
         self.sortOrder = sortOrder
         self.filter = filter
+        self.timeDisplay = timeDisplay
     }
 }

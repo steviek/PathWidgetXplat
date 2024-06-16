@@ -10,12 +10,24 @@ import pathwidgetxplat.composeapp.generated.resources.edit_to_add_stations
 import pathwidgetxplat.composeapp.generated.resources.error_long
 import pathwidgetxplat.composeapp.generated.resources.error_short
 import pathwidgetxplat.composeapp.generated.resources.updated_at_time
+import pathwidgetxplat.composeapp.generated.resources.updated_at_time_relative_full
+import pathwidgetxplat.composeapp.generated.resources.updated_at_time_relative_shorter
 
 object IosResourceProvider {
     fun getEmptyStateString(): String = getStringBlocking(string.edit_to_add_stations)
 
     fun getUpdatedAtTime(formattedFetchTime: String): String {
         return getStringBlocking(string.updated_at_time, formattedFetchTime)
+    }
+
+    fun getFullRelativeUpdatedAtTime(displayTime: String, dataTime: String): String {
+        if (displayTime == dataTime) return getUpdatedAtTime(displayTime)
+        return getStringBlocking(string.updated_at_time_relative_full, displayTime, dataTime)
+    }
+
+    fun getShorterRelativeUpdatedAtTime(displayTime: String, dataTime: String): String {
+        if (displayTime == dataTime) return getUpdatedAtTime(displayTime)
+        return getStringBlocking(string.updated_at_time_relative_shorter, displayTime, dataTime)
     }
 
     fun getErrorLong(): String = getStringBlocking(string.error_long)

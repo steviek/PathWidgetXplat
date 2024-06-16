@@ -48,6 +48,7 @@ import kotlinx.datetime.DayOfWeek.SATURDAY
 import kotlinx.datetime.DayOfWeek.SUNDAY
 import kotlinx.datetime.Instant
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -65,8 +66,15 @@ object WidgetDataFetcher {
                 value.orEmpty().joinToString(separator = ",") { it.pathApiName }
         }
 
+    fun widgetFetchStaleness(force: Boolean): Staleness {
+        return Staleness(
+            staleAfter = if (force) 5.seconds else 30.seconds,
+            invalidAfter = Duration.INFINITE,
+        )
+    }
+
     fun fetchWidgetData(
-        limit: Int,
+        stationLimit: Int,
         stations: List<Station>,
         lines: Collection<Line>,
         sort: StationSort,
@@ -77,7 +85,7 @@ object WidgetDataFetcher {
         onFailure: (error: Throwable, hadInternet: Boolean, data: WidgetData?) -> Unit,
     ): AgedValue<WidgetData>? {
         val (fetch, previous) = fetchWidgetDataWithPrevious(
-            limit,
+            stationLimit = stationLimit,
             stations,
             lines,
             sort,
@@ -92,7 +100,7 @@ object WidgetDataFetcher {
     }
 
     fun fetchWidgetDataWithPrevious(
-        limit: Int,
+        stationLimit: Int,
         stations: List<Station>,
         lines: Collection<Line>,
         sort: StationSort,
@@ -113,7 +121,7 @@ object WidgetDataFetcher {
         ): WidgetData {
             return createWidgetData(
                 now,
-                limit,
+                stationLimit,
                 stations,
                 lines,
                 sort,
@@ -180,7 +188,7 @@ object WidgetDataFetcher {
 
     private fun createWidgetData(
         now: Instant,
-        limit: Int,
+        stationLimit: Int,
         stations: List<Station>,
         lines: Collection<Line>,
         sort: StationSort,
@@ -282,14 +290,14 @@ object WidgetDataFetcher {
         }
         val nextFetchTime =
             stationDatas
-                .take(limit)
+                .take(stationLimit)
                 .flatMap { it.signs }
                 .mapNotNull { it.projectedArrivals.maxOrNull() }
                 .minOrNull()
                 ?: (now + 15.minutes)
         return WidgetData(
             fetchTime = now,
-            stations = stationDatas.take(limit),
+            stations = stationDatas.take(stationLimit),
             nextFetchTime = nextFetchTime,
             closestStationId = closestStationToUse?.pathApiName,
         )
@@ -351,5 +359,23 @@ object WidgetDataFetcher {
         }
 
         return projectedDateTime.hour !in 6..9 && projectedDateTime.hour !in 16..19
+    }
+
+    fun prunePassedDepartures(data: WidgetData?, time: Instant): WidgetData? {
+        data ?: return null
+        return data.copy(
+            stations = data.stations.map { station ->
+                station.copy(
+                    trains = station.trains.filter { it.projectedArrival >= time },
+                    signs = station.signs.map { sign ->
+                        sign.copy(
+                            projectedArrivals = sign.projectedArrivals.filter {
+                                it >= time
+                            }
+                        )
+                    }
+                )
+            }
+        )
     }
 }

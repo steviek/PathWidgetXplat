@@ -18,7 +18,8 @@ struct Provider: AppIntentTimelineProvider {
             size: context.displaySize,
             configuration: ConfigurationAppIntent(stations: [.jsq]),
             data: nil,
-            hasError: false
+            hasError: false,
+            dataFrom: Date()
         )
     }
     
@@ -26,38 +27,46 @@ struct Provider: AppIntentTimelineProvider {
         for configuration: ConfigurationAppIntent,
         in context: Context
     ) async -> SimpleEntry {
-        return await liveSnapshot(for: configuration, in: context)
+        return await createEntries(
+            for: configuration,
+            in: context,
+            count: 1
+        ).first!
     }
     
     func timeline(
         for configuration: ConfigurationAppIntent,
         in context: Context
     ) async -> Timeline<SimpleEntry> {
-        var entries: [SimpleEntry] = []
-        let entry = await liveSnapshot(for: configuration, in: context)
-        entries.append(entry)
-        return Timeline(entries: entries, policy: .atEnd)
+        let entries = await createEntries(
+            for: configuration,
+            in: context,
+            count: configuration.timeDisplay == .relative ? 16 : 1
+        )
+        let refreshTime = Date().addingTimeInterval(15 * 60)
+        return Timeline(entries: entries, policy: .after(refreshTime))
     }
     
-    private func liveSnapshot(
+    private func createEntries(
         for configuration: ConfigurationAppIntent,
-        in context: Context
-    ) async -> SimpleEntry {
-        let limit =
+        in context: Context,
+        count: Int
+    ) async -> [SimpleEntry] {
+        let stationLimit =
         WidgetConfigurationUtils.getWidgetLimit(family: context.family)
         
         let effectiveConfiguration: ConfigurationAppIntent
-        let widgetData: WidgetData?
+        var widgetData: WidgetData?
         let hasError: Bool
         if (context.isPreview) {
-            widgetData = Fixtures().widgetData(limit: Int32(limit))
+            widgetData = Fixtures().widgetData(limit: Int32(stationLimit))
             effectiveConfiguration = ConfigurationAppIntent(
                 stations: [.jsq, .wtc]
             )
             hasError = false
         } else {
             let fetchResult = await WidgetDataFetcher().fetchWidgetDataAsync(
-                limit: Int32(limit),
+                stationLimit: Int32(stationLimit),
                 stations: configuration.stations.map { $0.toStation()},
                 lines: configuration.lines.map { $0.toLine() },
                 filter: configuration.filter.toTrainFilter(),
@@ -68,13 +77,30 @@ struct Provider: AppIntentTimelineProvider {
             effectiveConfiguration = configuration
         }
         
-        return SimpleEntry(
-            date: Date(),
-            size: context.displaySize,
-            configuration: effectiveConfiguration,
-            data: widgetData,
-            hasError: hasError
-        )
+        let now = Date()
+        
+        var entries: [SimpleEntry] = []
+        var date = now
+        
+        for _ in 0..<count {
+            widgetData = WidgetDataFetcher().prunePassedDepartures(
+                data: widgetData,
+                time: date.toKotlinInstant()
+            )
+            entries.append(
+                SimpleEntry(
+                    date: date,
+                    size: context.displaySize,
+                    configuration: effectiveConfiguration,
+                    data: widgetData,
+                    hasError: hasError,
+                    dataFrom: now
+                )
+            )
+            date = TimeUtilities().getStartOfNextMinute(time: date.toKotlinInstant()).toDate()
+        }
+        
+        return entries
     }
 }
 
@@ -84,6 +110,7 @@ struct SimpleEntry: TimelineEntry {
     let configuration: ConfigurationAppIntent
     let data: WidgetData?
     let hasError: Bool
+    let dataFrom: Date
 }
 
 struct widget: Widget {

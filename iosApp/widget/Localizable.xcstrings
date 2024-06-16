@@ -1,6 +1,16 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "5 min" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5 min"
+          }
+        }
+      }
+    },
     "9th Street" : {
       "localizations" : {
         "en" : {
@@ -13,6 +23,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "9th Street"
+          }
+        }
+      }
+    },
+    "12:30" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "12:30"
           }
         }
       }
@@ -160,10 +180,24 @@
       }
     },
     "Hoboken ⇆ 33rd Street" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoboken ⇆ 33rd Street"
+          }
+        }
+      }
     },
     "Hoboken ⇆ World Trade Center" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoboken ⇆ World Trade Center"
+          }
+        }
+      }
     },
     "Journal Square" : {
       "localizations" : {
@@ -176,7 +210,14 @@
       }
     },
     "Journal Square ⇆ 33rd Street" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Journal Square ⇆ 33rd Street"
+          }
+        }
+      }
     },
     "Lines" : {
       "extractionState" : "manual",
@@ -200,7 +241,14 @@
       }
     },
     "Newark ⇆ World Trade Center" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Newark ⇆ World Trade Center"
+          }
+        }
+      }
     },
     "Newport" : {
       "localizations" : {
@@ -278,6 +326,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Estaciones"
+          }
+        }
+      }
+    },
+    "Time" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hora"
+          }
+        }
+      }
+    },
+    "Time Display" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Formato de la hora"
           }
         }
       }

@@ -136,7 +136,7 @@ class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
 
     private fun startFetch(staleness: Staleness): FetchWithPrevious<WidgetData> {
         return WidgetDataFetcher.fetchWidgetDataWithPrevious(
-            limit = Int.MAX_VALUE,
+            stationLimit = Int.MAX_VALUE,
             stations = StationSelectionManager.selection.value.selectedStations,
             sort = SettingsManager.stationSort.value,
             lines = SettingsManager.lineFilter.value,

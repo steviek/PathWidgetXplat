@@ -112,7 +112,7 @@ object AndroidWidgetDataRepository {
             WidgetConfigurationManager.getWidgetConfigurations().values.any { it.useClosestStation }
 
         return WidgetDataFetcher.fetchWidgetDataWithPrevious(
-            limit = Int.MAX_VALUE,
+            stationLimit = Int.MAX_VALUE,
             stations = Stations.All,
             lines = Line.entries,
             sort = Alphabetical,

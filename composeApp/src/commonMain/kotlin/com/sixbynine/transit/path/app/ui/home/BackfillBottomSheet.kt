@@ -33,7 +33,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import pathwidgetxplat.composeapp.generated.resources.Res.drawable
 import pathwidgetxplat.composeapp.generated.resources.Res.string
-import pathwidgetxplat.composeapp.generated.resources.langauge_code
+import pathwidgetxplat.composeapp.generated.resources.language_code
 import pathwidgetxplat.composeapp.generated.resources.presumed_train
 import pathwidgetxplat.composeapp.generated.resources.train_track
 
@@ -102,7 +102,7 @@ private fun HomeScreenScope.createSubtext(
     trainData: TrainData,
     source: HomeBackfillSource,
 ): AnnotatedString {
-    return when (stringResource(string.langauge_code)) {
+    return when (stringResource(string.language_code)) {
         "es" -> createSpanishSubtext(station, trainData, source)
         else -> createEnglishSubtext(station, trainData, source)
     }

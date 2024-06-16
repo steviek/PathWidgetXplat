@@ -4,13 +4,13 @@ import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.widget.WidgetData.StationData
-import kotlinx.datetime.LocalTime
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
 class StationDataComparator(
     order: StationSort?,
-    now: LocalTime = now().toLocalDateTime(TimeZone.currentSystemDefault()).time,
+    now: LocalDateTime = now().toLocalDateTime(TimeZone.currentSystemDefault()),
 ) : Comparator<StationData> {
 
     // TODO: Fix this

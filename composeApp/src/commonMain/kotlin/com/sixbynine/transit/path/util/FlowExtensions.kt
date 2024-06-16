@@ -1,11 +1,13 @@
 package com.sixbynine.transit.path.util
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 suspend fun Flow<Boolean>.awaitTrue() = first { it }
 
@@ -126,4 +128,30 @@ inline fun <A, B, C, D, E, F, G, H, T> combineStates(
         combineStates(flow5, flow6, ::Pair),
         combineStates(flow7, flow8, ::Pair)
     ) { a, b, (c, d), (e, f), (g, h) -> block(a, b, c, d, e, f, g, h) }
+}
+
+
+inline fun <A, B, C, D, E, F, G, H, I, T> combineStates(
+    flow1: StateFlow<A>,
+    flow2: StateFlow<B>,
+    flow3: StateFlow<C>,
+    flow4: StateFlow<D>,
+    flow5: StateFlow<E>,
+    flow6: StateFlow<F>,
+    flow7: StateFlow<G>,
+    flow8: StateFlow<H>,
+    flow9: StateFlow<I>,
+    crossinline block: (A, B, C, D, E, F, G, H, I) -> T
+): StateFlow<T> {
+    return combineStates(
+        combineStates(flow1, flow2, ::Pair),
+        combineStates(flow3, flow4, ::Pair),
+        combineStates(flow5, flow6, ::Pair),
+        combineStates(flow7, flow8, ::Pair),
+        flow9,
+    ) { (a, b), (c, d), (e, f), (g, h), i -> block(a, b, c, d, e, f, g, h, i) }
+}
+
+fun <T> Flow<T>.collectIn(scope: CoroutineScope, block: suspend (T) -> Unit) {
+    scope.launch { collect { block(it) } }
 }

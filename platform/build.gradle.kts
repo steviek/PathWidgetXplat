@@ -22,6 +22,14 @@ kotlin {
             implementation(libs.kotlin.serialization.json)
         }
 
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+        }
+
+        androidMain.dependencies {
+            implementation(libs.androidx.core.ktx)
+        }
+
         all {
             languageSettings.optIn("kotlin.ExperimentalStdlibApi")
             languageSettings.optIn("kotlin.contracts.ExperimentalContracts")

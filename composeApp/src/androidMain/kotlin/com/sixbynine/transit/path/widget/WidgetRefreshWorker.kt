@@ -6,7 +6,6 @@ import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy.KEEP
 import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType.UNMETERED
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
@@ -16,6 +15,7 @@ import com.sixbynine.transit.path.api.PathApi
 import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.util.Staleness
 import com.sixbynine.transit.path.util.await
+import kotlinx.coroutines.delay
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -42,6 +42,10 @@ class WidgetRefreshWorker(
             DepartureBoardWidget().update(applicationContext, glanceId)
         }
 
+        // I have a hunch that things are getting killed/cancelled too quickly, so keep us alive a
+        // little longer.
+        delay(10.seconds)
+
         return Result.success()
     }
 
@@ -66,7 +70,6 @@ class WidgetRefreshWorker(
                     .setConstraints(
                         Constraints.Builder()
                             .setRequiresBatteryNotLow(true)
-                            .setRequiredNetworkType(UNMETERED)
                             .build()
                     )
                     .build()

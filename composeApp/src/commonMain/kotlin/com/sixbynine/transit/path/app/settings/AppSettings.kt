@@ -14,4 +14,5 @@ data class AppSettings(
     val stationSort: StationSort,
     val displayPresumedTrains: Boolean,
     val avoidMissingTrains: AvoidMissingTrains,
+    val commutingConfiguration: CommutingConfiguration,
 )

@@ -28,6 +28,7 @@ fun RadioButtonWithText(
     subtext: String? = null,
     subtextStyle: TextStyle = LocalTextStyle.current,
     subtextColor: Color = Color.Unspecified,
+    fillMaxWidth: Boolean = true
 ) {
     Row(
         Modifier.selectable(selected = selected, onClick = onClick)
@@ -36,7 +37,10 @@ fun RadioButtonWithText(
     ) {
         RadioButton(selected = selected, onClick = null)
         Spacer(Modifier.width(8.dp))
-        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Column(
+            modifier = Modifier.weight(1f, fill = fillMaxWidth),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
             Text(text = text, style = textStyle, color = textColor)
 
             if (subtext != null) {

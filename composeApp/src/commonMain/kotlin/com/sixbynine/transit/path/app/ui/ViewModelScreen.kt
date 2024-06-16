@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import moe.tlaster.precompose.navigation.Navigator
 
 @Composable
-fun <State, Intent, Effect> ViewModelScreen(
+fun <State : Any, Intent : Any, Effect : Any> ViewModelScreen(
     viewModelKey: String,
     createViewModel: () -> PathViewModel<State, Intent, Effect>,
     onEffect: suspend HandleEffectsScope.(Effect) -> Unit,

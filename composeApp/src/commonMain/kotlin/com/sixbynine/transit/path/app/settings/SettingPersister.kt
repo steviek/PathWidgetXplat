@@ -72,6 +72,18 @@ inline fun <reified E> GlobalSettingPersister(
     )
 }
 
+inline fun <reified T : Any> GlobalSettingPersister(
+    key: String,
+    defaultValue: T,
+    crossinline toString: (T) -> String,
+    crossinline fromString: (String) -> T,
+): SettingPersister<T> {
+    return SettingPersister(
+        defaultValue,
+        serializer = GlobalDataStoreSerializer(key, { toString(it) }, { fromString(it) })
+    )
+}
+
 inline fun SettingPersister(
     key: String,
     defaultValue: Boolean
@@ -119,5 +131,21 @@ class IntGlobalDataStoreSerializer<R>(
     override fun get(): R? {
         val number = dataStore.getLong(key)?.toInt() ?: return null
         return IntPersistable.fromPersistence(number, enumEntries)
+    }
+}
+
+class GlobalDataStoreSerializer<T : Any>(
+    private val key: String,
+    private val toString: (T) -> String,
+    private val fromString: (String) -> T,
+) : StorageSerializer<T> {
+    private val dataStore = globalDataStore()
+
+    override fun set(value: T?) {
+        dataStore[key] = value?.let(toString)
+    }
+
+    override fun get(): T? {
+        return dataStore.getString(key)?.let(fromString)
     }
 }

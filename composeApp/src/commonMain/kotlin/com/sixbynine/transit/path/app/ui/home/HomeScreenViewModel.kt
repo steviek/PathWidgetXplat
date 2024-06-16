@@ -17,6 +17,7 @@ import com.sixbynine.transit.path.app.external.ExternalRoutingManager
 import com.sixbynine.transit.path.app.lifecycle.AppLifecycleObserver
 import com.sixbynine.transit.path.app.settings.SettingsManager
 import com.sixbynine.transit.path.app.settings.TimeDisplay
+import com.sixbynine.transit.path.app.settings.isActiveAt
 import com.sixbynine.transit.path.app.station.StationSelectionManager
 import com.sixbynine.transit.path.app.ui.PathViewModel
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.DepartureBoardData
@@ -46,38 +47,35 @@ import com.sixbynine.transit.path.app.ui.layout.LayoutOption.ThreeColumns
 import com.sixbynine.transit.path.app.ui.layout.LayoutOption.TwoColumns
 import com.sixbynine.transit.path.app.ui.layout.LayoutOptionManager
 import com.sixbynine.transit.path.time.now
-import com.sixbynine.transit.path.util.launchAndReturnUnit
+import com.sixbynine.transit.path.util.localizedString
 import com.sixbynine.transit.path.util.repeatEvery
 import com.sixbynine.transit.path.util.runUnless
 import com.sixbynine.transit.path.widget.WidgetData
 import com.sixbynine.transit.path.widget.WidgetDataFormatter
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.getString
 import pathwidgetxplat.composeapp.generated.resources.Res.string
-import pathwidgetxplat.composeapp.generated.resources.delay_time
-import pathwidgetxplat.composeapp.generated.resources.langauge_code
 import pathwidgetxplat.composeapp.generated.resources.update_footer_text
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 
 class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, Intent, Effect>() {
 
-    private val fetchingUseCase = WidgetDataFetchingUseCase(viewModelScope)
+    private val fetchingUseCase = WidgetDataFetchingUseCase(lightweightScope)
     private val fetchData get() = fetchingUseCase.fetchData.value
 
     private val _state = MutableStateFlow(
@@ -92,8 +90,8 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
             isEditing = false,
             timeDisplay = SettingsManager.timeDisplay.value,
             stationSort = SettingsManager.stationSort.value,
-            updateFooterText = null,
-            data = null
+            updateFooterText = runBlocking { createFooterText() },
+            data = fetchData.data?.toDepartureBoardData()?.adjustedForLatestSettings()
         )
     )
     override val state = _state.asStateFlow()
@@ -101,8 +99,10 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
     private val _effects = Channel<Effect>()
     override val effects = _effects.receiveAsFlow()
 
+    override val rateLimitedIntents = setOf(SettingsClicked)
+
     init {
-        viewModelScope.launch {
+        lightweightScope.launch {
             val footerText = createFooterText()
             val initialData = fetchData.data?.toDepartureBoardData()?.adjustedForLatestSettings()
             updateState {
@@ -113,7 +113,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
             }
         }
 
-        viewModelScope.launch(Dispatchers.Default) {
+        lightweightScope.launch {
             fetchingUseCase.fetchData.collectLatest { fetchData ->
                 repeatEvery(250.milliseconds) {
                     AppLifecycleObserver.isActive.first { it } // Make sure the UI is visible
@@ -146,7 +146,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
         }
     }
 
-    override fun onIntent(intent: Intent) = viewModelScope.launchAndReturnUnit {
+    override suspend fun performIntent(intent: Intent) {
         when (intent) {
             RetryClicked, UpdateNowClicked -> fetchingUseCase.fetchNow()
             EditClicked -> updateState { copy(isEditing = true) }
@@ -227,15 +227,14 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
         crossinline block: suspend State.(T) -> State
     ) {
         flow.onEach { updateState { block(it) } }
-            .flowOn(Dispatchers.Default)
-            .launchIn(viewModelScope)
+            .launchIn(lightweightScope)
     }
 
     private suspend fun updateState(operation: suspend State.() -> State) {
         _state.value = operation(state.value)
     }
 
-    private suspend fun DepartureBoardData.adjustedForLatestSettings(): DepartureBoardData {
+    private fun DepartureBoardData.adjustedForLatestSettings(): DepartureBoardData {
         val stationToIndex =
             StationSelectionManager
                 .selection
@@ -243,8 +242,10 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
                 .selectedStations
                 .mapIndexed { index, station -> station.pathApiName to index }
                 .toMap()
-        val hour = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).hour
-        val isMorning = hour in 3 until 12
+        val dateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        val isCommutingHome =
+            SettingsManager.commutingConfiguration.value.isActiveAt(dateTime)
+        val isAtHome = !isCommutingHome
         return copy(
             stations = stations
                 .runUnless(SettingsManager.stationSort.value == StationSort.Proximity) {
@@ -255,8 +256,8 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
 
                     val station = it.station
                     val isFirst = when (SettingsManager.stationSort.value) {
-                        StationSort.NjAm -> isMorning == station.isInNewJersey
-                        StationSort.NyAm -> isMorning == station.isInNewYork
+                        StationSort.NjAm -> isAtHome == station.isInNewJersey
+                        StationSort.NyAm -> isAtHome == station.isInNewYork
                         StationSort.Proximity -> return@sortedBy 0
                         Alphabetical -> return@sortedBy 0
                     }
@@ -296,13 +297,13 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
     }
 
     private fun sendEffect(effect: Effect) {
-        viewModelScope.launch {
+        lightweightScope.launch {
             _effects.send(effect)
         }
     }
 
     companion object {
-        suspend fun WidgetData.toDepartureBoardData(
+        fun WidgetData.toDepartureBoardData(
             timeDisplay: TimeDisplay = SettingsManager.timeDisplay.value
         ): DepartureBoardData {
             val stations = stations.mapNotNull { data ->
@@ -352,7 +353,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
             return DepartureBoardData(stations = stations)
         }
 
-        private suspend fun trainDisplayTime(
+        private fun trainDisplayTime(
             timeDisplay: TimeDisplay,
             isDelayed: Boolean,
             isBackfilled: Boolean,
@@ -361,7 +362,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
             return with(StringBuilder()) {
                 if (isBackfilled) append("~")
 
-                if (isDelayed) append(getString(string.delay_time))
+                if (isDelayed) append(localizedString(en = "Delayed - ", es = "Retrasado - "))
 
                 val time = when (timeDisplay) {
                     TimeDisplay.Relative -> WidgetDataFormatter.formatRelativeTime(
@@ -377,8 +378,8 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
             }
         }
 
-        private suspend fun AlertText.unpack(): String? {
-            val languageCode = getString(string.langauge_code)
+        private fun AlertText.unpack(): String? {
+            val languageCode = localizedString(en = "en", es = "es")
             return localizations.find { it.locale == languageCode }?.text
                 ?: localizations.firstOrNull()?.text
         }

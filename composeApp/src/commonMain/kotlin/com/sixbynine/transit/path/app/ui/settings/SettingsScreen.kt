@@ -31,10 +31,7 @@ import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.RateAp
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.SendFeedbackClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.ShareAppClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.ShowPresumedTrainsChanged
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.StationLimitClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.StationSortClicked
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.TimeDisplayChanged
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.TimeDisplayClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.LocationSettingState
 import org.jetbrains.compose.resources.stringResource
 import pathwidgetxplat.composeapp.generated.resources.Res.string
@@ -48,9 +45,7 @@ import pathwidgetxplat.composeapp.generated.resources.lines
 import pathwidgetxplat.composeapp.generated.resources.presumed_trains_subtext
 import pathwidgetxplat.composeapp.generated.resources.rate_app
 import pathwidgetxplat.composeapp.generated.resources.send_feedback
-import pathwidgetxplat.composeapp.generated.resources.setting_header_time_display
 import pathwidgetxplat.composeapp.generated.resources.settings
-import pathwidgetxplat.composeapp.generated.resources.settings_header_station_filter
 import pathwidgetxplat.composeapp.generated.resources.share_app
 import pathwidgetxplat.composeapp.generated.resources.show_presumed_trains
 import pathwidgetxplat.composeapp.generated.resources.station_order
@@ -93,15 +88,11 @@ fun SettingsScope.Content() {
                 LocationSettingSection()
             }
 
-            TimeDisplaySection()
-
             FilterSection()
 
             LineFilterSection()
 
             StationOrderSection()
-
-            StationLimitSection()
 
             SettingsItem(stringResource(string.advanced_settings)) {
                 onIntent(
@@ -120,25 +111,11 @@ fun SettingsScope.Content() {
             SettingsItem(stringResource(string.buy_me_a_coffee)) { onIntent(BuyMeACoffeeClicked) }
         }
 
-        StationLimitBottomSheet(
-            isShown = state.bottomSheet == BottomSheetType.StationLimit,
-            limit = state.stationLimit,
-            onDismiss = { onIntent(SettingsContract.Intent.BottomSheetDismissed) },
-            onLimitClicked = { onIntent(SettingsContract.Intent.StationLimitSelected(it)) },
-        )
-
         StationSortBottomSheet(
             isShown = state.bottomSheet == BottomSheetType.StationSort,
             sort = state.stationSort,
             onDismiss = { onIntent(SettingsContract.Intent.BottomSheetDismissed) },
             onSortClicked = { onIntent(SettingsContract.Intent.StationSortSelected(it)) },
-        )
-
-        TimeDisplayBottomSheet(
-            isShown = state.bottomSheet == BottomSheetType.TimeDisplay,
-            display = state.timeDisplay,
-            onDismiss = { onIntent(SettingsContract.Intent.BottomSheetDismissed) },
-            onTimeDisplayClicked = { onIntent(TimeDisplayChanged(it)) },
         )
 
         TrainFilterBottomSheet(
@@ -178,29 +155,11 @@ private fun SettingsScope.LineFilterSection() {
 }
 
 @Composable
-private fun SettingsScope.TimeDisplaySection() {
-    SettingsItem(
-        title = stringResource(string.setting_header_time_display),
-        subtitle = stringResource(state.timeDisplay.title),
-        onClick = { onIntent(TimeDisplayClicked) }
-    )
-}
-
-@Composable
 private fun SettingsScope.StationOrderSection() {
     SettingsItem(
         title = stringResource(string.station_order),
         subtitle = stringResource(state.stationSort.title),
         onClick = { onIntent(StationSortClicked) }
-    )
-}
-
-@Composable
-private fun SettingsScope.StationLimitSection() {
-    SettingsItem(
-        title = stringResource(string.settings_header_station_filter),
-        subtitle = stringResource(state.stationLimit.displayName),
-        onClick = { onIntent(StationLimitClicked) }
     )
 }
 

@@ -9,12 +9,18 @@ import com.sixbynine.transit.path.location.LocationPermissionRequestResult.Denie
 import com.sixbynine.transit.path.location.LocationPermissionRequestResult.Granted
 import com.sixbynine.transit.path.location.LocationProvider
 import com.sixbynine.transit.path.preferences.IntPersistable
-import com.sixbynine.transit.path.util.combineStates
+import com.sixbynine.transit.path.util.JsonFormat
+import com.sixbynine.transit.path.util.collectIn
 import com.sixbynine.transit.path.util.globalDataStore
+import com.sixbynine.transit.path.util.launchAndReturnUnit
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
 
 object SettingsManager {
     private const val AvoidMissingTrainsKey = "avoid_missing_trains"
@@ -29,6 +35,13 @@ object SettingsManager {
         SettingPersister("location_setting", LocationSetting.Disabled)
     private val avoidMissingTrainsPersister =
         GlobalSettingPersister(AvoidMissingTrainsKey, AvoidMissingTrains.Disabled)
+    private val commutingConfigurationPersister =
+        GlobalSettingPersister<CommutingConfiguration>(
+            "commuting",
+            defaultValue = CommutingConfiguration.default(),
+            toString = { JsonFormat.encodeToString(it) },
+            fromString = { JsonFormat.decodeFromString(it) }
+        )
 
     val locationSetting = locationSettingPersister.flow
     val trainFilter = trainFilterPersister.flow
@@ -38,21 +51,27 @@ object SettingsManager {
     val stationSort = stationSortPersister.flow
     val displayPresumedTrains = displayPresumedTrainsPersister.flow
     val avoidMissingTrains = avoidMissingTrainsPersister.flow
+    val commutingConfiguration = commutingConfigurationPersister.flow
 
-    val settings = combineStates(
-        locationSetting,
-        trainFilter,
-        lineFilter,
-        timeDisplay,
-        stationLimit,
-        stationSort,
-        displayPresumedTrains,
-        avoidMissingTrains,
-        ::AppSettings
+    private val _settings = MutableStateFlow(
+        AppSettings(
+            locationSetting.value,
+            trainFilter.value,
+            lineFilter.value,
+            timeDisplay.value,
+            stationLimit.value,
+            stationSort.value,
+            displayPresumedTrains.value,
+            avoidMissingTrains.value,
+            commutingConfiguration.value
+        )
     )
+    val settings = _settings.asStateFlow()
+
+    private val lightweightScope = CoroutineScope(Dispatchers.Default)
 
     init {
-        GlobalScope.launch(Dispatchers.Default) {
+        lightweightScope.launch {
             if (!LocationProvider().isLocationSupportedByDevice ||
                 !LocationProvider().hasLocationPermission()
             ) {
@@ -75,9 +94,47 @@ object SettingsManager {
                 }
             }
         }
+
+        locationSetting.collectIn(lightweightScope) { newSetting ->
+            _settings.update { it.copy(locationSetting = newSetting) }
+        }
+
+        trainFilter.collectIn(lightweightScope) { newSetting ->
+            _settings.update { it.copy(trainFilter = newSetting) }
+        }
+
+        lineFilter.collectIn(lightweightScope) { newSetting ->
+            _settings.update { it.copy(lineFilters = newSetting) }
+        }
+
+        timeDisplay.collectIn(lightweightScope) { newSetting ->
+            _settings.update { it.copy(timeDisplay = newSetting) }
+        }
+
+        stationLimit.collectIn(lightweightScope) { newSetting ->
+            _settings.update { it.copy(stationLimit = newSetting) }
+        }
+
+        stationSort.collectIn(lightweightScope) { newSetting ->
+            _settings.update { it.copy(stationSort = newSetting) }
+        }
+
+        displayPresumedTrains.collectIn(lightweightScope) { newSetting ->
+            _settings.update { it.copy(displayPresumedTrains = newSetting) }
+        }
+
+        avoidMissingTrains.collectIn(lightweightScope) { newSetting ->
+            _settings.update { it.copy(avoidMissingTrains = newSetting) }
+        }
+
+        commutingConfiguration.collectIn(lightweightScope) { newSetting ->
+            _settings.update { it.copy(commutingConfiguration = newSetting) }
+        }
+
+
     }
 
-    fun updateLocationSetting(enabled: Boolean) {
+    fun updateLocationSetting(enabled: Boolean) = lightweightScope.launchAndReturnUnit {
         val setting = when {
             !enabled -> LocationSetting.Disabled
             LocationProvider().hasLocationPermission() -> LocationSetting.Enabled
@@ -91,36 +148,40 @@ object SettingsManager {
         }
     }
 
-    fun updateTrainFilter(trainFilter: TrainFilter) {
+    fun updateTrainFilter(trainFilter: TrainFilter) = lightweightScope.launchAndReturnUnit {
         Analytics.filterSet(trainFilter)
         trainFilterPersister.update(trainFilter)
     }
 
-    fun updateLineFilters(lineFilters: Set<Line>) {
+    fun updateLineFilters(lineFilters: Set<Line>) = lightweightScope.launchAndReturnUnit {
         Analytics.lineFiltersSet(lineFilters)
         lineFilterPersister.update(lineFilters)
     }
 
-    fun updateTimeDisplay(timeDisplay: TimeDisplay) {
+    fun updateTimeDisplay(timeDisplay: TimeDisplay) = lightweightScope.launchAndReturnUnit {
         Analytics.timeDisplaySet(timeDisplay)
         timeDisplayPersister.update(timeDisplay)
     }
 
-    fun updateStationLimit(stationLimit: StationLimit) {
+    fun updateStationLimit(stationLimit: StationLimit) = lightweightScope.launchAndReturnUnit {
         Analytics.stationLimitSet(stationLimit)
         stationLimitPersister.update(stationLimit)
     }
 
-    fun updateStationSort(stationSort: StationSort) {
+    fun updateStationSort(stationSort: StationSort) = lightweightScope.launchAndReturnUnit {
         Analytics.stationSortSet(stationSort)
         stationSortPersister.update(stationSort)
     }
 
-    fun updateDisplayPresumedTrains(displayPresumedTrains: Boolean) {
+    fun updateDisplayPresumedTrains(
+        displayPresumedTrains: Boolean,
+    ) = lightweightScope.launchAndReturnUnit {
         displayPresumedTrainsPersister.update(displayPresumedTrains)
     }
 
-    fun updateAvoidMissingTrains(avoidMissingTrains: AvoidMissingTrains) {
+    fun updateAvoidMissingTrains(
+        avoidMissingTrains: AvoidMissingTrains,
+    ) = lightweightScope.launchAndReturnUnit {
         Analytics.avoidMissingTrainsSet(avoidMissingTrains)
         avoidMissingTrainsPersister.update(avoidMissingTrains)
     }
@@ -129,5 +190,12 @@ object SettingsManager {
         return globalDataStore().getLong(AvoidMissingTrainsKey)
             ?.let { IntPersistable.fromPersistence(it.toInt()) }
             ?: AvoidMissingTrains.Disabled
+    }
+
+    fun updateCommutingConfiguration(
+        configuration: CommutingConfiguration,
+    ) = lightweightScope.launchAndReturnUnit {
+        Analytics.commutingConfigurationSet()
+        commutingConfigurationPersister.update(configuration)
     }
 }

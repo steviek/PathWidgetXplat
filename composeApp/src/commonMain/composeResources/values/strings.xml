@@ -13,6 +13,8 @@
     <string name="avoid_missing_trains_description_3">Enable this setting to deduct three minutes from arrival times and help avoid missing trains.</string>
     <string name="app_name">Departures for PATH</string>
     <string name="back">Back</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
     <string name="buy_me_a_coffee">Buy me a coffee</string>
     <string name="cannot_move_explanation_closest">%1$s is the closest station</string>
     <string name="cannot_move_explanation_state">You have sorted stations by state</string>
@@ -23,8 +25,12 @@
     <string name="closest_station_setting_title">Display the closest station first</string>
     <string name="collapse">Collapse</string>
     <string name="complete_widget_setup">Complete widget setup</string>
-    <string name="commuting_schedule">Commuting schedule</string>
+    <string name="commuting_schedule">Commuting home schedule</string>
+    <string name="commuting_schedule_description">Customize the schedule for when you are commuting home. This controls the commuter sort options. For example, if you chose New Jersey Commuter, then New Jersey stations will show first unless this schedule is active</string>
     <string name="confirm">Confirm</string>
+    <string name="app_settings">Settings that apply to the app</string>
+    <string name="app_and_widget_settings">Settings that apply to the app and any widgets</string>
+    <string name="days">Days</string>
     <string name="delay_time">Delayed - </string>
     <string name="delete">Delete</string>
     <string name="done">Done</string>
@@ -37,13 +43,16 @@
     <string name="failed_to_fetch">Failed to fetch train times</string>
     <string name="failed_to_update">Failed to update</string>
     <string name="filter">Filter</string>
+    <string name="destination_state">Destination</string>
     <string name="interstate_explanation">Interstate trains includes trains heading toward New York from New Jersey stations, and vice versa.</string>
-    <string name="langauge_code">en</string>
+    <string name="language_code">en</string>
     <string name="learn_more">Learn more</string>
     <string name="lines">Lines</string>
     <string name="lines_show_all">Show all lines</string>
     <string name="move_down">Move down</string>
     <string name="move_up">Move up</string>
+    <string name="new_jersey">New Jersey</string>
+    <string name="new_york">New York</string>
     <string name="no_internet">No internet</string>
     <string name="open_in_browser">Open in browser</string>
     <string name="presumed_train">Presumed train</string>
@@ -53,6 +62,7 @@
     <string name="refreshing_short">…</string>
     <string name="report_a_problem">Report a problem</string>
     <string name="retry">Retry</string>
+    <string name="save">Save</string>
     <string name="send_feedback">Send feedback</string>
     <string name="setting_header_time_display">Time display</string>
     <string name="setting_time_display_clock">Clock</string>
@@ -68,6 +78,8 @@
     <string name="show_interstate_trains">Show only interstate trains</string>
     <string name="show_presumed_trains">Show presumed trains</string>
     <string name="sort">Sort</string>
+    <string name="start">Start</string>
+    <string name="end">End</string>
     <string name="station_empty">No trains announced for station</string>
     <string name="station_filter_four">4 trains</string>
     <string name="station_filter_none">No limit</string>

@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -157,8 +158,9 @@ class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
     }
 
     private companion object {
-        val ForcedStaleness = Staleness(staleAfter = 10.seconds, invalidAfter = 5.minutes)
-        val UnforcedStaleness = Staleness(staleAfter = 30.seconds, invalidAfter = 5.minutes)
+        private val FetchInvalidAfter = 6.hours
+        val ForcedStaleness = Staleness(staleAfter = 10.seconds, invalidAfter = FetchInvalidAfter)
+        val UnforcedStaleness = Staleness(staleAfter = 30.seconds, invalidAfter = FetchInvalidAfter)
         val FetchInterval = 1.minutes
 
         fun createInitialFetchData(data: FetchWithPrevious<WidgetData>): FetchData {
@@ -166,7 +168,7 @@ class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
             val lastFetchAge = lastFetch?.age
             val lastFetchData = lastFetch?.value
             val now = now()
-            if (lastFetchAge == null || lastFetchAge >= 10.minutes) {
+            if (lastFetchAge == null || lastFetchAge >= FetchInvalidAfter) {
                 return FetchData(
                     lastFetchTime = null,
                     nextFetchTime = now,

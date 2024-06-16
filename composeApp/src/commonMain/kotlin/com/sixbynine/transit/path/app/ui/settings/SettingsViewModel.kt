@@ -9,9 +9,7 @@ import com.sixbynine.transit.path.app.external.shareAppToSystem
 import com.sixbynine.transit.path.app.settings.SettingsManager
 import com.sixbynine.transit.path.app.ui.BaseViewModel
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.BottomSheetType.Lines
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.BottomSheetType.StationLimit
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.BottomSheetType.StationSort
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.BottomSheetType.TimeDisplay
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.BottomSheetType.TrainFilter
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Effect
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Effect.GoBack
@@ -28,19 +26,14 @@ import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.RateAp
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.SendFeedbackClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.ShareAppClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.ShowPresumedTrainsChanged
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.StationLimitClicked
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.StationLimitSelected
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.StationSortClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.StationSortSelected
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.TimeDisplayChanged
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.TimeDisplayClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.TrainFilterChanged
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.TrainFilterClicked
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.LocationSettingState
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.State
 import com.sixbynine.transit.path.location.LocationPermissionRequestResult
 import com.sixbynine.transit.path.location.LocationProvider
-import com.sixbynine.transit.path.util.launchAndReturnUnit
 import com.sixbynine.transit.path.util.withElementPresent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
@@ -48,10 +41,8 @@ import kotlinx.coroutines.flow.onEach
 
 class SettingsViewModel : BaseViewModel<State, Intent, Effect>(createInitialState()) {
     init {
-        updateStateOnEach(SettingsManager.timeDisplay) { copy(timeDisplay = it) }
         updateStateOnEach(SettingsManager.trainFilter) { copy(trainFilter = it) }
         updateStateOnEach(SettingsManager.lineFilter) { copy(lines = it) }
-        updateStateOnEach(SettingsManager.stationLimit) { copy(stationLimit = it) }
         updateStateOnEach(SettingsManager.stationSort) { copy(stationSort = it) }
         updateStateOnEach(SettingsManager.displayPresumedTrains) { copy(showPresumedTrains = it) }
         if (LocationProvider().isLocationSupportedByDevice) {
@@ -72,16 +63,24 @@ class SettingsViewModel : BaseViewModel<State, Intent, Effect>(createInitialStat
         }
     }
 
+    override val rateLimitedIntents: Set<Intent> = setOf(
+        StationSortClicked,
+        TrainFilterClicked,
+        LinesClicked,
+        BackClicked,
+        SendFeedbackClicked,
+        RateAppClicked,
+        ShareAppClicked,
+        BuyMeACoffeeClicked,
+        AdvancedSettingsClicked
+    )
+
     private inline fun <T> updateStateOnEach(flow: Flow<T>, crossinline block: State.(T) -> State) {
-        flow.onEach { updateState { block(it) } }.launchIn(viewModelScope)
+        flow.onEach { updateState { block(it) } }.launchIn(lightweightScope)
     }
 
-    override fun onIntent(intent: Intent) = viewModelScope.launchAndReturnUnit {
+    override suspend fun performIntent(intent: Intent) {
         when (intent) {
-            is TimeDisplayChanged -> {
-                SettingsManager.updateTimeDisplay(intent.display)
-                updateState { copy(bottomSheet = null) }
-            }
 
             is TrainFilterChanged -> {
                 SettingsManager.updateTrainFilter(intent.filter)
@@ -92,11 +91,6 @@ class SettingsViewModel : BaseViewModel<State, Intent, Effect>(createInitialStat
                 val newLineFilters =
                     state.value.lines.withElementPresent(intent.filter, intent.isChecked)
                 SettingsManager.updateLineFilters(newLineFilters)
-            }
-
-            is StationLimitSelected -> {
-                SettingsManager.updateStationLimit(intent.limit)
-                updateState { copy(bottomSheet = null) }
             }
 
             is StationSortSelected -> {
@@ -115,16 +109,8 @@ class SettingsViewModel : BaseViewModel<State, Intent, Effect>(createInitialStat
 
             BackClicked -> sendEffect(GoBack)
 
-            StationLimitClicked -> {
-                updateState { copy(bottomSheet = StationLimit) }
-            }
-
             StationSortClicked -> {
                 updateState { copy(bottomSheet = StationSort) }
-            }
-
-            TimeDisplayClicked -> {
-                updateState { copy(bottomSheet = TimeDisplay) }
             }
 
             BottomSheetDismissed -> {
@@ -178,10 +164,8 @@ class SettingsViewModel : BaseViewModel<State, Intent, Effect>(createInitialStat
             }
             return State(
                 locationSetting = locationSetting,
-                timeDisplay = SettingsManager.timeDisplay.value,
                 trainFilter = SettingsManager.trainFilter.value,
                 lines = SettingsManager.lineFilter.value,
-                stationLimit = SettingsManager.stationLimit.value,
                 stationSort = SettingsManager.stationSort.value,
                 showPresumedTrains = SettingsManager.displayPresumedTrains.value,
                 hasLocationPermission = LocationProvider().hasLocationPermission(),

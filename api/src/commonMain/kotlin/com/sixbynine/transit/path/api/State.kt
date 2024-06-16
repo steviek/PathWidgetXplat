@@ -1,9 +1,16 @@
 package com.sixbynine.transit.path.api
 
+import com.sixbynine.transit.path.api.State.NewJersey
+import com.sixbynine.transit.path.api.State.NewYork
 import com.sixbynine.transit.path.location.Location
 
 enum class State {
     NewJersey, NewYork
+}
+
+fun State.other(): State = when(this) {
+    NewJersey -> NewYork
+    NewYork -> NewJersey
 }
 
 val Station.state: State

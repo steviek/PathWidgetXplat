@@ -55,6 +55,10 @@ object Analytics {
         strategy.logEvent("avoid_missing_trains_set", mapOf("option" to option.name.lowercase()))
     }
 
+    fun commutingConfigurationSet() {
+        strategy.logEvent("avoid_missing_trains_set")
+    }
+
     fun shareAppClicked() {
         strategy.logEvent("share_app_clicked")
     }

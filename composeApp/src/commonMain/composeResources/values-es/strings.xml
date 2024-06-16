@@ -36,7 +36,7 @@
     <string name="failed_to_update">Un error se encontró</string>
     <string name="filter">Filtro</string>
     <string name="interstate_explanation">Los trenes interstatales incluyen trenes que van hacia Nueva York desde estaciones de Nueva Jersey, y viceversa</string>
-    <string name="langauge_code">es</string>
+    <string name="language_code">es</string>
     <string name="learn_more">Aprender más (en inglés)</string>
     <string name="lines">Líneas</string>
     <string name="lines_show_all">Mostrar todos las líneas</string>

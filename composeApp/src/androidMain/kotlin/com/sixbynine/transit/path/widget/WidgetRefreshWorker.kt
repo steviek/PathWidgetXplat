@@ -38,9 +38,7 @@ class WidgetRefreshWorker(
             )
             .await()
 
-        glanceIds.forEach { glanceId ->
-            DepartureBoardWidget().update(applicationContext, glanceId)
-        }
+        DepartureBoardWidget.onDataChanged()
 
         // I have a hunch that things are getting killed/cancelled too quickly, so keep us alive a
         // little longer.

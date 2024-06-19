@@ -19,7 +19,24 @@ struct DepartureBoardView: View {
         return ZStack {
             VStack(spacing: 0) {
                 if let data = entry.data {
-                    DepartureBoardStations(entry: entry, data: data)
+                    let footerHeight = max(
+                        measureTextHeight(
+                            maxSize: entry.size,
+                            text: "Updated",
+                            font: UIFont.systemFont(ofSize: 12)
+                        ),
+                        32
+                    )
+                    let innerWidth = entry.size.width - 32
+                    let innerHeight = entry.size.height - 20 - footerHeight
+                    
+                    DepartureBoardStations(
+                        entry: entry,
+                        data: data,
+                        width: innerWidth,
+                        height: innerHeight
+                    )
+                        .frame(width: innerWidth, height: innerHeight)
                     
                     HStack(alignment: .center, spacing: 0) {
                         Button(intent: RefreshIntent()) {

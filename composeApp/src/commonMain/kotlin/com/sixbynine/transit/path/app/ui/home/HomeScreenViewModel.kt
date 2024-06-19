@@ -62,14 +62,10 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import org.jetbrains.compose.resources.getString
-import pathwidgetxplat.composeapp.generated.resources.Res.string
-import pathwidgetxplat.composeapp.generated.resources.update_footer_text
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 
@@ -90,7 +86,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
             isEditing = false,
             timeDisplay = SettingsManager.timeDisplay.value,
             stationSort = SettingsManager.stationSort.value,
-            updateFooterText = runBlocking { createFooterText() },
+            updateFooterText = createFooterText(),
             data = fetchData.data?.toDepartureBoardData()?.adjustedForLatestSettings()
         )
     )
@@ -205,14 +201,19 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
         }
     }
 
-    private suspend fun createFooterText(): String? = with(fetchData) {
+    private fun createFooterText(): String? = with(fetchData) {
         val formattedFetchTime =
             WidgetDataFormatter.formatTimeWithSeconds(lastFetchTime ?: return@with null)
         // could be localized better, but this works for en and es
-        return getString(
-            string.update_footer_text,
-            formattedFetchTime,
-            "${timeUntilNextFetch.inWholeSeconds}s"
+        return localizedString(
+            en = {
+                "Updated at $formattedFetchTime, updating again in " +
+                        "${timeUntilNextFetch.inWholeSeconds}s"
+            },
+            es = {
+                "Se actualizó a las $formattedFetchTime, va actualizarse de nuevo en " +
+                        "${timeUntilNextFetch.inWholeSeconds}s"
+            }
         )
     }
 

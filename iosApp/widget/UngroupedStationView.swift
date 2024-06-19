@@ -17,11 +17,10 @@ struct UngroupedStationView: View {
     let station: WidgetData.StationData
     let width: CGFloat
     let height: CGFloat
-    let pad: Bool
     
     var body: some View {
-        let rowCountWith6Spacing = measureRowCount(initialHeight: height, pad: pad, rowSpacing: 6)
-        let rowCountWith4Spacing = measureRowCount(initialHeight: height, pad: pad, rowSpacing: 4)
+        let rowCountWith6Spacing = measureRowCount(initialHeight: height, rowSpacing: 6)
+        let rowCountWith4Spacing = measureRowCount(initialHeight: height, rowSpacing: 4)
         let rowCount = max(rowCountWith4Spacing, rowCountWith6Spacing)
         let rowSpacing: CGFloat = rowCountWith4Spacing > rowCountWith6Spacing ? 4 : 6
         VStack(alignment: .leading, spacing: 0) {
@@ -31,7 +30,7 @@ struct UngroupedStationView: View {
                     WidgetDataFormatter().formatHeadSign(
                         title: station.displayName,
                         fits: {
-                            let titleSpace = width - (pad ? 16 : 0) - 16
+                            let titleSpace = width - 16
                             let textWidth = measureTextWidth(text: $0, font: UIFont.systemFont(ofSize: 14, weight: .bold))
                             return (textWidth <= titleSpace).toKotlinBoolean()
                         }
@@ -68,7 +67,6 @@ struct UngroupedStationView: View {
                 }
                 
             }
-            .padding([.horizontal], pad ? 8 : 0)
             
             Spacer()
         }
@@ -121,7 +119,7 @@ struct UngroupedStationView: View {
         }
     }
     
-    private func measureRowCount(initialHeight: CGFloat, pad: Bool, rowSpacing: CGFloat) -> Int {
+    private func measureRowCount(initialHeight: CGFloat, rowSpacing: CGFloat) -> Int {
         var height = initialHeight
         let headerHeight = measureTextHeight(text: "Updated", font: UIFont.systemFont(ofSize: 14, weight: .bold))
         height -= headerHeight

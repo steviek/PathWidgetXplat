@@ -17,37 +17,48 @@ struct DepartureBoardStations: View {
     let height: CGFloat
     
     var body: some View {
-        let tileWidth = data.stations.count > 1 ? (width / 2) - 8 : width
-        let tileHeight = data.stations.count > 2 ? (height / 2) - 8 : height
+        let columnWidth = data.stations.count > 1 ? (width / 2) - 8 : width
+        
+        // If we have multiple columns, then pad the sides of the station tiles.
         let pad = data.stations.count > 1
+        let tileWidth = columnWidth - (pad ? 16 : 0)
+        let tileHeight = data.stations.count > 2 ? (height / 2) - 8 : height
         HStack(spacing: 0) {
+            if (pad) {
+                Spacer().frame(width: 8)
+            }
+
             VStack(alignment: .leading, spacing: 0) {
                 if (data.stations.count > 0) {
-                    stationView(data.stations[0], width: tileWidth, height: tileHeight, pad: pad)
+                    stationView(data.stations[0], width: tileWidth, height: tileHeight)
                 }
                 
                 if (data.stations.count > 2) {
                     Spacer().frame(height: 16)
-                    stationView(data.stations[2], width: tileWidth, height: tileHeight, pad: pad)
+                    stationView(data.stations[2], width: tileWidth, height: tileHeight)
                 }
             }
             .frame(width: tileWidth, height: height)
             
             if (data.stations.count > 1) {
-                Spacer().frame(width: 16)
+                Spacer().frame(width: 32)
                 VStack(alignment: .leading, spacing: 0) {
                     if (data.stations.count > 1) {
-                        stationView(data.stations[1], width: tileWidth, height: tileHeight, pad: pad)
+                        stationView(data.stations[1], width: tileWidth, height: tileHeight)
                     }
                     
                     if (data.stations.count > 3) {
                         Spacer().frame(height: 16)
-                        stationView(data.stations[3], width: tileWidth, height: tileHeight, pad: pad)
+                        stationView(data.stations[3], width: tileWidth, height: tileHeight)
                     } else if (data.stations.count > 2) {
                         Spacer()
                     }
                 }
                 .frame(width: tileWidth, height: height)
+            }
+            
+            if (pad) {
+                Spacer().frame(width: 8)
             }
         }
         .frame(width: width, height: height)
@@ -57,24 +68,21 @@ struct DepartureBoardStations: View {
     private func stationView(
         _ station: WidgetData.StationData,
         width: CGFloat,
-        height: CGFloat,
-        pad: Bool
+        height: CGFloat
     ) -> some View {
         if (entry.configuration.trainGrouping == .ungrouped) {
             UngroupedStationView(
                 entry: entry,
                 station: station,
                 width: width,
-                height: height,
-                pad: pad
+                height: height
             )
         } else {
             UngroupedStationView(
                 entry: entry,
                 station: station,
                 width: width,
-                height: height,
-                pad: pad
+                height: height
             )
         }
     }

@@ -15,6 +15,8 @@
 		AA9B5F7C2C1F831C00251F59 /* DepartureBoardStations.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9B5F7B2C1F831C00251F59 /* DepartureBoardStations.swift */; };
 		AA9B5F7E2C1F83C100251F59 /* ViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9B5F7D2C1F83C100251F59 /* ViewExtensions.swift */; };
 		AA9B5F802C1FC7B000251F59 /* UngroupedStationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9B5F7F2C1FC7B000251F59 /* UngroupedStationView.swift */; };
+		AA9B5F822C23380B00251F59 /* GroupedStationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9B5F812C23380B00251F59 /* GroupedStationView.swift */; };
+		AA9B5F842C23383800251F59 /* ColorCircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9B5F832C23383800251F59 /* ColorCircle.swift */; };
 		AAB47C192B15A46400079022 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AAB47C182B15A46400079022 /* WidgetKit.framework */; };
 		AAB47C1B2B15A46400079022 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AAB47C1A2B15A46400079022 /* SwiftUI.framework */; };
 		AAB47C1E2B15A46400079022 /* widgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB47C1D2B15A46400079022 /* widgetBundle.swift */; };
@@ -76,6 +78,8 @@
 		AA9B5F7B2C1F831C00251F59 /* DepartureBoardStations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepartureBoardStations.swift; sourceTree = "<group>"; };
 		AA9B5F7D2C1F83C100251F59 /* ViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewExtensions.swift; sourceTree = "<group>"; };
 		AA9B5F7F2C1FC7B000251F59 /* UngroupedStationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UngroupedStationView.swift; sourceTree = "<group>"; };
+		AA9B5F812C23380B00251F59 /* GroupedStationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupedStationView.swift; sourceTree = "<group>"; };
+		AA9B5F832C23383800251F59 /* ColorCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorCircle.swift; sourceTree = "<group>"; };
 		AAB47C172B15A46400079022 /* widgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = widgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		AAB47C182B15A46400079022 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		AAB47C1A2B15A46400079022 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -193,6 +197,8 @@
 				AA9B5F7B2C1F831C00251F59 /* DepartureBoardStations.swift */,
 				AA9B5F7D2C1F83C100251F59 /* ViewExtensions.swift */,
 				AA9B5F7F2C1FC7B000251F59 /* UngroupedStationView.swift */,
+				AA9B5F812C23380B00251F59 /* GroupedStationView.swift */,
+				AA9B5F832C23383800251F59 /* ColorCircle.swift */,
 			);
 			path = widget;
 			sourceTree = "<group>";
@@ -398,8 +404,10 @@
 			files = (
 				AAB47C3E2B15ABB800079022 /* EmptyDepartureBoardView.swift in Sources */,
 				AAB47C442B15AD4000079022 /* FetchResult.swift in Sources */,
+				AA9B5F842C23383800251F59 /* ColorCircle.swift in Sources */,
 				AAB47C422B15AD3200079022 /* WidgetInterop.swift in Sources */,
 				AAB47C3A2B15AB9600079022 /* DepartureBoardView.swift in Sources */,
+				AA9B5F822C23380B00251F59 /* GroupedStationView.swift in Sources */,
 				AA9B5F7C2C1F831C00251F59 /* DepartureBoardStations.swift in Sources */,
 				AAB47C3B2B15AB9600079022 /* ConfigurationAppIntent.swift in Sources */,
 				AA9B5F802C1FC7B000251F59 /* UngroupedStationView.swift in Sources */,

@@ -1,15 +1,15 @@
 //
-//  UngroupedStationView.swift
+//  GroupedStationView.swift
 //  widgetExtension
 //
-//  Created by Steven Kideckel on 2024-06-16.
+//  Created by Steven Kideckel on 2024-06-19.
 //  Copyright © 2024 orgName. All rights reserved.
 //
 
 import SwiftUI
 import ComposeApp
 
-struct UngroupedStationView: View {
+struct GroupedStationView: View {
     
     let entry: SimpleEntry
     let station: WidgetData.StationData
@@ -109,5 +109,3 @@ struct UngroupedStationView: View {
         measureTextSize(maxSize: entry.size, text: text, font: font)
     }
 }
-
-

@@ -17,6 +17,8 @@
 		AA9B5F802C1FC7B000251F59 /* UngroupedStationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9B5F7F2C1FC7B000251F59 /* UngroupedStationView.swift */; };
 		AA9B5F822C23380B00251F59 /* GroupedStationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9B5F812C23380B00251F59 /* GroupedStationView.swift */; };
 		AA9B5F842C23383800251F59 /* ColorCircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9B5F832C23383800251F59 /* ColorCircle.swift */; };
+		AA9B5F862C233A6900251F59 /* StationTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9B5F852C233A6900251F59 /* StationTitle.swift */; };
+		AA9B5F882C23785800251F59 /* EntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9B5F872C23785800251F59 /* EntryView.swift */; };
 		AAB47C192B15A46400079022 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AAB47C182B15A46400079022 /* WidgetKit.framework */; };
 		AAB47C1B2B15A46400079022 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AAB47C1A2B15A46400079022 /* SwiftUI.framework */; };
 		AAB47C1E2B15A46400079022 /* widgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB47C1D2B15A46400079022 /* widgetBundle.swift */; };
@@ -80,6 +82,8 @@
 		AA9B5F7F2C1FC7B000251F59 /* UngroupedStationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UngroupedStationView.swift; sourceTree = "<group>"; };
 		AA9B5F812C23380B00251F59 /* GroupedStationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupedStationView.swift; sourceTree = "<group>"; };
 		AA9B5F832C23383800251F59 /* ColorCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorCircle.swift; sourceTree = "<group>"; };
+		AA9B5F852C233A6900251F59 /* StationTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StationTitle.swift; sourceTree = "<group>"; };
+		AA9B5F872C23785800251F59 /* EntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryView.swift; sourceTree = "<group>"; };
 		AAB47C172B15A46400079022 /* widgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = widgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		AAB47C182B15A46400079022 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		AAB47C1A2B15A46400079022 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -199,6 +203,8 @@
 				AA9B5F7F2C1FC7B000251F59 /* UngroupedStationView.swift */,
 				AA9B5F812C23380B00251F59 /* GroupedStationView.swift */,
 				AA9B5F832C23383800251F59 /* ColorCircle.swift */,
+				AA9B5F852C233A6900251F59 /* StationTitle.swift */,
+				AA9B5F872C23785800251F59 /* EntryView.swift */,
 			);
 			path = widget;
 			sourceTree = "<group>";
@@ -403,6 +409,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AAB47C3E2B15ABB800079022 /* EmptyDepartureBoardView.swift in Sources */,
+				AA9B5F862C233A6900251F59 /* StationTitle.swift in Sources */,
 				AAB47C442B15AD4000079022 /* FetchResult.swift in Sources */,
 				AA9B5F842C23383800251F59 /* ColorCircle.swift in Sources */,
 				AAB47C422B15AD3200079022 /* WidgetInterop.swift in Sources */,
@@ -416,6 +423,7 @@
 				AAB47C1E2B15A46400079022 /* widgetBundle.swift in Sources */,
 				AAB47C202B15A46400079022 /* widget.swift in Sources */,
 				AA9B5F7E2C1F83C100251F59 /* ViewExtensions.swift in Sources */,
+				AA9B5F882C23785800251F59 /* EntryView.swift in Sources */,
 				AAB47C402B15AD2300079022 /* RefreshIntent.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

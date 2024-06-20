@@ -47,3 +47,16 @@ extension ColorWrapper {
         )
     }
 }
+
+extension TimeDisplay {
+    func toKotlinTimeDisplay() -> ComposeApp.TimeDisplay {
+        switch self {
+        case .clock:
+            return ComposeApp.TimeDisplay.clock
+        case .relative:
+            return ComposeApp.TimeDisplay.relative
+        default:
+            return ComposeApp.TimeDisplay.clock
+        }
+    }
+}

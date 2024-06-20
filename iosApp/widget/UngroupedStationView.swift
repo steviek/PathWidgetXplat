@@ -9,7 +9,7 @@
 import SwiftUI
 import ComposeApp
 
-struct UngroupedStationView: View {
+struct UngroupedStationView: EntryView {
     
     let entry: SimpleEntry
     let station: WidgetData.StationData
@@ -22,23 +22,7 @@ struct UngroupedStationView: View {
         let rowCount = max(rowCountWith4Spacing, rowCountWith6Spacing)
         let rowSpacing: CGFloat = rowCountWith4Spacing > rowCountWith6Spacing ? 4 : 6
         VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 0) {
-                Spacer()
-                Text(
-                    WidgetDataFormatter().formatHeadSign(
-                        title: station.displayName,
-                        fits: {
-                            let titleSpace = width - 16
-                            let textWidth = measureTextWidth(text: $0, font: UIFont.systemFont(ofSize: 14, weight: .bold))
-                            return (textWidth <= titleSpace).toKotlinBoolean()
-                        }
-                    )
-                )
-                .multilineTextAlignment(.center)
-                .font(Font.system(size: 14))
-                .fontWeight(.bold)
-                Spacer()
-            }
+            StationTitle(title: station.displayName, width: width, maxHeight: height)
                         
             let trains = station.trains
                 .filter { train in !train.isPast(now: entry.date.toKotlinInstant())}
@@ -95,18 +79,6 @@ struct UngroupedStationView: View {
         
         let rowHeight = measureTextHeight(text: "To", font: UIFont.systemFont(ofSize: 12)) + rowSpacing
         return Int(floor(height / rowHeight))
-    }
-    
-    private func measureTextHeight(text: String, font: UIFont) -> CGFloat {
-        measureTextSize(text: text, font: font).height
-    }
-    
-    private func measureTextWidth(text: String, font: UIFont) -> CGFloat {
-        measureTextSize(text: text, font: font).width
-    }
-    
-    private func measureTextSize(text: String, font: UIFont) -> CGRect {
-        measureTextSize(maxSize: entry.size, text: text, font: font)
     }
 }
 

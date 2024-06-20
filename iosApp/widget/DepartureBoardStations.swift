@@ -27,7 +27,7 @@ struct DepartureBoardStations: View {
             if (pad) {
                 Spacer().frame(width: 8)
             }
-
+            
             VStack(alignment: .leading, spacing: 0) {
                 if (data.stations.count > 0) {
                     stationView(data.stations[0], width: tileWidth, height: tileHeight)
@@ -70,15 +70,16 @@ struct DepartureBoardStations: View {
         width: CGFloat,
         height: CGFloat
     ) -> some View {
-        if (entry.configuration.trainGrouping == .ungrouped) {
+        switch entry.configuration.trainGrouping {
+        case .ungrouped:
             UngroupedStationView(
                 entry: entry,
                 station: station,
                 width: width,
                 height: height
             )
-        } else {
-            UngroupedStationView(
+        case .byHeadsign:
+            GroupedStationView(
                 entry: entry,
                 station: station,
                 width: width,

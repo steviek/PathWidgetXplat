@@ -103,9 +103,6 @@ struct ConfigurationAppIntent: WidgetConfigurationIntent {
     @Parameter(title: "Lines", default: [LineChoice.nwkWtc, LineChoice.hobWtc, LineChoice.jsq33, LineChoice.hob33])
     var lines: [LineChoice]
     
-    @Parameter(title: "Order", default: SortOrder.alphabetical)
-    var sortOrder: SortOrder
-    
     @Parameter(title: "Filter", default: Filter.all)
     var filter: Filter
     
@@ -115,28 +112,31 @@ struct ConfigurationAppIntent: WidgetConfigurationIntent {
     @Parameter(title: "Grouping", default: TrainGrouping.ungrouped)
     var trainGrouping: TrainGrouping
     
+    @Parameter(title: "Order", default: SortOrder.alphabetical)
+    var sortOrder: SortOrder
+    
     init() {
         self.stations = []
         self.lines = LineChoice.allCases
-        self.sortOrder = .alphabetical
         self.filter = .all
         self.timeDisplay = .relative
         self.trainGrouping = .ungrouped
+        self.sortOrder = .alphabetical
     }
     
     init(
         stations: [StationChoice] = [],
         lines: [LineChoice] = LineChoice.allCases,
-        sortOrder: SortOrder = .alphabetical,
         filter: Filter = .all,
         timeDisplay: TimeDisplay = .relative,
-        trainGrouping: TrainGrouping = .ungrouped
+        trainGrouping: TrainGrouping = .ungrouped,
+        sortOrder: SortOrder = .alphabetical
     ) {
         self.stations = stations
         self.lines = lines
-        self.sortOrder = sortOrder
         self.filter = filter
         self.timeDisplay = timeDisplay
         self.trainGrouping = trainGrouping
+        self.sortOrder = sortOrder
     }
 }

@@ -66,6 +66,7 @@ object WidgetDataFetcher {
                 value.orEmpty().joinToString(separator = ",") { it.pathApiName }
         }
 
+    @Suppress("UNUSED") // Used by swift code
     fun widgetFetchStaleness(force: Boolean): Staleness {
         return Staleness(
             staleAfter = if (force) 5.seconds else 30.seconds,
@@ -73,6 +74,7 @@ object WidgetDataFetcher {
         )
     }
 
+    @Suppress("UNUSED") // Used by swift code
     fun fetchWidgetData(
         stationLimit: Int,
         stations: List<Station>,
@@ -228,6 +230,15 @@ object WidgetDataFetcher {
                 apiTrains
                     .groupBy { it.headsign }
                     .mapNotNull { (headSign, trains) ->
+                        if (!matchesFilter(station, headSign, filter)) {
+                            return@mapNotNull null
+                        }
+
+                        val headSignLines = trains.flatMap { it.lines }.toSet()
+                        if (headSignLines.isNotEmpty() && headSignLines.none { it in lines }) {
+                            return@mapNotNull null
+                        }
+
                         val colors =
                             trains.flatMap { it.lineColors }
                                 .distinct()
@@ -243,11 +254,7 @@ object WidgetDataFetcher {
                                 .distinct()
                                 .sorted()
                         if (arrivals.isEmpty()) return@mapNotNull null
-                        WidgetData.SignData(
-                            headSign,
-                            colors,
-                            arrivals,
-                        )
+                        WidgetData.SignData(headSign, colors, arrivals)
                     }
                     .sortedBy { it.projectedArrivals.min() }
 
@@ -269,7 +276,7 @@ object WidgetDataFetcher {
                     (train.lines == null || train.lines.any { line -> line in lines })
                         .also {
                             if (!it) {
-                                Logging.d("Filtering out train ${train} because it's not in the right lines")
+                                Logging.d("Filtering out train $train because it's not in the right lines")
                             }
                         }
                 }
@@ -308,9 +315,17 @@ object WidgetDataFetcher {
         train: WidgetData.TrainData,
         filter: TrainFilter
     ): Boolean {
+        return matchesFilter(station, train.title, filter)
+    }
+
+    private fun matchesFilter(
+        station: Station,
+        headSign: String,
+        filter: TrainFilter
+    ): Boolean {
         if (filter == TrainFilter.All) return true
 
-        val destination = Stations.fromHeadSign(train.title) ?: return true
+        val destination = Stations.fromHeadSign(headSign) ?: return true
         return when {
             // Newport -> Hoboken is the only time an NJ-terminating train travels east.
             destination == Stations.Hoboken -> station.isInNewYork
@@ -361,18 +376,16 @@ object WidgetDataFetcher {
         return projectedDateTime.hour !in 6..9 && projectedDateTime.hour !in 16..19
     }
 
+    @Suppress("UNUSED") // Used by swift code
     fun prunePassedDepartures(data: WidgetData?, time: Instant): WidgetData? {
         data ?: return null
         return data.copy(
             stations = data.stations.map { station ->
                 station.copy(
                     trains = station.trains.filter { it.projectedArrival >= time },
-                    signs = station.signs.map { sign ->
-                        sign.copy(
-                            projectedArrivals = sign.projectedArrivals.filter {
-                                it >= time
-                            }
-                        )
+                    signs = station.signs.mapNotNull { sign ->
+                        sign.copy(projectedArrivals = sign.projectedArrivals.filter { it >= time })
+                            .takeUnless { it.projectedArrivals.isEmpty() }
                     }
                 )
             }

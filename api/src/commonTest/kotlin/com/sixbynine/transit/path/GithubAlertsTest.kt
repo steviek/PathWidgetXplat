@@ -39,9 +39,6 @@ class GithubAlertsTest {
     @Test
     fun `current alerts text`() {
         val alerts = GithubAlerts(
-            MemorialDayGroveStAlert,
-            MemorialDayOvernightCleaning,
-            GeneralGroveStAlert,
             GeneralOvernightCleaning,
             FourteenthStreetOvernight,
         )

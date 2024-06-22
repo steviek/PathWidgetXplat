@@ -9,6 +9,7 @@ import pathwidgetxplat.composeapp.generated.resources.Res.string
 import pathwidgetxplat.composeapp.generated.resources.edit_to_add_stations
 import pathwidgetxplat.composeapp.generated.resources.error_long
 import pathwidgetxplat.composeapp.generated.resources.error_short
+import pathwidgetxplat.composeapp.generated.resources.station_empty
 import pathwidgetxplat.composeapp.generated.resources.updated_at_time
 import pathwidgetxplat.composeapp.generated.resources.updated_at_time_relative_full
 import pathwidgetxplat.composeapp.generated.resources.updated_at_time_relative_shorter
@@ -33,6 +34,8 @@ object IosResourceProvider {
     fun getErrorLong(): String = getStringBlocking(string.error_long)
 
     fun getErrorShort(): String = getStringBlocking(string.error_short)
+
+    fun getNoTrainsText(): String = getStringBlocking(string.station_empty)
 
     private inline fun getStringBlocking(resource: StringResource): String = runBlocking {
         val start = now()

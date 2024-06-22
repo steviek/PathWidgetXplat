@@ -50,6 +50,16 @@ struct UngroupedStationView: EntryView {
                 
             }
             
+            if (trains.isEmpty) {
+                HStack {
+                    Spacer()
+                    Text(IosResourceProvider().getNoTrainsText())
+                        .font(Font.system(size: 11))
+                        .multilineTextAlignment(.center)
+                    Spacer()
+                }
+            }
+            
             Spacer()
         }
         .frame(width: width, height: height)

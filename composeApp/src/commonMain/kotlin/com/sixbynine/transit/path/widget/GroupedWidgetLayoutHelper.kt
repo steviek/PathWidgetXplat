@@ -6,148 +6,129 @@ import com.sixbynine.transit.path.app.settings.TimeDisplay.Relative
 import com.sixbynine.transit.path.app.ui.ColorWrapper
 import com.sixbynine.transit.path.app.ui.FontInfo
 import com.sixbynine.transit.path.app.ui.SizeWrapper
+import com.sixbynine.transit.path.util.localizedString
 import com.sixbynine.transit.path.widget.GroupedWidgetLayoutInfo.SignLayoutInfo
+import com.sixbynine.transit.path.widget.WidgetData.SignData
 import com.sixbynine.transit.path.widget.WidgetData.StationData
 import kotlinx.datetime.Instant
 
-object GroupedWidgetLayoutHelper {
-    fun computeLayoutInfo(
-        station: StationData,
-        displayAt: Instant,
-        timeDisplay: TimeDisplay,
-        width: Double,
-        height: Double,
-        measure: (text: String, font: FontInfo) -> SizeWrapper,
-    ): GroupedWidgetLayoutInfo {
-        fun measureHeight(text: String, font: FontInfo): Double {
-            return measure(text, font).height
-        }
+@Suppress("unused") // Called by swift
+class GroupedWidgetLayoutHelper(
+    private val station: StationData,
+    private val displayAt: Instant,
+    private val timeDisplay: TimeDisplay,
+    private val width: Double,
+    private val height: Double,
+    private val measure: (text: String, font: FontInfo) -> SizeWrapper,
+) {
 
-        fun measureWidth(text: String, font: FontInfo): Double {
-            return measure(text, font).width
-        }
+    private val relSubtextPrefix = localizedString(en = "also in ", es = "también en ")
+    private val clockSubtextPrefix = localizedString(en = "also at ", es = "también a las ")
 
+    fun computeLayoutInfo(): GroupedWidgetLayoutInfo {
         val titleHeight = measureHeight("Hello", Font.StationTitle)
-        // Title plus some spacing below it
         val stationHeadlineHeight = maxOf(12.0, measureHeight("WTC", Font.SignTitle))
         val arrivalTextHeight = measureHeight("in 10 min", Font.NextArrivalText)
 
         val signCount = station.signs.size
-        var subLineCount = 1
-        var spacingBetweenSigns = 16
-        var spacingBelowTitle = 8
-        val spacingBelowHeadSign = 2
-        while (subLineCount > 0 || spacingBetweenSigns > 4 || spacingBelowTitle > 4) {
+
+        val sizeConfiguration = chooseLargestStep(SizeConfiguration.Steps) { step ->
+            val subLineCount = if (step.hasSubtext) 1 else 0
+            val spacingBelowTitle = step.spacingBelowTitle
+            val spacingBelowHeadSign = step.spacingBelowHeadSign
+            val spacingBetweenSigns = step.spacingBetweenSigns
+
             val heightForSigns = height - titleHeight - spacingBelowTitle
 
             val heightNeededForSign =
                 stationHeadlineHeight + subLineCount * arrivalTextHeight + spacingBelowHeadSign
             val totalHeightNeeded =
                 heightNeededForSign * signCount + (spacingBetweenSigns * (signCount - 1))
-            if (totalHeightNeeded <= heightForSigns) {
-                // If this fits, let's go with this...
-                break
-            }
 
-            // Otherwise, shrink something to try for the next level down.
-            when {
-                spacingBetweenSigns > 12 -> spacingBetweenSigns = 12
-                spacingBetweenSigns > 10 -> spacingBetweenSigns = 10
-                spacingBetweenSigns > 8 -> spacingBetweenSigns = 8
-                spacingBetweenSigns > 6 -> spacingBetweenSigns = 6
-                spacingBelowTitle > 6 -> spacingBelowTitle = 6
-                spacingBelowTitle > 4 -> spacingBelowTitle = 4
-                spacingBetweenSigns > 4 -> spacingBetweenSigns = 4
-                else -> {
-                    spacingBetweenSigns = 16
-                    spacingBelowTitle = 8
-                    subLineCount--
-                }
-            }
+            totalHeightNeeded <= heightForSigns
         }
 
-        val spaceForHeadSign =
-            if (subLineCount > 0) {
-                width - 20 - measureWidth("10 min", Font.NextArrivalText)
-            } else {
-                0.0
-            }
-
+        val spaceForHeadSign = if (sizeConfiguration.hasSubtext) {
+            width - 20 - measureWidth("10 min", Font.NextArrivalText)
+        } else {
+            0.0
+        }
 
         val signLayoutInfos =
             station
                 .signs
                 .sortedBy { it.projectedArrivals.minOrNull() }
-                .map { sign ->
-                    val title = WidgetDataFormatter.formatHeadSign(
-                        title = sign.title,
-                        fits = {
-                            measure(it, Font.SignTitle).width <= spaceForHeadSign
-                        }
-                    )
+                .mapNotNull { sign ->
+                    val title =
+                        WidgetDataFormatter.formatHeadSign(
+                            title = sign.title,
+                            fits = { measure(it, Font.SignTitle).width <= spaceForHeadSign }
+                        )
 
-                    val firstArrival: String
-                    val formattedArrivalTimes = when (timeDisplay) {
-                        Relative -> run {
-                            val availableWidth = when (subLineCount) {
-                                0 -> width - 20 - measureWidth(title, Font.SignTitle)
-                                1 -> width
-                                else -> width * subLineCount * 0.9
-                            }
-                            firstArrival =
-                                sign.projectedArrivals.firstOrNull()?.let { time ->
-                                    WidgetDataFormatter.formatRelativeTime(
-                                        displayAt,
-                                        time
-                                    )
-                                }.orEmpty()
-
-
-                            for (i in sign.projectedArrivals.size downTo 2) {
-                                val formattedTimes =
-                                    sign.projectedArrivals.take(i).drop(1).joinToString(
-                                        prefix = "also in ",
-                                        postfix = " min",
-                                    ) { time ->
-                                        val minutesToArrival = (time - displayAt).inWholeMinutes
-                                        minutesToArrival.coerceAtLeast(0).toString()
-                                    }
-                                if (measureWidth(
-                                        formattedTimes,
-                                        Font.NextArrivalText
-                                    ) <= availableWidth
-                                ) {
-                                    return@run formattedTimes
-                                }
-                            }
-
-                            firstArrival
+                    val nextArrivalTime =
+                        sign.projectedArrivals.firstOrNull() ?: return@mapNotNull null
+                    val nextArrival = when (timeDisplay) {
+                        Relative -> {
+                            WidgetDataFormatter.formatRelativeTime(displayAt, nextArrivalTime)
                         }
 
                         Clock -> {
-                            firstArrival = sign.projectedArrivals.firstOrNull()
-                                ?.let { WidgetDataFormatter.formatTime(it) }.orEmpty()
-                            sign.projectedArrivals.joinToString {
-                                WidgetDataFormatter.formatTime(it)
-                            }
+                            WidgetDataFormatter.formatTime(nextArrivalTime)
                         }
                     }
 
+                    val subtext = createSubtext(sizeConfiguration, sign)
                     SignLayoutInfo(
                         title = title,
                         colors = sign.colors,
-                        nextArrival = firstArrival,
-                        formattedArrivalTimes = formattedArrivalTimes,
+                        nextArrival = nextArrival,
+                        subtext = subtext,
                     )
                 }
 
         return GroupedWidgetLayoutInfo(
             signs = signLayoutInfos,
-            spacingBetweenSigns = spacingBetweenSigns.toDouble(),
-            lineCountBelowTitle = subLineCount,
-            spacingBelowTitle = spacingBelowTitle.toDouble(),
-            spacingBelowHeadSign = spacingBelowHeadSign.toDouble(),
+            spacingBetweenSigns = sizeConfiguration.spacingBetweenSigns.toDouble(),
+            lineCountBelowTitle = if (sizeConfiguration.hasSubtext) 1 else 0,
+            spacingBelowTitle = sizeConfiguration.spacingBelowTitle.toDouble(),
+            spacingBelowHeadSign = sizeConfiguration.spacingBelowHeadSign.toDouble(),
         )
+    }
+
+    private fun createSubtext(
+        sizeConfiguration: SizeConfiguration,
+        sign: SignData,
+    ): String? {
+        if (!sizeConfiguration.hasSubtext) return null
+
+        val nextArrivals = sign.projectedArrivals.drop(1)
+        if (nextArrivals.isEmpty()) {
+            return " "
+        }
+
+        val timesToText: (List<Instant>) -> String = when (timeDisplay) {
+            Relative -> { times ->
+                times.joinToString(prefix = relSubtextPrefix, postfix = " min") { time ->
+                    val minutesToArrival = (time - displayAt).inWholeMinutes
+                    minutesToArrival.coerceAtLeast(0).toString()
+                }
+            }
+
+            Clock -> { times ->
+                times.joinToString(prefix = clockSubtextPrefix) { time ->
+                    WidgetDataFormatter.formatTime(time)
+                }
+            }
+        }
+
+        val steps = (nextArrivals.size downTo 1).toList()
+        return chooseWidestText(
+            maxWidth = width,
+            font = Font.ArrivalLinesText,
+            steps = steps
+        ) { step ->
+            timesToText(nextArrivals.take(step))
+        }
     }
 
     private object Font {
@@ -155,6 +136,38 @@ object GroupedWidgetLayoutHelper {
         val SignTitle = FontInfo(12, isBold = true)
         val NextArrivalText = FontInfo(12, isBold = true, isMonospacedDigit = true)
         val ArrivalLinesText = FontInfo(11, isMonospacedDigit = true)
+    }
+
+    private fun <T> chooseWidestText(
+        maxWidth: Double,
+        font: FontInfo,
+        steps: List<T>,
+        stringify: (T) -> String
+    ): String {
+        val step = chooseLargestStep(steps) { measureWidth(stringify(it), font) <= maxWidth }
+        return stringify(step)
+    }
+
+    private fun <T> chooseLargestStep(steps: List<T>, fits: (T) -> Boolean): T {
+        require(steps.isNotEmpty())
+        steps.forEachIndexed { index, step ->
+            if (index == steps.lastIndex) {
+                return@forEachIndexed
+            }
+
+            if (fits(step)) {
+                return step
+            }
+        }
+        return steps.last()
+    }
+
+    private fun measureHeight(text: String, font: FontInfo): Double {
+        return measure(text, font).height
+    }
+
+    private fun measureWidth(text: String, font: FontInfo): Double {
+        return measure(text, font).width
     }
 }
 
@@ -169,32 +182,32 @@ data class GroupedWidgetLayoutInfo(
         val title: String,
         val colors: List<ColorWrapper>,
         val nextArrival: String,
-        val formattedArrivalTimes: String,
+        val subtext: String?,
     )
 }
 
-data class RelativeTimesFormatConfiguration(val postfix: String, val separator: String) {
+data class SizeConfiguration(
+    val hasSubtext: Boolean,
+    val spacingBetweenSigns: Int,
+    val spacingBelowTitle: Int,
+    val spacingBelowHeadSign: Int = 2
+) {
     companion object {
-        val WiderOptions = listOf(
-            RelativeTimesFormatConfiguration(" min", ", "),
-            RelativeTimesFormatConfiguration(" min", ","),
-            RelativeTimesFormatConfiguration("", ", "),
+        val Steps = listOf(
+            SizeConfiguration(hasSubtext = true, spacingBetweenSigns = 16, spacingBelowTitle = 8),
+            SizeConfiguration(hasSubtext = true, spacingBetweenSigns = 12, spacingBelowTitle = 8),
+            SizeConfiguration(hasSubtext = true, spacingBetweenSigns = 8, spacingBelowTitle = 8),
+            SizeConfiguration(hasSubtext = true, spacingBetweenSigns = 6, spacingBelowTitle = 8),
+            SizeConfiguration(hasSubtext = true, spacingBetweenSigns = 6, spacingBelowTitle = 6),
+            SizeConfiguration(hasSubtext = true, spacingBetweenSigns = 6, spacingBelowTitle = 4),
+            SizeConfiguration(hasSubtext = true, spacingBetweenSigns = 4, spacingBelowTitle = 4),
+            SizeConfiguration(hasSubtext = false, spacingBetweenSigns = 16, spacingBelowTitle = 8),
+            SizeConfiguration(hasSubtext = false, spacingBetweenSigns = 12, spacingBelowTitle = 8),
+            SizeConfiguration(hasSubtext = false, spacingBetweenSigns = 8, spacingBelowTitle = 8),
+            SizeConfiguration(hasSubtext = false, spacingBetweenSigns = 6, spacingBelowTitle = 8),
+            SizeConfiguration(hasSubtext = false, spacingBetweenSigns = 6, spacingBelowTitle = 6),
+            SizeConfiguration(hasSubtext = false, spacingBetweenSigns = 6, spacingBelowTitle = 4),
+            SizeConfiguration(hasSubtext = false, spacingBetweenSigns = 4, spacingBelowTitle = 4),
         )
-
-        val Shortest = RelativeTimesFormatConfiguration("", ",")
-    }
-}
-
-private fun formatRelativeTimes(
-    option: RelativeTimesFormatConfiguration,
-    displayAt: Instant,
-    times: List<Instant>
-): String {
-    return times.joinToString(
-        postfix = option.postfix,
-        separator = option.separator,
-    ) { time ->
-        val minutesToArrival = (time - displayAt).inWholeMinutes
-        minutesToArrival.coerceAtLeast(0).toString()
     }
 }

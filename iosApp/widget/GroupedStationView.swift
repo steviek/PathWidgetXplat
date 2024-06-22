@@ -17,7 +17,7 @@ struct GroupedStationView: EntryView {
     let height: CGFloat
     
     var body: some View {
-        let layoutInfo = GroupedWidgetLayoutHelper().computeLayoutInfo(
+        let layoutInfo = GroupedWidgetLayoutHelper(
             station: station,
             displayAt: entry.date.toKotlinInstant(),
             timeDisplay: entry.configuration.timeDisplay.toKotlinTimeDisplay(),
@@ -33,11 +33,21 @@ struct GroupedStationView: EntryView {
                 let size = measureTextSize(text: text, font: uiFont)
                 return SizeWrapper(width: size.width, height: size.height)
             }
-        )
+        ).computeLayoutInfo()
         
         VStack(alignment: .leading, spacing: 0) {
             StationTitle(title: station.displayName, width: width, maxHeight: height)
             Spacer().frame(height: layoutInfo.spacingBelowTitle)
+            
+            if (layoutInfo.signs.isEmpty) {
+                HStack {
+                    Spacer()
+                    Text(IosResourceProvider().getNoTrainsText())
+                        .font(Font.system(size: 11))
+                        .multilineTextAlignment(.center)
+                    Spacer()
+                }
+            }
             
             ForEach(layoutInfo.signs.indices, id : \.self) { index in
                 if (index > 0) {
@@ -58,13 +68,7 @@ struct GroupedStationView: EntryView {
                         
                         Spacer().frame(width: 4)
                         Spacer()
-                        
-                        let arrivalText = if layoutInfo.lineCountBelowTitle > 0 {
-                            sign.nextArrival
-                        } else {
-                            sign.formattedArrivalTimes
-                        }
-                        Text(arrivalText)
+                        Text(sign.nextArrival)
                             .monospacedDigit()
                             .font(Font.system(size: 12))
                             .fontWeight(.bold)
@@ -76,7 +80,7 @@ struct GroupedStationView: EntryView {
                     
                     if (layoutInfo.lineCountBelowTitle > 0) {
                         HStack {
-                            Text(sign.formattedArrivalTimes)
+                            Text(sign.subtext ?? "")
                                 .font(Font.system(size: 11))
                                 .monospacedDigit()
                                 .lineLimit(Int(layoutInfo.lineCountBelowTitle))

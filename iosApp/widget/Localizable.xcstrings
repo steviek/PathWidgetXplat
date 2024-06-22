@@ -99,9 +99,6 @@
         }
       }
     },
-    "By destination" : {
-
-    },
     "Christopher Street" : {
       "localizations" : {
         "es" : {
@@ -152,8 +149,15 @@
         }
       }
     },
-    "Grouping" : {
-
+    "Group By Destination" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agrupar por destino"
+          }
+        }
+      }
     },
     "Grove Street" : {
       "localizations" : {
@@ -286,6 +290,26 @@
         }
       }
     },
+    "Off" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desactivado"
+          }
+        }
+      }
+    },
+    "On" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activado"
+          }
+        }
+      }
+    },
     "Only interstate trains" : {
       "localizations" : {
         "es" : {
@@ -355,12 +379,6 @@
           }
         }
       }
-    },
-    "Train Grouping" : {
-
-    },
-    "Ungrouped" : {
-
     },
     "Updates all the widgets" : {
       "localizations" : {

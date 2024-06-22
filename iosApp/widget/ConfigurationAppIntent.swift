@@ -85,11 +85,11 @@ enum TimeDisplay : String, AppEnum {
 enum TrainGrouping : String, AppEnum {
     case ungrouped, byHeadsign
     
-    static var typeDisplayRepresentation: TypeDisplayRepresentation = "Train Grouping"
+    static var typeDisplayRepresentation: TypeDisplayRepresentation = "Group By Destination"
     
     static var caseDisplayRepresentations: [TrainGrouping : DisplayRepresentation] = [
-        .ungrouped: "Ungrouped",
-        .byHeadsign: "By destination",
+        .ungrouped: "Off",
+        .byHeadsign: "On",
     ]
 }
 
@@ -109,7 +109,7 @@ struct ConfigurationAppIntent: WidgetConfigurationIntent {
     @Parameter(title: "Time", default: TimeDisplay.relative)
     var timeDisplay: TimeDisplay
     
-    @Parameter(title: "Grouping", default: TrainGrouping.ungrouped)
+    @Parameter(title: "Group By Destination", default: TrainGrouping.ungrouped)
     var trainGrouping: TrainGrouping
     
     @Parameter(title: "Order", default: SortOrder.alphabetical)

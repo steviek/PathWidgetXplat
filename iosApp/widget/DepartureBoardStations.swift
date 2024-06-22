@@ -17,14 +17,12 @@ struct DepartureBoardStations: View {
     let height: CGFloat
     
     var body: some View {
-        let columnWidth = data.stations.count > 1 ? (width / 2) - 8 : width
-        
         // If we have multiple columns, then pad the sides of the station tiles.
-        let pad = data.stations.count > 1
-        let tileWidth = columnWidth - (pad ? 16 : 0)
+        let multiColumn = data.stations.count > 1
+        let tileWidth = multiColumn ? (width / 2) - 24 : width
         let tileHeight = data.stations.count > 2 ? (height / 2) - 8 : height
         HStack(spacing: 0) {
-            if (pad) {
+            if (multiColumn) {
                 Spacer().frame(width: 8)
             }
             
@@ -40,7 +38,7 @@ struct DepartureBoardStations: View {
             }
             .frame(width: tileWidth, height: height)
             
-            if (data.stations.count > 1) {
+            if (multiColumn) {
                 Spacer().frame(width: 32)
                 VStack(alignment: .leading, spacing: 0) {
                     if (data.stations.count > 1) {
@@ -57,7 +55,7 @@ struct DepartureBoardStations: View {
                 .frame(width: tileWidth, height: height)
             }
             
-            if (pad) {
+            if (multiColumn) {
                 Spacer().frame(width: 8)
             }
         }

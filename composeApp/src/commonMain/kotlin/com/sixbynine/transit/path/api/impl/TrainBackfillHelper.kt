@@ -276,7 +276,7 @@ object TrainBackfillHelper {
                                 val trainTerminalCheckpoint =
                                     trainTerminalStation?.let { checkpointsInLine[it] }
                                 if (trainTerminalCheckpoint != null &&
-                                    trainTerminalCheckpoint < stationCheckpoint) {
+                                    trainTerminalCheckpoint <= stationCheckpoint) {
                                     // This covers a case where the train is running on a modified
                                     // route stopping before this station. Example: don't backfill
                                     // Harrison with a 'Newark'-line train from WTC that is

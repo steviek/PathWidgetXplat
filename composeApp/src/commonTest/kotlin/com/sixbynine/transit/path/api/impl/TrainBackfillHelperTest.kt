@@ -9,6 +9,7 @@ import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.Stations.ExchangePlace
 import com.sixbynine.transit.path.api.Stations.GroveStreet
 import com.sixbynine.transit.path.api.Stations.Harrison
+import com.sixbynine.transit.path.api.Stations.JournalSquare
 import com.sixbynine.transit.path.api.Stations.Newport
 import com.sixbynine.transit.path.api.Stations.WorldTradeCenter
 import com.sixbynine.transit.path.app.ui.Colors
@@ -310,6 +311,44 @@ class TrainBackfillHelperTest {
         val harTrains = backfilled[Harrison.pathApiName]
         val harTrainsTimes = harTrains?.map { it.projectedArrival.printForAssertions() }
         assertEquals(listOf("10:20", "10:22"), harTrainsTimes)
+    }
+
+    @Test
+    fun `do not backfill for same station`() {
+        val trains = departuresMap {
+            station(ExchangePlace) {
+                wtcJsqTrainAt(10, 30)
+            }
+
+            station(JournalSquare) {
+                nwkWtcTrainAt(10, 20)
+                newarkTrainAt(10, 22)
+            }
+        }
+
+        val backfilled = TrainBackfillHelper.withBackfill(trains)
+        val jsqTrains = backfilled[JournalSquare.pathApiName]
+        val jsqTrainTimes = jsqTrains?.map { it.projectedArrival.printForAssertions() }
+        assertEquals(listOf("10:20", "10:22"), jsqTrainTimes)
+    }
+
+    @Test
+    fun `can still backfill for shorter trains`() {
+        val trains = departuresMap {
+            station(WorldTradeCenter) {
+                newarkTrainAt(10, 20)
+                wtcJsqTrainAt(10, 40)
+            }
+
+            station(ExchangePlace) {
+                newarkTrainAt(10, 23)
+            }
+        }
+
+        val backfilled = TrainBackfillHelper.withBackfill(trains)
+        val expTrains = backfilled[ExchangePlace.pathApiName]
+        val expTrainTimes = expTrains?.map { it.projectedArrival.printForAssertions() }
+        assertEquals(listOf("10:23", "10:43"), expTrainTimes)
     }
 
     private fun departuresMap(

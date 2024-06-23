@@ -259,8 +259,8 @@ object TrainBackfillHelper {
                                     )
                                 )
                             }
-                            ?.filter { earliestTrain != null && it.projectedArrival > earliestTrain}
-                            ?.forEach { hypotheticalTrain ->
+                            ?.filter { earliestTrain != null && it.projectedArrival > earliestTrain }
+                            ?.forEach eachTrain@ { hypotheticalTrain ->
                                 val trainMatches: (DepartureBoardTrain) -> Boolean = trainMatches@{
                                     if (it.lineId != lineId) return@trainMatches false
                                     val timeDelta =
@@ -270,13 +270,28 @@ object TrainBackfillHelper {
                                 }
                                 val currentTrains =
                                     backfilled[station.pathApiName] ?: return@eachStation
+
+                                val trainTerminalStation =
+                                    Stations.fromHeadSign(hypotheticalTrain.headsign)
+                                val trainTerminalCheckpoint =
+                                    trainTerminalStation?.let { checkpointsInLine[it] }
+                                if (trainTerminalCheckpoint != null &&
+                                    trainTerminalCheckpoint < stationCheckpoint) {
+                                    // This covers a case where the train is running on a modified
+                                    // route stopping before this station. Example: don't backfill
+                                    // Harrison with a 'Newark'-line train from WTC that is
+                                    // terminating at JSQ.
+                                    return@eachTrain
+                                }
+
                                 if (currentTrains.none { trainMatches(it) }) {
                                     if (ShouldLog) {
                                         Logging.d(
                                             "\tBackfilling ${station.displayName} with a train from " +
                                                     "${priorStation.displayName} to $lineId" +
                                                     " hypothetically departing at " +
-                                                    "${hypotheticalTrain.projectedArrival}"
+                                                    "${hypotheticalTrain.projectedArrival}," +
+                                                    "train going to $trainTerminalStation"
                                         )
                                     }
 

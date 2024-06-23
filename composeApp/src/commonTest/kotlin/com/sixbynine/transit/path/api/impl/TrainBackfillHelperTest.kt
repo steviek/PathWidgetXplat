@@ -8,6 +8,7 @@ import com.sixbynine.transit.path.api.State.NewYork
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.Stations.ExchangePlace
 import com.sixbynine.transit.path.api.Stations.GroveStreet
+import com.sixbynine.transit.path.api.Stations.Harrison
 import com.sixbynine.transit.path.api.Stations.Newport
 import com.sixbynine.transit.path.api.Stations.WorldTradeCenter
 import com.sixbynine.transit.path.app.ui.Colors
@@ -290,6 +291,25 @@ class TrainBackfillHelperTest {
         val expTrains = backfilled[ExchangePlace.pathApiName]
         val expTrainTimes = expTrains?.map { it.projectedArrival.printForAssertions() }
         assertEquals(listOf("10:30", "10:35"), expTrainTimes)
+    }
+
+    @Test
+    fun `do not backfill down the line`() {
+        val trains = departuresMap {
+            station(ExchangePlace) {
+                wtcJsqTrainAt(10, 30)
+            }
+
+            station(Harrison) {
+                nwkWtcTrainAt(10, 20)
+                newarkTrainAt(10, 22)
+            }
+        }
+
+        val backfilled = TrainBackfillHelper.withBackfill(trains)
+        val harTrains = backfilled[Harrison.pathApiName]
+        val harTrainsTimes = harTrains?.map { it.projectedArrival.printForAssertions() }
+        assertEquals(listOf("10:20", "10:22"), harTrainsTimes)
     }
 
     private fun departuresMap(

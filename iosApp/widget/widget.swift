@@ -9,6 +9,7 @@
 import WidgetKit
 import SwiftUI
 import ComposeApp
+import CoreLocation
 
 struct Provider: AppIntentTimelineProvider {
     
@@ -69,8 +70,9 @@ struct Provider: AppIntentTimelineProvider {
             hasPathError = false
         } else {
             let fetchResult = await WidgetDataFetcher().fetchWidgetDataAsync(
+                includeClosestStation: configuration.stations.contains(where: { $0 == .closest}),
                 stationLimit: Int32(stationLimit),
-                stations: configuration.stations.map { $0.toStation()},
+                stations: configuration.stations.compactMap { $0.toStation()},
                 lines: configuration.lines.map { $0.toLine() },
                 filter: configuration.filter.toTrainFilter(),
                 sort: configuration.sortOrder.toStationSort()
@@ -129,7 +131,7 @@ struct widget: Widget {
             provider: Provider()
         ) { entry in
             ZStack {
-                if (entry.configuration.stations.isEmpty) {
+                if (showEmptyView(entry)) {
                     EmptyDepartureBoardView(isError: false, isPathError: false)
                 } else if entry.hasError, entry.data?.stations.isEmpty != false {
                     EmptyDepartureBoardView(isError: true, isPathError: entry.hasPathError)
@@ -138,6 +140,19 @@ struct widget: Widget {
                 }
             }
             .containerBackground(.fill.tertiary, for: .widget)
+        }
+    }
+    
+    private func showEmptyView(_ entry: SimpleEntry) -> Bool {
+        let choices = entry.configuration.stations
+        if choices.count >= 2 {
+            return false
+        }
+        
+        if let single = choices.first {
+            return single == .closest && !CLLocationManager().isAuthorizedForWidgetUpdates
+        } else {
+            return true
         }
     }
 }

@@ -21,6 +21,8 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         )
         
         Analytics().appLaunched()
+
+        IosLocationProvider().requestDelegate = LocationHelper()
         
         return true
     }

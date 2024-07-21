@@ -8,6 +8,7 @@ import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.location.LocationPermissionRequestResult.Denied
 import com.sixbynine.transit.path.location.LocationPermissionRequestResult.Granted
 import com.sixbynine.transit.path.location.LocationProvider
+import com.sixbynine.transit.path.location.awaitIsLocationSupportedByDevice
 import com.sixbynine.transit.path.preferences.IntPersistable
 import com.sixbynine.transit.path.util.JsonFormat
 import com.sixbynine.transit.path.util.collectIn
@@ -17,7 +18,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
@@ -72,13 +72,13 @@ object SettingsManager {
 
     init {
         lightweightScope.launch {
-            if (!LocationProvider().isLocationSupportedByDevice ||
+            if (!LocationProvider().awaitIsLocationSupportedByDevice() ||
                 !LocationProvider().hasLocationPermission()
             ) {
                 locationSettingPersister.update(LocationSetting.Disabled)
             }
 
-            LocationProvider().locationPermissionResults.collectLatest {
+            LocationProvider().locationPermissionResults.collect {
                 when (it) {
                     Denied -> {
                         locationSettingPersister.update(LocationSetting.Disabled)

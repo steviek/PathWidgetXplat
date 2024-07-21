@@ -4,7 +4,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -154,4 +156,8 @@ inline fun <A, B, C, D, E, F, G, H, I, T> combineStates(
 
 fun <T> Flow<T>.collectIn(scope: CoroutineScope, block: suspend (T) -> Unit) {
     scope.launch { collect { block(it) } }
+}
+
+fun <T> stateFlowOf(value: T): StateFlow<T> {
+    return MutableStateFlow(value).asStateFlow()
 }

@@ -23,8 +23,10 @@ extension SortOrder {
 }
 
 extension StationChoice {
-    func toStation() -> Station {
+    func toStation() -> Station? {
         return switch (self) {
+        case .closest:
+            nil
         case .exp:
             Stations().ExchangePlace
         case .grove:
@@ -83,6 +85,7 @@ extension Filter {
 
 extension WidgetDataFetcher {
     func fetchWidgetDataAsync(
+        includeClosestStation: Bool,
         stationLimit: Int32,
         stations: [Station],
         lines: [Line],
@@ -97,7 +100,7 @@ extension WidgetDataFetcher {
                     lines: lines,
                     sort: sort,
                     filter: filter,
-                    includeClosestStation: false,
+                    includeClosestStation: includeClosestStation,
                     staleness: widgetFetchStaleness(force: false),
                     onSuccess: { data in
                         continuation.resume(returning: FetchResult(data: data, hadInternet: true, hasError: false, hasPathError: false))

@@ -36,6 +36,24 @@
           }
         }
       }
+    },
+    "NSLocationWhenInUseUsageDescription" : {
+      "comment" : "Privacy - Location When In Use Usage Description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your location will be used to identify the closest PATH station"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Su ubicación se utilizará para identificar la estación  de PATH más cercana."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

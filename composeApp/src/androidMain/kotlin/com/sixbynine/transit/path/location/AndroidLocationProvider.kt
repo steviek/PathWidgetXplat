@@ -18,12 +18,15 @@ import com.sixbynine.transit.path.location.LocationCheckResult.NoPermission
 import com.sixbynine.transit.path.location.LocationCheckResult.NoProvider
 import com.sixbynine.transit.path.location.LocationCheckResult.Success
 import com.sixbynine.transit.path.util.IsTest
+import com.sixbynine.transit.path.util.DataResult
+import com.sixbynine.transit.path.util.stateFlowOf
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
@@ -41,8 +44,8 @@ object AndroidLocationProvider : LocationProvider {
     private val locationManager =
         context.getSystemService(Context.LOCATION_SERVICE) as LocationManager?
 
-    override val isLocationSupportedByDevice: Boolean
-        get() = locationManager != null && VERSION.SDK_INT >= 23
+    override val isLocationSupportedByDeviceFlow =
+        stateFlowOf(DataResult.success(locationManager != null && VERSION.SDK_INT >= 23))
 
     private val _locationPermissionResultsChannel = Channel<LocationPermissionRequestResult>()
     override val locationPermissionResults: SharedFlow<LocationPermissionRequestResult> =
@@ -161,7 +164,8 @@ var Location.elapsedRealtime: Duration
     }
 
 object TestLocationProvider : LocationProvider {
-    override val isLocationSupportedByDevice = false
+    override val isLocationSupportedByDeviceFlow: StateFlow<DataResult<Boolean>>
+        get() = stateFlowOf(DataResult.success(false))
     override val locationPermissionResults: SharedFlow<LocationPermissionRequestResult>
         get() = MutableSharedFlow()
 

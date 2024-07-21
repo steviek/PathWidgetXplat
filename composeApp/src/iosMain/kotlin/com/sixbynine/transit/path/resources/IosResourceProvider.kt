@@ -1,7 +1,5 @@
 package com.sixbynine.transit.path.resources
 
-import com.sixbynine.transit.path.Logging
-import com.sixbynine.transit.path.time.now
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
@@ -45,8 +43,7 @@ object IosResourceProvider {
     fun getNoTrainsText(): String = getStringBlocking(string.station_empty)
 
     private inline fun getStringBlocking(resource: StringResource): String = runBlocking {
-        val start = now()
-        getString(resource).also { Logging.d("getString took ${now() - start}") }
+        getString(resource)
     }
 
     private inline fun getStringBlocking(

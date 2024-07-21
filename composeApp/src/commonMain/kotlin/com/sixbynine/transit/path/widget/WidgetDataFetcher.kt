@@ -127,7 +127,7 @@ object WidgetDataFetcher {
         staleness: Staleness,
         now: Instant = now(),
     ): FetchWithPrevious<WidgetData> {
-        Logging.initialize()
+        Logging.d("Fetch widget data with previous, includeClosestStation = $includeClosestStation")
         val (liveDepartures, previousDepartures) =
             PathApi.instance.getUpcomingDepartures(now, staleness)
         val (githubAlerts, previousGithubAlerts) = GithubAlertsRepository.getAlerts(now)
@@ -171,8 +171,7 @@ object WidgetDataFetcher {
             coroutineScope {
                 val stationsByProximity =
                     if (includeClosestStation) {
-                        when (val locationResult =
-                            LocationProvider().tryToGetLocation(3.seconds)) {
+                        when (val locationResult = LocationProvider().tryToGetLocation(3.seconds)) {
                             NoPermission, NoProvider -> null
                             is Failure -> lastClosestStations
                             is Success -> {
@@ -260,7 +259,7 @@ object WidgetDataFetcher {
         data: DepartureBoardTrainMap,
         isPathApiBroken: Boolean,
     ): WidgetData {
-        Logging.d("createWidgetData, stations = ${stations.map { it.pathApiName }}, lines=$lines")
+        Logging.d("createWidgetData, stations = ${stations.map { it.pathApiName }}, lines=$lines, closestStations=${closestStations.orEmpty().map { it.pathApiName }}")
         val adjustedStations = stations.toMutableList()
         val stationDatas = arrayListOf<WidgetData.StationData>()
         val avoidMissingTrains = currentAvoidMissingTrains()

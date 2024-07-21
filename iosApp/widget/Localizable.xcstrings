@@ -109,6 +109,16 @@
         }
       }
     },
+    "Closest station (requires location access)" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La estación más cercana (require acceso a la ubicación)"
+          }
+        }
+      }
+    },
     "Departure board for PATH" : {
       "localizations" : {
         "es" : {

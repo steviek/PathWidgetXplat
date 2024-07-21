@@ -12,11 +12,12 @@ import SwiftUI
 import ComposeApp
 
 enum StationChoice : String, AppEnum {
-    case exp, grove, harrison, hoboken, jsq, newark, newport, christopher, ninth, fourteenth, twentyThird, thirtyThird, wtc
+    case closest, exp, grove, harrison, hoboken, jsq, newark, newport, christopher, ninth, fourteenth, twentyThird, thirtyThird, wtc
     
     static var typeDisplayRepresentation: TypeDisplayRepresentation = "Station Choice"
     
     static var caseDisplayRepresentations: [StationChoice : DisplayRepresentation] = [
+        .closest: "Closest station (requires location access)",
         .exp: "Exchange Place",
         .grove: "Grove Street",
         .harrison: "Harrison",
@@ -109,7 +110,7 @@ struct ConfigurationAppIntent: WidgetConfigurationIntent {
     @Parameter(title: "Time", default: TimeDisplay.relative)
     var timeDisplay: TimeDisplay
     
-    @Parameter(title: "Group By Destination", default: TrainGrouping.ungrouped)
+    @Parameter(title: "Group By Destination", default: TrainGrouping.byHeadsign)
     var trainGrouping: TrainGrouping
     
     @Parameter(title: "Order", default: SortOrder.alphabetical)
@@ -120,7 +121,7 @@ struct ConfigurationAppIntent: WidgetConfigurationIntent {
         self.lines = LineChoice.allCases
         self.filter = .all
         self.timeDisplay = .relative
-        self.trainGrouping = .ungrouped
+        self.trainGrouping = .byHeadsign
         self.sortOrder = .alphabetical
     }
     
@@ -129,7 +130,7 @@ struct ConfigurationAppIntent: WidgetConfigurationIntent {
         lines: [LineChoice] = LineChoice.allCases,
         filter: Filter = .all,
         timeDisplay: TimeDisplay = .relative,
-        trainGrouping: TrainGrouping = .ungrouped,
+        trainGrouping: TrainGrouping = .byHeadsign,
         sortOrder: SortOrder = .alphabetical
     ) {
         self.stations = stations

@@ -12,5 +12,7 @@
 		<string>en</string>
 		<string>es</string>
 	</array>
+    <key>NSWidgetWantsLocation</key>
+    <true/>
 </dict>
 </plist>

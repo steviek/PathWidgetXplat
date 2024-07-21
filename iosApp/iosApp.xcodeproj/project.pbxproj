@@ -42,6 +42,8 @@
 		AAD5000C2B72768800D6F505 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD5000B2B72768800D6F505 /* AppDelegate.swift */; };
 		AAD500102B72782000D6F505 /* FirebaseAnalyticsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = AAD5000F2B72782000D6F505 /* FirebaseAnalyticsSwift */; };
 		AAD500122B72783400D6F505 /* FirebasePerformance in Frameworks */ = {isa = PBXBuildFile; productRef = AAD500112B72783400D6F505 /* FirebasePerformance */; };
+		AAF007B32C4DC88600D54649 /* LocationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF007B22C4DC88600D54649 /* LocationHelper.swift */; };
+		AAF007B42C4DC88600D54649 /* LocationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF007B22C4DC88600D54649 /* LocationHelper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -102,6 +104,7 @@
 		AAB47C492B16625300079022 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		AAD500052B7275F400D6F505 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		AAD5000B2B72768800D6F505 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		AAF007B22C4DC88600D54649 /* LocationHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationHelper.swift; sourceTree = "<group>"; };
 		AB3632DC29227652001CCB65 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -179,6 +182,7 @@
 				AAB47C492B16625300079022 /* InfoPlist.xcstrings */,
 				AAD5000B2B72768800D6F505 /* AppDelegate.swift */,
 				AA34DA362BB0F7F600DB50A0 /* Assets.xcassets */,
+				AAF007B22C4DC88600D54649 /* LocationHelper.swift */,
 			);
 			path = iosApp;
 			sourceTree = "<group>";
@@ -397,6 +401,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AAF007B32C4DC88600D54649 /* LocationHelper.swift in Sources */,
 				AAB47C462B165AC300079022 /* Interop.swift in Sources */,
 				2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */,
 				AAD5000C2B72768800D6F505 /* AppDelegate.swift in Sources */,
@@ -414,6 +419,7 @@
 				AA9B5F842C23383800251F59 /* ColorCircle.swift in Sources */,
 				AAB47C422B15AD3200079022 /* WidgetInterop.swift in Sources */,
 				AAB47C3A2B15AB9600079022 /* DepartureBoardView.swift in Sources */,
+				AAF007B42C4DC88600D54649 /* LocationHelper.swift in Sources */,
 				AA9B5F822C23380B00251F59 /* GroupedStationView.swift in Sources */,
 				AA9B5F7C2C1F831C00251F59 /* DepartureBoardStations.swift in Sources */,
 				AAB47C3B2B15AB9600079022 /* ConfigurationAppIntent.swift in Sources */,

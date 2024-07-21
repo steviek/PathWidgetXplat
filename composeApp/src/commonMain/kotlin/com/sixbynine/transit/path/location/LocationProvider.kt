@@ -1,10 +1,15 @@
 package com.sixbynine.transit.path.location
 
+import com.sixbynine.transit.path.util.DataResult
+import com.sixbynine.transit.path.util.DataResult.Success
+import com.sixbynine.transit.path.util.isLoading
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlin.time.Duration
 
 interface LocationProvider {
-    val isLocationSupportedByDevice: Boolean
+    val isLocationSupportedByDeviceFlow: StateFlow<DataResult<Boolean>>
 
     val locationPermissionResults: SharedFlow<LocationPermissionRequestResult>
 
@@ -13,6 +18,14 @@ interface LocationProvider {
     fun requestLocationPermission()
 
     suspend fun tryToGetLocation(timeout: Duration): LocationCheckResult
+}
+
+val LocationProvider.isLocationSupportedByDevice: Boolean
+    get() = isLocationSupportedByDeviceFlow.value.data ?: true
+
+suspend fun LocationProvider.awaitIsLocationSupportedByDevice(): Boolean {
+    val result = isLocationSupportedByDeviceFlow.first { !it.isLoading() }
+    return result is Success && result.data
 }
 
 sealed interface LocationCheckResult {

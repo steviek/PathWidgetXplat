@@ -8,9 +8,17 @@
 
 import WidgetKit
 import SwiftUI
+import ComposeApp
 
 @main
 struct widgetBundle: WidgetBundle {
+    
+    init() {
+        let locationHelper = LocationHelper()
+        locationHelper.isWidget = true
+        IosLocationProvider().requestDelegate = locationHelper
+    }
+    
     var body: some Widget {
         widget()
     }

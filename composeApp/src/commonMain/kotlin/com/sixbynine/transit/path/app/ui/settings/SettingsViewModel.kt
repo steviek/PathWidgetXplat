@@ -34,6 +34,7 @@ import com.sixbynine.transit.path.app.ui.settings.SettingsContract.LocationSetti
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.State
 import com.sixbynine.transit.path.location.LocationPermissionRequestResult
 import com.sixbynine.transit.path.location.LocationProvider
+import com.sixbynine.transit.path.location.isLocationSupportedByDevice
 import com.sixbynine.transit.path.util.withElementPresent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
@@ -45,21 +46,17 @@ class SettingsViewModel : BaseViewModel<State, Intent, Effect>(createInitialStat
         updateStateOnEach(SettingsManager.lineFilter) { copy(lines = it) }
         updateStateOnEach(SettingsManager.stationSort) { copy(stationSort = it) }
         updateStateOnEach(SettingsManager.displayPresumedTrains) { copy(showPresumedTrains = it) }
-        if (LocationProvider().isLocationSupportedByDevice) {
-            updateStateOnEach(SettingsManager.locationSetting) {
-                copy(
-                    locationSetting = when (it) {
-                        Enabled, EnabledPendingPermission -> LocationSettingState.Enabled
-                        Disabled -> LocationSettingState.Disabled
-                    }
-                )
-            }
+        updateStateOnEach(SettingsManager.locationSetting) {
+            copy(
+                locationSetting = when (it) {
+                    Enabled, EnabledPendingPermission -> LocationSettingState.Enabled
+                    Disabled -> LocationSettingState.Disabled
+                }
+            )
         }
 
-        if (LocationProvider().isLocationSupportedByDevice) {
-            updateStateOnEach(LocationProvider().locationPermissionResults) {
-                copy(hasLocationPermission = it is LocationPermissionRequestResult.Granted)
-            }
+        updateStateOnEach(LocationProvider().locationPermissionResults) {
+            copy(hasLocationPermission = it is LocationPermissionRequestResult.Granted)
         }
     }
 

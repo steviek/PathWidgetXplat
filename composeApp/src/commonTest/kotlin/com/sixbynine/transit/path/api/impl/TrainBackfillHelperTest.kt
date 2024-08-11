@@ -10,6 +10,7 @@ import com.sixbynine.transit.path.api.Stations.ExchangePlace
 import com.sixbynine.transit.path.api.Stations.GroveStreet
 import com.sixbynine.transit.path.api.Stations.Harrison
 import com.sixbynine.transit.path.api.Stations.JournalSquare
+import com.sixbynine.transit.path.api.Stations.Newark
 import com.sixbynine.transit.path.api.Stations.Newport
 import com.sixbynine.transit.path.api.Stations.WorldTradeCenter
 import com.sixbynine.transit.path.app.ui.Colors
@@ -314,6 +315,24 @@ class TrainBackfillHelperTest {
     }
 
     @Test
+    fun `do not backfill up the line`() {
+        val trains = departuresMap {
+            station(ExchangePlace) {
+                nwkWtcTrainAt(10, 30)
+            }
+
+            station(Newark) {
+                nwkHarTrainAt(10, 20)
+            }
+        }
+
+        val backfilled = TrainBackfillHelper.withBackfill(trains)
+        val expTrains = backfilled[ExchangePlace.pathApiName]
+        val expTrainsTimes = expTrains?.map { it.projectedArrival.printForAssertions() }
+        assertEquals(listOf("10:30"), expTrainsTimes)
+    }
+
+    @Test
     fun `do not backfill for same station`() {
         val trains = departuresMap {
             station(ExchangePlace) {
@@ -391,6 +410,12 @@ class TrainBackfillHelperTest {
                     map.getOrPut(station) { mutableListOf() }
                         .add(wtcJsqTrain(time.toUtcInstant()))
                 }
+
+                override fun nwkHarTrainAt(hour: Int, minute: Int) {
+                    val time = date.atTime(hour, minute)
+                    map.getOrPut(station) { mutableListOf() }
+                        .add(nwkHarTrain(time.toUtcInstant()))
+                }
             }
             block(scope)
         }
@@ -401,6 +426,7 @@ class TrainBackfillHelperTest {
             fun hobWtcTrainAt(hour: Int, minute: Int)
             fun wtcHobTrainAt(hour: Int, minute: Int)
             fun wtcJsqTrainAt(hour: Int, minute: Int)
+            fun nwkHarTrainAt(hour: Int, minute: Int)
         }
 
         fun build(): Map<String, List<DepartureBoardTrain>> {
@@ -479,6 +505,18 @@ class TrainBackfillHelperTest {
                 isDelayed = false,
                 backfillSource = null,
                 directionState = NewJersey,
+                lines = setOf(Line.NewarkWtc)
+            )
+        }
+
+        fun nwkHarTrain(projectedArrival: Instant): DepartureBoardTrain {
+            return DepartureBoardTrain(
+                headsign = "Harrison",
+                projectedArrival = projectedArrival,
+                lineColors = Colors.NwkWtc,
+                isDelayed = false,
+                backfillSource = null,
+                directionState = NewYork,
                 lines = setOf(Line.NewarkWtc)
             )
         }

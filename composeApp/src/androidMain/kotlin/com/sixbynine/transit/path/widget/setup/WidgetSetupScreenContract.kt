@@ -10,6 +10,7 @@ import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.api.state
 import com.sixbynine.transit.path.app.ui.ScreenScope
 import com.sixbynine.transit.path.location.AndroidLocationProvider
+import com.sixbynine.transit.path.location.isLocationSupportedByDevice
 import com.sixbynine.transit.path.widget.StationByDisplayNameComparator
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.Intent
 import com.sixbynine.transit.path.widget.setup.WidgetSetupScreenContract.State

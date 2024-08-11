@@ -19,6 +19,7 @@ object Stations {
         "Journal" in headSign -> JournalSquare
         "Exchange" in headSign -> ExchangePlace
         "Grove" in headSign -> GroveStreet
+        "Harrison" in headSign -> Harrison
         else -> null
     }
 

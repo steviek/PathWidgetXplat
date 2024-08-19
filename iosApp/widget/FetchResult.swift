@@ -12,4 +12,5 @@ struct FetchResult {
     let data: WidgetData?
     let hadInternet: Bool
     let hasError: Bool
+    let hasPathError: Bool
 }

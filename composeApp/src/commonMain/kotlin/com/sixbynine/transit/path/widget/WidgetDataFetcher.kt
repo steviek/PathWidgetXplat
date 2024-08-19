@@ -5,6 +5,7 @@ import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.api.DepartureBoardTrainMap
 import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.PathApi
+import com.sixbynine.transit.path.api.PathApiException
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.Stations
@@ -84,7 +85,12 @@ object WidgetDataFetcher {
         includeClosestStation: Boolean,
         staleness: Staleness,
         onSuccess: (WidgetData) -> Unit,
-        onFailure: (error: Throwable, hadInternet: Boolean, data: WidgetData?) -> Unit,
+        onFailure: (
+            error: Throwable,
+            hadInternet: Boolean,
+            isPathError: Boolean,
+            data: WidgetData?,
+        ) -> Unit,
     ): AgedValue<WidgetData>? {
         val (fetch, previous) = fetchWidgetDataWithPrevious(
             stationLimit = stationLimit,
@@ -96,7 +102,14 @@ object WidgetDataFetcher {
             staleness,
         )
         GlobalScope.launch {
-            fetch.await().onSuccess(onSuccess).onFailure(onFailure)
+            fetch.await().onSuccess(onSuccess).onFailure { error, hadInternet, data ->
+                onFailure(
+                    error,
+                    hadInternet,
+                    error is PathApiException,
+                    data,
+                )
+            }
         }
         return previous
     }

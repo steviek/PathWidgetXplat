@@ -100,21 +100,22 @@ extension WidgetDataFetcher {
                     includeClosestStation: false,
                     staleness: widgetFetchStaleness(force: false),
                     onSuccess: { data in
-                        continuation.resume(returning: FetchResult(data: data, hadInternet: true, hasError: false))
+                        continuation.resume(returning: FetchResult(data: data, hadInternet: true, hasError: false, hasPathError: false))
                     },
-                    onFailure: { (e, hadInternet, data) in
+                    onFailure: { (e, hadInternet, isPathError, data) in
                         continuation.resume(
                             returning: FetchResult(
                                 data: data,
                                 hadInternet: hadInternet.toBool(),
-                                hasError: true
+                                hasError: true,
+                                hasPathError: isPathError.toBool()
                             )
                         )
                     }
                 )
             }
         } catch {
-            return FetchResult(data: nil, hadInternet: true, hasError: true)
+            return FetchResult(data: nil, hadInternet: true, hasError: true, hasPathError: false)
         }
         
     }

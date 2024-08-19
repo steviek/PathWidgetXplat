@@ -19,6 +19,7 @@ struct Provider: AppIntentTimelineProvider {
             configuration: ConfigurationAppIntent(stations: [.jsq]),
             data: nil,
             hasError: false,
+            hasPathError: false,
             dataFrom: Date()
         )
     }
@@ -58,12 +59,14 @@ struct Provider: AppIntentTimelineProvider {
         let effectiveConfiguration: ConfigurationAppIntent
         var widgetData: WidgetData?
         let hasError: Bool
+        let hasPathError: Bool
         if (context.isPreview) {
             widgetData = Fixtures().widgetData(limit: Int32(stationLimit))
             effectiveConfiguration = ConfigurationAppIntent(
                 stations: [.jsq, .wtc]
             )
             hasError = false
+            hasPathError = false
         } else {
             let fetchResult = await WidgetDataFetcher().fetchWidgetDataAsync(
                 stationLimit: Int32(stationLimit),
@@ -74,6 +77,7 @@ struct Provider: AppIntentTimelineProvider {
             )
             widgetData = fetchResult.data
             hasError = fetchResult.hasError
+            hasPathError = fetchResult.hasPathError
             effectiveConfiguration = configuration
         }
         
@@ -94,6 +98,7 @@ struct Provider: AppIntentTimelineProvider {
                     configuration: effectiveConfiguration,
                     data: widgetData,
                     hasError: hasError,
+                    hasPathError: hasPathError,
                     dataFrom: now
                 )
             )
@@ -110,6 +115,7 @@ struct SimpleEntry: TimelineEntry {
     let configuration: ConfigurationAppIntent
     let data: WidgetData?
     let hasError: Bool
+    let hasPathError: Bool
     let dataFrom: Date
 }
 
@@ -124,7 +130,9 @@ struct widget: Widget {
         ) { entry in
             ZStack {
                 if (entry.configuration.stations.isEmpty) {
-                    EmptyDepartureBoardView()
+                    EmptyDepartureBoardView(isError: false, isPathError: false)
+                } else if entry.hasError, entry.data?.stations.isEmpty != false {
+                    EmptyDepartureBoardView(isError: true, isPathError: entry.hasPathError)
                 } else {
                     DepartureBoardView(entry: entry)
                 }

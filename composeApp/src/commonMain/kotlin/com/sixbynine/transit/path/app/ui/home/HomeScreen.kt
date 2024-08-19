@@ -68,6 +68,7 @@ import pathwidgetxplat.composeapp.generated.resources.delete
 import pathwidgetxplat.composeapp.generated.resources.done
 import pathwidgetxplat.composeapp.generated.resources.edit
 import pathwidgetxplat.composeapp.generated.resources.failed_to_fetch
+import pathwidgetxplat.composeapp.generated.resources.failed_to_fetch_path_fault
 import pathwidgetxplat.composeapp.generated.resources.move_down
 import pathwidgetxplat.composeapp.generated.resources.move_up
 import pathwidgetxplat.composeapp.generated.resources.retry
@@ -141,7 +142,7 @@ private fun HomeScreenScope.MainContent(modifier: Modifier) {
             }
 
             state.hasError && state.data == null -> {
-                ErrorState()
+                ErrorState(isPathApiError = state.isPathApiError)
             }
 
             else -> {
@@ -174,13 +175,18 @@ private fun HomeScreenScope.MainContent(modifier: Modifier) {
 }
 
 @Composable
-private fun HomeScreenScope.ErrorState() {
+private fun HomeScreenScope.ErrorState(isPathApiError: Boolean) {
     Column(
         modifier = Modifier.padding(gutter()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        val text = if (isPathApiError) {
+            string.failed_to_fetch_path_fault
+        } else {
+            string.failed_to_fetch
+        }
         Text(
-            text = stringResource(string.failed_to_fetch),
+            text = stringResource(text),
             style = MaterialTheme.typography.headlineSmall,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurface,

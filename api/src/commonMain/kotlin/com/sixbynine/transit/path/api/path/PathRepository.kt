@@ -2,6 +2,7 @@ package com.sixbynine.transit.path.api.path
 
 import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.api.NetworkException
+import com.sixbynine.transit.path.api.PathApiException
 import com.sixbynine.transit.path.api.createHttpClient
 import com.sixbynine.transit.path.network.NetworkManager
 import com.sixbynine.transit.path.preferences.StringPreferencesKey
@@ -77,7 +78,11 @@ object PathRepository {
                             lastPathResponseTime = now
                             lastPathResponse = responseText
 
-                            JsonFormat.decodeFromString<PathServiceResults>(responseText)
+                            JsonFormat.decodeFromString<PathServiceResults>(responseText).also {
+                                if (it.results.isEmpty()) {
+                                    throw PathApiException.NoResults
+                                }
+                            }
                         }
                     }
                         .fold(

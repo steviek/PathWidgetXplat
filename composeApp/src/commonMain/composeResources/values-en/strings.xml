@@ -41,6 +41,7 @@
     <string name="error_short">Error</string>
     <string name="expand">Expand</string>
     <string name="failed_to_fetch">Failed to fetch train times</string>
+    <string name="failed_to_fetch_path_fault">Failed to fetch train times, the PATH realtime departures service is not currently working</string>
     <string name="failed_to_update">Failed to update</string>
     <string name="filter">Filter</string>
     <string name="interstate_explanation">Interstate trains includes trains heading toward New York from New Jersey stations, and vice versa.</string>

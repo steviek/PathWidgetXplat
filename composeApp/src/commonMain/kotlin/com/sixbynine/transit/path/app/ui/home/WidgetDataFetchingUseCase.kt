@@ -4,6 +4,7 @@ import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.api.LocationSetting.Disabled
 import com.sixbynine.transit.path.api.LocationSetting.Enabled
 import com.sixbynine.transit.path.api.LocationSetting.EnabledPendingPermission
+import com.sixbynine.transit.path.api.PathApiException
 import com.sixbynine.transit.path.app.lifecycle.AppLifecycleObserver
 import com.sixbynine.transit.path.app.settings.SettingsManager
 import com.sixbynine.transit.path.app.station.StationSelectionManager
@@ -130,6 +131,7 @@ class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
             nextFetchTime = now() + FetchInterval,
             data = result.data,
             hasError = result.isFailure(),
+            isPathApiError = result.isFailure() && result.error is PathApiException,
             isFetching = false
         )
     }
@@ -151,6 +153,7 @@ class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
         val nextFetchTime: Instant,
         val data: WidgetData?,
         val hasError: Boolean,
+        val isPathApiError: Boolean,
         val isFetching: Boolean
     ) {
         val timeUntilNextFetch: Duration
@@ -174,6 +177,7 @@ class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
                     nextFetchTime = now,
                     data = null,
                     hasError = false,
+                    isPathApiError = false,
                     isFetching = true,
                 )
             }
@@ -184,6 +188,7 @@ class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
                 nextFetchTime = nextFetchTime,
                 data = lastFetchData,
                 hasError = false,
+                isPathApiError = false,
                 isFetching = isFetching
             )
         }

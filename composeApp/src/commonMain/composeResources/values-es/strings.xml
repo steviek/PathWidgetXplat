@@ -41,6 +41,7 @@
     <string name="error_short">Error</string>
     <string name="expand">Expandir</string>
     <string name="failed_to_fetch">Error al obtener los horarios de los trenes</string>
+    <string name="failed_to_fetch_path_fault">Error al obtener los horarios de los trenes, el servicio "PATH realtime departures" no functiona ahora</string>
     <string name="failed_to_update">Un error se encontró</string>
     <string name="filter">Filtro</string>
     <string name="interstate_explanation">Los trenes interstatales incluyen trenes que van hacia Nueva York desde estaciones de Nueva Jersey, y viceversa</string>

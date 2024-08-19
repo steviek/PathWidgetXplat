@@ -114,7 +114,9 @@ object PathRepository {
             JsonFormat.decodeFromString<PathServiceResults>(lastPathResponse)
         }
 
-        return result.getOrNull()?.let { AgedValue(now - lastPathResponseTime, it) }
+        return result.getOrNull()
+            ?.takeIf { it.results.isNotEmpty() }
+            ?.let { AgedValue(now - lastPathResponseTime, it) }
     }
 
     @Serializable

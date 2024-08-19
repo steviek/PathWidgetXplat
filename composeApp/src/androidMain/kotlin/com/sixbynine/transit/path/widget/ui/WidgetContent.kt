@@ -17,12 +17,16 @@ import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.text.TextAlign
 import com.sixbynine.transit.path.MainActivity
+import com.sixbynine.transit.path.api.PathApiException
+import com.sixbynine.transit.path.util.isFailure
 import com.sixbynine.transit.path.widget.glance.GlanceTheme
 import com.sixbynine.transit.path.widget.glance.Text
 import com.sixbynine.transit.path.widget.glance.stringResource
 import com.sixbynine.transit.path.widget.startConfigurationActivityAction
 import pathwidgetxplat.composeapp.generated.resources.Res.string
 import pathwidgetxplat.composeapp.generated.resources.complete_widget_setup
+import pathwidgetxplat.composeapp.generated.resources.failed_to_fetch
+import pathwidgetxplat.composeapp.generated.resources.failed_to_fetch_path_fault
 
 @Composable
 fun WidgetContent(state: WidgetState) {
@@ -33,8 +37,11 @@ fun WidgetContent(state: WidgetState) {
                 .fillMaxSize(),
             contentAlignment = Alignment.Center,
         ) {
+            val result = state.result
             if (state.needsSetup) {
                 SetupView()
+            } else if (result.isFailure() && result.data?.stations?.isNotEmpty() != true) {
+                ErrorView(isPathApiError = result.error is PathApiException)
             } else {
                 MainWidgetContent(state)
             }
@@ -76,6 +83,22 @@ private fun SetupView() {
             .padding(16.dp),
         text = stringResource(string.complete_widget_setup),
         color = GlanceTheme.colors.primary,
+        fontSize = 18.sp,
+        textAlign = TextAlign.Center
+    )
+}
+
+@Composable
+private fun ErrorView(isPathApiError: Boolean) {
+    val text = if (isPathApiError) {
+        string.failed_to_fetch_path_fault
+    } else {
+        string.failed_to_fetch
+    }
+    Text(
+        modifier = GlanceModifier.padding(16.dp),
+        text = stringResource(text),
+        color = GlanceTheme.colors.error,
         fontSize = 18.sp,
         textAlign = TextAlign.Center
     )

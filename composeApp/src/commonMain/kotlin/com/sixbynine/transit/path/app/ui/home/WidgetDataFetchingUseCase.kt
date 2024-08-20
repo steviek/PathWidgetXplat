@@ -131,7 +131,8 @@ class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
             nextFetchTime = now() + FetchInterval,
             data = result.data,
             hasError = result.isFailure(),
-            isPathApiError = result.isFailure() && result.error is PathApiException,
+            isPathApiBusted = (result.isFailure() && result.error is PathApiException) ||
+                    result.data?.isPathApiBroken == true,
             isFetching = false
         )
     }
@@ -153,7 +154,7 @@ class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
         val nextFetchTime: Instant,
         val data: WidgetData?,
         val hasError: Boolean,
-        val isPathApiError: Boolean,
+        val isPathApiBusted: Boolean,
         val isFetching: Boolean
     ) {
         val timeUntilNextFetch: Duration
@@ -177,7 +178,7 @@ class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
                     nextFetchTime = now,
                     data = null,
                     hasError = false,
-                    isPathApiError = false,
+                    isPathApiBusted = false,
                     isFetching = true,
                 )
             }
@@ -188,7 +189,7 @@ class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
                 nextFetchTime = nextFetchTime,
                 data = lastFetchData,
                 hasError = false,
-                isPathApiError = false,
+                isPathApiBusted = false,
                 isFetching = isFetching
             )
         }

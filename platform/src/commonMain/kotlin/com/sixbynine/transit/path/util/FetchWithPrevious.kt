@@ -77,6 +77,16 @@ inline fun <A, B, C> combine(
     )
 }
 
+@JvmName("combineFetchWithPrevious")
+inline fun <A, B, C, D> combine(
+    first: FetchWithPrevious<A>,
+    second: FetchWithPrevious<B>,
+    third: FetchWithPrevious<C>,
+    crossinline transform: (A, B, C) -> D
+): FetchWithPrevious<D> {
+    return combine(combine(first, second, ::Pair), third) { (a, b), c -> transform(a, b, c) }
+}
+
 
 suspend fun <T> FetchWithPrevious<T>.await(): DataResult<T> {
     return fetch.await()

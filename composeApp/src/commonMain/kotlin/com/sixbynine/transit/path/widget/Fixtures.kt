@@ -163,6 +163,7 @@ object Fixtures {
             fetchTime = now,
             nextFetchTime = now + 12.minutes,
             closestStationId = null,
+            isPathApiBroken = false,
         )
     }
 }

@@ -1,8 +1,10 @@
 package com.sixbynine.transit.path.app.ui.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -19,6 +21,7 @@ import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.UpdateNo
 import com.sixbynine.transit.path.app.ui.theme.Dimensions
 import org.jetbrains.compose.resources.stringResource
 import pathwidgetxplat.composeapp.generated.resources.Res.string
+import pathwidgetxplat.composeapp.generated.resources.path_api_busted
 import pathwidgetxplat.composeapp.generated.resources.update_now
 import pathwidgetxplat.composeapp.generated.resources.updating
 
@@ -74,6 +77,8 @@ fun HomeScreenScope.DepartureBoardFooter() {
             }
         }
     }
+
+    PathBustedErrorBanner()
 }
 
 @Composable
@@ -93,5 +98,23 @@ private fun HomeScreenScope.UpdateNowButton(modifier: Modifier = Modifier) {
         onClick = { onIntent(UpdateNowClicked) }
     ) {
         Text(stringResource(string.update_now))
+    }
+}
+
+@Composable
+private fun HomeScreenScope.PathBustedErrorBanner(modifier: Modifier = Modifier) {
+    if (!state.isPathApiBusted) {
+        return
+    }
+    Row(
+        modifier.fillMaxWidth().background(MaterialTheme.colorScheme.errorContainer)
+            .padding(horizontal = 16.dp).padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = stringResource(string.path_api_busted),
+            color = MaterialTheme.colorScheme.onErrorContainer,
+            textAlign = TextAlign.Center,
+        )
     }
 }

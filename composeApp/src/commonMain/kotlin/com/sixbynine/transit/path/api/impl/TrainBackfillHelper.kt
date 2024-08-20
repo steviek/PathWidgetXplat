@@ -6,6 +6,7 @@ import com.sixbynine.transit.path.api.DepartureBoardTrain
 import com.sixbynine.transit.path.api.State
 import com.sixbynine.transit.path.api.State.NewJersey
 import com.sixbynine.transit.path.api.State.NewYork
+import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.Stations.ChristopherStreet
 import com.sixbynine.transit.path.api.Stations.ExchangePlace
@@ -184,6 +185,29 @@ object TrainBackfillHelper {
             TwentyThirdStreet to 13.minutes + 43.seconds,
         ),
     )
+
+    fun getCheckpoints(route: String): Map<Station, Duration>? {
+        return when (route) {
+            "NWK_WTC" -> LineIdToCheckpoints[NWK_WTC]
+            "WTC_NWK" -> LineIdToCheckpoints[WTC_NWK]
+            "JSQ_33S" -> LineIdToCheckpoints[OK_JSQ_33S]
+            "33S_JSQ" -> LineIdToCheckpoints[OK_33S_JSQ]
+            "JSQ_HOB_33S" -> LineIdToCheckpoints[PAIN_JSQ_33S]
+            "33S_HOB_JSQ" -> LineIdToCheckpoints[PAIN_33S_JSQ]
+            "WTC_HOB" -> LineIdToCheckpoints[WTC_HOB]
+            "HOB_WTC" -> LineIdToCheckpoints[HOB_WTC]
+            "HOB_33S" -> LineIdToCheckpoints[OK_HOB_33S]
+            "33S_HOB" -> LineIdToCheckpoints[OK_33S_HOB]
+            "WTC_JSQ" -> LineIdToCheckpoints[WTC_NWK]
+                ?.filterKeys { it != Harrison && it != JournalSquare }
+            "JSQ_WTC" -> LineIdToCheckpoints[NWK_WTC]
+                ?.filterKeys { it != Newark && it != Harrison }
+                ?.mapValues { (_, checkpoint) -> checkpoint - 12.minutes + 43.seconds }
+            "NWK_HAR" -> mapOf(Newark to 0.minutes)
+            "HAR_NWK" -> mapOf(Harrison to 0.minutes)
+            else -> null
+        }
+    }
 
     // Map to check for when trains are heading in the same direction with the same color as the
     // main line, but stopping at an earlier station. This checks that e.g. a train from World Trade

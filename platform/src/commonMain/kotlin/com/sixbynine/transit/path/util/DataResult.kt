@@ -27,14 +27,19 @@ sealed interface DataResult<T> {
     }
 }
 
+fun <T> DataResult<T>.isSuccess(): Boolean {
+    contract { returns(true) implies (this@isSuccess is Success<T>) }
+    return this is Success
+}
+
 fun <T> DataResult<T>.isLoading(): Boolean {
     contract { returns(true) implies (this@isLoading is DataResult.Loading<T>) }
     return this is DataResult.Loading
 }
 
 fun <T> DataResult<T>.isFailure(): Boolean {
-    contract { returns(true) implies (this@isFailure is DataResult.Failure<T>) }
-    return this is DataResult.Failure
+    contract { returns(true) implies (this@isFailure is Failure<T>) }
+    return this is Failure
 }
 
 inline fun <T, R> DataResult<T>.fold(
@@ -84,7 +89,7 @@ fun <T> Result<T>.toDataResult(): DataResult<T> {
 inline fun <A, B, C> combine(
     first: DataResult<A>,
     second: DataResult<B>,
-    crossinline transform: (A, B) -> C
+    transform: (A, B) -> C
 ): DataResult<C> {
     if (first is Success && second is Success) {
         return DataResult.success(transform(first.data, second.data))
@@ -98,7 +103,7 @@ inline fun <A, B, C> combine(
     }
 }
 
-fun <A, B, C> DataResult<A>.combine(
+inline fun <A, B, C> DataResult<A>.combine(
     other: DataResult<B>,
     transform: (A, B) -> C
 ): DataResult<C> {

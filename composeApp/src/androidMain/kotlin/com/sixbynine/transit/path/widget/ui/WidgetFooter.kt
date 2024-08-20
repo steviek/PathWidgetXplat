@@ -54,6 +54,7 @@ fun WidgetFooter(
             modifier =
             GlanceModifier
                 .visibility(if (VERSION.SDK_INT >= 31) Invisible else Visible),
+            isClickable = VERSION.SDK_INT < 31,
             srcResId = drawable.ic_edit_inset,
             contentDesc = string.edit,
             onClick = startConfigurationActivityAction()

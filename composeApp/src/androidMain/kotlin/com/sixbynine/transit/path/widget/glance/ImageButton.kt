@@ -21,9 +21,12 @@ fun ImageButton(
     @DrawableRes srcResId: Int,
     contentDesc: StringResource,
     onClick: Action,
+    isClickable: Boolean = true,
 ) {
     Image(
-        modifier = modifier.clickable(onClick).cornerRadius(200.dp),
+        modifier = modifier
+            .let { if (isClickable) it.clickable(onClick) else it }
+            .cornerRadius(200.dp),
         provider = ImageProvider(srcResId),
         contentDescription = stringResource(contentDesc),
         colorFilter = ColorFilter.tint(GlanceTheme.colors.primary),

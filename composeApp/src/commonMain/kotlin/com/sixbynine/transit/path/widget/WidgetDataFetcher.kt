@@ -13,11 +13,11 @@ import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.api.alerts.GithubAlerts
 import com.sixbynine.transit.path.api.alerts.GithubAlertsRepository
 import com.sixbynine.transit.path.api.alerts.hidesTrainAt
+import com.sixbynine.transit.path.api.impl.SchedulePathApi
 import com.sixbynine.transit.path.api.isEastOf
 import com.sixbynine.transit.path.api.isInNewJersey
 import com.sixbynine.transit.path.api.isInNewYork
 import com.sixbynine.transit.path.api.isWestOf
-import com.sixbynine.transit.path.api.schedule.GithubScheduleRepository
 import com.sixbynine.transit.path.api.state
 import com.sixbynine.transit.path.app.settings.AvoidMissingTrains
 import com.sixbynine.transit.path.app.settings.AvoidMissingTrains.Always
@@ -37,10 +37,12 @@ import com.sixbynine.transit.path.util.AgedValue
 import com.sixbynine.transit.path.util.DataResult
 import com.sixbynine.transit.path.util.FetchWithPrevious
 import com.sixbynine.transit.path.util.Staleness
-import com.sixbynine.transit.path.util.map
+import com.sixbynine.transit.path.util.isFailure
+import com.sixbynine.transit.path.util.isSuccess
 import com.sixbynine.transit.path.util.onFailure
 import com.sixbynine.transit.path.util.onSuccess
 import com.sixbynine.transit.path.util.suspendRunCatching
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -126,15 +128,17 @@ object WidgetDataFetcher {
     ): FetchWithPrevious<WidgetData> {
         Logging.initialize()
         val now = now()
-        val (departures, previousDepartures) =
+        val (liveDepartures, previousDepartures) =
             PathApi.instance.getUpcomingDepartures(now, staleness)
         val (githubAlerts, previousGithubAlerts) = GithubAlertsRepository.getAlerts(now)
-        val (schedule, previousSchedule) = GithubScheduleRepository.getSchedules(now)
+        val (scheduleDepartures, previousScheduleDepartures) =
+            SchedulePathApi().getUpcomingDepartures(now, staleness)
 
         fun createWidgetData(
             data: DepartureBoardTrainMap,
             githubAlerts: GithubAlerts?,
             closestStations: List<Station>?,
+            isPathApiBroken: Boolean,
         ): WidgetData {
             return createWidgetData(
                 now,
@@ -145,22 +149,26 @@ object WidgetDataFetcher {
                 filter,
                 closestStations,
                 githubAlerts,
-                data
+                data,
+                isPathApiBroken
             )
         }
 
-        val previous = previousDepartures?.value?.let {
+        val previous = run {
+
+            val data = previousDepartures ?: previousScheduleDepartures ?: return@run null
             AgedValue(
-                previousDepartures.age,
+                data.age,
                 createWidgetData(
-                    it,
+                    data.value,
                     previousGithubAlerts?.value,
-                    lastClosestStations
+                    lastClosestStations,
+                    isPathApiBroken = false,
                 )
             )
         }
 
-        val fetch = GlobalScope.async {
+        val fetch: Deferred<DataResult<WidgetData>> = GlobalScope.async {
             coroutineScope {
                 val stationsByProximity =
                     if (includeClosestStation) {
@@ -177,14 +185,41 @@ object WidgetDataFetcher {
                         null
                     }
 
-                departures.await()
-                    .map {
-                        createWidgetData(
-                            it,
-                            githubAlerts.await().data,
-                            stationsByProximity
+                val live = liveDepartures.await()
+                val scheduled = scheduleDepartures.await()
+
+                when {
+                    live.isSuccess() -> {
+                        DataResult.success(
+                            createWidgetData(
+                                live.data,
+                                githubAlerts.await().data,
+                                stationsByProximity,
+                                isPathApiBroken = false,
+                            )
                         )
                     }
+
+                    live.isFailure() && scheduled.isSuccess() -> {
+                        DataResult.success(
+                            createWidgetData(
+                                scheduled.data,
+                                githubAlerts.await().data,
+                                stationsByProximity,
+                                isPathApiBroken = true,
+                            )
+                        )
+                    }
+
+                    live.isFailure() -> {
+                        DataResult.failure(live.error, live.hadInternet, null)
+                    }
+                    scheduled.isFailure() -> {
+                        DataResult.failure(scheduled.error, scheduled.hadInternet, null)
+                    }
+
+                    else -> DataResult.failure(error = IllegalStateException(), hadInternet = true)
+                }
             }
         }
         val fetchWithTimeout = GlobalScope.async {
@@ -212,7 +247,8 @@ object WidgetDataFetcher {
         filter: TrainFilter,
         closestStations: List<Station>?,
         githubAlerts: GithubAlerts?,
-        data: DepartureBoardTrainMap
+        data: DepartureBoardTrainMap,
+        isPathApiBroken: Boolean,
     ): WidgetData {
         Logging.d("createWidgetData, stations = ${stations.map { it.pathApiName }}, lines=$lines")
         val adjustedStations = stations.toMutableList()
@@ -322,6 +358,7 @@ object WidgetDataFetcher {
             stations = stationDatas.take(stationLimit),
             nextFetchTime = nextFetchTime,
             closestStationId = closestStationToUse?.pathApiName,
+            isPathApiBroken = isPathApiBroken,
         )
     }
 

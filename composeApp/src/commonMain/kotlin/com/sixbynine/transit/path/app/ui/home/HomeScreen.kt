@@ -22,7 +22,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -117,7 +117,7 @@ fun HomeScreen(state: State, onIntent: (Intent) -> Unit) {
     Scaffold(
         bottomBar = {
             Column {
-                Divider()
+                HorizontalDivider()
                 scope.DepartureBoardFooter()
             }
         }
@@ -142,7 +142,7 @@ private fun HomeScreenScope.MainContent(modifier: Modifier) {
             }
 
             state.hasError && (state.data == null || state.data.stations.isEmpty()) -> {
-                ErrorState(isPathApiError = state.isPathApiError)
+                ErrorState(isPathApiError = state.isPathApiBusted)
             }
 
             else -> {

@@ -22,7 +22,7 @@ object HomeScreenContract {
         val stationSort: StationSort = StationSort.Alphabetical,
         val isLoading: Boolean = true,
         val hasError: Boolean = false,
-        val isPathApiError: Boolean = false,
+        val isPathApiBusted: Boolean = false,
         val data: DepartureBoardData? = null,
         val showStationSelectionDialog: Boolean = false,
         val showAddStationBottomSheet: Boolean = false,

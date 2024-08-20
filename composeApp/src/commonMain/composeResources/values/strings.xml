@@ -54,7 +54,7 @@
     <string name="no_internet">No internet</string>
     <string name="ok">OK</string>
     <string name="open_in_browser">Open in browser</string>
-    <string name="path_api_busted">The PATH live departures API is not currently working. Displaying scheduled times.</string>
+    <string name="path_api_busted">Port Authority’s live departures service is not currently working. Displaying scheduled times.</string>
     <string name="presumed_train">Presumed train</string>
     <string name="presumed_trains_subtext">Presumed trains are those which aren’t yet reported by RidePATH, but which should exist because of reported trains at stations earlier in the line and the usual travel time between stations.</string>
     <string name="rate_app">Rate app</string>

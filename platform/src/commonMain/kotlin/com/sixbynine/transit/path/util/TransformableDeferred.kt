@@ -2,6 +2,7 @@ package com.sixbynine.transit.path.util
 
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
+import kotlin.jvm.JvmName
 
 interface TransformableDeferred<out T> {
     suspend fun await(): T
@@ -41,4 +42,24 @@ fun <T, R> TransformableDeferred<T>.map(transform: (T) -> R): TransformableDefer
 
 fun <T, R> Deferred<T>.map(transform: (T) -> R): TransformableDeferred<R> {
     return transformable().map(transform)
+}
+
+@JvmName("combineTransformableDeferreds")
+inline fun <A, B, C> combine(
+    first: TransformableDeferred<A>,
+    second: TransformableDeferred<B>,
+    crossinline transform: (A, B) -> C
+): TransformableDeferred<C> {
+    return object : TransformableDeferred<C> {
+        override suspend fun await(): C {
+            return transform(first.await(), second.await())
+        }
+    }
+}
+
+fun <A, B, C> TransformableDeferred<A>.combine(
+    other: TransformableDeferred<B>,
+    transform: (A, B) -> C
+): TransformableDeferred<C> {
+    return combine(this, other, transform)
 }

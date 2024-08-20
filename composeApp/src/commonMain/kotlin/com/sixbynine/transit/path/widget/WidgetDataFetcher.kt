@@ -17,6 +17,7 @@ import com.sixbynine.transit.path.api.isEastOf
 import com.sixbynine.transit.path.api.isInNewJersey
 import com.sixbynine.transit.path.api.isInNewYork
 import com.sixbynine.transit.path.api.isWestOf
+import com.sixbynine.transit.path.api.schedule.GithubScheduleRepository
 import com.sixbynine.transit.path.api.state
 import com.sixbynine.transit.path.app.settings.AvoidMissingTrains
 import com.sixbynine.transit.path.app.settings.AvoidMissingTrains.Always
@@ -128,6 +129,7 @@ object WidgetDataFetcher {
         val (departures, previousDepartures) =
             PathApi.instance.getUpcomingDepartures(now, staleness)
         val (githubAlerts, previousGithubAlerts) = GithubAlertsRepository.getAlerts(now)
+        val (schedule, previousSchedule) = GithubScheduleRepository.getSchedules(now)
 
         fun createWidgetData(
             data: DepartureBoardTrainMap,

@@ -13,3 +13,9 @@ inline fun <T> T.runIf(condition: Boolean, block: T.() -> T): T {
 }
 
 inline fun <T> T.runUnless(condition: Boolean, block: T.() -> T) = runIf(!condition) { block() }
+
+inline fun <A : Any, B : Any, C> ifNotNull(first: A?, second: B?, transform: (A, B) -> C): C? {
+    first ?: return null
+    second ?: return null
+    return transform(first, second)
+}

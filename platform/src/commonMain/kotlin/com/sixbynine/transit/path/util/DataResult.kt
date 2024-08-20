@@ -1,6 +1,9 @@
 package com.sixbynine.transit.path.util
 
+import com.sixbynine.transit.path.util.DataResult.Failure
+import com.sixbynine.transit.path.util.DataResult.Success
 import kotlin.contracts.contract
+import kotlin.jvm.JvmName
 
 sealed interface DataResult<T> {
     val data: T?
@@ -75,4 +78,29 @@ fun <T> Result<T>.toDataResult(): DataResult<T> {
         onSuccess = { DataResult.success(it) },
         onFailure = { DataResult.failure(it, hadInternet = true, data = null) }
     )
+}
+
+@JvmName("combineDataResults")
+inline fun <A, B, C> combine(
+    first: DataResult<A>,
+    second: DataResult<B>,
+    crossinline transform: (A, B) -> C
+): DataResult<C> {
+    if (first is Success && second is Success) {
+        return DataResult.success(transform(first.data, second.data))
+    }
+
+    val data = ifNotNull(first.data, second.data, transform)
+    return when {
+        first is Failure -> DataResult.failure(first.error, first.hadInternet, data)
+        second is Failure -> DataResult.failure(second.error, second.hadInternet, data)
+        else -> DataResult.loading(data)
+    }
+}
+
+fun <A, B, C> DataResult<A>.combine(
+    other: DataResult<B>,
+    transform: (A, B) -> C
+): DataResult<C> {
+    return combine(this, other, transform)
 }

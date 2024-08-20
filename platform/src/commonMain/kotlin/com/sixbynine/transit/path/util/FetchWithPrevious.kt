@@ -2,6 +2,7 @@ package com.sixbynine.transit.path.util
 
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
+import kotlin.jvm.JvmName
 import kotlin.time.Duration.Companion.seconds
 
 data class FetchWithPrevious<T>(
@@ -57,6 +58,25 @@ fun <T, R> FetchWithPrevious<T>.map(
         previous = previous?.map(transform),
     )
 }
+
+@JvmName("combineFetchWithPrevious")
+inline fun <A, B, C> combine(
+    first: FetchWithPrevious<A>,
+    second: FetchWithPrevious<B>,
+    crossinline transform: (A, B) -> C
+): FetchWithPrevious<C> {
+    val previous = ifNotNull(first.previous, second.previous) { a, b ->
+        AgedValue(
+            age = maxOf(a.age, b.age),
+            value = transform(a.value, b.value),
+        )
+    }
+    return FetchWithPrevious(
+        fetch = first.fetch.combine(second.fetch) { a, b -> combine(a, b, transform) },
+        previous = previous,
+    )
+}
+
 
 suspend fun <T> FetchWithPrevious<T>.await(): DataResult<T> {
     return fetch.await()

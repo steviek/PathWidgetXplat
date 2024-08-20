@@ -19,8 +19,12 @@ import com.sixbynine.transit.path.time.NewYorkTimeZone
 import com.sixbynine.transit.path.util.FetchWithPrevious
 import com.sixbynine.transit.path.util.Staleness
 import com.sixbynine.transit.path.util.map
+import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.atTime
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration.Companion.minutes
@@ -211,26 +215,35 @@ class SchedulePathApi : PathApi {
                 }
 
                 departures.forEach forEachDeparture@{ time ->
-                    val originTrain = DepartureBoardTrain(
-                        headsign = headsign,
-                        projectedArrival = localNow.date.atTime(time).toInstant(NewYorkTimeZone),
-                        lineColors = lineColors,
-                        isDelayed = false,
-                        backfillSource = null,
-                        directionState = directionState,
-                        lines = lines,
-                    )
-                    results.getOrPut(origin.pathApiName) { mutableListOf() } += originTrain
-
-                    val checkpoints =
-                        TrainBackfillHelper.getCheckpoints(route) ?: return@forEachDeparture
-                    checkpoints.forEach { (checkpointStation, checkpointTime) ->
-                        results.getOrPut(checkpointStation.pathApiName) { mutableListOf() } +=
-                            originTrain.copy(
-                                projectedArrival = originTrain.projectedArrival + checkpointTime
-                            )
+                    val dates = mutableListOf(localNow.date)
+                    if (timing.isActiveAt(localNow.minusDays(1).toInstant(NewYorkTimeZone))) {
+                        dates += localNow.minusDays(1).date
+                    }
+                    if (timing.isActiveAt(localNow.plusDays(1).toInstant(NewYorkTimeZone))) {
+                        dates += localNow.plusDays(1).date
                     }
 
+                    dates.forEach { date ->
+                        val originTrain = DepartureBoardTrain(
+                            headsign = headsign,
+                            projectedArrival = date.atTime(time).toInstant(NewYorkTimeZone),
+                            lineColors = lineColors,
+                            isDelayed = false,
+                            backfillSource = null,
+                            directionState = directionState,
+                            lines = lines,
+                        )
+                        results.getOrPut(origin.pathApiName) { mutableListOf() } += originTrain
+
+                        val checkpoints =
+                            TrainBackfillHelper.getCheckpoints(route) ?: return@forEachDeparture
+                        checkpoints.forEach { (checkpointStation, checkpointTime) ->
+                            results.getOrPut(checkpointStation.pathApiName) { mutableListOf() } +=
+                                originTrain.copy(
+                                    projectedArrival = originTrain.projectedArrival + checkpointTime
+                                )
+                        }
+                    }
                 }
             }
         }
@@ -278,4 +291,12 @@ class SchedulePathApi : PathApi {
             }
         }
     }
+}
+
+fun LocalDateTime.minusDays(days: Int) : LocalDateTime {
+    return date.minus(DatePeriod(days = 1)).atTime(time)
+}
+
+fun LocalDateTime.plusDays(days: Int) : LocalDateTime {
+    return date.plus(DatePeriod(days = 1)).atTime(time)
 }

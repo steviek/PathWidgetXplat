@@ -155,7 +155,6 @@ object WidgetDataFetcher {
         }
 
         val previous = run {
-
             val data = previousDepartures ?: previousScheduleDepartures ?: return@run null
             AgedValue(
                 data.age,
@@ -188,37 +187,48 @@ object WidgetDataFetcher {
                 val live = liveDepartures.await()
                 val scheduled = scheduleDepartures.await()
 
+
+                val departureBoardTrainMap = live.data ?: scheduled.data
+                val isPathApiBroken = live.isFailure() && live.error is PathApiException
+
+                val widgetData = departureBoardTrainMap?.let { data ->
+                    createWidgetData(
+                        data,
+                        githubAlerts.await().data,
+                        stationsByProximity,
+                        isPathApiBroken = isPathApiBroken,
+                    )
+                }
+
                 when {
-                    live.isSuccess() -> {
-                        DataResult.success(
-                            createWidgetData(
-                                live.data,
-                                githubAlerts.await().data,
-                                stationsByProximity,
-                                isPathApiBroken = false,
-                            )
+                    (live.isSuccess() || (scheduled.data != null && isPathApiBroken)) &&
+                            widgetData != null -> {
+                        DataResult.success(widgetData)
+                    }
+
+                    live.isFailure() && live.data != null -> {
+                        DataResult.failure(
+                            error = live.error,
+                            hadInternet = live.hadInternet,
+                            data = widgetData
                         )
                     }
 
-                    live.isFailure() && scheduled.isSuccess() -> {
-                        DataResult.success(
-                            createWidgetData(
-                                scheduled.data,
-                                githubAlerts.await().data,
-                                stationsByProximity,
-                                isPathApiBroken = true,
-                            )
-                        )
-                    }
-
-                    live.isFailure() -> {
-                        DataResult.failure(live.error, live.hadInternet, null)
-                    }
                     scheduled.isFailure() -> {
-                        DataResult.failure(scheduled.error, scheduled.hadInternet, null)
+                        DataResult.failure(
+                            error = scheduled.error,
+                            hadInternet = scheduled.hadInternet,
+                            data = widgetData
+                        )
                     }
 
-                    else -> DataResult.failure(error = IllegalStateException(), hadInternet = true)
+                    else -> {
+                        DataResult.failure(
+                            error = IllegalStateException(),
+                            hadInternet = true,
+                            data = widgetData
+                        )
+                    }
                 }
             }
         }

@@ -82,9 +82,10 @@ fun DepartureBoard(result: DataResult<WidgetData>, modifier: GlanceModifier = Gl
                                 Spacer(modifier = GlanceModifier.width(26.dp))
 
                                 Text(
-                                    text = sign.projectedArrivals.joinToString(separator = "   ") {
-                                        WidgetDataFormatter.formatTime(it)
-                                    },
+                                    text = sign.projectedArrivals.take(12)
+                                        .joinToString(separator = "   ") {
+                                            WidgetDataFormatter.formatTime(it)
+                                        },
                                     style = GlanceTheme.typography.secondary,
                                 )
                             }

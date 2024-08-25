@@ -29,6 +29,7 @@ kotlin {
             implementation(projects.logging)
             api(projects.api)
             implementation(projects.platform)
+            implementation(projects.schedule)
 
             implementation(compose.animation)
             implementation(compose.runtime)

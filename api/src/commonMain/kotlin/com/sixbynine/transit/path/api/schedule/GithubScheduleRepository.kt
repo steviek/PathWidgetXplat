@@ -1,5 +1,6 @@
 package com.sixbynine.transit.path.api.schedule
 
+import com.sixbynine.transit.path.schedule.Schedules
 import com.sixbynine.transit.path.util.FetchWithPrevious
 import com.sixbynine.transit.path.util.RemoteFileRepository
 import com.sixbynine.transit.path.util.combine

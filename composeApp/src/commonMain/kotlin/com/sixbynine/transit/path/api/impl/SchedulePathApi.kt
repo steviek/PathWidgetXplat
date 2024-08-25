@@ -11,10 +11,10 @@ import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.schedule.GithubScheduleRepository
 import com.sixbynine.transit.path.api.schedule.ScheduleAndOverride
-import com.sixbynine.transit.path.api.schedule.ScheduleTiming
-import com.sixbynine.transit.path.api.schedule.Schedules
 import com.sixbynine.transit.path.app.ui.ColorWrapper
 import com.sixbynine.transit.path.app.ui.Colors
+import com.sixbynine.transit.path.schedule.ScheduleTiming
+import com.sixbynine.transit.path.schedule.Schedules
 import com.sixbynine.transit.path.time.NewYorkTimeZone
 import com.sixbynine.transit.path.util.FetchWithPrevious
 import com.sixbynine.transit.path.util.Staleness

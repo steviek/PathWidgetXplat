@@ -25,6 +25,7 @@ kotlin {
             implementation(projects.platform)
             implementation(projects.logging)
             implementation(projects.flipper)
+            implementation(projects.schedule)
 
             implementation(libs.ktor.core)
             implementation(libs.ktor.logging)

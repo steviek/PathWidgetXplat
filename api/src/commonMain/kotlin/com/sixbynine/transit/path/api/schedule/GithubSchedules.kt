@@ -39,7 +39,9 @@ data class ScheduleTiming(
 data class Schedule(
     val id: Int,
     val name: String,
-    val departures: Map<String, List<@Serializable(with = LocalTimeAsShortSerializer::class) LocalTime>>
+    val departures: Map<String, List<@Serializable(with = LocalTimeAsShortSerializer::class) LocalTime>>,
+    @Serializable(with = LocalTimeAsShortSerializer::class) val firstSlowDepartureTime: LocalTime?,
+    @Serializable(with = LocalTimeAsShortSerializer::class) val lastSlowDepartureTime: LocalTime?,
 )
 
 class LocalTimeAsShortSerializer : KSerializer<LocalTime> {

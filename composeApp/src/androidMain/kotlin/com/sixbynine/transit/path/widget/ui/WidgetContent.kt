@@ -40,8 +40,8 @@ fun WidgetContent(state: WidgetState) {
             val result = state.result
             if (state.needsSetup) {
                 SetupView()
-            } else if (result.isFailure() && result.data?.stations?.isNotEmpty() != true) {
-                ErrorView(isPathApiError = result.error is PathApiException)
+            } else if (result.isFailure() && result.data?.stations.orEmpty().isEmpty()) {
+                ErrorView(state, isPathApiError = result.error is PathApiException)
             } else {
                 MainWidgetContent(state)
             }
@@ -89,17 +89,24 @@ private fun SetupView() {
 }
 
 @Composable
-private fun ErrorView(isPathApiError: Boolean) {
+private fun ErrorView(state: WidgetState, isPathApiError: Boolean) {
     val text = if (isPathApiError) {
         string.failed_to_fetch_path_fault
     } else {
         string.failed_to_fetch
     }
-    Text(
-        modifier = GlanceModifier.padding(16.dp),
-        text = stringResource(text),
-        color = GlanceTheme.colors.error,
-        fontSize = 18.sp,
-        textAlign = TextAlign.Center
-    )
+    Column(GlanceModifier.fillMaxSize()) {
+        Text(
+            modifier = GlanceModifier.defaultWeight().padding(16.dp),
+            text = stringResource(text),
+            color = GlanceTheme.colors.error,
+            fontSize = 18.sp,
+            textAlign = TextAlign.Center
+        )
+
+        WidgetFooter(
+            state = state,
+            modifier = GlanceModifier.height(WidgetFooterHeight)
+        )
+    }
 }

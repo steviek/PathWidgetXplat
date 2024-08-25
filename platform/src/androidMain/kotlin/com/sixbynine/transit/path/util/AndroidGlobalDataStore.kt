@@ -55,4 +55,30 @@ object AndroidGlobalDataStore : GlobalDataStore {
     }
 }
 
-actual fun globalDataStore(): GlobalDataStore = AndroidGlobalDataStore
+private object TestGlobalDataStore : GlobalDataStore {
+    private val data = mutableMapOf<String, Any?>()
+
+    override fun set(key: String, value: String?) {
+        data[key] = value
+    }
+
+    override fun set(key: String, value: Boolean?) {
+        data[key] = value
+    }
+
+    override fun set(key: String, value: Long?) {
+        data[key] = value
+    }
+
+    override fun getString(key: String): String? {
+        return data[key] as String?
+    }
+
+    override fun getLong(key: String): Long? {
+        return data[key] as Long?
+    }
+}
+
+actual fun globalDataStore(): GlobalDataStore {
+    return if(IsTest) TestGlobalDataStore else AndroidGlobalDataStore
+}

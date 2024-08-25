@@ -1,13 +1,13 @@
 package com.sixbynine.transit.path
 
 import com.sixbynine.transit.path.platform.IsDebug
+import com.sixbynine.transit.path.util.IsTest
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
 
 object Logging {
     private val hasInitialized = MutableStateFlow(false)
-    private var isTest = false
 
     fun initialize() {
         if (hasInitialized.compareAndSet(expect = false, update = true)) {
@@ -15,12 +15,8 @@ object Logging {
         }
     }
 
-    fun setTest() {
-        isTest = true
-    }
-
     fun d(message: String) {
-        if (isTest) {
+        if (IsTest) {
             println(message)
             return
         }
@@ -30,7 +26,7 @@ object Logging {
     }
 
     fun w(message: String, throwable: Throwable? = null) {
-        if (isTest) {
+        if (IsTest) {
             println(message)
             return
         }
@@ -39,7 +35,7 @@ object Logging {
     }
 
     fun e(message: String, throwable: Throwable? = null) {
-        if (isTest) {
+        if (IsTest) {
             println(message)
             return
         }

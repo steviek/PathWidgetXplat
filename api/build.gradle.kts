@@ -40,7 +40,12 @@ kotlin {
 
         androidMain.dependencies {
             implementation(libs.ktor.okhttp)
+        }
 
+        val androidUnitTest by getting {
+            dependencies {
+                implementation(libs.kotlin.test)
+            }
         }
 
         iosMain.dependencies {

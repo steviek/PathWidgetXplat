@@ -22,6 +22,7 @@ import com.sixbynine.transit.path.util.map
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
 import kotlinx.datetime.atTime
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
@@ -106,6 +107,20 @@ class SchedulePathApi : PathApi {
             // This doesn't account for midnight overlap, should sort this out.
             if (!timing.isActiveAt(now)) return@forEach
             val schedule = schedules.schedules.find { it.id == timing.scheduleId } ?: return@forEach
+
+            val slowStartTime = schedule.firstSlowDepartureTime
+            val slowEndTime = schedule.lastSlowDepartureTime
+
+            fun isSlowAt(time: LocalTime): Boolean {
+                slowStartTime ?: return false
+                slowEndTime ?: return false
+                return if (slowStartTime <= slowEndTime) {
+                    time >= slowStartTime && time <= slowEndTime
+                } else {
+                    time >= slowStartTime || time <= slowEndTime
+                }
+            }
+
             schedule.departures.forEach forEachRoute@{ (route, departures) ->
                 val headsign: String
                 val lineColors: List<ColorWrapper>
@@ -120,6 +135,7 @@ class SchedulePathApi : PathApi {
                         lines = setOf(Line.NewarkWtc)
                         origin = Stations.Newark
                     }
+
                     "WTC_NWK" -> {
                         headsign = "Newark"
                         lineColors = Colors.NwkWtc
@@ -127,6 +143,7 @@ class SchedulePathApi : PathApi {
                         lines = setOf(Line.NewarkWtc)
                         origin = Stations.WorldTradeCenter
                     }
+
                     "JSQ_33S" -> {
                         headsign = "33rd Street"
                         lineColors = Colors.Jsq33s
@@ -134,6 +151,7 @@ class SchedulePathApi : PathApi {
                         lines = setOf(Line.JournalSquare33rd)
                         origin = Stations.JournalSquare
                     }
+
                     "33S_JSQ" -> {
                         headsign = "Journal Square"
                         lineColors = Colors.Jsq33s
@@ -141,6 +159,7 @@ class SchedulePathApi : PathApi {
                         lines = setOf(Line.JournalSquare33rd)
                         origin = Stations.ThirtyThirdStreet
                     }
+
                     "JSQ_HOB_33S" -> {
                         headsign = "33rd Street via Hoboken"
                         lineColors = Colors.Jsq33s + Colors.Hob33s
@@ -148,6 +167,7 @@ class SchedulePathApi : PathApi {
                         lines = setOf(Line.JournalSquare33rd, Line.Hoboken33rd)
                         origin = Stations.JournalSquare
                     }
+
                     "33S_HOB_JSQ" -> {
                         headsign = "Journal Square via Hoboken"
                         lineColors = Colors.Jsq33s + Colors.Hob33s
@@ -155,6 +175,7 @@ class SchedulePathApi : PathApi {
                         lines = setOf(Line.JournalSquare33rd, Line.Hoboken33rd)
                         origin = Stations.ThirtyThirdStreet
                     }
+
                     "WTC_HOB" -> {
                         headsign = "Hoboken"
                         lineColors = Colors.HobWtc
@@ -162,6 +183,7 @@ class SchedulePathApi : PathApi {
                         lines = setOf(Line.HobokenWtc)
                         origin = Stations.WorldTradeCenter
                     }
+
                     "HOB_WTC" -> {
                         headsign = "World Trade Center"
                         lineColors = Colors.HobWtc
@@ -169,6 +191,7 @@ class SchedulePathApi : PathApi {
                         lines = setOf(Line.HobokenWtc)
                         origin = Stations.Hoboken
                     }
+
                     "HOB_33S" -> {
                         headsign = "33rd Street"
                         lineColors = Colors.Hob33s
@@ -176,6 +199,7 @@ class SchedulePathApi : PathApi {
                         lines = setOf(Line.Hoboken33rd)
                         origin = Stations.Hoboken
                     }
+
                     "33S_HOB" -> {
                         headsign = "Hoboken"
                         lineColors = Colors.Hob33s
@@ -183,6 +207,7 @@ class SchedulePathApi : PathApi {
                         lines = setOf(Line.Hoboken33rd)
                         origin = Stations.ThirtyThirdStreet
                     }
+
                     "WTC_JSQ" -> {
                         headsign = "Journal Square"
                         lineColors = Colors.NwkWtc
@@ -190,6 +215,7 @@ class SchedulePathApi : PathApi {
                         lines = setOf(Line.NewarkWtc)
                         origin = Stations.WorldTradeCenter
                     }
+
                     "JSQ_WTC" -> {
                         headsign = "World Trade Center"
                         lineColors = Colors.NwkWtc
@@ -197,6 +223,7 @@ class SchedulePathApi : PathApi {
                         lines = setOf(Line.NewarkWtc)
                         origin = Stations.JournalSquare
                     }
+
                     "NWK_HAR" -> {
                         headsign = "Harrison"
                         lineColors = Colors.NwkWtc
@@ -204,6 +231,7 @@ class SchedulePathApi : PathApi {
                         lines = setOf(Line.NewarkWtc)
                         origin = Stations.Newark
                     }
+
                     "HAR_NWK" -> {
                         headsign = "Newark"
                         lineColors = Colors.NwkWtc
@@ -211,6 +239,7 @@ class SchedulePathApi : PathApi {
                         lines = setOf(Line.NewarkWtc)
                         origin = Stations.Harrison
                     }
+
                     else -> return@forEachRoute
                 }
 
@@ -236,8 +265,9 @@ class SchedulePathApi : PathApi {
                         results.getOrPut(origin.pathApiName) { mutableListOf() } += originTrain
 
                         val checkpoints =
-                            TrainBackfillHelper.getCheckpoints(route) ?: return@forEachDeparture
-                        checkpoints.forEach { (checkpointStation, checkpointTime) ->
+                            TrainBackfillHelper.getCheckpoints(route, isSlowTime = isSlowAt(time))
+                                ?: return@forEachDeparture
+                        checkpoints.filterKeys { it != origin }.forEach { (checkpointStation, checkpointTime) ->
                             results.getOrPut(checkpointStation.pathApiName) { mutableListOf() } +=
                                 originTrain.copy(
                                     projectedArrival = originTrain.projectedArrival + checkpointTime
@@ -293,10 +323,10 @@ class SchedulePathApi : PathApi {
     }
 }
 
-fun LocalDateTime.minusDays(days: Int) : LocalDateTime {
+fun LocalDateTime.minusDays(days: Int): LocalDateTime {
     return date.minus(DatePeriod(days = 1)).atTime(time)
 }
 
-fun LocalDateTime.plusDays(days: Int) : LocalDateTime {
+fun LocalDateTime.plusDays(days: Int): LocalDateTime {
     return date.plus(DatePeriod(days = 1)).atTime(time)
 }

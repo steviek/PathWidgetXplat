@@ -67,6 +67,12 @@ kotlin {
             implementation(libs.google.accompanist)
         }
 
+        val androidUnitTest by getting {
+            dependencies {
+                implementation(libs.kotlin.coroutines.test)
+            }
+        }
+
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }

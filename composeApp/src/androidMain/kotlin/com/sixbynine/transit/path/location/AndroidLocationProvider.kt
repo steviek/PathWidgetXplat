@@ -17,9 +17,11 @@ import com.sixbynine.transit.path.location.LocationCheckResult.Failure
 import com.sixbynine.transit.path.location.LocationCheckResult.NoPermission
 import com.sixbynine.transit.path.location.LocationCheckResult.NoProvider
 import com.sixbynine.transit.path.location.LocationCheckResult.Success
+import com.sixbynine.transit.path.util.IsTest
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -158,5 +160,20 @@ var Location.elapsedRealtime: Duration
         elapsedRealtimeNanos = value.inWholeNanoseconds
     }
 
-actual fun LocationProvider(): LocationProvider = AndroidLocationProvider
+object TestLocationProvider : LocationProvider {
+    override val isLocationSupportedByDevice = false
+    override val locationPermissionResults: SharedFlow<LocationPermissionRequestResult>
+        get() = MutableSharedFlow()
 
+    override fun hasLocationPermission(): Boolean = false
+
+    override fun requestLocationPermission() {}
+
+    override suspend fun tryToGetLocation(timeout: Duration): LocationCheckResult {
+        return NoProvider
+    }
+}
+
+actual fun LocationProvider(): LocationProvider {
+    return if (IsTest) TestLocationProvider else AndroidLocationProvider
+}

@@ -1,7 +1,6 @@
 package com.sixbynine.transit.path.api.path
 
 import com.sixbynine.transit.path.Logging
-import com.sixbynine.transit.path.api.NetworkException
 import com.sixbynine.transit.path.api.PathApiException
 import com.sixbynine.transit.path.api.createHttpClient
 import com.sixbynine.transit.path.network.NetworkManager
@@ -14,10 +13,8 @@ import com.sixbynine.transit.path.util.FetchWithPrevious
 import com.sixbynine.transit.path.util.IoScope
 import com.sixbynine.transit.path.util.JsonFormat
 import com.sixbynine.transit.path.util.Staleness
+import com.sixbynine.transit.path.util.readRemoteFile
 import com.sixbynine.transit.path.util.suspendRunCatching
-import io.ktor.client.request.get
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.isSuccess
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.sync.Mutex
@@ -66,14 +63,11 @@ object PathRepository {
                 async {
                     suspendRunCatching {
                         withTimeout(5.seconds) {
-                            val response =
-                                httpClient.get("https://www.panynj.gov/bin/portauthority/ridepath.json")
-
-                            if (!response.status.isSuccess()) {
-                                throw NetworkException(response.status.toString())
-                            }
-
-                            val responseText = response.bodyAsText()
+                            val responseText =
+                                readRemoteFile(
+                                    "https://www.panynj.gov/bin/portauthority/ridepath.json",
+                                )
+                                    .getOrThrow()
 
                             lastPathResponseTime = now
                             lastPathResponse = responseText

@@ -1,6 +1,5 @@
 package com.sixbynine.transit.path.api.impl
 
-import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.api.DepartureBoardTrain
 import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.State.NewJersey
@@ -14,6 +13,7 @@ import com.sixbynine.transit.path.api.Stations.Newark
 import com.sixbynine.transit.path.api.Stations.Newport
 import com.sixbynine.transit.path.api.Stations.WorldTradeCenter
 import com.sixbynine.transit.path.app.ui.Colors
+import com.sixbynine.transit.path.util.IsTest
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
@@ -33,7 +33,7 @@ import kotlin.test.assertTrue
 class TrainBackfillHelperTest {
     @BeforeTest
     fun setUp() {
-        Logging.setTest()
+        IsTest = true
     }
 
     @Test

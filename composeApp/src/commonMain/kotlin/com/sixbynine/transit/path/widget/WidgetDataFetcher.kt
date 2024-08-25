@@ -125,9 +125,9 @@ object WidgetDataFetcher {
         filter: TrainFilter,
         includeClosestStation: Boolean,
         staleness: Staleness,
+        now: Instant = now(),
     ): FetchWithPrevious<WidgetData> {
         Logging.initialize()
-        val now = now()
         val (liveDepartures, previousDepartures) =
             PathApi.instance.getUpcomingDepartures(now, staleness)
         val (githubAlerts, previousGithubAlerts) = GithubAlertsRepository.getAlerts(now)

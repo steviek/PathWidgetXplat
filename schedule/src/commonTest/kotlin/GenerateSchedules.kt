@@ -79,7 +79,8 @@ private fun printMainSchedule() {
         validFrom = LocalDate(2024, APRIL, 7).atTime(MIDNIGHT),
         validTo = null,
         schedules = listOf(weekdaySchedule, saturdaySchedule, sundaySchedule),
-        timings = listOf(weekdayScheduleTiming, saturdayScheduleTiming, sundayScheduleTiming)
+        timings = listOf(weekdayScheduleTiming, saturdayScheduleTiming, sundayScheduleTiming),
+        name = "Regular",
     )
 
     println(json.encodeToString(schedules))
@@ -123,7 +124,8 @@ private fun printOverrideSchedule() {
         validFrom = LocalDate(2024, AUGUST, 31).atTime(MIDNIGHT),
         validTo = LocalDate(2024, SEPTEMBER, 3).atTime(MIDNIGHT),
         schedules = listOf(satSchedule, sunSchedule, monSchedule),
-        timings = listOf(saturdayScheduleTiming, sundayScheduleTiming, mondayScheduleTiming)
+        timings = listOf(saturdayScheduleTiming, sundayScheduleTiming, mondayScheduleTiming),
+        name = "Labor Day Weekend"
     )
 
     println(json.encodeToString(schedules))

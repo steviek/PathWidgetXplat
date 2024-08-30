@@ -4,10 +4,12 @@ import com.sixbynine.transit.path.schedule.Schedules
 import kotlinx.datetime.DayOfWeek.MONDAY
 import kotlinx.datetime.DayOfWeek.SATURDAY
 import kotlinx.datetime.DayOfWeek.SUNDAY
+import kotlinx.datetime.DayOfWeek.TUESDAY
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.Month.APRIL
 import kotlinx.datetime.Month.AUGUST
+import kotlinx.datetime.Month.SEPTEMBER
 import kotlinx.datetime.atTime
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -84,33 +86,44 @@ private fun printMainSchedule() {
 }
 
 private fun printOverrideSchedule() {
-    val aug17Schedule =
-        createSchedule(id = 17, name = "Aug 24 Schedule", departures = AdjustedSaturdayDepartures)
+    val satSchedule =
+        createSchedule(id = 10, name = "Aug 31 Schedule", departures = AdjustedSaturdayDepartures)
 
     val saturdayScheduleTiming = ScheduleTiming(
-        scheduleId = aug17Schedule.id,
+        scheduleId = satSchedule.id,
         startDay = SATURDAY,
         startTime = MIDNIGHT,
         endDay = SUNDAY,
         endTime = MIDNIGHT
     )
 
-    val aug18Schedule =
-        createSchedule(id = 18, name = "Aug 25 Schedule", departures = AdjustedSundayDepartures)
+    val sunSchedule =
+        createSchedule(id = 11, name = "Sep 1 Schedule", departures = AdjustedSundayDepartures)
 
     val sundayScheduleTiming = ScheduleTiming(
-        scheduleId = aug18Schedule.id,
+        scheduleId = sunSchedule.id,
         startDay = SUNDAY,
         startTime = MIDNIGHT,
         endDay = MONDAY,
         endTime = MIDNIGHT
     )
 
+    val monSchedule =
+        createSchedule(id = 12, name = "Sep 2 Schedule", departures = AdjustedMondayDepartures)
+
+    val mondayScheduleTiming = ScheduleTiming(
+        scheduleId = monSchedule.id,
+        startDay = MONDAY,
+        startTime = MIDNIGHT,
+        endDay = TUESDAY,
+        endTime = MIDNIGHT
+    )
+
     val schedules = Schedules(
-        validFrom = LocalDate(2024, AUGUST, 24).atTime(MIDNIGHT),
-        validTo = LocalDate(2024, AUGUST, 26).atTime(MIDNIGHT),
-        schedules = listOf(aug17Schedule, aug18Schedule),
-        timings = listOf(saturdayScheduleTiming, sundayScheduleTiming)
+        validFrom = LocalDate(2024, AUGUST, 31).atTime(MIDNIGHT),
+        validTo = LocalDate(2024, SEPTEMBER, 3).atTime(MIDNIGHT),
+        schedules = listOf(satSchedule, sunSchedule, monSchedule),
+        timings = listOf(saturdayScheduleTiming, sundayScheduleTiming, mondayScheduleTiming)
     )
 
     println(json.encodeToString(schedules))

@@ -80,7 +80,7 @@ private fun printMainSchedule() {
         validTo = null,
         schedules = listOf(weekdaySchedule, saturdaySchedule, sundaySchedule),
         timings = listOf(weekdayScheduleTiming, saturdayScheduleTiming, sundayScheduleTiming),
-        name = "Regular",
+        name = "regular",
     )
 
     println(json.encodeToString(schedules))

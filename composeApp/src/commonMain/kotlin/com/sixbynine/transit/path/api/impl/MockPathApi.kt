@@ -54,6 +54,11 @@ internal class MockPathApi : PathApi {
                 )
             )
         }.mapKeys { it.key.pathApiName }
-        return FetchWithPrevious(AgedValue(0.seconds, DepartureBoardTrainMap(stationsToDepartures)))
+        return FetchWithPrevious(
+            AgedValue(
+                0.seconds,
+                DepartureBoardTrainMap(stationsToDepartures, scheduleName = null)
+            )
+        )
     }
 }

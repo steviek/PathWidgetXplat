@@ -79,6 +79,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
             isLoading = fetchData.isFetching,
             hasError = fetchData.hasError,
             isPathApiBusted = fetchData.isPathApiBusted,
+            scheduleName = fetchData.scheduleName,
             isTablet = maxWidth >= 480.dp && maxHeight >= 480.dp,
             selectedStations = StationSelectionManager.selection.value.selectedStations,
             unselectedStations = StationSelectionManager.selection.value.unselectedStations,
@@ -120,6 +121,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
                             isLoading = fetchData.isFetching,
                             hasError = fetchData.hasError,
                             isPathApiBusted = fetchData.isPathApiBusted,
+                            scheduleName = fetchData.scheduleName,
                             updateFooterText = createFooterText(),
                             data = createDepartureBoardData()
                         )

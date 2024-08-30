@@ -24,6 +24,7 @@ data class Schedules(
     @Serializable(with = LocalDateTimeSerializer::class) val validTo: LocalDateTime?,
     val schedules: List<Schedule>,
     val timings: List<ScheduleTiming>,
+    val name: String? = null,
 )
 
 @Serializable

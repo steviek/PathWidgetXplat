@@ -57,6 +57,6 @@ internal class PathApiImpl : PathApi {
             result.consideredStation to trains
         }
             .let { TrainBackfillHelper.withBackfill(it) }
-            .let { DepartureBoardTrainMap(it) }
+            .let { DepartureBoardTrainMap(it, scheduleName = null) }
     }
 }

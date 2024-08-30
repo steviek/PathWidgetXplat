@@ -369,6 +369,7 @@ object WidgetDataFetcher {
             nextFetchTime = nextFetchTime,
             closestStationId = closestStationToUse?.pathApiName,
             isPathApiBroken = isPathApiBroken,
+            scheduleName = data.scheduleName,
         )
     }
 

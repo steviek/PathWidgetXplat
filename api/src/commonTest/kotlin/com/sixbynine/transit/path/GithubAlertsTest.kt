@@ -24,11 +24,13 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.Month.APRIL
+import kotlinx.datetime.Month.AUGUST
 import kotlinx.datetime.Month.DECEMBER
 import kotlinx.datetime.Month.JANUARY
 import kotlinx.datetime.Month.JULY
 import kotlinx.datetime.Month.JUNE
 import kotlinx.datetime.Month.MAY
+import kotlinx.datetime.Month.SEPTEMBER
 import kotlinx.serialization.encodeToString
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -41,6 +43,7 @@ class GithubAlertsTest {
         val alerts = GithubAlerts(
             GeneralOvernightCleaning,
             FourteenthStreetOvernight,
+            LaborDayOvernightCleaning,
         )
 
         val json = JsonFormat.encodeToString(alerts)
@@ -279,20 +282,20 @@ class GithubAlertsTest {
             level = "WARN",
         )
 
-        val MemorialDayOvernightCleaning = Alert(
+        val LaborDayOvernightCleaning = Alert(
             stations = listOf(NinthStreet, TwentyThirdStreet),
             schedule = Schedule(),
             displaySchedule = Schedule.once(
-                from = LocalDateTime(2024, MAY, 24, 19, 0),
-                to = LocalDateTime(2024, MAY, 28, 3, 0),
+                from = LocalDateTime(2024, AUGUST, 30, 19, 0),
+                to = LocalDateTime(2024, SEPTEMBER, 3, 6, 0),
             ),
             trains = TrainFilter(),
             message = AlertText(
-                en = "9 St. & 23 St. stations will remain open overnight during Memorial Day Weekend",
-                es = "Las estaciones de 9 St. y 23 St. permanecerán abiertas durante la noche durante el fin de semana del Memorial Day"
+                en = "9 St. & 23 St. stations will remain open overnight during Labor Day Weekend",
+                es = "Las estaciones de 9 St. y 23 St. permanecerán abiertas durante la noche durante el fin de semana del Labor Day"
             ),
             url = AlertText(
-                en = "https://www.panynj.gov/path/en/planned-service-changes.html"
+                en = "https://www.panynj.gov/path/en/schedules-maps/weekend-schedules.html"
             ),
             level = "INFO"
         )
@@ -303,7 +306,7 @@ class GithubAlertsTest {
                 days = DayOfWeek.values().toList(),
                 start = LocalTime(0, 0),
                 end = LocalTime(5, 0),
-                from = LocalDate(2024, MAY, 29),
+                from = LocalDate(2024, SEPTEMBER, 4),
                 to = LocalDate(2025, DECEMBER, 31),
             ),
             displaySchedule = Schedule.repeatingDaily(

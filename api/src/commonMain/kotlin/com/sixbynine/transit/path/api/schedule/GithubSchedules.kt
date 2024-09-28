@@ -1,6 +1,18 @@
 package com.sixbynine.transit.path.api.schedule
 
 import com.sixbynine.transit.path.schedule.Schedules
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.isoDayNumber
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind.INT
+import kotlinx.serialization.descriptors.PrimitiveKind.SHORT
+import kotlinx.serialization.descriptors.PrimitiveKind.STRING
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 
 data class ScheduleAndOverride(
     val regularSchedule: Schedules,

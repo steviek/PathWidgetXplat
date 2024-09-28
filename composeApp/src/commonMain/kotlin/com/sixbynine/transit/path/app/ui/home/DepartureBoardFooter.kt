@@ -22,6 +22,7 @@ import com.sixbynine.transit.path.app.ui.theme.Dimensions
 import org.jetbrains.compose.resources.stringResource
 import pathwidgetxplat.composeapp.generated.resources.Res.string
 import pathwidgetxplat.composeapp.generated.resources.path_api_busted
+import pathwidgetxplat.composeapp.generated.resources.path_api_busted_name
 import pathwidgetxplat.composeapp.generated.resources.update_now
 import pathwidgetxplat.composeapp.generated.resources.updating
 
@@ -111,8 +112,13 @@ private fun HomeScreenScope.PathBustedErrorBanner(modifier: Modifier = Modifier)
             .padding(horizontal = 16.dp).padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.Center
     ) {
+        val scheduleName = state.scheduleName
         Text(
-            text = stringResource(string.path_api_busted),
+            text = if (scheduleName == null) {
+                stringResource(string.path_api_busted)
+            } else {
+                stringResource(string.path_api_busted_name, scheduleName)
+            },
             color = MaterialTheme.colorScheme.onErrorContainer,
             textAlign = TextAlign.Center,
         )

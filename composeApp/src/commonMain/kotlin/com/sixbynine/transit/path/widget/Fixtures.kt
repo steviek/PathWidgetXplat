@@ -164,6 +164,7 @@ object Fixtures {
             nextFetchTime = now + 12.minutes,
             closestStationId = null,
             isPathApiBroken = false,
+            scheduleName = null,
         )
     }
 }

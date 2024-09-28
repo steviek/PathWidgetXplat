@@ -19,6 +19,7 @@ import com.sixbynine.transit.path.time.NewYorkTimeZone
 import com.sixbynine.transit.path.util.FetchWithPrevious
 import com.sixbynine.transit.path.util.Staleness
 import com.sixbynine.transit.path.util.map
+import com.sixbynine.transit.path.util.orElse
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
@@ -44,6 +45,8 @@ class SchedulePathApi : PathApi {
         schedules: ScheduleAndOverride
     ): DepartureBoardTrainMap {
         val (schedule, override) = schedules
+
+        val localNow = now.toLocalDateTime(NewYorkTimeZone)
 
         val overrideTrains =
             override
@@ -93,7 +96,13 @@ class SchedulePathApi : PathApi {
                         .sortedBy { it.projectedArrival }
             }
 
-        return DepartureBoardTrainMap(allTrains)
+        val scheduleName =
+            override
+                ?.takeIf { localNow.inRange(it.validFrom, it.validTo) }
+                .orElse { schedule }
+                .name
+
+        return DepartureBoardTrainMap(allTrains, scheduleName = scheduleName)
     }
 
     private fun createDepartureBoardMap(
@@ -321,6 +330,12 @@ class SchedulePathApi : PathApi {
             }
         }
     }
+}
+
+private fun LocalDateTime.inRange(from: LocalDateTime, to: LocalDateTime?): Boolean {
+    if (this < from) return false
+    if (to == null) return true
+    return this < to
 }
 
 fun LocalDateTime.minusDays(days: Int): LocalDateTime {

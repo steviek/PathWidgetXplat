@@ -55,6 +55,7 @@
     <string name="ok">OK</string>
     <string name="open_in_browser">Abrir en navegador</string>
     <string name="path_api_busted">El servicio de salidas en vivo de la Port Authority no está funcionando actualmente. Visualización de horarios programados.</string>
+    <string name="path_api_busted_name">El servicio de salidas en vivo de la Port Authority no está funcionando actualmente. Visualización del horario %1$s.</string>
     <string name="presumed_train">Tren supuesto</string>
     <string name="presumed_trains_subtext">Trenes supuestos son los que aún no están reportados por RidePATH, pero que deberían existir debido a trenes reportados en estaciones anteriores de la línea y el tiempo habitual de viaje entre estaciones</string>
     <string name="rate_app">Calificar la aplicación</string>

@@ -42,6 +42,7 @@ import com.sixbynine.transit.path.util.isSuccess
 import com.sixbynine.transit.path.util.onFailure
 import com.sixbynine.transit.path.util.onSuccess
 import com.sixbynine.transit.path.util.suspendRunCatching
+import kotlinx.coroutines.CoroutineStart.LAZY
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
@@ -131,8 +132,6 @@ object WidgetDataFetcher {
         val (liveDepartures, previousDepartures) =
             PathApi.instance.getUpcomingDepartures(now, staleness)
         val (githubAlerts, previousGithubAlerts) = GithubAlertsRepository.getAlerts(now)
-        val (scheduleDepartures, previousScheduleDepartures) =
-            SchedulePathApi().getUpcomingDepartures(now, staleness)
 
         fun createWidgetData(
             data: DepartureBoardTrainMap,
@@ -155,7 +154,10 @@ object WidgetDataFetcher {
         }
 
         val previous = run {
-            val data = previousDepartures ?: previousScheduleDepartures ?: return@run null
+            val data =
+                previousDepartures ?: run {
+                    SchedulePathApi().getUpcomingDepartures(now, staleness).previous
+                } ?: return@run null
             AgedValue(
                 data.age,
                 createWidgetData(
@@ -185,11 +187,14 @@ object WidgetDataFetcher {
                     }
 
                 val live = liveDepartures.await()
-                val scheduled = scheduleDepartures.await()
-
-
-                val departureBoardTrainMap = live.data ?: scheduled.data
                 val isPathApiBroken = live.isFailure() && live.error is PathApiException
+                val scheduled = if (isPathApiBroken) {
+                    SchedulePathApi().getUpcomingDepartures(now, staleness).fetch.await()
+                } else {
+                    null
+                }
+
+                val departureBoardTrainMap = live.data ?: scheduled?.data
 
                 val widgetData = departureBoardTrainMap?.let { data ->
                     createWidgetData(
@@ -201,7 +206,7 @@ object WidgetDataFetcher {
                 }
 
                 when {
-                    (live.isSuccess() || (scheduled.data != null && isPathApiBroken)) &&
+                    (live.isSuccess() || (scheduled?.data != null && isPathApiBroken)) &&
                             widgetData != null -> {
                         DataResult.success(widgetData)
                     }
@@ -214,7 +219,7 @@ object WidgetDataFetcher {
                         )
                     }
 
-                    scheduled.isFailure() -> {
+                    scheduled?.isFailure() == true -> {
                         DataResult.failure(
                             error = scheduled.error,
                             hadInternet = scheduled.hadInternet,
@@ -232,7 +237,7 @@ object WidgetDataFetcher {
                 }
             }
         }
-        val fetchWithTimeout = GlobalScope.async {
+        val fetchWithTimeout = GlobalScope.async(start = LAZY) {
             suspendRunCatching {
                 withTimeout(5.seconds) {
                     fetch.await()

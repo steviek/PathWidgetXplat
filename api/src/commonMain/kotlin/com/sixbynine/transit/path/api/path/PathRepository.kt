@@ -94,7 +94,8 @@ object PathRepository {
                                 )
                             },
                         )
-                }
+                        .also { ongoingFetch = null }
+                }.also { ongoingFetch = it }
             }
 
             fetch.await()

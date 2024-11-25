@@ -29,6 +29,13 @@ object NativeGlobalDataStore : GlobalDataStore {
         defaults.synchronize()
     }
 
+    override fun getBoolean(key: String): Boolean? {
+        if (defaults.objectForKey(key) == null) {
+            return null
+        }
+        return defaults.boolForKey(key)
+    }
+
     override fun set(key: String, value: Long?) {
         if (value == null) {
             remove(key)

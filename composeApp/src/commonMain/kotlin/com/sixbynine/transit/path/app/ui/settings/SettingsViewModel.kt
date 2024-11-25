@@ -1,5 +1,6 @@
 package com.sixbynine.transit.path.app.ui.settings
 
+import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.analytics.Analytics
 import com.sixbynine.transit.path.api.LocationSetting.Disabled
 import com.sixbynine.transit.path.api.LocationSetting.Enabled
@@ -7,6 +8,7 @@ import com.sixbynine.transit.path.api.LocationSetting.EnabledPendingPermission
 import com.sixbynine.transit.path.app.external.ExternalRoutingManager
 import com.sixbynine.transit.path.app.external.shareAppToSystem
 import com.sixbynine.transit.path.app.settings.SettingsManager
+import com.sixbynine.transit.path.app.settings.exportDevLogs
 import com.sixbynine.transit.path.app.ui.BaseViewModel
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.BottomSheetType.Lines
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.BottomSheetType.StationSort
@@ -15,32 +17,25 @@ import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Effect
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Effect.GoBack
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Effect.GoToAdvancedSettings
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.AdvancedSettingsClicked
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.BackClicked
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.BottomSheetDismissed
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.BuyMeACoffeeClicked
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.LineFilterToggled
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.LinesClicked
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.LocationSettingChanged
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.RateAppClicked
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.SendFeedbackClicked
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.ShareAppClicked
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.ShowPresumedTrainsChanged
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.StationSortClicked
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.StationSortSelected
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.TrainFilterChanged
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.TrainFilterClicked
+import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.*
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.LocationSettingState
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.State
 import com.sixbynine.transit.path.location.LocationPermissionRequestResult
 import com.sixbynine.transit.path.location.LocationProvider
 import com.sixbynine.transit.path.location.isLocationSupportedByDevice
+import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.util.withElementPresent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
+import kotlin.time.Duration.Companion.seconds
 
 class SettingsViewModel : BaseViewModel<State, Intent, Effect>(createInitialState()) {
+
+    private var headerTapInfo: HeaderTapInfo? = null
+
     init {
         updateStateOnEach(SettingsManager.trainFilter) { copy(trainFilter = it) }
         updateStateOnEach(SettingsManager.lineFilter) { copy(lines = it) }
@@ -58,6 +53,8 @@ class SettingsViewModel : BaseViewModel<State, Intent, Effect>(createInitialStat
         updateStateOnEach(LocationProvider().locationPermissionResults) {
             copy(hasLocationPermission = it is LocationPermissionRequestResult.Granted)
         }
+
+        updateStateOnEach(SettingsManager.devOptionsEnabled) { copy(devOptionsEnabled = it) }
     }
 
     override val rateLimitedIntents: Set<Intent> = setOf(
@@ -144,8 +141,29 @@ class SettingsViewModel : BaseViewModel<State, Intent, Effect>(createInitialStat
             AdvancedSettingsClicked -> {
                 sendEffect(GoToAdvancedSettings)
             }
+
+            HeaderTapped -> {
+                val prevTapInfo = headerTapInfo
+                if (prevTapInfo != null && prevTapInfo.lastTapTime > now() - 1.seconds) {
+                    headerTapInfo = HeaderTapInfo(prevTapInfo.count + 1, now())
+                    if (prevTapInfo.count >= 5) {
+                        SettingsManager.updateDevOptionsEnabled(true)
+                    }
+                } else {
+                    headerTapInfo = HeaderTapInfo()
+                }
+            }
+
+            DevOptionsClicked -> {
+                viewModelScope.launch {
+                    val logs = Logging.getLogRecords()
+                    exportDevLogs(logs)
+                }
+            }
         }
     }
+
+    private data class HeaderTapInfo(val count: Int = 1, val lastTapTime: Instant = now())
 
     private companion object {
         fun createInitialState(): State {
@@ -166,6 +184,7 @@ class SettingsViewModel : BaseViewModel<State, Intent, Effect>(createInitialStat
                 stationSort = SettingsManager.stationSort.value,
                 showPresumedTrains = SettingsManager.displayPresumedTrains.value,
                 hasLocationPermission = LocationProvider().hasLocationPermission(),
+                devOptionsEnabled = SettingsManager.devOptionsEnabled.value,
             )
         }
     }

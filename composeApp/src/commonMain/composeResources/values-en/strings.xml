@@ -30,8 +30,9 @@
     <string name="complete_widget_setup">Complete widget setup</string>
     <string name="confirm">Confirm</string>
     <string name="days">Days</string>
-    <string name="delay_time">Delayed - </string>
+    <string name="delay_time">Delayed -</string>
     <string name="delete">Delete</string>
+    <string name="dev_options">Developer options</string>
     <string name="done">Done</string>
     <string name="due_now">due</string>
     <string name="edit">Edit</string>

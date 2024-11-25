@@ -1,5 +1,6 @@
 package com.sixbynine.transit.path.app.settings
 
+import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.analytics.Analytics
 import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.LocationSetting
@@ -42,6 +43,7 @@ object SettingsManager {
             toString = { JsonFormat.encodeToString(it) },
             fromString = { JsonFormat.decodeFromString(it) }
         )
+    private val devOptionsPersister = GlobalSettingPersister("dev_options", false)
 
     val locationSetting = locationSettingPersister.flow
     val trainFilter = trainFilterPersister.flow
@@ -52,6 +54,7 @@ object SettingsManager {
     val displayPresumedTrains = displayPresumedTrainsPersister.flow
     val avoidMissingTrains = avoidMissingTrainsPersister.flow
     val commutingConfiguration = commutingConfigurationPersister.flow
+    val devOptionsEnabled = devOptionsPersister.flow
 
     private val _settings = MutableStateFlow(
         AppSettings(
@@ -131,7 +134,9 @@ object SettingsManager {
             _settings.update { it.copy(commutingConfiguration = newSetting) }
         }
 
-
+        devOptionsEnabled.collectIn(lightweightScope) { isEnabled ->
+            Logging.isDeveloperMode = isEnabled
+        }
     }
 
     fun updateLocationSetting(enabled: Boolean) = lightweightScope.launchAndReturnUnit {
@@ -197,5 +202,9 @@ object SettingsManager {
     ) = lightweightScope.launchAndReturnUnit {
         Analytics.commutingConfigurationSet()
         commutingConfigurationPersister.update(configuration)
+    }
+
+    fun updateDevOptionsEnabled(enabled: Boolean) = lightweightScope.launchAndReturnUnit {
+        devOptionsPersister.update(enabled)
     }
 }

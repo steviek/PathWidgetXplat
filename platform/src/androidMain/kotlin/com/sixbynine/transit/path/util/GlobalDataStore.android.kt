@@ -32,6 +32,14 @@ object AndroidGlobalDataStore : GlobalDataStore {
         }
     }
 
+    override fun getBoolean(key: String): Boolean? {
+        return if (prefs.contains(key)) {
+            prefs.getBoolean(key, false)
+        } else {
+            null
+        }
+    }
+
     override fun set(key: String, value: Long?) {
         prefs.edit {
             if (value == null) {
@@ -77,8 +85,12 @@ private object TestGlobalDataStore : GlobalDataStore {
     override fun getLong(key: String): Long? {
         return data[key] as Long?
     }
+
+    override fun getBoolean(key: String): Boolean? {
+        return data[key] as Boolean?
+    }
 }
 
 actual fun globalDataStore(): GlobalDataStore {
-    return if(IsTest) TestGlobalDataStore else AndroidGlobalDataStore
+    return if (IsTest) TestGlobalDataStore else AndroidGlobalDataStore
 }

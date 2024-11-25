@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinSerialization)
 }
 
 kotlin {
@@ -16,6 +17,8 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.platform)
             implementation(libs.kotlin.coroutines)
+            implementation(libs.kotlin.date.time)
+            implementation(libs.kotlin.serialization.json)
             implementation(libs.napier)
         }
     }

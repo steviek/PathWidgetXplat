@@ -16,6 +16,7 @@ object SettingsContract {
         val showPresumedTrains: Boolean,
         val bottomSheet: BottomSheetType? = null,
         val hasLocationPermission: Boolean,
+        val devOptionsEnabled: Boolean,
     )
 
     enum class BottomSheetType {
@@ -42,6 +43,8 @@ object SettingsContract {
         data object ShareAppClicked : Intent
         data object BuyMeACoffeeClicked : Intent
         data object AdvancedSettingsClicked : Intent
+        data object HeaderTapped : Intent
+        data object DevOptionsClicked : Intent
     }
 
     sealed interface Effect {

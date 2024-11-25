@@ -1,6 +1,7 @@
 package com.sixbynine.transit.path.app.ui.settings
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -24,16 +26,10 @@ import com.sixbynine.transit.path.app.ui.icon.NativeIconButton
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.BottomSheetType
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Effect.GoBack
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Effect.GoToAdvancedSettings
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.AdvancedSettingsClicked
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.BuyMeACoffeeClicked
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.LocationSettingChanged
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.RateAppClicked
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.SendFeedbackClicked
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.ShareAppClicked
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.ShowPresumedTrainsChanged
-import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.StationSortClicked
+import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent.*
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.LocationSettingState
 import org.jetbrains.compose.resources.stringResource
+import pathwidgetxplat.composeapp.generated.resources.*
 import pathwidgetxplat.composeapp.generated.resources.Res.string
 import pathwidgetxplat.composeapp.generated.resources.advanced_settings
 import pathwidgetxplat.composeapp.generated.resources.back
@@ -71,7 +67,17 @@ fun SettingsScope.Content() {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(stringResource(string.settings)) },
+                title = {
+                    Text(
+                        text = stringResource(string.settings),
+                        modifier = Modifier.clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) {
+                            onIntent(HeaderTapped)
+                        }
+                    )
+                },
                 navigationIcon = {
                     NativeIconButton(
                         IconType.Back,
@@ -109,6 +115,10 @@ fun SettingsScope.Content() {
             SettingsItem(stringResource(string.send_feedback)) { onIntent(SendFeedbackClicked) }
 
             SettingsItem(stringResource(string.buy_me_a_coffee)) { onIntent(BuyMeACoffeeClicked) }
+
+            if (state.devOptionsEnabled) {
+                SettingsItem(stringResource(string.dev_options)) { onIntent(DevOptionsClicked) }
+            }
         }
 
         StationSortBottomSheet(

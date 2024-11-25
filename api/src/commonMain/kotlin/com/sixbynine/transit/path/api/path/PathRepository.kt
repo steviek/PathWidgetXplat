@@ -80,13 +80,21 @@ object PathRepository {
                         }
                     }
                         .fold(
-                            onSuccess = { DataResult.success(it) },
+                            onSuccess = {
+                                Logging.d("successfully fetched ridepath data")
+                                DataResult.success(it)
+                            },
                             onFailure = { error ->
-                                var hadInternet = NetworkManager().isConnectedToInternet()
+                                val shouldBeConnected = NetworkManager().isConnectedToInternet()
+                                var hadInternet = shouldBeConnected
 
                                 if ("Unable to resolve host" in error.message.toString()) {
                                     hadInternet = false
                                 }
+                                Logging.w(
+                                    "fetching ridepath failed, hadInternet=$hadInternet, shouldBeConnected=$shouldBeConnected",
+                                    error
+                                )
                                 DataResult.failure(
                                     error,
                                     hadInternet = hadInternet,

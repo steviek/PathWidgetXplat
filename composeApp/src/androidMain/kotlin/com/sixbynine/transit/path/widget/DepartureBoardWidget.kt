@@ -14,6 +14,7 @@ import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.provideContent
 import androidx.glance.appwidget.updateAll
 import androidx.glance.currentState
+import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.MobilePathApplication
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.TrainFilter
@@ -44,11 +45,13 @@ class DepartureBoardWidget : GlanceAppWidget() {
         launch { WidgetRefreshWorker.schedule() }
 
         val data = AndroidWidgetDataRepository.getData()
+        Logging.d("provideGlance")
         provideContent {
             val updateTime =
                 currentState(key = LastUpdateKey)
                     ?.let { Instant.fromEpochMilliseconds(it) } ?: now()
             val configuration = with(WidgetConfigurationManager) { getWidgetConfiguration() }
+            Logging.d("provideContent invoked, updateTime = $updateTime")
 
             val widgetState = if (configuration.needsSetup()) {
                 WidgetState(
@@ -65,6 +68,7 @@ class DepartureBoardWidget : GlanceAppWidget() {
                 )
             }
             WidgetContent(widgetState)
+            Logging.d("composed widget content with data fetched at ${widgetState.result.data?.fetchTime}")
         }
     }
 

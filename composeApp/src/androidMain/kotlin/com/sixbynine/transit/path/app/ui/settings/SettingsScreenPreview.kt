@@ -27,6 +27,7 @@ fun SettingsScreenPreview() {
                 stationSort = StationSort.Alphabetical,
                 showPresumedTrains = false,
                 hasLocationPermission = false,
+                devOptionsEnabled = false,
             ),
             onIntent = { intent ->
 

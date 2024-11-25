@@ -120,6 +120,6 @@ extension WidgetDataFetcher {
         } catch {
             return FetchResult(data: nil, hadInternet: true, hasError: true, hasPathError: false)
         }
-        
+
     }
 }

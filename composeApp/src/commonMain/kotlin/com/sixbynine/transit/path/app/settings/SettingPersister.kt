@@ -62,6 +62,16 @@ inline fun <reified E> BitFlagSettingPersister(
     return BitFlagSettingPersister(IntPreferencesKey(key), defaultValue)
 }
 
+inline fun GlobalSettingPersister(
+    key: String,
+    defaultValue: Boolean
+): SettingPersister<Boolean> {
+    return SettingPersister(
+        defaultValue,
+        serializer = BooleanGlobalDataStoreSerializer(key)
+    )
+}
+
 inline fun <reified E> GlobalSettingPersister(
     key: String,
     defaultValue: E
@@ -131,6 +141,18 @@ class IntGlobalDataStoreSerializer<R>(
     override fun get(): R? {
         val number = dataStore.getLong(key)?.toInt() ?: return null
         return IntPersistable.fromPersistence(number, enumEntries)
+    }
+}
+
+class BooleanGlobalDataStoreSerializer(private val key: String) : StorageSerializer<Boolean> {
+    private val dataStore = globalDataStore()
+
+    override fun set(value: Boolean?) {
+        dataStore[key] = value
+    }
+
+    override fun get(): Boolean? {
+        return dataStore.getBoolean(key)
     }
 }
 

@@ -9,6 +9,8 @@ interface GlobalDataStore {
 
     operator fun set(key: String, value: Boolean?)
 
+    fun getBoolean(key: String): Boolean?
+
     operator fun set(key: String, value: Long?)
 
     fun getLong(key: String): Long?

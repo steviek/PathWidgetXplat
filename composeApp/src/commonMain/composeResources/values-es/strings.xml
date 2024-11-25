@@ -30,8 +30,9 @@
     <string name="complete_widget_setup">Arreglar el widget</string>
     <string name="confirm">Confirmar</string>
     <string name="days">Días</string>
-    <string name="delay_time">Retrasado - </string>
+    <string name="delay_time">Retrasado -</string>
     <string name="delete">Eliminar</string>
+    <string name="dev_options">Configuraciones del desarrollador</string>
     <string name="done">Terminar</string>
     <string name="due_now">llega</string>
     <string name="edit">Editar</string>

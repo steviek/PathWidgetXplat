@@ -12,9 +12,10 @@ import ComposeApp
 import CoreLocation
 
 struct Provider: AppIntentTimelineProvider {
-    
+
     func placeholder(in context: Context) -> SimpleEntry {
-        return SimpleEntry(
+        print("start create placeholder")
+        let entry = SimpleEntry(
             date: Date(),
             size: context.displaySize,
             configuration: ConfigurationAppIntent(stations: [.jsq]),
@@ -23,19 +24,24 @@ struct Provider: AppIntentTimelineProvider {
             hasPathError: false,
             dataFrom: Date()
         )
+        print("return entry: \(entry)")
+        return entry
     }
-    
+
     func snapshot(
         for configuration: ConfigurationAppIntent,
         in context: Context
     ) async -> SimpleEntry {
-        return await createEntries(
+        print("start create snapshot: \(configuration)")
+        let entry = await createEntries(
             for: configuration,
             in: context,
             count: 1
         ).first!
+        print("return snapshot: \(entry)")
+        return entry
     }
-    
+
     func timeline(
         for configuration: ConfigurationAppIntent,
         in context: Context
@@ -48,15 +54,15 @@ struct Provider: AppIntentTimelineProvider {
         let refreshTime = Date().addingTimeInterval(10 * 60)
         return Timeline(entries: entries, policy: .after(refreshTime))
     }
-    
+
     private func createEntries(
         for configuration: ConfigurationAppIntent,
         in context: Context,
         count: Int
     ) async -> [SimpleEntry] {
         let stationLimit =
-        WidgetConfigurationUtils.getWidgetLimit(family: context.family)
-        
+            WidgetConfigurationUtils.getWidgetLimit(family: context.family)
+
         let effectiveConfiguration: ConfigurationAppIntent
         var widgetData: WidgetData?
         let hasError: Bool
@@ -70,10 +76,14 @@ struct Provider: AppIntentTimelineProvider {
             hasPathError = false
         } else {
             let fetchResult = await WidgetDataFetcher().fetchWidgetDataAsync(
-                includeClosestStation: configuration.stations.contains(where: { $0 == .closest}),
+                includeClosestStation: configuration.stations.contains(where: { $0 == .closest }),
                 stationLimit: Int32(stationLimit),
-                stations: configuration.stations.compactMap { $0.toStation()},
-                lines: configuration.lines.map { $0.toLine() },
+                stations: configuration.stations.compactMap {
+                    $0.toStation()
+                },
+                lines: configuration.lines.map {
+                    $0.toLine()
+                },
                 filter: configuration.filter.toTrainFilter(),
                 sort: configuration.sortOrder.toStationSort()
             )
@@ -82,12 +92,12 @@ struct Provider: AppIntentTimelineProvider {
             hasPathError = fetchResult.hasPathError
             effectiveConfiguration = configuration
         }
-        
+
         let now = Date()
-        
+
         var entries: [SimpleEntry] = []
         var date = now
-        
+
         for _ in 0..<count {
             widgetData = WidgetDataFetcher().prunePassedDepartures(
                 data: widgetData,
@@ -106,7 +116,7 @@ struct Provider: AppIntentTimelineProvider {
             )
             date = TimeUtilities().getStartOfNextMinute(time: date.toKotlinInstant()).toDate()
         }
-        
+
         return entries
     }
 }
@@ -123,7 +133,7 @@ struct SimpleEntry: TimelineEntry {
 
 struct widget: Widget {
     let kind: String = "widget"
-    
+
     var body: some WidgetConfiguration {
         AppIntentConfiguration(
             kind: kind,
@@ -142,13 +152,13 @@ struct widget: Widget {
             .containerBackground(.fill.tertiary, for: .widget)
         }
     }
-    
+
     private func showEmptyView(_ entry: SimpleEntry) -> Bool {
         let choices = entry.configuration.stations
         if choices.count >= 2 {
             return false
         }
-        
+
         if let single = choices.first {
             return single == .closest && !CLLocationManager().isAuthorizedForWidgetUpdates
         } else {

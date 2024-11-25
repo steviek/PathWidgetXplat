@@ -22,6 +22,7 @@ import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.layout.width
 import androidx.glance.unit.ColorProvider
+import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.MainActivity
 import com.sixbynine.transit.path.R.drawable
 import com.sixbynine.transit.path.app.ui.ColorWrapper
@@ -34,6 +35,7 @@ import com.sixbynine.transit.path.widget.glance.Text
 
 @Composable
 fun DepartureBoard(result: DataResult<WidgetData>, modifier: GlanceModifier = GlanceModifier) {
+    Logging.d("compose departure board with data fetched at ${result.data?.fetchTime}")
     LazyColumn(modifier) {
         if (VERSION.SDK_INT >= 31) {
             item {

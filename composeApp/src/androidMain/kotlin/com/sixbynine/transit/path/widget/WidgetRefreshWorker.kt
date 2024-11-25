@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
+import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy.KEEP
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
@@ -23,13 +24,15 @@ import kotlin.time.toJavaDuration
 
 class WidgetRefreshWorker(
     context: Context,
-    params: WorkerParameters
+    private val params: WorkerParameters
 ) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result {
         val glanceIds = getGlanceIds()
         if (glanceIds.isEmpty()) {
             cancel()
         }
+
+        val canRefreshLocation = params.inputData.getBoolean(CAN_REFRESH_LOCATION, true)
 
         PathApi.instance
             .getUpcomingDepartures(
@@ -38,7 +41,10 @@ class WidgetRefreshWorker(
             )
             .await()
 
-        DepartureBoardWidget.onDataChanged()
+        AndroidWidgetDataRepository.refreshWidgetData(
+            force = false,
+            canRefreshLocation = canRefreshLocation
+        )
 
         // I have a hunch that things are getting killed/cancelled too quickly, so keep us alive a
         // little longer.
@@ -50,6 +56,7 @@ class WidgetRefreshWorker(
     companion object {
         private const val WORK_TAG = "path_widget_refresh"
         private const val ONE_TIME_WORK_TAG = "path_widget_refresh_one_time"
+        private const val CAN_REFRESH_LOCATION = "can_refresh_location"
         private val context get() = MobilePathApplication.instance
         private val glanceAppWidgetManager get() = GlanceAppWidgetManager(context)
 
@@ -70,6 +77,7 @@ class WidgetRefreshWorker(
                             .setRequiresBatteryNotLow(true)
                             .build()
                     )
+                    .setInputData(Data.Builder().putBoolean(CAN_REFRESH_LOCATION, false).build())
                     .build()
             workManager.enqueueUniquePeriodicWork(WORK_TAG, KEEP, workRequest)
         }
@@ -81,7 +89,11 @@ class WidgetRefreshWorker(
             }
 
             val workManager = WorkManager.getInstance(context)
-            val workRequest = OneTimeWorkRequestBuilder<WidgetRefreshWorker>().build()
+            val workRequest = OneTimeWorkRequestBuilder<WidgetRefreshWorker>().setInputData(
+                Data.Builder()
+                    .putBoolean(CAN_REFRESH_LOCATION, true)
+                    .build()
+            ).build()
             workManager.enqueueUniqueWork(ONE_TIME_WORK_TAG, ExistingWorkPolicy.KEEP, workRequest)
         }
 

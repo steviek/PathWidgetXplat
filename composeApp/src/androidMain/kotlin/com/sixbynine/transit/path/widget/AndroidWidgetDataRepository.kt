@@ -53,9 +53,17 @@ object AndroidWidgetDataRepository {
     private var hasLoadedOnce = false
 
     private val _data = GlobalScope.async {
-        MutableStateFlow(getDataResult(startFetch(force = false).previous?.value))
+        MutableStateFlow(
+            getDataResult(
+                startFetch(
+                    force = false,
+                    canRefreshLocation = false
+                ).previous?.value
+            )
+        )
 
     }
+
     suspend fun getData(): StateFlow<DataResult<WidgetData>> {
         return _data.await().asStateFlow()
     }
@@ -63,7 +71,7 @@ object AndroidWidgetDataRepository {
     init {
         GlobalScope.launch {
             if (!hasLoadedOnce) {
-                refreshWidgetData(force = false)
+                refreshWidgetData(force = false, canRefreshLocation = false)
             }
         }
     }
@@ -82,12 +90,12 @@ object AndroidWidgetDataRepository {
         }
     }
 
-    suspend fun refreshWidgetData(force: Boolean) = coroutineScope {
+    suspend fun refreshWidgetData(force: Boolean, canRefreshLocation: Boolean) = coroutineScope {
         if (isLoading && hasLoadedOnce) {
             return@coroutineScope
         }
 
-        val (fetch, previous) = startFetch(force)
+        val (fetch, previous) = startFetch(force, canRefreshLocation)
 
         hasLoadedOnce = true
         isLoading = true
@@ -107,7 +115,10 @@ object AndroidWidgetDataRepository {
         DepartureBoardWidget.onDataChanged()
     }
 
-    private suspend fun startFetch(force: Boolean): FetchWithPrevious<WidgetData> {
+    private suspend fun startFetch(
+        force: Boolean,
+        canRefreshLocation: Boolean
+    ): FetchWithPrevious<WidgetData> {
         val anyWidgetsUseLocation =
             WidgetConfigurationManager.getWidgetConfigurations().values.any { it.useClosestStation }
 
@@ -118,6 +129,7 @@ object AndroidWidgetDataRepository {
             sort = Alphabetical,
             filter = TrainFilter.All,
             includeClosestStation = anyWidgetsUseLocation,
+            canRefreshLocation = canRefreshLocation,
             staleness = Staleness(
                 staleAfter = if (force) 5.seconds else 30.seconds,
                 invalidAfter = Duration.INFINITE, // Always show old data while loading widget.

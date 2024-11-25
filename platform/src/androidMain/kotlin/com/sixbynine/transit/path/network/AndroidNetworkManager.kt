@@ -2,6 +2,8 @@ package com.sixbynine.transit.path.network
 
 import android.content.Context
 import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build.VERSION
 import com.sixbynine.transit.path.PathApplication
 import com.sixbynine.transit.path.util.IsTest
 
@@ -14,7 +16,16 @@ object AndroidNetworkManager : NetworkManager {
 
     override fun isConnectedToInternet(): Boolean {
         if (IsTest) return true
-        return connectivityManager.activeNetworkInfo?.isConnectedOrConnecting == true
+        if (VERSION.SDK_INT < 23) {
+            return connectivityManager.activeNetworkInfo?.isConnectedOrConnecting == true
+        }
+
+        val network = connectivityManager.activeNetwork ?: return false
+        val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+        return capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
+                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH) ||
+                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
     }
 }
 

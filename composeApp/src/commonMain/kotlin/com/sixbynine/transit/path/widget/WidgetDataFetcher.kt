@@ -19,6 +19,7 @@ import com.sixbynine.transit.path.api.isInNewJersey
 import com.sixbynine.transit.path.api.isInNewYork
 import com.sixbynine.transit.path.api.isWestOf
 import com.sixbynine.transit.path.api.state
+import com.sixbynine.transit.path.app.lifecycle.AppLifecycleObserver
 import com.sixbynine.transit.path.app.settings.AvoidMissingTrains
 import com.sixbynine.transit.path.app.settings.AvoidMissingTrains.Always
 import com.sixbynine.transit.path.app.settings.AvoidMissingTrains.Disabled
@@ -126,6 +127,7 @@ object WidgetDataFetcher {
         filter: TrainFilter,
         includeClosestStation: Boolean,
         staleness: Staleness,
+        canRefreshLocation: Boolean = true,
         now: Instant = now(),
     ): FetchWithPrevious<WidgetData> {
         Logging.d("Fetch widget data with previous, includeClosestStation = $includeClosestStation")
@@ -171,20 +173,21 @@ object WidgetDataFetcher {
 
         val fetch: Deferred<DataResult<WidgetData>> = GlobalScope.async {
             coroutineScope {
-                val stationsByProximity =
-                    if (includeClosestStation) {
-                        when (val locationResult =
-                            LocationProvider().tryToGetLocation(3.seconds)) {
-                            NoPermission, NoProvider -> null
-                            is Failure -> lastClosestStations
-                            is Success -> {
-                                Stations.byProximityTo(locationResult.location)
-                                    .also { lastClosestStations = it }
-                            }
-                        }
-                    } else {
-                        null
+                val stationsByProximity = when {
+                    !includeClosestStation -> null
+                    !canRefreshLocation && !AppLifecycleObserver.isActive.value -> {
+                        lastClosestStations
                     }
+                    else -> when (val locationResult =
+                        LocationProvider().tryToGetLocation(3.seconds)) {
+                        NoPermission, NoProvider -> null
+                        is Failure -> lastClosestStations
+                        is Success -> {
+                            Stations.byProximityTo(locationResult.location)
+                                .also { lastClosestStations = it }
+                        }
+                    }
+                }
 
                 val live = liveDepartures.await()
                 val isPathApiBroken = live.isFailure() && live.error is PathApiException

@@ -17,8 +17,8 @@ import com.sixbynine.transit.path.location.LocationCheckResult.Failure
 import com.sixbynine.transit.path.location.LocationCheckResult.NoPermission
 import com.sixbynine.transit.path.location.LocationCheckResult.NoProvider
 import com.sixbynine.transit.path.location.LocationCheckResult.Success
-import com.sixbynine.transit.path.util.IsTest
 import com.sixbynine.transit.path.util.DataResult
+import com.sixbynine.transit.path.util.IsTest
 import com.sixbynine.transit.path.util.stateFlowOf
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.TimeoutCancellationException
@@ -109,6 +109,8 @@ object AndroidLocationProvider : LocationProvider {
         return try {
             withTimeout(timeout) {
                 val currentLocation = locationManager.getCurrentLocation(provider)
+                    ?: return@withTimeout lastKnownLocation?.let { Success(it.toSharedLocation()) }
+                        ?: Failure(RuntimeException("android returned null location for user"))
                 Logging.d(
                     "Retrieved current location as " +
                             "${currentLocation.toLatLngStringWithGoogleApiLink()} from $provider"
@@ -127,14 +129,14 @@ object AndroidLocationProvider : LocationProvider {
     @RequiresPermission(anyOf = [ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION])
     private suspend fun LocationManager.getCurrentLocation(
         provider: String
-    ) = suspendCancellableCoroutine<Location> { continuation ->
+    ) = suspendCancellableCoroutine { continuation ->
         if (VERSION.SDK_INT >= 30) {
             val cancellationSignal = CancellationSignal()
             getCurrentLocation(
                 provider,
                 cancellationSignal,
                 context.mainExecutor
-            ) { location ->
+            ) { location: Location? ->
                 continuation.resumeWith(Result.success(location))
             }
             continuation.invokeOnCancellation { cancellationSignal.cancel() }

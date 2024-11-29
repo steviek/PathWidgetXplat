@@ -87,9 +87,11 @@ object HomeScreenContract {
         data object AddStationClicked : Intent
         data class ConstraintsChanged(val maxWidth: Dp, val maxHeight: Dp) : Intent
         data class AlertUrlClicked(val url: String) : Intent
+        data class StationClicked(val id: String) : Intent
     }
 
     sealed interface Effect {
         data object NavigateToSettings : Effect
+        data class NavigateToStation(val stationId: String) : Effect
     }
 }

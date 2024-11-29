@@ -15,10 +15,12 @@ import com.sixbynine.transit.path.app.ui.advancedsettings.AdvancedSettingsScreen
 import com.sixbynine.transit.path.app.ui.home.HomeScreen
 import com.sixbynine.transit.path.app.ui.settings.SettingScreen
 import com.sixbynine.transit.path.app.ui.setup.SetupScreen
+import com.sixbynine.transit.path.app.ui.station.StationScreen
 import com.sixbynine.transit.path.app.ui.theme.AppTheme
 import moe.tlaster.precompose.PreComposeApp
 import moe.tlaster.precompose.navigation.NavHost
 import moe.tlaster.precompose.navigation.Navigator
+import moe.tlaster.precompose.navigation.path
 import moe.tlaster.precompose.navigation.rememberNavigator
 
 @Composable
@@ -43,6 +45,11 @@ fun App() {
 
                     scene("/home") {
                         HomeScreen()
+                    }
+
+                    scene("/station/{id}") { backStackEntry ->
+                        val stationId: String? = backStackEntry.path<String>("id")
+                        StationScreen(stationId)
                     }
 
                     scene("/settings") {

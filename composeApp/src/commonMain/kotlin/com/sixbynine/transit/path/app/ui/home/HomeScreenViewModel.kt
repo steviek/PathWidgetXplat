@@ -25,6 +25,7 @@ import com.sixbynine.transit.path.app.ui.PathViewModel
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.DepartureBoardData
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Effect
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Effect.NavigateToSettings
+import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Effect.NavigateToStation
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.HomeBackfillSource
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.AddStationClicked
@@ -38,6 +39,7 @@ import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.RetryCli
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.SettingsClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StationBottomSheetDismissed
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StationBottomSheetSelection
+import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StationClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StationSelectionDialogDismissed
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StopEditingClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.UpdateNowClicked
@@ -204,6 +206,10 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
 
             is AlertUrlClicked -> {
                 ExternalRoutingManager().openUrl(intent.url)
+            }
+
+            is StationClicked -> {
+                sendEffect(NavigateToStation(intent.id))
             }
         }
     }

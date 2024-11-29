@@ -27,6 +27,7 @@ import com.sixbynine.transit.path.app.ui.AppUiScope
 import com.sixbynine.transit.path.app.ui.ViewModelScreen
 import com.sixbynine.transit.path.app.ui.gutter
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Effect.NavigateToSettings
+import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Effect.NavigateToStation
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.ConstraintsChanged
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.EditClicked
@@ -34,7 +35,6 @@ import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.RetryCli
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.SettingsClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StopEditingClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.State
-import com.sixbynine.transit.path.app.ui.station.AddStationBottomSheet
 import org.jetbrains.compose.resources.stringResource
 import pathwidgetxplat.composeapp.generated.resources.Res.string
 import pathwidgetxplat.composeapp.generated.resources.done
@@ -66,6 +66,10 @@ fun HomeScreen() {
                 when (effect) {
                     is NavigateToSettings -> {
                         navigator.navigate("/settings")
+                    }
+
+                    is NavigateToStation -> {
+                        navigator.navigate("/station/${effect.stationId}")
                     }
                 }
             }

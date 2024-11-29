@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,9 +16,9 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,6 +39,7 @@ import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.AddStati
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.MoveStationDownClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.MoveStationUpClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.RemoveStationClicked
+import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StationClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.StationData
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.TrainData
 import com.sixbynine.transit.path.app.ui.icon.IconType
@@ -63,74 +65,12 @@ fun HomeScreenScope.DepartureBoard() {
         contentPadding = PaddingValues(bottom = 16.dp),
     ) {
         data?.stations?.forEachIndexed { index, station ->
-            val canMoveUp = run {
-                if (station.isClosest) return@run false
-                val prevStation = data.stations.getOrNull(index - 1) ?: return@run false
-                if (state.stationSort == StationSort.Alphabetical) return@run true
-                prevStation.state == station.state
-            }
-
-            val nextStation = data.stations.getOrNull(index + 1)
-            val canMoveDown = run {
-                if (station.isClosest) return@run false
-                nextStation ?: return@run false
-                if (state.stationSort == StationSort.Alphabetical) return@run true
-                nextStation.state == station.state
-            }
-
             item(station.id) {
-                StationHeader(
-                    modifier = Modifier.fillMaxSize().animateItemPlacement()
-                        .padding(top = if (index == 0) 0.dp else 16.dp),
-                    canMoveDown = canMoveDown,
-                    canMoveUp = canMoveUp,
-                    canDelete = !station.isClosest,
-                    data = station
+                Station(
+                    station,
+                    index,
+                    Modifier.padding(horizontal = 16.dp, vertical = 8.dp).animateItemPlacement()
                 )
-            }
-
-            item(station.id + "-alerts") {
-                StationAlertBox(
-                    text = station.alertText,
-                    url = station.alertUrl,
-                    colors = if (station.alertIsWarning) {
-                        StationAlertBoxColors.Warning
-                    } else {
-                        StationAlertBoxColors.Info
-                    }
-                )
-            }
-
-            StationTrains(this, station)
-
-            if (station.trains.isEmpty()) {
-                item(station.id + "-empty") {
-                    Box(
-                        Modifier.fillMaxWidth().padding(horizontal = gutter()),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = stringResource(string.station_empty),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-
-                    }
-                }
-            }
-
-            if (state.isEditing && nextStation != null && !canMoveDown) {
-                item {
-                    val text = if (station.isClosest) {
-                        stringResource(
-                            string.cannot_move_explanation_closest,
-                            station.station.displayName
-                        )
-                    } else {
-                        stringResource(string.cannot_move_explanation_state)
-                    }
-                    CannotMoveExplanation(text)
-                }
             }
         }
 
@@ -153,16 +93,88 @@ fun HomeScreenScope.DepartureBoard() {
     }
 }
 
-private fun HomeScreenScope.StationTrains(listScope: LazyListScope, station: StationData) {
+@Composable
+private fun HomeScreenScope.Station(
+    station: StationData,
+    index: Int,
+    modifier: Modifier = Modifier
+) {
+    val data = state.data ?: return
+    val canMoveUp = run {
+        if (station.isClosest) return@run false
+        val prevStation = data.stations.getOrNull(index - 1) ?: return@run false
+        if (state.stationSort == StationSort.Alphabetical) return@run true
+        prevStation.state == station.state
+    }
+
+    val nextStation = data.stations.getOrNull(index + 1)
+    val canMoveDown = run {
+        if (station.isClosest) return@run false
+        nextStation ?: return@run false
+        if (state.stationSort == StationSort.Alphabetical) return@run true
+        nextStation.state == station.state
+    }
+
+    Card(modifier.clickable { onIntent(StationClicked(station.id)) }) {
+        Column(Modifier.padding(bottom = 8.dp)) {
+            StationHeader(
+                modifier = Modifier.fillMaxSize(),
+                canMoveDown = canMoveDown,
+                canMoveUp = canMoveUp,
+                canDelete = !station.isClosest,
+                data = station
+            )
+
+            StationAlertBox(
+                text = station.alertText,
+                url = station.alertUrl,
+                colors = if (station.alertIsWarning) {
+                    StationAlertBoxColors.Warning
+                } else {
+                    StationAlertBoxColors.Info
+                }
+            )
+
+            StationTrains(station)
+        }
+
+        if (station.trains.isEmpty()) {
+            Box(
+                Modifier.fillMaxWidth().padding(horizontal = gutter()),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = stringResource(string.station_empty),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+            }
+        }
+
+        if (state.isEditing && nextStation != null && !canMoveDown) {
+            val text = if (station.isClosest) {
+                stringResource(
+                    string.cannot_move_explanation_closest,
+                    station.station.displayName
+                )
+            } else {
+                stringResource(string.cannot_move_explanation_state)
+            }
+            CannotMoveExplanation(text)
+        }
+    }
+}
+
+@Composable
+private fun HomeScreenScope.StationTrains(station: StationData) {
     if (!state.groupByDestination) {
         station.trains.fastForEach { train ->
-            listScope.item(station.id + train.id) {
-                TrainLine(
-                    station.station,
-                    train,
-                    modifier = Modifier.fillMaxSize().animateItemPlacement()
-                )
-            }
+            TrainLine(
+                station.station,
+                train,
+                modifier = Modifier.fillMaxSize()
+            )
         }
         return
     }
@@ -180,15 +192,12 @@ private fun HomeScreenScope.StationTrains(listScope: LazyListScope, station: Sta
 
     groupedTrains.fastForEachIndexed { index, trains ->
         val isLastGroup = index == groupedTrains.lastIndex
-        listScope.item(station.id + trains.first().id) {
-            TrainLine(
-                station.station,
-                trains,
-                modifier = Modifier.fillMaxSize()
-                    .conditional(!isLastGroup) { padding(bottom = 8.dp) }
-                    .animateItemPlacement()
-            )
-        }
+        TrainLine(
+            station.station,
+            trains,
+            modifier = Modifier.fillMaxSize()
+                .conditional(!isLastGroup) { padding(bottom = 8.dp) }
+        )
     }
 }
 
@@ -202,16 +211,21 @@ private fun HomeScreenScope.StationHeader(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.heightIn(48.dp),
+        modifier = modifier.heightIn(40.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
+        Box(
             modifier = Modifier.weight(1f).padding(start = gutter()),
-            text = data.station.displayName,
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onSurface
-        )
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = data.station.displayName,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+
         AnimatedVisibility(
             state.isEditing,
             enter = fadeIn(),

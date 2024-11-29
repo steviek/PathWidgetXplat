@@ -1,4 +1,4 @@
-package com.sixbynine.transit.path.app.ui.station
+package com.sixbynine.transit.path.app.ui.home
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -19,7 +19,6 @@ import com.sixbynine.transit.path.app.ui.PathBottomSheet
 import com.sixbynine.transit.path.app.ui.gutter
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StationBottomSheetDismissed
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StationBottomSheetSelection
-import com.sixbynine.transit.path.app.ui.home.HomeScreenScope
 
 @Composable
 fun HomeScreenScope.AddStationBottomSheet() {

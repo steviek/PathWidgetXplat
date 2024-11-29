@@ -24,13 +24,12 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.Month.APRIL
-import kotlinx.datetime.Month.AUGUST
 import kotlinx.datetime.Month.DECEMBER
 import kotlinx.datetime.Month.JANUARY
 import kotlinx.datetime.Month.JULY
 import kotlinx.datetime.Month.JUNE
 import kotlinx.datetime.Month.MAY
-import kotlinx.datetime.Month.SEPTEMBER
+import kotlinx.datetime.Month.NOVEMBER
 import kotlinx.serialization.encodeToString
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -286,13 +285,13 @@ class GithubAlertsTest {
             stations = listOf(NinthStreet, TwentyThirdStreet),
             schedule = Schedule(),
             displaySchedule = Schedule.once(
-                from = LocalDateTime(2024, AUGUST, 30, 19, 0),
-                to = LocalDateTime(2024, SEPTEMBER, 3, 6, 0),
+                from = LocalDateTime(2024, NOVEMBER, 29, 19, 0),
+                to = LocalDateTime(2024, DECEMBER, 2, 6, 0),
             ),
             trains = TrainFilter(),
             message = AlertText(
-                en = "9 St. & 23 St. stations will remain open overnight during Labor Day Weekend",
-                es = "Las estaciones de 9 St. y 23 St. permanecerán abiertas durante la noche durante el fin de semana del Labor Day"
+                en = "9 St. & 23 St. stations will remain open overnight during Thanksgiving Weekend",
+                es = "Las estaciones de 9 St. y 23 St. permanecerán abiertas durante la noche durante el fin de semana del Thanksgiving"
             ),
             url = AlertText(
                 en = "https://www.panynj.gov/path/en/schedules-maps/weekend-schedules.html"
@@ -306,7 +305,7 @@ class GithubAlertsTest {
                 days = DayOfWeek.values().toList(),
                 start = LocalTime(0, 0),
                 end = LocalTime(5, 0),
-                from = LocalDate(2024, SEPTEMBER, 4),
+                from = LocalDate(2024, DECEMBER, 3),
                 to = LocalDate(2025, DECEMBER, 31),
             ),
             displaySchedule = Schedule.repeatingDaily(

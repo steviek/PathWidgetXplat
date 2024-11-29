@@ -163,7 +163,7 @@ private fun AnnotatedString.Builder.appendBolded(text: String) {
 }
 
 @Composable
-private fun TrainBox(trainData: TrainData, station: Station, modifier: Modifier = Modifier) {
+private fun HomeScreenScope.TrainBox(trainData: TrainData, station: Station, modifier: Modifier = Modifier) {
     Column(
         modifier
             .clip(RoundedCornerShape(16.dp))

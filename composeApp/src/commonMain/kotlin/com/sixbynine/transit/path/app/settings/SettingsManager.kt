@@ -27,6 +27,7 @@ object SettingsManager {
     private const val AvoidMissingTrainsKey = "avoid_missing_trains"
 
     private val trainFilterPersister = SettingPersister("train_filter", TrainFilter.All)
+    private val groupTrainsPersister = SettingPersister("group_trains", true)
     private val lineFilterPersister = BitFlagSettingPersister("line_filter", Line.entries)
     private val timeDisplayPersister = SettingPersister("time_display", TimeDisplay.Relative)
     private val stationLimitPersister = SettingPersister("station_limit", StationLimit.ThreePerLine)
@@ -46,6 +47,7 @@ object SettingsManager {
     private val devOptionsPersister = GlobalSettingPersister("dev_options", false)
 
     val locationSetting = locationSettingPersister.flow
+    val groupTrains = groupTrainsPersister.flow
     val trainFilter = trainFilterPersister.flow
     val lineFilter = lineFilterPersister.flow
     val timeDisplay = timeDisplayPersister.flow
@@ -66,7 +68,8 @@ object SettingsManager {
             stationSort.value,
             displayPresumedTrains.value,
             avoidMissingTrains.value,
-            commutingConfiguration.value
+            commutingConfiguration.value,
+            groupTrains.value,
         )
     )
     val settings = _settings.asStateFlow()
@@ -132,6 +135,10 @@ object SettingsManager {
 
         commutingConfiguration.collectIn(lightweightScope) { newSetting ->
             _settings.update { it.copy(commutingConfiguration = newSetting) }
+        }
+
+        groupTrains.collectIn(lightweightScope) { newSetting ->
+            _settings.update { it.copy(groupTrains = newSetting) }
         }
 
         devOptionsEnabled.collectIn(lightweightScope) { isEnabled ->
@@ -202,6 +209,12 @@ object SettingsManager {
     ) = lightweightScope.launchAndReturnUnit {
         Analytics.commutingConfigurationSet()
         commutingConfigurationPersister.update(configuration)
+    }
+
+    fun updateGroupTrains(
+        groupTrains: Boolean,
+    ) = lightweightScope.launchAndReturnUnit {
+        groupTrainsPersister.update(groupTrains)
     }
 
     fun updateDevOptionsEnabled(enabled: Boolean) = lightweightScope.launchAndReturnUnit {

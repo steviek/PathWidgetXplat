@@ -67,6 +67,7 @@
     <string name="save">Guardar</string>
     <string name="send_feedback">Enviar comentarios</string>
     <string name="setting_header_time_display">Formato de la hora</string>
+    <string name="setting_header_train_grouping">Agrupar trenes por destino</string>
     <string name="setting_time_display_clock">Reloj</string>
     <string name="setting_time_display_clock_subtitle">p. ej. “a las %1$s“</string>
     <string name="setting_time_display_relative">Relativo</string>
@@ -97,6 +98,8 @@
     <string name="station_order_proximity">Proximidad</string>
     <string name="station_order_proximity_subtext">Ordenar estaciones por distancia desde la ubicación actual</string>
     <string name="stations">Estaciones</string>
+    <string name="train_grouping_off">Desactivado</string>
+    <string name="train_grouping_on">Activado</string>
     <string name="to_destination">%1$s</string>
     <string name="update_footer_text">Se actualizó a las %1$s, va actualizarse de nuevo en %2$s</string>
     <string name="update_now">Actualizar ahora</string>

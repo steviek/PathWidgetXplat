@@ -29,6 +29,7 @@ object HomeScreenContract {
         val showAddStationBottomSheet: Boolean = false,
         val useColumnForFooter: Boolean = false,
         val updateFooterText: String? = null,
+        val groupByDestination: Boolean = true,
     )
 
     data class DepartureBoardData(

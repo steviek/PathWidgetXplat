@@ -67,6 +67,7 @@
     <string name="save">Save</string>
     <string name="send_feedback">Send feedback</string>
     <string name="setting_header_time_display">Time display</string>
+    <string name="setting_header_train_grouping">Group trains by destination</string>
     <string name="setting_time_display_clock">Clock</string>
     <string name="setting_time_display_clock_subtitle">e.g. “at %1$s“</string>
     <string name="setting_time_display_relative">Relative</string>
@@ -98,6 +99,8 @@
     <string name="station_order_proximity_subtext">Order stations by distance from current location</string>
     <string name="stations">Stations</string>
     <string name="to_destination">%1$s</string>
+    <string name="train_grouping_off">Off</string>
+    <string name="train_grouping_on">On</string>
     <string name="update_footer_text">Updated at %1$s, updating again in %2$s</string>
     <string name="update_now">Update now</string>
     <string name="updated_at_time">Updated at %1$s</string>

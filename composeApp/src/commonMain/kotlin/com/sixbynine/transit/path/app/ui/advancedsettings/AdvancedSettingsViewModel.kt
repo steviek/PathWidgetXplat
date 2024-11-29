@@ -20,6 +20,7 @@ import com.sixbynine.transit.path.app.ui.advancedsettings.AdvancedSettingsContra
 import com.sixbynine.transit.path.app.ui.advancedsettings.AdvancedSettingsContract.Intent.StationLimitSelected
 import com.sixbynine.transit.path.app.ui.advancedsettings.AdvancedSettingsContract.Intent.TimeDisplayChanged
 import com.sixbynine.transit.path.app.ui.advancedsettings.AdvancedSettingsContract.Intent.TimeDisplayClicked
+import com.sixbynine.transit.path.app.ui.advancedsettings.AdvancedSettingsContract.Intent.TrainGroupingClicked
 import com.sixbynine.transit.path.app.ui.advancedsettings.AdvancedSettingsContract.State
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
@@ -35,6 +36,9 @@ class AdvancedSettingsViewModel : BaseViewModel<State, Intent, Effect>(
         updateStateOnEach(SettingsManager.stationLimit) { copy(stationLimit = it) }
         updateStateOnEach(SettingsManager.commutingConfiguration) {
             copy(commutingConfiguration = it)
+        }
+        updateStateOnEach(SettingsManager.groupTrains) {
+            copy(groupTrains = it)
         }
     }
 
@@ -90,6 +94,10 @@ class AdvancedSettingsViewModel : BaseViewModel<State, Intent, Effect>(
             TimeDisplayClicked -> {
                 updateState { copy(bottomSheet = TimeDisplay) }
             }
+
+            is TrainGroupingClicked -> {
+                SettingsManager.updateGroupTrains(!intent.isEnabled)
+            }
         }
     }
 
@@ -103,6 +111,7 @@ class AdvancedSettingsViewModel : BaseViewModel<State, Intent, Effect>(
                 avoidMissingTrains = SettingsManager.avoidMissingTrains.value,
                 timeDisplay = SettingsManager.timeDisplay.value,
                 stationLimit = SettingsManager.stationLimit.value,
+                groupTrains = SettingsManager.groupTrains.value,
                 commutingConfiguration = CommutingConfiguration.default(),
             )
         }

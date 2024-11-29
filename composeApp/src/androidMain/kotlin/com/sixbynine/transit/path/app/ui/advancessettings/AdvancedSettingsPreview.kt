@@ -19,6 +19,7 @@ fun AdvancedSettingsPreview() {
                 avoidMissingTrains = OffPeak,
                 stationLimit = Six,
                 timeDisplay = Clock,
+                groupTrains = true,
                 commutingConfiguration = CommutingConfiguration.default()
             ),
             onIntent = {

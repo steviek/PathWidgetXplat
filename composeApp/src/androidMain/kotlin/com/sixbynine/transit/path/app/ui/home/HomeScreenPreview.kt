@@ -7,7 +7,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.sixbynine.transit.path.PathWidgetPreview
 import com.sixbynine.transit.path.PreviewTheme
+import com.sixbynine.transit.path.api.LocationSetting
 import com.sixbynine.transit.path.api.Stations
+import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.app.settings.TimeDisplay
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.EditClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.RetryClicked
@@ -34,7 +36,11 @@ fun HomeScreenPreview() {
                 layoutOption = TwoColumns,
                 isLoading = false,
                 hasError = false,
-                data = runBlocking { Fixtures.widgetData().toDepartureBoardData(TimeDisplay.Relative) },
+                data = runBlocking { Fixtures.widgetData().toDepartureBoardData(
+                    timeDisplay = TimeDisplay.Relative,
+                    trainFilter = TrainFilter.All,
+                    locationSetting = LocationSetting.Disabled,
+                ) },
                 timeDisplay = TimeDisplay.Relative,
             ),
             onIntent = {

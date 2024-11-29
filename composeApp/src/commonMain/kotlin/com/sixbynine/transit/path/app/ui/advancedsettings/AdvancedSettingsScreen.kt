@@ -28,6 +28,7 @@ import com.sixbynine.transit.path.app.ui.advancedsettings.AdvancedSettingsContra
 import com.sixbynine.transit.path.app.ui.advancedsettings.AdvancedSettingsContract.Intent.StationLimitSelected
 import com.sixbynine.transit.path.app.ui.advancedsettings.AdvancedSettingsContract.Intent.TimeDisplayChanged
 import com.sixbynine.transit.path.app.ui.advancedsettings.AdvancedSettingsContract.Intent.TimeDisplayClicked
+import com.sixbynine.transit.path.app.ui.advancedsettings.AdvancedSettingsContract.Intent.TrainGroupingClicked
 import com.sixbynine.transit.path.app.ui.advancedsettings.AdvancedSettingsContract.State
 import com.sixbynine.transit.path.app.ui.icon.IconType.Back
 import com.sixbynine.transit.path.app.ui.icon.NativeIconButton
@@ -48,7 +49,10 @@ import pathwidgetxplat.composeapp.generated.resources.avoid_missing_trains
 import pathwidgetxplat.composeapp.generated.resources.back
 import pathwidgetxplat.composeapp.generated.resources.commuting_schedule
 import pathwidgetxplat.composeapp.generated.resources.setting_header_time_display
+import pathwidgetxplat.composeapp.generated.resources.setting_header_train_grouping
 import pathwidgetxplat.composeapp.generated.resources.settings_header_station_filter
+import pathwidgetxplat.composeapp.generated.resources.train_grouping_off
+import pathwidgetxplat.composeapp.generated.resources.train_grouping_on
 
 @Composable
 fun AdvancedSettingsScreen() {
@@ -89,6 +93,8 @@ private fun AdvancedSettingsScope.Content() {
             modifier = Modifier.padding(contentPadding).verticalScroll(rememberScrollState()),
         ) {
             TimeDisplaySection()
+
+            TrainGroupingSection()
 
             AvoidMissingTrainsSection()
 
@@ -133,6 +139,17 @@ private fun AdvancedSettingsScope.TimeDisplaySection() {
         title = stringResource(string.setting_header_time_display),
         subtitle = stringResource(state.timeDisplay.title),
         onClick = { onIntent(TimeDisplayClicked) }
+    )
+}
+
+@Composable
+private fun AdvancedSettingsScope.TrainGroupingSection() {
+    SettingsItem(
+        title = stringResource(string.setting_header_train_grouping),
+        subtitle = stringResource(
+            if (state.groupTrains) string.train_grouping_on else string.train_grouping_off
+        ),
+        onClick = { onIntent(TrainGroupingClicked(state.groupTrains)) }
     )
 }
 

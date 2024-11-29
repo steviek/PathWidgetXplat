@@ -12,6 +12,7 @@ object AdvancedSettingsContract {
     data class State(
         val avoidMissingTrains: AvoidMissingTrains,
         val timeDisplay: TimeDisplay,
+        val groupTrains: Boolean,
         val stationLimit: StationLimit,
         val commutingConfiguration: CommutingConfiguration,
         val bottomSheet: BottomSheetType? = null,
@@ -29,6 +30,7 @@ object AdvancedSettingsContract {
         data class StationLimitSelected(val limit: StationLimit) : Intent
         data object AvoidMissingTrainsClicked : Intent
         data object TimeDisplayClicked : Intent
+        data class TrainGroupingClicked(val isEnabled: Boolean) : Intent
         data object CommutingScheduleClicked : Intent
         data object StationLimitClicked : Intent
         data object BottomSheetDismissed : Intent

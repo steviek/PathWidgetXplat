@@ -22,9 +22,6 @@ class GroupedWidgetLayoutHelper(
     private val measure: (text: String, font: FontInfo) -> SizeWrapper,
 ) {
 
-    private val relSubtextPrefix = localizedString(en = "also in ", es = "también en ")
-    private val clockSubtextPrefix = localizedString(en = "also at ", es = "también a las ")
-
     fun computeLayoutInfo(): GroupedWidgetLayoutInfo {
         val titleHeight = measureHeight("Hello", Font.StationTitle)
         val stationHeadlineHeight = maxOf(12.0, measureHeight("WTC", Font.SignTitle))
@@ -106,19 +103,8 @@ class GroupedWidgetLayoutHelper(
             return " "
         }
 
-        val timesToText: (List<Instant>) -> String = when (timeDisplay) {
-            Relative -> { times ->
-                times.joinToString(prefix = relSubtextPrefix, postfix = " min") { time ->
-                    val minutesToArrival = (time - displayAt).inWholeMinutes
-                    minutesToArrival.coerceAtLeast(0).toString()
-                }
-            }
-
-            Clock -> { times ->
-                times.joinToString(prefix = clockSubtextPrefix) { time ->
-                    WidgetDataFormatter.formatTime(time)
-                }
-            }
+        val timesToText: (List<Instant>) -> String = { times ->
+            joinAdditionalTimes(timeDisplay, times, displayAt)
         }
 
         val steps = (nextArrivals.size downTo 1).toList()
@@ -168,6 +154,26 @@ class GroupedWidgetLayoutHelper(
 
     private fun measureWidth(text: String, font: FontInfo): Double {
         return measure(text, font).width
+    }
+
+    companion object {
+        private val relSubtextPrefix = localizedString(en = "also in ", es = "también en ")
+        private val clockSubtextPrefix = localizedString(en = "also at ", es = "también a las ")
+
+        fun joinAdditionalTimes(
+            timeDisplay: TimeDisplay,
+            times: List<Instant>,
+            displayAt: Instant,
+        ) = when (timeDisplay) {
+            Relative -> times.joinToString(prefix = relSubtextPrefix, postfix = " min") { time ->
+                val minutesToArrival = (time - displayAt).inWholeMinutes
+                minutesToArrival.coerceAtLeast(0).toString()
+            }
+
+            Clock -> times.joinToString(prefix = clockSubtextPrefix) { time ->
+                WidgetDataFormatter.formatTime(time)
+            }
+        }
     }
 }
 

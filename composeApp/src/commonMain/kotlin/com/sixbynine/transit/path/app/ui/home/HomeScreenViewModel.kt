@@ -2,10 +2,12 @@ package com.sixbynine.transit.path.app.ui.home
 
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.sixbynine.transit.path.api.LocationSetting
 import com.sixbynine.transit.path.api.LocationSetting.Enabled
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.StationSort.Alphabetical
 import com.sixbynine.transit.path.api.Stations
+import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.api.TrainFilter.Companion.matchesFilter
 import com.sixbynine.transit.path.api.alerts.AlertText
 import com.sixbynine.transit.path.api.alerts.isDisplayedNow
@@ -141,7 +143,8 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
             copy(
                 stationSort = it.stationSort,
                 timeDisplay = it.timeDisplay,
-                data = createDepartureBoardData()
+                groupByDestination = it.groupTrains,
+                data = createDepartureBoardData(),
             )
         }
     }
@@ -309,7 +312,19 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
 
     companion object {
         fun WidgetData.toDepartureBoardData(
-            timeDisplay: TimeDisplay = SettingsManager.timeDisplay.value
+
+        ): DepartureBoardData {
+            return toDepartureBoardData(
+                SettingsManager.timeDisplay.value,
+                SettingsManager.trainFilter.value,
+                SettingsManager.locationSetting.value,
+            )
+        }
+
+        fun WidgetData.toDepartureBoardData(
+            timeDisplay: TimeDisplay,
+            trainFilter: TrainFilter,
+            locationSetting: LocationSetting,
         ): DepartureBoardData {
             val stations = stations.mapNotNull { data ->
                 val station =
@@ -320,7 +335,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
                     station = station,
                     trains = data.trains
                         .filter { it.projectedArrival >= now() - 1.minutes }
-                        .filter { matchesFilter(station, it, SettingsManager.trainFilter.value) }
+                        .filter { matchesFilter(station, it, trainFilter) }
                         .map { train ->
                             TrainData(
                                 id = train.id,
@@ -347,8 +362,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
                                 },
                             )
                         },
-                    isClosest = data.id == closestStationId &&
-                            SettingsManager.locationSetting.value == Enabled,
+                    isClosest = data.id == closestStationId && locationSetting == Enabled,
                     alertText = alertToDisplay?.message?.unpack(),
                     alertUrl = alertToDisplay?.url?.unpack(),
                     alertIsWarning = alertToDisplay?.isWarning == true,

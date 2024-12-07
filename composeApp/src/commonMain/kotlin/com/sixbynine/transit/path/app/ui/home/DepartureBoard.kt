@@ -1,8 +1,6 @@
 package com.sixbynine.transit.path.app.ui.home
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachIndexed
@@ -42,9 +41,13 @@ import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.RemoveSt
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StationClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.StationData
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.TrainData
+import com.sixbynine.transit.path.app.ui.home.TrainGrouper.groupTrains
 import com.sixbynine.transit.path.app.ui.icon.IconType
 import com.sixbynine.transit.path.app.ui.icon.NativeIconButton
 import com.sixbynine.transit.path.util.conditional
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.filterNotNull
 import org.jetbrains.compose.resources.stringResource
 import pathwidgetxplat.composeapp.generated.resources.Res.string
 import pathwidgetxplat.composeapp.generated.resources.add_station
@@ -88,8 +91,12 @@ fun HomeScreenScope.DepartureBoard() {
     }
 
     // Scroll the list to the top whenever the first station changes.
-    LaunchedEffect(listState, data?.stations?.firstOrNull()?.id) {
-        listState.scrollToItem(0)
+    val firstStation = remember { MutableStateFlow(null as String?) }
+    firstStation.value = data?.stations?.firstOrNull()?.id
+    LaunchedEffect(listState, firstStation) {
+        firstStation.filterNotNull().drop(1).collect {
+            listState.scrollToItem(0)
+        }
     }
 }
 
@@ -125,14 +132,14 @@ private fun HomeScreenScope.Station(
                 data = station
             )
 
-            StationAlertBox(
+            AlertBox(
                 text = station.alertText,
                 url = station.alertUrl,
                 colors = if (station.alertIsWarning) {
-                    StationAlertBoxColors.Warning
+                    AlertBoxColors.Warning
                 } else {
-                    StationAlertBoxColors.Info
-                }
+                    AlertBoxColors.Info
+                },
             )
 
             StationTrains(station)
@@ -140,7 +147,7 @@ private fun HomeScreenScope.Station(
 
         if (station.trains.isEmpty()) {
             Box(
-                Modifier.fillMaxWidth().padding(horizontal = gutter()),
+                Modifier.fillMaxWidth().padding(horizontal = gutter()).padding(bottom = 8.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -151,18 +158,18 @@ private fun HomeScreenScope.Station(
 
             }
         }
+    }
 
-        if (state.isEditing && nextStation != null && !canMoveDown) {
-            val text = if (station.isClosest) {
-                stringResource(
-                    string.cannot_move_explanation_closest,
-                    station.station.displayName
-                )
-            } else {
-                stringResource(string.cannot_move_explanation_state)
-            }
-            CannotMoveExplanation(text)
+    if (state.isEditing && nextStation != null && !canMoveDown) {
+        val text = if (station.isClosest) {
+            stringResource(
+                string.cannot_move_explanation_closest,
+                station.station.displayName
+            )
+        } else {
+            stringResource(string.cannot_move_explanation_state)
         }
+        CannotMoveExplanation(text)
     }
 }
 
@@ -179,17 +186,7 @@ private fun HomeScreenScope.StationTrains(station: StationData) {
         return
     }
 
-    val groupedTrains = arrayListOf<ArrayList<TrainData>>()
-
-    station.trains.fastForEach { train ->
-        val group = groupedTrains.find { it.firstOrNull()?.title == train.title }
-        if (group == null) {
-            groupedTrains += arrayListOf(train)
-        } else {
-            group.add(train)
-        }
-    }
-
+    val groupedTrains = groupTrains(station.station, station.trains)
     groupedTrains.fastForEachIndexed { index, trains ->
         val isLastGroup = index == groupedTrains.lastIndex
         TrainLine(
@@ -201,7 +198,6 @@ private fun HomeScreenScope.StationTrains(station: StationData) {
     }
 }
 
-
 @Composable
 private fun HomeScreenScope.StationHeader(
     data: StationData,
@@ -211,27 +207,22 @@ private fun HomeScreenScope.StationHeader(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.heightIn(40.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalAlignment = Alignment.CenterVertically
+        modifier = modifier.heightIn(40.dp).fillMaxWidth().padding(horizontal = gutter()),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally),
     ) {
-        Box(
-            modifier = Modifier.weight(1f).padding(start = gutter()),
-            contentAlignment = Alignment.Center
-        ) {
+        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
             Text(
                 text = data.station.displayName,
                 style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
         }
 
-        AnimatedVisibility(
-            state.isEditing,
-            enter = fadeIn(),
-            exit = fadeOut()
-        ) {
-            Row(Modifier.padding(end = gutter() - 12.dp)) {
+        AnimatedVisibility(state.isEditing) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 if (canMoveDown) {
                     NativeIconButton(
                         icon = IconType.ArrowDown,
@@ -258,6 +249,8 @@ private fun HomeScreenScope.StationHeader(
                         contentDescription = stringResource(string.delete),
                         onClick = { onIntent(RemoveStationClicked(data.id)) }
                     )
+                } else {
+                    Spacer(Modifier.width(48.dp))
                 }
             }
         }

@@ -33,7 +33,8 @@ object HomeScreenContract {
     )
 
     data class DepartureBoardData(
-        val stations: List<StationData>
+        val stations: List<StationData>,
+        val globalAlerts: List<GlobalAlert>
     )
 
     data class StationData(
@@ -72,6 +73,12 @@ object HomeScreenContract {
             get() = source.station
     }
 
+    data class GlobalAlert(
+        val text: String,
+        val url: String?,
+        val isWarning: Boolean,
+    )
+
     sealed interface Intent {
         data object RetryClicked : Intent
         data object EditClicked : Intent
@@ -86,7 +93,6 @@ object HomeScreenContract {
         data class StationBottomSheetSelection(val station: Station) : Intent
         data object AddStationClicked : Intent
         data class ConstraintsChanged(val maxWidth: Dp, val maxHeight: Dp) : Intent
-        data class AlertUrlClicked(val url: String) : Intent
         data class StationClicked(val id: String) : Intent
     }
 

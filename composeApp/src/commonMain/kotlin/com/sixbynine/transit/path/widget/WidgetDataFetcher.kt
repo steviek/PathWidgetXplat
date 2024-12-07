@@ -46,6 +46,7 @@ import com.sixbynine.transit.path.util.suspendRunCatching
 import kotlinx.coroutines.CoroutineStart.LAZY
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -57,6 +58,7 @@ import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.TimeSource.Monotonic
 
 object WidgetDataFetcher {
 
@@ -171,20 +173,41 @@ object WidgetDataFetcher {
             )
         }
 
-        val fetch: Deferred<DataResult<WidgetData>> = GlobalScope.async {
+        val fetch: Deferred<DataResult<WidgetData>> = GlobalScope.async(start = LAZY) {
             coroutineScope {
+                liveDepartures.start()
+                githubAlerts.start()
+
                 val stationsByProximity = when {
                     !includeClosestStation -> null
                     !canRefreshLocation && !AppLifecycleObserver.isActive.value -> {
                         lastClosestStations
                     }
-                    else -> when (val locationResult =
-                        LocationProvider().tryToGetLocation(3.seconds)) {
-                        NoPermission, NoProvider -> null
-                        is Failure -> lastClosestStations
-                        is Success -> {
-                            Stations.byProximityTo(locationResult.location)
-                                .also { lastClosestStations = it }
+
+                    else -> {
+                        val mark = Monotonic.markNow()
+                        val locationResult = try {
+                            withTimeout(3.seconds) { LocationProvider().tryToGetLocation() }
+                        } catch (e: TimeoutCancellationException) {
+                            Logging.w("Timed out trying to get the user's location")
+                            Failure(e)
+                        }
+
+                        when (locationResult) {
+                            NoPermission, NoProvider -> null
+                            is Failure -> lastClosestStations
+                            is Success -> {
+                                Stations.byProximityTo(locationResult.location)
+                                    .also {
+                                        Logging.d(
+                                            "Received current location as " +
+                                                    "${locationResult.location} in " +
+                                                    "${mark.elapsedNow()}, closest stations are" +
+                                                    " ${it.map { it.displayName }}"
+                                        )
+                                        lastClosestStations = it
+                                    }
+                            }
                         }
                     }
                 }
@@ -371,6 +394,7 @@ object WidgetDataFetcher {
                 .mapNotNull { it.projectedArrivals.maxOrNull() }
                 .minOrNull()
                 ?: (now + 15.minutes)
+        val globalAlerts = githubAlerts?.alerts?.filter { it.isGlobal }.orEmpty()
         return WidgetData(
             fetchTime = now,
             stations = stationDatas.take(stationLimit),
@@ -378,6 +402,7 @@ object WidgetDataFetcher {
             closestStationId = closestStationToUse?.pathApiName,
             isPathApiBroken = isPathApiBroken,
             scheduleName = data.scheduleName,
+            globalAlerts = globalAlerts,
         )
     }
 

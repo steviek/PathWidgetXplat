@@ -13,10 +13,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
+import com.sixbynine.transit.path.app.settings.TimeDisplay
 import com.sixbynine.transit.path.app.ui.ColorCircle
 import com.sixbynine.transit.path.app.ui.ColorWrapper
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.TrainData
@@ -45,6 +45,28 @@ fun HomeScreenScope.TrainLineContent(
 @Composable
 fun HomeScreenScope.TrainLineContent(
     data: List<TrainData>,
+    modifier: Modifier = Modifier,
+    textStyle: TextStyle = MaterialTheme.typography.titleMedium,
+    subtitleTextStyle: TextStyle = MaterialTheme.typography.bodyLarge,
+    textColor: Color = MaterialTheme.colorScheme.onSurface,
+    fullWidth: Boolean = true,
+) {
+    TrainLineContent(
+        data = data,
+        timeDisplay = state.timeDisplay,
+        modifier = modifier,
+        textStyle = textStyle,
+        subtitleTextStyle = subtitleTextStyle,
+        textColor = textColor,
+        fullWidth = fullWidth,
+    )
+}
+
+
+@Composable
+fun TrainLineContent(
+    data: List<TrainData>,
+    timeDisplay: TimeDisplay,
     modifier: Modifier = Modifier,
     textStyle: TextStyle = MaterialTheme.typography.titleMedium,
     subtitleTextStyle: TextStyle = MaterialTheme.typography.bodyLarge,
@@ -86,7 +108,7 @@ fun HomeScreenScope.TrainLineContent(
             val additionalTimes = data.drop(1).map { it.projectedArrival }
             Text(
                 text = GroupedWidgetLayoutHelper.joinAdditionalTimes(
-                    state.timeDisplay,
+                    timeDisplay,
                     additionalTimes,
                     now()
                 ),

@@ -14,7 +14,6 @@ import CoreLocation
 struct Provider: AppIntentTimelineProvider {
 
     func placeholder(in context: Context) -> SimpleEntry {
-        print("start create placeholder")
         let entry = SimpleEntry(
             date: Date(),
             size: context.displaySize,
@@ -24,7 +23,6 @@ struct Provider: AppIntentTimelineProvider {
             hasPathError: false,
             dataFrom: Date()
         )
-        print("return entry: \(entry)")
         return entry
     }
 
@@ -32,13 +30,11 @@ struct Provider: AppIntentTimelineProvider {
         for configuration: ConfigurationAppIntent,
         in context: Context
     ) async -> SimpleEntry {
-        print("start create snapshot: \(configuration)")
         let entry = await createEntries(
             for: configuration,
             in: context,
             count: 1
         ).first!
-        print("return snapshot: \(entry)")
         return entry
     }
 

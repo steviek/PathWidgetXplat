@@ -2,7 +2,6 @@ package com.sixbynine.transit.path.api.path
 
 import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.api.PathApiException
-import com.sixbynine.transit.path.api.createHttpClient
 import com.sixbynine.transit.path.network.NetworkManager
 import com.sixbynine.transit.path.preferences.StringPreferencesKey
 import com.sixbynine.transit.path.preferences.persisting
@@ -25,7 +24,6 @@ import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.seconds
 
 object PathRepository {
-    private val httpClient = createHttpClient()
     private var lastPathResponse by persisting(StringPreferencesKey("last_success"))
     private var lastPathResponseTime by persistingInstant("last_success_time")
     private var ongoingFetch: Deferred<DataResult<PathServiceResults>>? = null

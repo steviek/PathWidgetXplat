@@ -32,6 +32,8 @@ data class Alert(
     val displaySchedule: Schedule? = null,
     /** The level of the alert's value. */
     val level: String? = null,
+    /** Whether this is a global level alert. Stations are ignored if so. */
+    val isGlobal: Boolean = false,
 )
 
 fun Alert(

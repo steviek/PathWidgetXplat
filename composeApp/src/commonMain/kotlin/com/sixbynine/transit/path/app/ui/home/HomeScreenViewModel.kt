@@ -15,21 +15,21 @@ import com.sixbynine.transit.path.api.alerts.isWarning
 import com.sixbynine.transit.path.api.isInNewJersey
 import com.sixbynine.transit.path.api.isInNewYork
 import com.sixbynine.transit.path.api.matches
-import com.sixbynine.transit.path.app.external.ExternalRoutingManager
 import com.sixbynine.transit.path.app.lifecycle.AppLifecycleObserver
 import com.sixbynine.transit.path.app.settings.SettingsManager
 import com.sixbynine.transit.path.app.settings.TimeDisplay
 import com.sixbynine.transit.path.app.settings.isActiveAt
+import com.sixbynine.transit.path.app.station.StationSelection
 import com.sixbynine.transit.path.app.station.StationSelectionManager
 import com.sixbynine.transit.path.app.ui.PathViewModel
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.DepartureBoardData
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Effect
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Effect.NavigateToSettings
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Effect.NavigateToStation
+import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.GlobalAlert
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.HomeBackfillSource
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.AddStationClicked
-import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.AlertUrlClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.ConstraintsChanged
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.EditClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.MoveStationDownClicked
@@ -75,7 +75,7 @@ import kotlin.time.Duration.Companion.minutes
 
 class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, Intent, Effect>() {
 
-    private val fetchingUseCase = WidgetDataFetchingUseCase(lightweightScope)
+    private val fetchingUseCase = WidgetDataFetchingUseCase.get(this)
     private val fetchData get() = fetchingUseCase.fetchData.value
 
     private val _state = MutableStateFlow(
@@ -204,14 +204,14 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
                 }
             }
 
-            is AlertUrlClicked -> {
-                ExternalRoutingManager().openUrl(intent.url)
-            }
-
             is StationClicked -> {
                 sendEffect(NavigateToStation(intent.id))
             }
         }
+    }
+
+    override fun onCleared() {
+        fetchingUseCase.unsubscribe(this)
     }
 
     private fun createFooterText(): String? = with(fetchData) {
@@ -230,7 +230,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
         )
     }
 
-    private suspend fun createDepartureBoardData(): DepartureBoardData? {
+    private fun createDepartureBoardData(): DepartureBoardData? {
         return fetchData.data
             ?.toDepartureBoardData()
             ?.adjustedForLatestSettings()
@@ -318,64 +318,72 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
 
     companion object {
         fun WidgetData.toDepartureBoardData(
-
+            trainFilter: TrainFilter = SettingsManager.trainFilter.value,
+            timeDisplay: TimeDisplay = SettingsManager.timeDisplay.value,
+            locationSetting: LocationSetting = SettingsManager.locationSetting.value,
+            stationSelection: StationSelection = StationSelectionManager.selection.value,
         ): DepartureBoardData {
-            return toDepartureBoardData(
-                SettingsManager.timeDisplay.value,
-                SettingsManager.trainFilter.value,
-                SettingsManager.locationSetting.value,
-            )
-        }
-
-        fun WidgetData.toDepartureBoardData(
-            timeDisplay: TimeDisplay,
-            trainFilter: TrainFilter,
-            locationSetting: LocationSetting,
-        ): DepartureBoardData {
-            val stations = stations.mapNotNull { data ->
-                val station =
-                    Stations.All.firstOrNull { it.pathApiName == data.id }
-                        ?: return@mapNotNull null
-                val alertToDisplay = data.alerts?.firstOrNull { it.isDisplayedNow() }
-                val stationData = StationData(
-                    station = station,
-                    trains = data.trains
-                        .filter { it.projectedArrival >= now() - 1.minutes }
-                        .filter { matchesFilter(station, it, trainFilter) }
-                        .map { train ->
-                            TrainData(
-                                id = train.id,
-                                title = train.title,
-                                colors = train.colors,
-                                displayText = trainDisplayTime(
-                                    timeDisplay,
-                                    isDelayed = train.isDelayed,
-                                    isBackfilled = train.isBackfilled,
-                                    train.projectedArrival
-                                ),
-                                projectedArrival = train.projectedArrival,
-                                isDelayed = train.isDelayed,
-                                backfill = train.backfillSource?.let {
-                                    HomeBackfillSource(
-                                        it,
-                                        trainDisplayTime(
+            val stations =
+                stations
+                    .filter { station ->
+                        (station.id == closestStationId && locationSetting == Enabled) ||
+                                stationSelection.selectedStations
+                                    .any { station.id == it.pathApiName }
+                    }
+                    .mapNotNull { data ->
+                        val station =
+                            Stations.All.firstOrNull { it.pathApiName == data.id }
+                                ?: return@mapNotNull null
+                        val alertToDisplay = data.alerts?.firstOrNull { it.isDisplayedNow() }
+                        val stationData = StationData(
+                            station = station,
+                            trains = data.trains
+                                .filter { it.projectedArrival >= now() - 1.minutes }
+                                .filter { matchesFilter(station, it, trainFilter) }
+                                .map { train ->
+                                    TrainData(
+                                        id = train.id,
+                                        title = train.title,
+                                        colors = train.colors,
+                                        displayText = trainDisplayTime(
                                             timeDisplay,
                                             isDelayed = train.isDelayed,
-                                            isBackfilled = false,
-                                            it.projectedArrival
-                                        )
+                                            isBackfilled = train.isBackfilled,
+                                            train.projectedArrival
+                                        ),
+                                        projectedArrival = train.projectedArrival,
+                                        isDelayed = train.isDelayed,
+                                        backfill = train.backfillSource?.let {
+                                            HomeBackfillSource(
+                                                it,
+                                                trainDisplayTime(
+                                                    timeDisplay,
+                                                    isDelayed = train.isDelayed,
+                                                    isBackfilled = false,
+                                                    it.projectedArrival
+                                                )
+                                            )
+                                        },
                                     )
                                 },
-                            )
-                        },
-                    isClosest = data.id == closestStationId && locationSetting == Enabled,
-                    alertText = alertToDisplay?.message?.unpack(),
-                    alertUrl = alertToDisplay?.url?.unpack(),
-                    alertIsWarning = alertToDisplay?.isWarning == true,
-                )
-                stationData
-            }
-            return DepartureBoardData(stations = stations)
+                            isClosest = data.id == closestStationId && locationSetting == Enabled,
+                            alertText = alertToDisplay?.message?.unpack(),
+                            alertUrl = alertToDisplay?.url?.unpack(),
+                            alertIsWarning = alertToDisplay?.isWarning == true,
+                        )
+                        stationData
+                    }
+            return DepartureBoardData(
+                stations = stations,
+                globalAlerts = globalAlerts.mapNotNull {
+                    if (!it.isDisplayedNow()) return@mapNotNull null
+                    GlobalAlert(
+                        text = it.message?.unpack() ?: return@mapNotNull null,
+                        url = it.url?.unpack(),
+                        isWarning = it.isWarning
+                    )
+                }
+            )
         }
 
         private fun trainDisplayTime(

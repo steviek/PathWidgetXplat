@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import platform.CoreLocation.CLLocationManager
-import kotlin.time.Duration
 
 @Suppress("unused")
 object IosLocationProvider : LocationProvider {
@@ -51,7 +50,7 @@ object IosLocationProvider : LocationProvider {
         requestDelegate?.requestLocationPermission()
     }
 
-    override suspend fun tryToGetLocation(timeout: Duration): LocationCheckResult {
+    override suspend fun tryToGetLocation(): LocationCheckResult {
         locationRequest?.takeIf { it.isActive }?.let { return it.await() }
 
         val deferredRequest = CompletableDeferred<LocationCheckResult>()

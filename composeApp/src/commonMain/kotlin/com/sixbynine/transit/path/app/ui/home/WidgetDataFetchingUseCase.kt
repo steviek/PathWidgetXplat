@@ -1,10 +1,13 @@
 package com.sixbynine.transit.path.app.ui.home
 
 import com.sixbynine.transit.path.Logging
+import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.LocationSetting.Disabled
 import com.sixbynine.transit.path.api.LocationSetting.Enabled
 import com.sixbynine.transit.path.api.LocationSetting.EnabledPendingPermission
 import com.sixbynine.transit.path.api.PathApiException
+import com.sixbynine.transit.path.api.Stations
+import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.app.lifecycle.AppLifecycleObserver
 import com.sixbynine.transit.path.app.settings.SettingsManager
 import com.sixbynine.transit.path.app.station.StationSelectionManager
@@ -19,6 +22,7 @@ import com.sixbynine.transit.path.widget.WidgetData
 import com.sixbynine.transit.path.widget.WidgetDataFetcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,7 +42,10 @@ import kotlin.time.Duration.Companion.seconds
  * Encapsulates the logic for what the latest fetched [WidgetData] is and when we should fetch
  * again.
  */
-class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
+class WidgetDataFetchingUseCase private constructor() {
+
+    private val subscribers = mutableSetOf<Any>()
+    private val scope = CoroutineScope(Dispatchers.Default)
 
     private val initialFetch = startFetch(staleness = UnforcedStaleness)
 
@@ -94,14 +101,20 @@ class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
         if (fetchData.value.isFetching) {
             fetchData()
         } else if (shouldFetchForLocationSettingChange()) {
-            Logging.d("Fetching widget data, force for location2")
             fetchData(force = true)
         }
     }
 
     fun fetchNow() {
-        Logging.d("Fetching widget data, force for fetchNow")
         fetchData(force = true)
+    }
+
+    fun unsubscribe(subscriber: Any) {
+        subscribers.remove(subscriber)
+        if (subscribers.isEmpty()) {
+            scope.cancel()
+            instance = null
+        }
     }
 
     private fun shouldFetchForLocationSettingChange(): Boolean {
@@ -141,10 +154,10 @@ class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
     private fun startFetch(staleness: Staleness): FetchWithPrevious<WidgetData> {
         return WidgetDataFetcher.fetchWidgetDataWithPrevious(
             stationLimit = Int.MAX_VALUE,
-            stations = StationSelectionManager.selection.value.selectedStations,
+            stations = Stations.All,
             sort = SettingsManager.stationSort.value,
-            lines = SettingsManager.lineFilter.value,
-            filter = SettingsManager.trainFilter.value,
+            lines = Line.entries,
+            filter = TrainFilter.All,
             includeClosestStation = SettingsManager.locationSetting.value == Enabled,
             staleness = staleness,
         )
@@ -163,13 +176,13 @@ class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
             get() = (nextFetchTime - now()).coerceAtLeast(Duration.ZERO)
     }
 
-    private companion object {
+    companion object {
         private val FetchInvalidAfter = 6.hours
-        val ForcedStaleness = Staleness(staleAfter = 10.seconds, invalidAfter = FetchInvalidAfter)
-        val UnforcedStaleness = Staleness(staleAfter = 30.seconds, invalidAfter = FetchInvalidAfter)
-        val FetchInterval = 1.minutes
+        private val ForcedStaleness = Staleness(staleAfter = 10.seconds, invalidAfter = FetchInvalidAfter)
+        private val UnforcedStaleness = Staleness(staleAfter = 30.seconds, invalidAfter = FetchInvalidAfter)
+        private val FetchInterval = 1.minutes
 
-        fun createInitialFetchData(data: FetchWithPrevious<WidgetData>): FetchData {
+        private fun createInitialFetchData(data: FetchWithPrevious<WidgetData>): FetchData {
             val lastFetch = data.previous
             val lastFetchAge = lastFetch?.age
             val lastFetchData = lastFetch?.value
@@ -196,6 +209,15 @@ class WidgetDataFetchingUseCase(private val scope: CoroutineScope) {
                 isFetching = isFetching,
                 scheduleName = null,
             )
+        }
+
+        private var instance: WidgetDataFetchingUseCase? = null
+
+        fun get(subscriber: Any): WidgetDataFetchingUseCase {
+            val useCase = instance ?: WidgetDataFetchingUseCase()
+            useCase.subscribers += subscriber
+            instance = useCase
+            return useCase
         }
     }
 }

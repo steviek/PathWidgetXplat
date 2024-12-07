@@ -19,6 +19,7 @@ data class WidgetData(
     val closestStationId: String?,
     val isPathApiBroken: Boolean?,
     val scheduleName: String?,
+    val globalAlerts: List<Alert>  = emptyList(),
 ) {
     @Serializable
     data class StationData(

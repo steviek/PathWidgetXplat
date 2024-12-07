@@ -82,7 +82,7 @@ object AndroidLocationProvider : LocationProvider {
         activity.requestLocationPermissions()
     }
 
-    override suspend fun tryToGetLocation(timeout: Duration): LocationCheckResult {
+    override suspend fun tryToGetLocation(): LocationCheckResult {
         if (locationManager == null || VERSION.SDK_INT < 23) {
             return NoProvider
         }
@@ -107,19 +107,14 @@ object AndroidLocationProvider : LocationProvider {
         Logging.d("Last known location is ${lastKnownLocation?.toLatLngStringWithGoogleApiLink()}")
 
         return try {
-            withTimeout(timeout) {
-                val currentLocation = locationManager.getCurrentLocation(provider)
-                    ?: return@withTimeout lastKnownLocation?.let { Success(it.toSharedLocation()) }
-                        ?: Failure(RuntimeException("android returned null location for user"))
-                Logging.d(
-                    "Retrieved current location as " +
-                            "${currentLocation.toLatLngStringWithGoogleApiLink()} from $provider"
-                )
-                Success(currentLocation.toSharedLocation())
-            }
-        } catch (e: TimeoutCancellationException) {
-            Logging.w("Timed out trying to get the user's location")
-            lastKnownLocation?.let { Success(it.toSharedLocation()) } ?: Failure(e)
+            val currentLocation = locationManager.getCurrentLocation(provider)
+                ?: return lastKnownLocation?.let { Success(it.toSharedLocation()) }
+                    ?: Failure(RuntimeException("android returned null location for user"))
+            Logging.d(
+                "Retrieved current location as " +
+                        "${currentLocation.toLatLngStringWithGoogleApiLink()} from $provider"
+            )
+            Success(currentLocation.toSharedLocation())
         } catch (t: Throwable) {
             Logging.w("Unexpected error getting the user's location", t)
             lastKnownLocation?.let { Success(it.toSharedLocation()) } ?: Failure(t)
@@ -175,7 +170,7 @@ object TestLocationProvider : LocationProvider {
 
     override fun requestLocationPermission() {}
 
-    override suspend fun tryToGetLocation(timeout: Duration): LocationCheckResult {
+    override suspend fun tryToGetLocation(): LocationCheckResult {
         return NoProvider
     }
 }

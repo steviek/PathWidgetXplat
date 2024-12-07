@@ -132,6 +132,6 @@ object Stations {
     private fun Station.distanceTo(location: Location): Double {
         val dLatitude = coordinates.latitude - location.latitude
         val dLongitude = coordinates.longitude - location.longitude
-        return dLatitude * dLatitude + dLongitude * dLongitude
+        return (dLatitude * dLatitude) + (dLongitude * dLongitude)
     }
 }

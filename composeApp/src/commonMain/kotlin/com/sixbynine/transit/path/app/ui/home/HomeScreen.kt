@@ -114,7 +114,7 @@ private fun HomeScreenScope.MainContent(modifier: Modifier) {
                 )
             }
 
-            state.hasError && (state.data == null || state.data?.stations?.isEmpty() == true) -> {
+            state.hasError && state.data?.stations.isNullOrEmpty() -> {
                 ErrorState(isPathApiError = state.isPathApiBusted)
             }
 
@@ -137,6 +137,14 @@ private fun HomeScreenScope.MainContent(modifier: Modifier) {
                     ) {
                         Text(stringResource(if (state.isEditing) string.done else string.edit))
                     }
+                }
+
+                state.data?.globalAlerts?.forEach {
+                    AlertBox(
+                        text = it.text,
+                        url = it.url,
+                        colors = if (it.isWarning) AlertBoxColors.Warning else AlertBoxColors.Info,
+                    )
                 }
 
                 DepartureBoard()

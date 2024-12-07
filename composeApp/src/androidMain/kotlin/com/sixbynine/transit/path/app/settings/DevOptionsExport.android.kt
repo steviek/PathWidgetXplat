@@ -27,7 +27,7 @@ actual fun exportDevLogs(logs: List<LogRecord>) {
             writer.write(",")
             writer.write(log.level.toString())
             writer.write(",")
-            writer.write(log.message)
+            writer.write(log.message.replace(",", "\",\""))
             writer.newLine()
         }
     }

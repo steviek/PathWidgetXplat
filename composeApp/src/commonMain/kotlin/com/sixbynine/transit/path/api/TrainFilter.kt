@@ -1,5 +1,6 @@
 package com.sixbynine.transit.path.api
 
+import com.sixbynine.transit.path.app.ui.home.HomeScreenContract
 import com.sixbynine.transit.path.preferences.IntPersistable
 import com.sixbynine.transit.path.widget.WidgetData
 
@@ -10,6 +11,16 @@ enum class TrainFilter(override val number: Int) : IntPersistable {
         fun matchesFilter(
             origin: Station,
             train: WidgetData.TrainData,
+            filter: TrainFilter
+        ): Boolean {
+            if (filter == All) return true
+            val destination = Stations.fromHeadSign(train.title) ?: return true
+            return matchesFilter(origin, destination, filter)
+        }
+
+        fun matchesFilter(
+            origin: Station,
+            train: HomeScreenContract.TrainData,
             filter: TrainFilter
         ): Boolean {
             if (filter == All) return true

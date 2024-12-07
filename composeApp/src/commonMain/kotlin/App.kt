@@ -1,5 +1,5 @@
-
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import com.sixbynine.transit.path.app.ui.advancedsettings.AdvancedSettingsScreen
@@ -17,6 +18,7 @@ import com.sixbynine.transit.path.app.ui.settings.SettingScreen
 import com.sixbynine.transit.path.app.ui.setup.SetupScreen
 import com.sixbynine.transit.path.app.ui.station.StationScreen
 import com.sixbynine.transit.path.app.ui.theme.AppTheme
+import com.sixbynine.transit.path.app.ui.theme.Dimensions.isTablet
 import moe.tlaster.precompose.PreComposeApp
 import moe.tlaster.precompose.navigation.NavHost
 import moe.tlaster.precompose.navigation.Navigator
@@ -27,37 +29,42 @@ import moe.tlaster.precompose.navigation.rememberNavigator
 fun App() {
     PreComposeApp {
         val navigator = rememberNavigator()
-        CompositionLocalProvider(LocalNavigator provides navigator) {
-            AppTheme {
-                NavHost(
-                    modifier = Modifier
-                        .background(colorScheme.background)
-                        .windowInsetsPadding(
-                            WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)
-                        )
-                        .fillMaxSize(),
-                    navigator = navigator,
-                    initialRoute = "/home"
-                ) {
-                    scene("/setup") {
-                        SetupScreen()
-                    }
+        BoxWithConstraints {
+            CompositionLocalProvider(
+                LocalNavigator provides navigator,
+                LocalIsTablet provides isTablet()
+            ) {
+                AppTheme {
+                    NavHost(
+                        modifier = Modifier
+                            .background(colorScheme.background)
+                            .windowInsetsPadding(
+                                WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)
+                            )
+                            .fillMaxSize(),
+                        navigator = navigator,
+                        initialRoute = "/home"
+                    ) {
+                        scene("/setup") {
+                            SetupScreen()
+                        }
 
-                    scene("/home") {
-                        HomeScreen()
-                    }
+                        scene("/home") {
+                            HomeScreen()
+                        }
 
-                    scene("/station/{id}") { backStackEntry ->
-                        val stationId: String? = backStackEntry.path<String>("id")
-                        StationScreen(stationId)
-                    }
+                        scene("/station/{id}") { backStackEntry ->
+                            val stationId: String? = backStackEntry.path<String>("id")
+                            StationScreen(stationId)
+                        }
 
-                    scene("/settings") {
-                        SettingScreen()
-                    }
+                        scene("/settings") {
+                            SettingScreen()
+                        }
 
-                    scene("/advanced_settings") {
-                        AdvancedSettingsScreen()
+                        scene("/advanced_settings") {
+                            AdvancedSettingsScreen()
+                        }
                     }
                 }
             }
@@ -66,3 +73,4 @@ fun App() {
 }
 
 val LocalNavigator = staticCompositionLocalOf<Navigator> { error("Navigator not found") }
+val LocalIsTablet = compositionLocalOf { false }

@@ -1,3 +1,3 @@
 package com.sixbynine.transit.path.platform
 
-actual val IsDebug: Boolean = true
+actual val IsDebug: Boolean = false

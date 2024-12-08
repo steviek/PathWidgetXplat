@@ -116,7 +116,7 @@ struct DepartureBoardView: View {
     }
 
     private func footerTextFits(_ text: String) -> Bool {
-        let maxWidth = entry.size.width - 64 - 24 - 8
+        let maxWidth = entry.size.width - (64 + 24 + 16)
         return measureTextWidth(maxSize: entry.size, text: text, font: UIFont.systemFont(ofSize: 12)) <= maxWidth
 
     }

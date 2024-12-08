@@ -343,7 +343,8 @@ object TrainBackfillHelper {
             lineIdToEarliestTrain.forEach eachHeadSign@{ (lineId, earliestTrain) ->
                 val checkpointsInLine = LineIdToCheckpointsFaster[lineId] ?: run {
                     if (ShouldLog) {
-                        Logging.d("\tBackfill: No checkpoints for ${station.displayName} for $lineId!")
+                        Logging.d("    Backfill: No checkpoints for ${station.displayName} for" +
+                                "$lineId!")
                     }
                     return@eachHeadSign
                 }
@@ -394,8 +395,8 @@ object TrainBackfillHelper {
                                 if (currentTrains.none { trainMatches(it) }) {
                                     if (ShouldLog) {
                                         Logging.d(
-                                            "\tBackfilling ${station.displayName} with a train from " +
-                                                    "${priorStation.displayName} to $lineId" +
+                                            "    Backfilling ${station.displayName} with a train " +
+                                                    "from ${priorStation.displayName} to $lineId" +
                                                     " hypothetically departing at " +
                                                     "${hypotheticalTrain.projectedArrival}," +
                                                     "train going to $trainTerminalStation"
@@ -407,9 +408,9 @@ object TrainBackfillHelper {
                                 } else {
                                     if (ShouldLog) {
                                         Logging.d(
-                                            "\tSkip backfilling ${station.displayName} with a train from " +
-                                                    "${priorStation.displayName} to $lineId" +
-                                                    " hypothetically departing at " +
+                                            "    Skip backfilling ${station.displayName} with a " +
+                                                    "train from ${priorStation.displayName} to " +
+                                                    "$lineId hypothetically departing at " +
                                                     "${hypotheticalTrain.projectedArrival}"
                                         )
                                     }

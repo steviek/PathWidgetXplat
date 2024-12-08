@@ -16,10 +16,8 @@ import platform.UIKit.UIWindow
 @OptIn(BetaInteropApi::class)
 actual fun exportDevLogs(logs: List<LogRecord>) {
     val csvString =
-        logs.joinToString(separator = "\n", prefix = "timestamp,level,message\n") {
-            it.timestamp.toString() + "," +
-                    it.level.toString() + "," +
-                    it.message.replace(",", "\",\"")
+        logs.joinToString(separator = "\n", prefix = "timestamp\tlevel\tmessage\n") {
+            it.timestamp.toString() + "\t" + it.level.toString() + "\t" + it.message
         }
 
     val cacheDirectory =
@@ -29,7 +27,7 @@ actual fun exportDevLogs(logs: List<LogRecord>) {
             .firstNotNullOfOrNull { it as? NSURL }
             ?: return
 
-    val filePath = NSURL.fileURLWithPath("logs.csv", relativeToURL = cacheDirectory)
+    val filePath = NSURL.fileURLWithPath("logs.tsv", relativeToURL = cacheDirectory)
 
     NSString.create(format = csvString)
         .writeToURL(filePath, atomically = true)

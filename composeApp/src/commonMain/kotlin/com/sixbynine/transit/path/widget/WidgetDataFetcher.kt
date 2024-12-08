@@ -56,6 +56,7 @@ import kotlinx.datetime.DayOfWeek.SUNDAY
 import kotlinx.datetime.Instant
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TimeSource.Monotonic
@@ -187,7 +188,7 @@ object WidgetDataFetcher {
                     else -> {
                         val mark = Monotonic.markNow()
                         val locationResult = try {
-                            withTimeout(3.seconds) { LocationProvider().tryToGetLocation() }
+                            withTimeout(800.milliseconds) { LocationProvider().tryToGetLocation() }
                         } catch (e: TimeoutCancellationException) {
                             Logging.w("Timed out trying to get the user's location")
                             Failure(e)

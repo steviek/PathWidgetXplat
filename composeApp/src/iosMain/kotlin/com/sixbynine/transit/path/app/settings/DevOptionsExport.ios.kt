@@ -1,7 +1,9 @@
 package com.sixbynine.transit.path.app.settings
 
 import com.sixbynine.transit.path.LogRecord
+import com.sixbynine.transit.path.time.NewYorkTimeZone
 import kotlinx.cinterop.BetaInteropApi
+import kotlinx.datetime.toLocalDateTime
 import platform.Foundation.NSCachesDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSString
@@ -17,7 +19,9 @@ import platform.UIKit.UIWindow
 actual fun exportDevLogs(logs: List<LogRecord>) {
     val csvString =
         logs.joinToString(separator = "\n", prefix = "timestamp\tlevel\tmessage\n") {
-            it.timestamp.toString() + "\t" + it.level.toString() + "\t" + it.message
+            it.timestamp.toLocalDateTime(NewYorkTimeZone).toString() +
+                    "\t" + it.level.toString() +
+                    "\t" + it.message
         }
 
     val cacheDirectory =

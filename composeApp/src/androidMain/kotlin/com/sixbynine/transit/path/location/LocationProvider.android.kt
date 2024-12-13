@@ -20,7 +20,9 @@ import com.sixbynine.transit.path.location.LocationCheckResult.Success
 import com.sixbynine.transit.path.util.DataResult
 import com.sixbynine.transit.path.util.IsTest
 import com.sixbynine.transit.path.util.stateFlowOf
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -30,6 +32,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeout
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.nanoseconds
 
@@ -80,7 +83,7 @@ object AndroidLocationProvider : LocationProvider {
         activity.requestLocationPermissions()
     }
 
-    override suspend fun tryToGetLocation(): LocationCheckResult {
+    override suspend fun tryToGetLocation(timeout: Duration): LocationCheckResult {
         if (locationManager == null || VERSION.SDK_INT < 23) {
             return NoProvider
         }
@@ -105,17 +108,22 @@ object AndroidLocationProvider : LocationProvider {
         Logging.d("Last known location is ${lastKnownLocation?.toLatLngStringWithGoogleApiLink()}")
 
         return try {
-            val currentLocation = locationManager.getCurrentLocation(provider)
-                ?: return lastKnownLocation?.let { Success(it.toSharedLocation()) }
-                    ?: Failure(RuntimeException("android returned null location for user"))
-            Logging.d(
-                "Retrieved current location as " +
-                        "${currentLocation.toLatLngStringWithGoogleApiLink()} from $provider"
-            )
-            Success(currentLocation.toSharedLocation())
+            withTimeout(timeout) {
+                val currentLocation = locationManager.getCurrentLocation(provider)
+                    ?: return@withTimeout lastKnownLocation?.let { Success(it.toSharedLocation()) }
+                        ?: Failure(RuntimeException("android returned null location for user"))
+                Logging.d(
+                    "Retrieved current location as " +
+                            "${currentLocation.toLatLngStringWithGoogleApiLink()} from $provider"
+                )
+                Success(currentLocation.toSharedLocation())
+            }
+        } catch (e : TimeoutCancellationException) {
+            Failure(e)
+        } catch (e: CancellationException) {
+            throw e
         } catch (t: Throwable) {
-            Logging.w("Unexpected error getting the user's location", t)
-            lastKnownLocation?.let { Success(it.toSharedLocation()) } ?: Failure(t)
+            Failure(t)
         }
     }
 
@@ -168,7 +176,7 @@ object TestLocationProvider : LocationProvider {
 
     override fun requestLocationPermission() {}
 
-    override suspend fun tryToGetLocation(): LocationCheckResult {
+    override suspend fun tryToGetLocation(timeout: Duration): LocationCheckResult {
         return NoProvider
     }
 }

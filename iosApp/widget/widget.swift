@@ -95,10 +95,12 @@ struct Provider: AppIntentTimelineProvider {
         var date = now
 
         for _ in 0..<count {
-            widgetData = WidgetDataFetcher().prunePassedDepartures(
-                data: widgetData,
-                time: date.toKotlinInstant()
-            )
+            if (!context.isPreview) {
+                widgetData = WidgetDataFetcher().prunePassedDepartures(
+                    data: widgetData,
+                    time: date.toKotlinInstant()
+                )
+            }
             entries.append(
                 SimpleEntry(
                     date: date,
@@ -137,7 +139,7 @@ struct widget: Widget {
             provider: Provider()
         ) { entry in
             ZStack {
-                if (showEmptyView(entry)) {
+                if showEmptyView(entry) {
                     EmptyDepartureBoardView(isError: false, isPathError: false)
                 } else if entry.hasError, entry.data?.stations.isEmpty != false {
                     EmptyDepartureBoardView(isError: true, isPathError: entry.hasPathError)
@@ -150,6 +152,7 @@ struct widget: Widget {
     }
 
     private func showEmptyView(_ entry: SimpleEntry) -> Bool {
+    
         let choices = entry.configuration.stations
         if choices.count >= 2 {
             return false

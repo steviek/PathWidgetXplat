@@ -14,6 +14,7 @@ import com.sixbynine.transit.path.util.JsonFormat
 import com.sixbynine.transit.path.util.Staleness
 import com.sixbynine.transit.path.util.readRemoteFile
 import com.sixbynine.transit.path.util.suspendRunCatching
+import kotlinx.coroutines.CoroutineStart.LAZY
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.sync.Mutex
@@ -48,7 +49,7 @@ object PathRepository {
             return it
         }
 
-        return IoScope.async {
+        return IoScope.async(start = LAZY) {
             val fetch = mutex.withLock {
                 ongoingFetch?.takeIf { it.isActive }?.let {
                     Logging.d("Join existing fetch")

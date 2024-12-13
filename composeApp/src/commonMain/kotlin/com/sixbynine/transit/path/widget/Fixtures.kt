@@ -18,7 +18,30 @@ object Fixtures {
                 WidgetData.StationData(
                     id = "JSQ",
                     displayName = "Journal Square",
-                    signs = emptyList(),
+                    signs = listOf(
+                        WidgetData.SignData(
+                            title = "WTC",
+                            colors = Colors.NwkWtc,
+                            lines = setOf(NewarkWtc),
+                            projectedArrivals = listOf(
+                                now + 1.minutes,
+                                now + 6.minutes,
+                                now + 11.minutes
+                            )
+                        ),
+                        WidgetData.SignData(
+                            title = "NWK",
+                            colors = Colors.NwkWtc,
+                            lines = setOf(NewarkWtc),
+                            projectedArrivals = listOf(now + 2.minutes, now + 7.minutes)
+                        ),
+                        WidgetData.SignData(
+                            title = "33S",
+                            colors = Colors.Jsq33s,
+                            lines = setOf(JournalSquare33rd),
+                            projectedArrivals = listOf(now + 3.minutes, now + 13.minutes)
+                        ),
+                    ),
                     trains = listOf(
                         WidgetData.TrainData(
                             id = "JSQ:1",
@@ -54,7 +77,20 @@ object Fixtures {
                 WidgetData.StationData(
                     id = "WTC",
                     displayName = "World Trade Center",
-                    signs = emptyList(),
+                    signs = listOf(
+                        WidgetData.SignData(
+                            title = "HOB",
+                            colors = Colors.HobWtc,
+                            lines = setOf(HobokenWtc),
+                            projectedArrivals = listOf(now, now + 7.minutes)
+                        ),
+                        WidgetData.SignData(
+                            title = "NWK",
+                            colors = Colors.NwkWtc,
+                            lines = setOf(NewarkWtc),
+                            projectedArrivals = listOf(now + 3.minutes, now + 8.minutes)
+                        )
+                    ),
                     trains = listOf(
                         WidgetData.TrainData(
                             id = "WTC:1",
@@ -90,7 +126,19 @@ object Fixtures {
                 WidgetData.StationData(
                     id = "NWK",
                     displayName = "Newark",
-                    signs = emptyList(),
+                    signs = listOf(
+                        WidgetData.SignData(
+                            title = "WTC",
+                            colors = Colors.NwkWtc,
+                            lines = setOf(NewarkWtc),
+                            projectedArrivals = listOf(
+                                now,
+                                now + 2.minutes,
+                                now + 5.minutes,
+                                now + 8.minutes
+                            ),
+                        )
+                    ),
                     trains = listOf(
                         WidgetData.TrainData(
                             id = "NWK:1",
@@ -126,7 +174,24 @@ object Fixtures {
                 WidgetData.StationData(
                     id = "33S",
                     displayName = "33rd Street",
-                    signs = emptyList(),
+                    signs = listOf(
+                        WidgetData.SignData(
+                            title = "HOB",
+                            colors = Colors.Hob33s,
+                            lines = setOf(Hoboken33rd),
+                            projectedArrivals = listOf(now + 1.minutes, now + 6.minutes),
+                        ),
+                        WidgetData.SignData(
+                            title = "JSQ",
+                            colors = Colors.Jsq33s,
+                            lines = setOf(JournalSquare33rd),
+                            projectedArrivals = listOf(
+                                now + 3.minutes,
+                                now + 7.minutes,
+                                now + 11.minutes
+                            ),
+                        )
+                    ),
                     trains = listOf(
                         WidgetData.TrainData(
                             id = "33S:1",

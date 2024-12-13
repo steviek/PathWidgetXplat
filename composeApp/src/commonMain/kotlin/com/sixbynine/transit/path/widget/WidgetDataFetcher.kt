@@ -46,7 +46,6 @@ import com.sixbynine.transit.path.util.suspendRunCatching
 import kotlinx.coroutines.CoroutineStart.LAZY
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -187,16 +186,14 @@ object WidgetDataFetcher {
 
                     else -> {
                         val mark = Monotonic.markNow()
-                        val locationResult = try {
-                            withTimeout(800.milliseconds) { LocationProvider().tryToGetLocation() }
-                        } catch (e: TimeoutCancellationException) {
-                            Logging.w("Timed out trying to get the user's location")
-                            Failure(e)
-                        }
+                        val locationResult = LocationProvider().tryToGetLocation(800.milliseconds)
 
                         when (locationResult) {
                             NoPermission, NoProvider -> null
-                            is Failure -> lastClosestStations
+                            is Failure -> {
+                                Logging.w("Failed to get location", locationResult.throwable)
+                                lastClosestStations
+                            }
                             is Success -> {
                                 Stations.byProximityTo(locationResult.location)
                                     .also {

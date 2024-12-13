@@ -6,12 +6,15 @@ import com.sixbynine.transit.path.location.IosLocationProvider.IosLocationAuthor
 import com.sixbynine.transit.path.location.IosLocationProvider.IosLocationAuthorizationStatus.NotDetermined
 import com.sixbynine.transit.path.location.IosLocationProvider.IosLocationAuthorizationStatus.Restricted
 import com.sixbynine.transit.path.location.IosLocationProvider.IosLocationAuthorizationStatus.WhenInUse
+import com.sixbynine.transit.path.location.LocationCheckResult.Failure
 import com.sixbynine.transit.path.util.DataResult
 import com.sixbynine.transit.path.util.launchAndReturnUnit
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -20,7 +23,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import platform.CoreLocation.CLLocationManager
+import kotlin.time.Duration
 
 @Suppress("unused")
 object IosLocationProvider : LocationProvider {
@@ -50,15 +56,30 @@ object IosLocationProvider : LocationProvider {
         requestDelegate?.requestLocationPermission()
     }
 
-    override suspend fun tryToGetLocation(): LocationCheckResult {
+    override suspend fun tryToGetLocation(timeout: Duration): LocationCheckResult {
         locationRequest?.takeIf { it.isActive }?.let { return it.await() }
 
         val deferredRequest = CompletableDeferred<LocationCheckResult>()
         locationRequest = deferredRequest
 
-        requestDelegate?.requestLocation()
+        Logging.d("Start a new location request")
+        withContext(Dispatchers.Main) {
+            requestDelegate?.requestLocation()
+        }
 
-        return deferredRequest.await()
+        return try {
+            withTimeout(timeout) {
+                deferredRequest.await()
+            }
+        } catch (e: TimeoutCancellationException) {
+            Failure(e)
+        } catch (e : CancellationException) {
+            locationRequest?.cancel(e)
+            locationRequest = null
+            throw e
+        } catch (e: Exception) {
+            Failure(e)
+        }
     }
 
     fun onAuthorizationChanged(
@@ -74,6 +95,7 @@ object IosLocationProvider : LocationProvider {
     }
 
     fun onLocationCheckCompleted(result: LocationCheckResult) {
+        Logging.d("iOS called back for location with $result")
         locationRequest?.complete(result)
     }
 

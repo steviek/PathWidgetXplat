@@ -284,7 +284,15 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
                             .filter { train ->
                                 SettingsManager.lineFilter.value.any { it.matches(train) }
                             }
-                            .filter(StationLimitFilter(SettingsManager.stationLimit.value))
+                            .let {
+                                if (SettingsManager.groupTrains.value) {
+                                    it
+                                } else {
+                                    it.filter(
+                                        StationLimitFilter(SettingsManager.stationLimit.value),
+                                    )
+                                }
+                            }
                             .map { train ->
                                 train.copy(
                                     displayText = trainDisplayTime(

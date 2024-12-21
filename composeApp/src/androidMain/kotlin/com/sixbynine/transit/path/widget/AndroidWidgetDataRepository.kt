@@ -7,6 +7,7 @@ import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.StationSort.Alphabetical
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.TrainFilter
+import com.sixbynine.transit.path.app.lifecycle.AppLifecycleObserver
 import com.sixbynine.transit.path.util.DataResult
 import com.sixbynine.transit.path.util.FetchWithPrevious
 import com.sixbynine.transit.path.util.Staleness
@@ -57,7 +58,7 @@ object AndroidWidgetDataRepository {
             getDataResult(
                 startFetch(
                     force = false,
-                    canRefreshLocation = false
+                    canRefreshLocation = false,
                 ).previous?.value
             )
         )
@@ -71,7 +72,11 @@ object AndroidWidgetDataRepository {
     init {
         GlobalScope.launch {
             if (!hasLoadedOnce) {
-                refreshWidgetData(force = false, canRefreshLocation = false)
+                refreshWidgetData(
+                    force = false,
+                    canRefreshLocation = false,
+                    isBackgroundUpdate = !AppLifecycleObserver.isActive.value
+                )
             }
         }
     }
@@ -90,12 +95,16 @@ object AndroidWidgetDataRepository {
         }
     }
 
-    suspend fun refreshWidgetData(force: Boolean, canRefreshLocation: Boolean) = coroutineScope {
+    suspend fun refreshWidgetData(
+        force: Boolean,
+        canRefreshLocation: Boolean,
+        isBackgroundUpdate: Boolean,
+    ) = coroutineScope {
         if (isLoading && hasLoadedOnce) {
             return@coroutineScope
         }
 
-        val (fetch, previous) = startFetch(force, canRefreshLocation)
+        val (fetch, previous) = startFetch(force, canRefreshLocation, isBackgroundUpdate)
 
         hasLoadedOnce = true
         isLoading = true
@@ -117,7 +126,8 @@ object AndroidWidgetDataRepository {
 
     private suspend fun startFetch(
         force: Boolean,
-        canRefreshLocation: Boolean
+        canRefreshLocation: Boolean,
+        isBackgroundUpdate: Boolean = !AppLifecycleObserver.isActive.value,
     ): FetchWithPrevious<WidgetData> {
         val anyWidgetsUseLocation =
             WidgetConfigurationManager.getWidgetConfigurations().values.any { it.useClosestStation }
@@ -130,6 +140,7 @@ object AndroidWidgetDataRepository {
             filter = TrainFilter.All,
             includeClosestStation = anyWidgetsUseLocation,
             canRefreshLocation = canRefreshLocation,
+            isBackgroundUpdate = isBackgroundUpdate,
             staleness = Staleness(
                 staleAfter = if (force) 5.seconds else 30.seconds,
                 invalidAfter = Duration.INFINITE, // Always show old data while loading widget.

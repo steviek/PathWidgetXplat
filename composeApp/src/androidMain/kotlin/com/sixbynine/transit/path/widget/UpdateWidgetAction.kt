@@ -11,6 +11,10 @@ class UpdateWidgetAction : ActionCallback {
         glanceId: GlanceId,
         parameters: ActionParameters
     ) {
-        AndroidWidgetDataRepository.refreshWidgetData(force = true, canRefreshLocation = true)
+        AndroidWidgetDataRepository.refreshWidgetData(
+            force = true,
+            canRefreshLocation = true,
+            isBackgroundUpdate = false
+        )
     }
 }

@@ -117,12 +117,7 @@ object WidgetDataFetcher {
         )
         GlobalScope.launch {
             fetch.await().onSuccess(onSuccess).onFailure { error, hadInternet, data ->
-                onFailure(
-                    error,
-                    hadInternet,
-                    error is PathApiException,
-                    data,
-                )
+                onFailure(error, hadInternet, error is PathApiException, data)
             }
         }
         return previous
@@ -137,6 +132,7 @@ object WidgetDataFetcher {
         includeClosestStation: Boolean,
         staleness: Staleness,
         canRefreshLocation: Boolean = true,
+        isBackgroundUpdate: Boolean = false,
         now: Instant = now(),
     ): FetchWithPrevious<WidgetData> {
         Logging.d("Fetch widget data with previous, includeClosestStation = $includeClosestStation")
@@ -245,11 +241,22 @@ object WidgetDataFetcher {
                     }
 
                     live.isFailure() && live.data != null -> {
-                        DataResult.failure(
-                            error = live.error,
-                            hadInternet = live.hadInternet,
-                            data = widgetData
-                        )
+                        if (isBackgroundUpdate && widgetData != null && !live.hadInternet) {
+                            // If this is a background update and we weren't given internet access,
+                            // this is likely just the Android widget being throttled by the system.
+                            // Let's treat it as success and just re-use the previous data.
+                            Logging.d(
+                                "Re-using previous data since the system denied us internet " +
+                                        "during a background update",
+                            )
+                            DataResult.success(widgetData)
+                        } else {
+                            DataResult.failure(
+                                error = live.error,
+                                hadInternet = live.hadInternet,
+                                data = widgetData
+                            )
+                        }
                     }
 
                     scheduled?.isFailure() == true -> {

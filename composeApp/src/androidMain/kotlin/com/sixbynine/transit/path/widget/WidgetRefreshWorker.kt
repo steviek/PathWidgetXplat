@@ -43,7 +43,8 @@ class WidgetRefreshWorker(
 
         AndroidWidgetDataRepository.refreshWidgetData(
             force = false,
-            canRefreshLocation = canRefreshLocation
+            canRefreshLocation = canRefreshLocation,
+            isBackgroundUpdate = true,
         )
 
         // I have a hunch that things are getting killed/cancelled too quickly, so keep us alive a

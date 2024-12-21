@@ -16,10 +16,9 @@ import com.sixbynine.transit.path.api.PathApi
 import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.util.Staleness
 import com.sixbynine.transit.path.util.await
+import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.toJavaDuration
 
 class WidgetRefreshWorker(
     context: Context,
@@ -67,7 +66,7 @@ class WidgetRefreshWorker(
 
             val workManager = WorkManager.getInstance(context)
             val workRequest =
-                PeriodicWorkRequestBuilder<WidgetRefreshWorker>(15.minutes.toJavaDuration())
+                PeriodicWorkRequestBuilder<WidgetRefreshWorker>(15, TimeUnit.MINUTES)
                     .setConstraints(
                         Constraints.Builder()
                             .setRequiresBatteryNotLow(true)

@@ -157,8 +157,8 @@ class GroupedWidgetLayoutHelper(
     }
 
     companion object {
-        private val relSubtextPrefix = localizedString(en = "also in ", es = "también en ")
-        private val clockSubtextPrefix = localizedString(en = "also at ", es = "también a las ")
+        private val relSubtextPrefix = localizedString(en = "also in ", es = "y en ")
+        private val clockSubtextPrefix = localizedString(en = "also at ", es = "y a las ")
 
         fun joinAdditionalTimes(
             timeDisplay: TimeDisplay,

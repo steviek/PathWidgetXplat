@@ -55,6 +55,7 @@
     <string name="no_internet">Sin Internet</string>
     <string name="ok">OK</string>
     <string name="open_in_browser">Abrir en navegador</string>
+    <string name="other_trains">Trenes adicionales</string>
     <string name="path_api_busted">El servicio de salidas en vivo de la Port Authority no está funcionando actualmente. Visualización de horarios programados.</string>
     <string name="path_api_busted_name">El servicio de salidas en vivo de la Port Authority no está funcionando actualmente. Visualización del horario %1$s.</string>
     <string name="presumed_train">Tren supuesto</string>

@@ -32,6 +32,7 @@ import com.sixbynine.transit.path.app.ui.station.StationContract.State
 import org.jetbrains.compose.resources.stringResource
 import pathwidgetxplat.composeapp.generated.resources.Res.string
 import pathwidgetxplat.composeapp.generated.resources.back
+import pathwidgetxplat.composeapp.generated.resources.other_trains
 
 @Composable
 fun StationScreen(stationId: String?) {
@@ -159,7 +160,7 @@ private fun LazyListScope.otherTrainsHeader() {
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             Text(
                 modifier = Modifier.padding(16.dp),
-                text = "Other trains",
+                text = stringResource(string.other_trains),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface,
             )

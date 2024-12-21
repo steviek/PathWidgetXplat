@@ -110,8 +110,8 @@ android {
         applicationId = "com.sixbynine.transit.path"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 48
-        versionName = "2024.12.07.2"
+        versionCode = 49
+        versionName = "2024.12.20"
         resourceConfigurations += setOf("en", "es")
     }
     buildFeatures {

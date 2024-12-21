@@ -16,7 +16,6 @@ import com.sixbynine.transit.path.api.PathApi
 import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.util.Staleness
 import com.sixbynine.transit.path.util.await
-import kotlinx.coroutines.delay
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -46,10 +45,6 @@ class WidgetRefreshWorker(
             canRefreshLocation = canRefreshLocation,
             isBackgroundUpdate = true,
         )
-
-        // I have a hunch that things are getting killed/cancelled too quickly, so keep us alive a
-        // little longer.
-        delay(10.seconds)
 
         return Result.success()
     }

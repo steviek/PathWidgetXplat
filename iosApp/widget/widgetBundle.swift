@@ -17,6 +17,7 @@ struct widgetBundle: WidgetBundle {
         let locationHelper = LocationHelper()
         locationHelper.isWidget = true
         IosLocationProvider().requestDelegate = locationHelper
+        NativeHolder().initialize(widgetReloader: IosWidgetReloader())
     }
 
     var body: some Widget {

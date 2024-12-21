@@ -42,6 +42,8 @@
 		AAD5000C2B72768800D6F505 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD5000B2B72768800D6F505 /* AppDelegate.swift */; };
 		AAD500102B72782000D6F505 /* FirebaseAnalyticsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = AAD5000F2B72782000D6F505 /* FirebaseAnalyticsSwift */; };
 		AAD500122B72783400D6F505 /* FirebasePerformance in Frameworks */ = {isa = PBXBuildFile; productRef = AAD500112B72783400D6F505 /* FirebasePerformance */; };
+		AAD56F262D0BF449001EE80B /* WidgetReloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD56F252D0BF449001EE80B /* WidgetReloader.swift */; };
+		AAD56F272D0BF449001EE80B /* WidgetReloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD56F252D0BF449001EE80B /* WidgetReloader.swift */; };
 		AAF007B32C4DC88600D54649 /* LocationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF007B22C4DC88600D54649 /* LocationHelper.swift */; };
 		AAF007B42C4DC88600D54649 /* LocationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF007B22C4DC88600D54649 /* LocationHelper.swift */; };
 /* End PBXBuildFile section */
@@ -104,6 +106,7 @@
 		AAB47C492B16625300079022 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		AAD500052B7275F400D6F505 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		AAD5000B2B72768800D6F505 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		AAD56F252D0BF449001EE80B /* WidgetReloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetReloader.swift; sourceTree = "<group>"; };
 		AAF007B22C4DC88600D54649 /* LocationHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationHelper.swift; sourceTree = "<group>"; };
 		AB3632DC29227652001CCB65 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -183,6 +186,7 @@
 				AAD5000B2B72768800D6F505 /* AppDelegate.swift */,
 				AA34DA362BB0F7F600DB50A0 /* Assets.xcassets */,
 				AAF007B22C4DC88600D54649 /* LocationHelper.swift */,
+				AAD56F252D0BF449001EE80B /* WidgetReloader.swift */,
 			);
 			path = iosApp;
 			sourceTree = "<group>";
@@ -406,6 +410,7 @@
 				2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */,
 				AAD5000C2B72768800D6F505 /* AppDelegate.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
+				AAD56F262D0BF449001EE80B /* WidgetReloader.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -414,6 +419,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AAB47C3E2B15ABB800079022 /* EmptyDepartureBoardView.swift in Sources */,
+				AAD56F272D0BF449001EE80B /* WidgetReloader.swift in Sources */,
 				AA9B5F862C233A6900251F59 /* StationTitle.swift in Sources */,
 				AAB47C442B15AD4000079022 /* FetchResult.swift in Sources */,
 				AA9B5F842C23383800251F59 /* ColorCircle.swift in Sources */,

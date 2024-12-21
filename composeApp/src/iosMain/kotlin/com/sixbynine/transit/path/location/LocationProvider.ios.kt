@@ -6,15 +6,17 @@ import com.sixbynine.transit.path.location.IosLocationProvider.IosLocationAuthor
 import com.sixbynine.transit.path.location.IosLocationProvider.IosLocationAuthorizationStatus.NotDetermined
 import com.sixbynine.transit.path.location.IosLocationProvider.IosLocationAuthorizationStatus.Restricted
 import com.sixbynine.transit.path.location.IosLocationProvider.IosLocationAuthorizationStatus.WhenInUse
-import com.sixbynine.transit.path.location.LocationCheckResult.Failure
+import com.sixbynine.transit.path.native.NativeHolder
+import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.util.DataResult
+import com.sixbynine.transit.path.util.globalDataStore
 import com.sixbynine.transit.path.util.launchAndReturnUnit
+import com.sixbynine.transit.path.widget.WidgetDataFetcher
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.IO
-import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -24,12 +26,23 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeout
+import kotlinx.datetime.Instant
 import platform.CoreLocation.CLLocationManager
-import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.TimeMark
+import kotlin.time.TimeSource.Monotonic
 
 @Suppress("unused")
 object IosLocationProvider : LocationProvider {
+    private val lastLocationRequestTimeKey = "location_lastRequestTime"
+    private var lastLocationRequestTime: Instant?
+        get() = globalDataStore()
+            .getLong(lastLocationRequestTimeKey)
+            ?.let { Instant.fromEpochMilliseconds(it) }
+        set(value) {
+            globalDataStore()[lastLocationRequestTimeKey] = value?.toEpochMilliseconds()
+        }
+
     private val _isLocationSupportedByDeviceFlow = MutableStateFlow(DataResult.loading<Boolean>())
     override val isLocationSupportedByDeviceFlow = _isLocationSupportedByDeviceFlow.asStateFlow()
 
@@ -41,7 +54,7 @@ object IosLocationProvider : LocationProvider {
 
     var requestDelegate: RequestDelegate? = null
 
-    private var locationRequest: CompletableDeferred<LocationCheckResult>? = null
+    private var locationRequest: LocationRequest? = null
 
     init {
         GlobalScope.launch(Dispatchers.IO) {
@@ -56,11 +69,19 @@ object IosLocationProvider : LocationProvider {
         requestDelegate?.requestLocationPermission()
     }
 
-    override suspend fun tryToGetLocation(timeout: Duration): LocationCheckResult {
-        locationRequest?.takeIf { it.isActive }?.let { return it.await() }
+    override suspend fun tryToGetLocation(): LocationCheckResult {
+        lastLocationRequestTime?.let {
+            if (now() - it <= 30.seconds) {
+                Logging.d("Skip location request, just checked")
+                return LocationCheckResult.JustChecked
+            }
+        }
 
-        val deferredRequest = CompletableDeferred<LocationCheckResult>()
+        locationRequest?.takeIf { it.deferred.isActive }?.let { return it.deferred.await() }
+
+        val deferredRequest = LocationRequest()
         locationRequest = deferredRequest
+        lastLocationRequestTime = now()
 
         Logging.d("Start a new location request")
         withContext(Dispatchers.Main) {
@@ -68,17 +89,10 @@ object IosLocationProvider : LocationProvider {
         }
 
         return try {
-            withTimeout(timeout) {
-                deferredRequest.await()
-            }
-        } catch (e: TimeoutCancellationException) {
-            Failure(e)
-        } catch (e : CancellationException) {
-            locationRequest?.cancel(e)
-            locationRequest = null
+            deferredRequest.deferred.await()
+        } catch (e: CancellationException) {
+            locationRequest?.deferred?.cancel(e)
             throw e
-        } catch (e: Exception) {
-            Failure(e)
         }
     }
 
@@ -96,7 +110,20 @@ object IosLocationProvider : LocationProvider {
 
     fun onLocationCheckCompleted(result: LocationCheckResult) {
         Logging.d("iOS called back for location with $result")
-        locationRequest?.complete(result)
+        val request = locationRequest ?: return
+
+        if (request.deferred.isActive) {
+            request.deferred.complete(result)
+        } else if (result is LocationCheckResult.Success) {
+            WidgetDataFetcher.onLocationReceived(
+                result.location,
+                request.timeMark.elapsedNow(),
+                isDuringFetch = false,
+            )
+            GlobalScope.launch(Dispatchers.Main) {
+                NativeHolder.widgetReloader.value?.reloadWidgets()
+            }
+        }
     }
 
     interface RequestDelegate {
@@ -110,6 +137,11 @@ object IosLocationProvider : LocationProvider {
     enum class IosLocationAuthorizationStatus {
         Always, WhenInUse, Denied, NotDetermined, Restricted
     }
+
+    private data class LocationRequest(
+        val deferred: CompletableDeferred<LocationCheckResult> = CompletableDeferred(),
+        val timeMark: TimeMark = Monotonic.markNow(),
+    )
 }
 
 actual fun LocationProvider(): LocationProvider = IosLocationProvider

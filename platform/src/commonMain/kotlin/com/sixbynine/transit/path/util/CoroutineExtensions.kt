@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.time.Duration
@@ -63,4 +64,15 @@ inline fun <T> Flow<T>.collectLatest(
     crossinline action: suspend (T) -> Unit
 ) {
     scope.launch { collectLatest { action(it) } }
+}
+
+suspend inline fun <T> withTimeoutCatching(
+    timeout: Duration,
+    crossinline block: suspend () -> T,
+): Result<T> {
+    return suspendRunCatching {
+        withTimeout(timeout) {
+            block()
+        }
+    }
 }

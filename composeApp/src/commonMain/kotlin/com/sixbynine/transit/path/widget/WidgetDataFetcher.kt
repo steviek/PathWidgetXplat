@@ -25,29 +25,33 @@ import com.sixbynine.transit.path.app.settings.AvoidMissingTrains.Always
 import com.sixbynine.transit.path.app.settings.AvoidMissingTrains.Disabled
 import com.sixbynine.transit.path.app.settings.AvoidMissingTrains.OffPeak
 import com.sixbynine.transit.path.app.settings.SettingsManager.currentAvoidMissingTrains
+import com.sixbynine.transit.path.location.Location
 import com.sixbynine.transit.path.location.LocationCheckResult.Failure
+import com.sixbynine.transit.path.location.LocationCheckResult.JustChecked
 import com.sixbynine.transit.path.location.LocationCheckResult.NoPermission
 import com.sixbynine.transit.path.location.LocationCheckResult.NoProvider
 import com.sixbynine.transit.path.location.LocationCheckResult.Success
 import com.sixbynine.transit.path.location.LocationProvider
-import com.sixbynine.transit.path.preferences.Preferences
-import com.sixbynine.transit.path.preferences.StringPreferencesKey
 import com.sixbynine.transit.path.time.NewYorkTimeZone
 import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.util.AgedValue
 import com.sixbynine.transit.path.util.DataResult
 import com.sixbynine.transit.path.util.FetchWithPrevious
 import com.sixbynine.transit.path.util.Staleness
+import com.sixbynine.transit.path.util.globalDataStore
 import com.sixbynine.transit.path.util.isFailure
 import com.sixbynine.transit.path.util.isSuccess
 import com.sixbynine.transit.path.util.onFailure
 import com.sixbynine.transit.path.util.onSuccess
 import com.sixbynine.transit.path.util.suspendRunCatching
+import com.sixbynine.transit.path.util.withTimeoutCatching
 import kotlinx.coroutines.CoroutineStart.LAZY
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import kotlinx.datetime.DayOfWeek.SATURDAY
@@ -62,17 +66,20 @@ import kotlin.time.TimeSource.Monotonic
 
 object WidgetDataFetcher {
 
-    private val lastClosestStationsKey = StringPreferencesKey("fetcher_lastClosestStations")
+    private val lastClosestStationsKey = "fetcher_lastClosestStations"
     private var lastClosestStations: List<Station>?
         get() {
-            val ids = Preferences()[lastClosestStationsKey]
+            val ids = globalDataStore().getString(lastClosestStationsKey)
             if (ids.isNullOrBlank()) return null
             return ids.split(",").mapNotNull { id -> Stations.byId(id) }
         }
         set(value) {
-            Preferences()[lastClosestStationsKey] =
+            globalDataStore()[lastClosestStationsKey] =
                 value.orEmpty().joinToString(separator = ",") { it.pathApiName }
         }
+
+    private val _nonFetchLocationReceived = MutableSharedFlow<Unit>()
+    val nonFetchLocationReceived = _nonFetchLocationReceived.asSharedFlow()
 
     @Suppress("UNUSED") // Used by swift code
     fun widgetFetchStaleness(force: Boolean): Staleness {
@@ -186,25 +193,27 @@ object WidgetDataFetcher {
 
                     else -> {
                         val mark = Monotonic.markNow()
-                        val locationResult = LocationProvider().tryToGetLocation(800.milliseconds)
+                        val locationResult =
+                            withTimeoutCatching(300.milliseconds) {
+                                LocationProvider().tryToGetLocation()
+                            }.getOrElse { Failure(it) }
 
                         when (locationResult) {
                             NoPermission, NoProvider -> null
+
+                            JustChecked -> lastClosestStations
+
                             is Failure -> {
                                 Logging.w("Failed to get location", locationResult.throwable)
                                 lastClosestStations
                             }
+
                             is Success -> {
-                                Stations.byProximityTo(locationResult.location)
-                                    .also {
-                                        Logging.d(
-                                            "Received current location as " +
-                                                    "${locationResult.location} in " +
-                                                    "${mark.elapsedNow()}, closest stations are" +
-                                                    " ${it.map { it.displayName }}"
-                                        )
-                                        lastClosestStations = it
-                                    }
+                                onLocationReceived(
+                                    locationResult.location,
+                                    mark.elapsedNow(),
+                                    isDuringFetch = true,
+                                )
                             }
                         }
                     }
@@ -484,5 +493,22 @@ object WidgetDataFetcher {
                 )
             }
         )
+    }
+
+    internal fun onLocationReceived(
+        location: Location,
+        duration: Duration,
+        isDuringFetch: Boolean
+    ): List<Station> {
+        return Stations.byProximityTo(location).also { stations ->
+            Logging.d(
+                "Received current location as $location in ${duration}, closest stations are " +
+                        stations.map { it.displayName }
+            )
+            lastClosestStations = stations
+            if (!isDuringFetch) {
+                _nonFetchLocationReceived.tryEmit(Unit)
+            }
+        }
     }
 }

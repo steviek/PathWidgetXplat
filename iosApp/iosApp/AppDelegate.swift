@@ -24,6 +24,8 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
         IosLocationProvider().requestDelegate = LocationHelper()
         
+        NativeHolder().initialize(widgetReloader: IosWidgetReloader())
+        
         return true
     }
     

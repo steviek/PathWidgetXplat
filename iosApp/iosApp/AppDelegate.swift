@@ -24,6 +24,12 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
         IosLocationProvider().requestDelegate = LocationHelper()
         
+        var firstDayOfWeek: String? = nil
+        if #available(iOS 16, *) {
+            firstDayOfWeek = Locale.current.firstDayOfWeek.rawValue
+        }
+        IOSPlatform().setFirstDayOfWeek(firstDayOfWeek: firstDayOfWeek)
+        
         NativeHolder().initialize(widgetReloader: IosWidgetReloader())
         
         return true
@@ -37,7 +43,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     
         let eventName = userInfo["event_name"] as! String
         userInfo.removeValue(forKey: "event_name")
-
+        
         FirebaseAnalytics.Analytics.logEvent(eventName, parameters: userInfo)
     }
 }

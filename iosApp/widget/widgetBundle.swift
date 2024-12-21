@@ -17,6 +17,13 @@ struct widgetBundle: WidgetBundle {
         let locationHelper = LocationHelper()
         locationHelper.isWidget = true
         IosLocationProvider().requestDelegate = locationHelper
+        
+        var firstDayOfWeek: String? = nil
+        if #available(iOS 16, *) {
+            firstDayOfWeek = Locale.current.firstDayOfWeek.rawValue
+        }
+        IOSPlatform().setFirstDayOfWeek(firstDayOfWeek: firstDayOfWeek)
+        
         NativeHolder().initialize(widgetReloader: IosWidgetReloader())
     }
 

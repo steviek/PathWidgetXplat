@@ -8,9 +8,7 @@ object NativeHolder {
 
     val widgetReloader = MutableStateFlow<WidgetReloader?>(null)
 
-    fun initialize(
-        widgetReloader: WidgetReloader
-    ) {
+    fun initialize(widgetReloader: WidgetReloader) {
         this.widgetReloader.value = widgetReloader
     }
 }

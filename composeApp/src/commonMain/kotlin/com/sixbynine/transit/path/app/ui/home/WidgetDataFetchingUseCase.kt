@@ -16,6 +16,7 @@ import com.sixbynine.transit.path.util.FetchWithPrevious
 import com.sixbynine.transit.path.util.Staleness
 import com.sixbynine.transit.path.util.awaitTrue
 import com.sixbynine.transit.path.util.collect
+import com.sixbynine.transit.path.util.collectIn
 import com.sixbynine.transit.path.util.collectLatest
 import com.sixbynine.transit.path.util.isFailure
 import com.sixbynine.transit.path.widget.WidgetData
@@ -83,6 +84,10 @@ class WidgetDataFetchingUseCase private constructor() {
                 // Force a refresh whenever location is enabled (with permission).
                 fetchData(force = true)
             }
+
+        WidgetDataFetcher.nonFetchLocationReceived.collectIn(scope) {
+            fetchData(force = false)
+        }
 
         fetchData.collectLatest(scope) {
             if (it.isFetching || it.hasError) return@collectLatest

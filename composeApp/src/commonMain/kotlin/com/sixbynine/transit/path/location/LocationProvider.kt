@@ -6,7 +6,6 @@ import com.sixbynine.transit.path.util.isLoading
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
-import kotlin.time.Duration
 
 interface LocationProvider {
     val isLocationSupportedByDeviceFlow: StateFlow<DataResult<Boolean>>
@@ -17,7 +16,7 @@ interface LocationProvider {
 
     fun requestLocationPermission()
 
-    suspend fun tryToGetLocation(timeout: Duration): LocationCheckResult
+    suspend fun tryToGetLocation(): LocationCheckResult
 }
 
 val LocationProvider.isLocationSupportedByDevice: Boolean
@@ -31,6 +30,7 @@ suspend fun LocationProvider.awaitIsLocationSupportedByDevice(): Boolean {
 sealed interface LocationCheckResult {
     data object NoPermission : LocationCheckResult
     data object NoProvider : LocationCheckResult
+    data object JustChecked : LocationCheckResult
     data class Failure(val throwable: Throwable) : LocationCheckResult
     data class Success(val location: Location) : LocationCheckResult {
         override fun toString() = "(${location.latitude}, ${location.longitude})"

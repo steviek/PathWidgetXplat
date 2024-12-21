@@ -20,6 +20,7 @@ class LocationHelper : NSObject, IosLocationProviderRequestDelegate, CLLocationM
         super.init()
 
         locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
     }
     
     func requestLocation() {

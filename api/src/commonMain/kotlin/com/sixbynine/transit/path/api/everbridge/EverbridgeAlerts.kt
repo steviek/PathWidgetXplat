@@ -65,7 +65,8 @@ fun EverbridgeAlert.isForStation(station: Station): Boolean {
         it.variableName.contains("elevator", true)
     }
     return elevatorDesc?.value?.get(0)?.contains(
-        station.displayName.split(" ")[0], false
+        "${station.displayName.split(" ")[0]}|${station.pathApiName}"
+            .toRegex(RegexOption.IGNORE_CASE)
     ) ?: false
 }
 

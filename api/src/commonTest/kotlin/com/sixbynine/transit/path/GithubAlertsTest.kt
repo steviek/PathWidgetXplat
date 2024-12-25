@@ -29,7 +29,6 @@ import kotlinx.datetime.Month.JANUARY
 import kotlinx.datetime.Month.JULY
 import kotlinx.datetime.Month.JUNE
 import kotlinx.datetime.Month.MAY
-import kotlinx.datetime.Month.NOVEMBER
 import kotlinx.serialization.encodeToString
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -42,7 +41,7 @@ class GithubAlertsTest {
         val alerts = GithubAlerts(
             GeneralOvernightCleaning,
             FourteenthStreetOvernight,
-            LaborDayOvernightCleaning,
+            ChristmasOvernightCleaning,
         )
 
         val json = JsonFormat.encodeToString(alerts)
@@ -281,17 +280,20 @@ class GithubAlertsTest {
             level = "WARN",
         )
 
-        val LaborDayOvernightCleaning = Alert(
+        val ChristmasOvernightCleaning = Alert(
             stations = listOf(NinthStreet, TwentyThirdStreet),
             schedule = Schedule(),
-            displaySchedule = Schedule.once(
-                from = LocalDateTime(2024, NOVEMBER, 29, 19, 0),
-                to = LocalDateTime(2024, DECEMBER, 2, 6, 0),
+            displaySchedule = Schedule.repeatingDaily(
+                days = DayOfWeek.values().toList(),
+                start = LocalTime(17, 0),
+                end = LocalTime(5, 0),
+                from = LocalDate(2024, DECEMBER, 23),
+                to = LocalDate(2025, JANUARY, 5),
             ),
             trains = TrainFilter(),
             message = AlertText(
-                en = "9 St. & 23 St. stations will remain open overnight during Thanksgiving Weekend",
-                es = "Las estaciones de 9 St. y 23 St. permanecerán abiertas durante la noche durante el fin de semana del Thanksgiving"
+                en = "9 St. & 23 St. stations will remain open overnight during the holiday season until January 6",
+                es = "Las estaciones de 9 St. y 23 St. permanecerán abiertas durante la noche hasta el 6 de enero"
             ),
             url = AlertText(
                 en = "https://www.panynj.gov/path/en/schedules-maps/weekend-schedules.html"
@@ -305,15 +307,15 @@ class GithubAlertsTest {
                 days = DayOfWeek.values().toList(),
                 start = LocalTime(0, 0),
                 end = LocalTime(5, 0),
-                from = LocalDate(2024, DECEMBER, 3),
+                from = LocalDate(2025, JANUARY, 6),
                 to = LocalDate(2025, DECEMBER, 31),
             ),
             displaySchedule = Schedule.repeatingDaily(
                 days = DayOfWeek.values().toList(),
                 start = LocalTime(17, 0),
                 end = LocalTime(5, 0),
-                from = LocalDate(2024, APRIL, 6),
-                to = LocalDate(2024, JUNE, 30),
+                from = LocalDate(2025, JANUARY, 5),
+                to = LocalDate(2025, DECEMBER, 30),
             ),
             trains = TrainFilter.all(),
             message = AlertText(
@@ -333,7 +335,7 @@ class GithubAlertsTest {
                 days = DayOfWeek.values().toList(),
                 start = LocalTime(22, 0),
                 end = LocalTime(7, 0),
-                from = LocalDate(2024, JANUARY, 1),
+                from = LocalDate(2024, JANUARY, 5),
                 to = LocalDate(2025, DECEMBER, 31),
             ),
             trains = TrainFilter(),

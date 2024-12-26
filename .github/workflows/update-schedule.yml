@@ -21,19 +21,19 @@ jobs:
         run: |
           cp schedule.json schedule-generator
           cp schedule_override.json schedule-generator
-          cd schedule-generator
 
       - name: install python packages
+        working-directory: schedule-generator
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: run script
+        working-directory: schedule-generator
         run: python index.py
 
       - name: put schedule in place
         run: |
-          cd ..
           mv schedule-generator/schedule.json .
           mv schedule-generator/schedule_override.json .
       

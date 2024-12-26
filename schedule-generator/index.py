@@ -60,7 +60,7 @@ def write_json(d: dict, file: str):
         if d != old_data:
             f.truncate(0)
             f.seek(0)
-            json.dump(d, f)
+            json.dump(d, f, separators=(',', ':'))
             return d
 
 if __name__ == "__main__":

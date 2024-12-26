@@ -40,6 +40,6 @@ jobs:
       - name: commit
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: Update scrape
-          commit_author: GitHub Actions <actions@github.com>
+          commit_message: 'chore: update schedules'
+          commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
           file_pattern: 'schedule*.json'

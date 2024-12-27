@@ -6,15 +6,14 @@ import com.sixbynine.transit.path.api.alerts.AlertText
 import com.sixbynine.transit.path.api.alerts.Schedule
 import com.sixbynine.transit.path.api.alerts.TrainFilter
 import com.sixbynine.transit.path.time.NewYorkTimeZone
+import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.util.InstantAsEpochMillisSerializer
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNames
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
+import kotlin.time.Duration.Companion.hours
 
 private const val PATH_ALERTS_URL = "https://www.panynj.gov/path/en/alerts.html"
 
@@ -66,12 +65,13 @@ data class Variable(
 
 fun EverbridgeAlert.isForStation(station: Station): Boolean {
     val elevatorDesc = incidentMessage.formVariableItems.firstOrNull {
-        it.variableName.contains("elevator", true)
+        it.variableName.contains("elevator", ignoreCase = true)
     }
-    return elevatorDesc?.value?.firstOrNull()?.contains(
-        "${station.displayName.split(" ")[0]}|${station.pathApiName}"
-            .toRegex(RegexOption.IGNORE_CASE)
-    ) ?: false
+    val elevatorValue = elevatorDesc?.value?.firstOrNull() ?: return false
+
+    val regex = "${station.displayName.split(" ").first()}|${station.pathApiName}"
+        .toRegex(RegexOption.IGNORE_CASE)
+    return elevatorValue.contains(regex)
 }
 
 fun EverbridgeAlert.isForLines(lineIds: List<Int>): Boolean {
@@ -85,8 +85,7 @@ fun EverbridgeAlert.toGithubAlert(): Alert {
         stations = emptyList(),
         schedule = Schedule.once(
             from = modifiedDate.toLocalDateTime(NewYorkTimeZone),
-            to = Clock.System.now().plus(1.toDuration(DurationUnit.HOURS))
-                .toLocalDateTime(NewYorkTimeZone)
+            to = now().plus(1.hours).toLocalDateTime(NewYorkTimeZone)
         ),
         trains = TrainFilter(),
         message = AlertText(incidentMessage.preMessage),
@@ -101,8 +100,7 @@ fun EverbridgeAlert.toGithubAlert(station: Station): Alert {
         stations = listOf(station),
         schedule = Schedule.once(
             from = modifiedDate.toLocalDateTime(NewYorkTimeZone),
-            to = Clock.System.now().plus(1.toDuration(DurationUnit.HOURS))
-                .toLocalDateTime(NewYorkTimeZone)
+            to = now().plus(1.hours).toLocalDateTime(NewYorkTimeZone)
         ),
         trains = TrainFilter(),
         message = AlertText(incidentMessage.preMessage),
@@ -111,19 +109,11 @@ fun EverbridgeAlert.toGithubAlert(station: Station): Alert {
 }
 
 fun EverbridgeAlerts.getAlertsForStation(station: Station): List<Alert> {
-    return data.filter {
-        it.isForStation(station)
-    }.map {
-        it.toGithubAlert(station)
-    }
+    return data.filter { it.isForStation(station) }.map { it.toGithubAlert(station) }
 }
 
 fun EverbridgeAlerts.getAlertsForLines(lineIds: List<Int>): List<Alert> {
-    return data.filter {
-        it.isForLines(lineIds)
-    }.map {
-        it.toGithubAlert()
-    }
+    return data.filter { it.isForLines(lineIds) }.map { it.toGithubAlert() }
 }
 
 fun lineToIndex(line: String): Int {

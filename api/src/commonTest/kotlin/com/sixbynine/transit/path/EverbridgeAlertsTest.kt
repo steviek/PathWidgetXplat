@@ -10,6 +10,7 @@ import com.sixbynine.transit.path.api.everbridge.Variable
 import com.sixbynine.transit.path.api.everbridge.getAlertsForLines
 import com.sixbynine.transit.path.api.everbridge.getAlertsForStation
 import com.sixbynine.transit.path.util.JsonFormat
+import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.Month.DECEMBER
 import kotlinx.datetime.Month.OCTOBER
@@ -85,8 +86,8 @@ class EverbridgeAlertsTest {
                     ),
                 )
             ),
-            createdDate = 1734988841776,
-            modifiedDate = 1734988841776
+            createdDate = Instant.fromEpochMilliseconds(1734988841776),
+            modifiedDate = Instant.fromEpochMilliseconds(1734988841776)
         )
         val NwkWtcDown = EverbridgeAlert(
             incidentMessage = IncidentMessage(
@@ -161,8 +162,8 @@ class EverbridgeAlertsTest {
                     )
                 )
             ),
-            createdDate = 1729533384417,
-            modifiedDate = 1729533384417
+            createdDate = Instant.fromEpochMilliseconds(1729533384417),
+            modifiedDate = Instant.fromEpochMilliseconds(1729533384417)
         )
     }
 }

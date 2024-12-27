@@ -64,7 +64,7 @@ fun EverbridgeAlert.isForStation(station: Station): Boolean {
     val elevatorDesc = incidentMessage.formVariableItems.firstOrNull {
         it.variableName.contains("elevator", true)
     }
-    return elevatorDesc?.value?.get(0)?.contains(
+    return elevatorDesc?.value?.firstOrNull()?.contains(
         "${station.displayName.split(" ")[0]}|${station.pathApiName}"
             .toRegex(RegexOption.IGNORE_CASE)
     ) ?: false

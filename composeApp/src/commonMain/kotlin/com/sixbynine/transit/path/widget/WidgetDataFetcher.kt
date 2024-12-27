@@ -13,6 +13,10 @@ import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.api.alerts.GithubAlerts
 import com.sixbynine.transit.path.api.alerts.GithubAlertsRepository
 import com.sixbynine.transit.path.api.alerts.hidesTrainAt
+import com.sixbynine.transit.path.api.everbridge.EverbridgeAlerts
+import com.sixbynine.transit.path.api.everbridge.EverbridgeAlertsRepository
+import com.sixbynine.transit.path.api.everbridge.getAlertsForLines
+import com.sixbynine.transit.path.api.everbridge.getAlertsForStation
 import com.sixbynine.transit.path.api.impl.SchedulePathApi
 import com.sixbynine.transit.path.api.isEastOf
 import com.sixbynine.transit.path.api.isInNewJersey
@@ -139,10 +143,12 @@ object WidgetDataFetcher {
         val (liveDepartures, previousDepartures) =
             PathApi.instance.getUpcomingDepartures(now, staleness)
         val (githubAlerts, previousGithubAlerts) = GithubAlertsRepository.getAlerts(now)
+        val (everbridgeAlerts, previousEverbridgeAlerts) = EverbridgeAlertsRepository.getAlerts(now)
 
         fun createWidgetData(
             data: DepartureBoardTrainMap,
             githubAlerts: GithubAlerts?,
+            everbridgeAlerts: EverbridgeAlerts?,
             closestStations: List<Station>?,
             isPathApiBroken: Boolean,
         ): WidgetData {
@@ -155,6 +161,7 @@ object WidgetDataFetcher {
                 filter,
                 closestStations,
                 githubAlerts,
+                everbridgeAlerts,
                 data,
                 isPathApiBroken
             )
@@ -170,6 +177,7 @@ object WidgetDataFetcher {
                 createWidgetData(
                     data.value,
                     previousGithubAlerts?.value,
+                    previousEverbridgeAlerts?.value,
                     lastClosestStations,
                     isPathApiBroken = false,
                 )
@@ -229,6 +237,7 @@ object WidgetDataFetcher {
                     createWidgetData(
                         data,
                         githubAlerts.await().data,
+                        everbridgeAlerts.await().data,
                         stationsByProximity,
                         isPathApiBroken = isPathApiBroken,
                     )
@@ -302,6 +311,7 @@ object WidgetDataFetcher {
         filter: TrainFilter,
         closestStations: List<Station>?,
         githubAlerts: GithubAlerts?,
+        everbridgeAlerts: EverbridgeAlerts?,
         data: DepartureBoardTrainMap,
         isPathApiBroken: Boolean,
     ): WidgetData {
@@ -320,6 +330,9 @@ object WidgetDataFetcher {
         for (station in adjustedStations) {
             val stationAlerts =
                 githubAlerts?.alerts?.filter { station.pathApiName in it.stations }.orEmpty()
+            val everbridgeStationAlerts =
+                everbridgeAlerts?.getAlertsForStation(station).orEmpty()
+
             val apiTrains =
                 data.getTrainsAt(station)
                     ?.filterNot { train ->
@@ -398,7 +411,7 @@ object WidgetDataFetcher {
                 signs = signs,
                 trains = trains,
                 state = station.state,
-                alerts = stationAlerts,
+                alerts = stationAlerts + everbridgeStationAlerts,
             )
         }
         val nextFetchTime =
@@ -409,6 +422,8 @@ object WidgetDataFetcher {
                 .minOrNull()
                 ?: (now + 15.minutes)
         val globalAlerts = githubAlerts?.alerts?.filter { it.isGlobal }.orEmpty()
+        val globalEverbridgeAlerts =
+            everbridgeAlerts?.getAlertsForLines(lines.map { it.number }).orEmpty()
         return WidgetData(
             fetchTime = now,
             stations = stationDatas.take(stationLimit),
@@ -416,7 +431,7 @@ object WidgetDataFetcher {
             closestStationId = closestStationToUse?.pathApiName,
             isPathApiBroken = isPathApiBroken,
             scheduleName = data.scheduleName,
-            globalAlerts = globalAlerts,
+            globalAlerts = globalAlerts + globalEverbridgeAlerts,
         )
     }
 

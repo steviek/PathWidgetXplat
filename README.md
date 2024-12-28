@@ -1,14 +1,19 @@
-# Departure Widget for PATH
+# Departures App for PATH
 
 This is a [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html) project targeting Android and iOS.
 
+The App UI is written in [Compose Multiplatform](https://www.jetbrains.com/compose-multiplatform/) with minimal platform-specific code.
+
+The widgets are native by necessity, and written in [SwiftUI](https://developer.apple.com/documentation/widgetkit/swiftui-views) on iOS and [Jetpack Glance](https://developer.android.com/develop/ui/compose/glance) for Android.
+
 ## Setup
 
-[Android Studio](https://developer.android.com/studio) Hedgehog or newer for editing the Kotlin code and running on Android. The JDK for the IDE should be Java 17.
+You can use any of the following options to work with the code here:
 
-[Xcode](https://developer.apple.com/xcode/) 15 or newer for editing the Swift code natively.
+- [Fleet](https://www.jetbrains.com/fleet/): Jetbrains' new multiplatform-first IDE that's capable of working with all the languages in the project and running both the Android and iOS apps
+- [Android Studio](https://developer.android.com/studio) Standard IDE for editing kotlin/Android code. With the [kotlin multiplatform plugin](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform), you can run the code on both Android and iOS
+- [Xcode](https://developer.apple.com/xcode/) allows for running the code on iOS, managing iOS simulators, and editing Swift code
 
-You can run the iOS app from Android Studio, as long as your target deployment and such is already set up properly. If you encounter issues, try running from Xcode.
 
 ## App store links
 

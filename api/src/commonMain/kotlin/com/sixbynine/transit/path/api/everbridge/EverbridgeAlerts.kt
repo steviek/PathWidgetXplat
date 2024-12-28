@@ -77,7 +77,7 @@ fun EverbridgeAlert.isForStation(station: Station): Boolean {
 fun EverbridgeAlert.isForLines(lineIds: List<Int>): Boolean {
     // this should match the order in Line.kt
     val linesDesc = incidentMessage.formVariableItems.firstOrNull { it.variableName == "Lines" }
-    return linesDesc?.value?.any { lineIds.contains(lineToIndex(it)) } ?: false
+    return linesDesc?.value?.any { lineIds.intersect(lineToIndex(it)).isNotEmpty() } ?: false
 }
 
 fun EverbridgeAlert.toGithubAlert(): Alert {
@@ -116,13 +116,14 @@ fun EverbridgeAlerts.getAlertsForLines(lineIds: List<Int>): List<Alert> {
     return data.filter { it.isForLines(lineIds) }.map { it.toGithubAlert() }
 }
 
-fun lineToIndex(line: String): Int {
-    when (line) {
-        // TODO: weekend services
-        "NWK-WTC" -> return 1
-        "HOB-WTC" -> return 2
-        "JSQ-33" -> return 3
-        "HOB-33" -> return 4
+fun lineToIndex(line: String): Set<Int> {
+    if (line == "JSQ-33 via HOB") return setOf(3, 4)
+    val x = when (line) {
+        "NWK-WTC" -> 1
+        "HOB-WTC" -> 2
+        "JSQ-33" -> 3
+        "HOB-33" -> 4
+        else -> null
     }
-    return 0
+    return if (x != null) setOf(x) else emptySet<Int>()
 }

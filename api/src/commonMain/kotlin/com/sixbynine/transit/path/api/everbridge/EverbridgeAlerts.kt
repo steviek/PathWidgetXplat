@@ -1,5 +1,10 @@
 package com.sixbynine.transit.path.api.everbridge
 
+import com.sixbynine.transit.path.api.Line
+import com.sixbynine.transit.path.api.Line.Hoboken33rd
+import com.sixbynine.transit.path.api.Line.HobokenWtc
+import com.sixbynine.transit.path.api.Line.JournalSquare33rd
+import com.sixbynine.transit.path.api.Line.NewarkWtc
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.alerts.Alert
 import com.sixbynine.transit.path.api.alerts.AlertText
@@ -74,10 +79,8 @@ fun EverbridgeAlert.isForStation(station: Station): Boolean {
     return elevatorValue.contains(regex)
 }
 
-fun EverbridgeAlert.isForLines(lineIds: List<Int>): Boolean {
-    // this should match the order in Line.kt
-    val linesDesc = incidentMessage.formVariableItems.firstOrNull { it.variableName == "Lines" }
-    return linesDesc?.value?.any { lineIds.intersect(lineToIndex(it)).isNotEmpty() } ?: false
+fun EverbridgeAlert.isForLines(lines: Collection<Line>): Boolean {
+    return lines.intersect(incidentMessage.lines).isNotEmpty()
 }
 
 fun EverbridgeAlert.toGithubAlert(): Alert {
@@ -112,18 +115,25 @@ fun EverbridgeAlerts.getAlertsForStation(station: Station): List<Alert> {
     return data.filter { it.isForStation(station) }.map { it.toGithubAlert(station) }
 }
 
-fun EverbridgeAlerts.getAlertsForLines(lineIds: List<Int>): List<Alert> {
-    return data.filter { it.isForLines(lineIds) }.map { it.toGithubAlert() }
+fun EverbridgeAlerts.getAlertsForLines(lines: Collection<Line>): List<Alert> {
+    return data.filter { it.isForLines(lines) }.map { it.toGithubAlert() }
 }
 
-fun lineToIndex(line: String): Set<Int> {
-    if (line == "JSQ-33 via HOB") return setOf(3, 4)
-    val x = when (line) {
-        "NWK-WTC" -> 1
-        "HOB-WTC" -> 2
-        "JSQ-33" -> 3
-        "HOB-33" -> 4
-        else -> null
+private val IncidentMessage.lines: Set<Line>
+    get() {
+        val linesDesc = formVariableItems.find { it.variableName == "Lines" }
+        return linesDesc
+            ?.value
+            .orEmpty()
+            .flatMap { line ->
+                when (line) {
+                    "JSQ-33 via HOB" -> listOf(JournalSquare33rd, Hoboken33rd)
+                    "NWK-WTC" -> listOf(NewarkWtc)
+                    "HOB-WTC" -> listOf(HobokenWtc)
+                    "JSQ-33" -> listOf(JournalSquare33rd)
+                    "HOB-33" -> listOf(Hoboken33rd)
+                    else -> emptyList()
+                }
+            }
+            .toSet()
     }
-    return if (x != null) setOf(x) else emptySet<Int>()
-}

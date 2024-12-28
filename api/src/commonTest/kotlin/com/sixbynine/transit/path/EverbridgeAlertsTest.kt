@@ -1,5 +1,7 @@
 package com.sixbynine.transit.path
 
+import com.sixbynine.transit.path.api.Line.HobokenWtc
+import com.sixbynine.transit.path.api.Line.NewarkWtc
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.alerts.AlertText
 import com.sixbynine.transit.path.api.alerts.isActiveAt
@@ -50,14 +52,14 @@ class EverbridgeAlertsTest {
     @Test
     fun `global alert conversion`() {
         val alerts = EverbridgeAlerts(NwkWtcDown)
-        val result = alerts.getAlertsForLines(listOf(1)).first()
+        val result = alerts.getAlertsForLines(listOf(NewarkWtc)).first()
         assertEquals(result.stations, emptyList())
         assertEquals(result.message, AlertText(NwkWtcDown.incidentMessage.preMessage))
         assertNull(result.trains.all)
         assertNull(result.trains.headSigns)
         assertTrue(result.isActiveAt(LocalDateTime(2024, OCTOBER, 21, 13, 57)))
         assertTrue(result.isGlobal)
-        assertTrue(alerts.getAlertsForLines(listOf(2)).isEmpty())
+        assertTrue(alerts.getAlertsForLines(listOf(HobokenWtc)).isEmpty())
     }
 
     private companion object {

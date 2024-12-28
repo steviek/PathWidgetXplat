@@ -1,0 +1,108 @@
+{
+  "status": "Success",
+  "data": [
+    {
+      "incidentMessage": {
+        "subject": "PATHAlert Update: Track Condition",
+        "preMessage": "01:56 PM: NWK-WTC delays continue. Next update w/in 15m.",
+        "formVariableItems": [
+          {
+            "val": [
+              "NWK-WTC"
+            ],
+            "variableName": "Lines",
+            "isRequired": true,
+            "seq": 1,
+            "variableId": 367103739691127
+          },
+          {
+            "val": [
+              "delays continue."
+            ],
+            "variableName": "Status",
+            "isRequired": true,
+            "seq": 2,
+            "variableId": 367103739691118
+          },
+          {
+            "val": [
+              "Crew working to resolve track condition"
+            ],
+            "variableName": "Track Condition Reason Update",
+            "isRequired": false,
+            "seq": 3,
+            "variableId": 402425550733521
+          },
+          {
+            "val": [
+              "between"
+            ],
+            "variableName": "Preposition",
+            "isRequired": true,
+            "seq": 4,
+            "variableId": 367103739691119
+          },
+          {
+            "val": [
+              "HAR",
+              "JSQ"
+            ],
+            "variableName": "Station",
+            "isRequired": true,
+            "seq": 5,
+            "variableId": 367103739691117
+          },
+          {
+            "variableName": "NJT Cross Honor Status",
+            "isRequired": false,
+            "seq": 6,
+            "variableId": 367103739691125
+          },
+          {
+            "variableName": "NJT Cross Honoring at",
+            "isRequired": false,
+            "seq": 7,
+            "variableId": 367103739691123
+          },
+          {
+            "variableName": "NYWW Cross Honor Status",
+            "isRequired": false,
+            "seq": 8,
+            "variableId": 367103739691126
+          },
+          {
+            "variableName": "NYWW Cross Honoring at",
+            "isRequired": false,
+            "seq": 9,
+            "variableId": 367103739691122
+          },
+          {
+            "variableName": "Cross Honor Start/End Time",
+            "isRequired": false,
+            "seq": 10,
+            "variableId": 367103739691120
+          },
+          {
+            "variableName": "Time Select",
+            "isRequired": false,
+            "seq": 11,
+            "variableId": 366828861784496
+          },
+          {
+            "val": [
+              "Next update w/in 15m."
+            ],
+            "variableName": "Guidance",
+            "isRequired": false,
+            "seq": 12,
+            "variableId": 367103739691116
+          }
+        ],
+        "sysVarTodayDateFormat": "mm-dd-yyyy",
+        "sysVarCurrentTimeFormat": "hh:mm a"
+      },
+      "CreatedDate": "1735414200000",
+      "ModifiedDate": "1735414200000"
+    }
+  ]
+}

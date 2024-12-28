@@ -7,13 +7,8 @@ import com.sixbynine.transit.path.api.Line.NewarkWtc
 import com.sixbynine.transit.path.app.ui.ColorWrapper
 import com.sixbynine.transit.path.app.ui.Colors
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract
-import com.sixbynine.transit.path.preferences.IntPersistable
 import com.sixbynine.transit.path.widget.WidgetData.SignData
 import com.sixbynine.transit.path.widget.WidgetData.TrainData
-
-enum class Line(override val number: Int) : IntPersistable {
-    NewarkWtc(1), HobokenWtc(2), JournalSquare33rd(3), Hoboken33rd(4);
-}
 
 val Line.colors: List<ColorWrapper>
     get() = when (this) {

@@ -10,9 +10,9 @@ def create_override(page: dict) -> dict:
     for _, item in page[":children"]["/path/en/planned-service-changes"][":items"]["root"][":items"].items():
         if 'linkTitle' not in item or item['linkTitle'] != "See schedules":
             continue
-        # TODO: get only the closest date
         link = item['linkHref'].split(".html")[0]
         s, d = parse_schedule(page[":children"][link][":items"]["root"][":items"])
+        # get only the closest date
         if date == None:
             data = s
             date = d

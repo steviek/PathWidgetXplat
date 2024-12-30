@@ -1,0 +1,45 @@
+name: schedule-updater
+
+on:
+  schedule:
+    - cron: '0 */12 * * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps: 
+      - name: get repo content
+        uses: actions/checkout@v2
+
+      - name: setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: setup directory
+        run: |
+          cp schedule.json schedule-generator
+          cp schedule_override.json schedule-generator
+
+      - name: install python packages
+        working-directory: schedule-generator
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: run script
+        working-directory: schedule-generator
+        run: python index.py
+
+      - name: put schedule in place
+        run: |
+          mv schedule-generator/schedule.json .
+          mv schedule-generator/schedule_override.json .
+      
+      - name: commit
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: 'chore: update schedules'
+          commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+          file_pattern: 'schedule*.json'

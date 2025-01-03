@@ -1,8 +1,6 @@
 package com.sixbynine.transit.path.util
 
 import com.sixbynine.transit.path.preferences.StringPreferencesKey
-import com.sixbynine.transit.path.preferences.persisting
-import com.sixbynine.transit.path.preferences.persistingInstant
 import com.sixbynine.transit.path.time.now
 import kotlinx.datetime.Instant
 import kotlinx.serialization.KSerializer
@@ -14,8 +12,8 @@ class RemoteFileRepository<T>(
     maxAge: Duration,
     private val serializer: KSerializer<T>
 ) {
-    private var storedJson by persisting(StringPreferencesKey(keyPrefix))
-    private var storedTime by persistingInstant("{$keyPrefix}_time")
+    private var storedJson by persistingGlobally(StringPreferencesKey(keyPrefix))
+    private var storedTime by persistingInstantGlobally("{$keyPrefix}_time")
 
     private val dataSource = DataSource(
         getCached = getCached@{

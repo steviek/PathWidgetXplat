@@ -422,8 +422,7 @@ object WidgetDataFetcher {
                 .minOrNull()
                 ?: (now + 15.minutes)
         val globalAlerts = githubAlerts?.alerts?.filter { it.isGlobal }.orEmpty()
-        val globalEverbridgeAlerts =
-            everbridgeAlerts?.getAlertsForLines(lines.map { it.number }).orEmpty()
+        val globalEverbridgeAlerts = everbridgeAlerts?.getAlertsForLines(lines).orEmpty()
         return WidgetData(
             fetchTime = now,
             stations = stationDatas.take(stationLimit),

@@ -11,7 +11,7 @@ object EverbridgeAlertsRepository {
         keyPrefix = "everbridge_alerts",
         url = "https://panynj.gov/bin/portauthority/everbridge/incidents?status=All&department=Path",
         serializer = EverbridgeAlerts.serializer(),
-        maxAge = 15.minutes
+        maxAge = 2.minutes
     )
 
     fun getAlerts(now: Instant): FetchWithPrevious<EverbridgeAlerts> {

@@ -18,6 +18,7 @@ import com.sixbynine.transit.path.api.matches
 import com.sixbynine.transit.path.app.lifecycle.AppLifecycleObserver
 import com.sixbynine.transit.path.app.settings.SettingsManager
 import com.sixbynine.transit.path.app.settings.TimeDisplay
+import com.sixbynine.transit.path.app.settings.TimeDisplay.Relative
 import com.sixbynine.transit.path.app.settings.isActiveAt
 import com.sixbynine.transit.path.app.station.StationSelection
 import com.sixbynine.transit.path.app.station.StationSelectionManager
@@ -46,6 +47,7 @@ import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.UpdateNo
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.State
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.StationData
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.TrainData
+import com.sixbynine.transit.path.app.ui.home.WidgetDataFetchingUseCase.FetchData
 import com.sixbynine.transit.path.app.ui.layout.LayoutOption.OneColumn
 import com.sixbynine.transit.path.app.ui.layout.LayoutOption.ThreeColumns
 import com.sixbynine.transit.path.app.ui.layout.LayoutOption.TwoColumns
@@ -71,7 +73,7 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, Intent, Effect>() {
 
@@ -92,7 +94,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
             isEditing = false,
             timeDisplay = SettingsManager.timeDisplay.value,
             stationSort = SettingsManager.stationSort.value,
-            updateFooterText = createFooterText(),
+            updateFooterText = createFooterText(fetchData),
             data = fetchData.data?.toDepartureBoardData()?.adjustedForLatestSettings()
         )
     )
@@ -105,7 +107,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
 
     init {
         lightweightScope.launch {
-            val footerText = createFooterText()
+            val footerText = createFooterText(fetchData)
             val initialData = fetchData.data?.toDepartureBoardData()?.adjustedForLatestSettings()
             updateState {
                 copy(
@@ -126,7 +128,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
                             hasError = fetchData.hasError,
                             isPathApiBusted = fetchData.isPathApiBusted,
                             scheduleName = fetchData.scheduleName,
-                            updateFooterText = createFooterText(),
+                            updateFooterText = createFooterText(fetchData),
                             data = createDepartureBoardData()
                         )
                     }
@@ -214,20 +216,66 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
         fetchingUseCase.unsubscribe(this)
     }
 
-    private fun createFooterText(): String? = with(fetchData) {
+    private fun createFooterText(fetchData: FetchData): String? = with(fetchData) {
         val formattedFetchTime =
             WidgetDataFormatter.formatTimeWithSeconds(lastFetchTime ?: return@with null)
-        // could be localized better, but this works for en and es
-        return localizedString(
-            en = {
-                "Updated at $formattedFetchTime, updating again in " +
-                        "${timeUntilNextFetch.inWholeSeconds}s"
-            },
-            es = {
-                "Se actualizó a las $formattedFetchTime, va actualizarse de nuevo en " +
-                        "${timeUntilNextFetch.inWholeSeconds}s"
+
+        val timeDisplay = SettingsManager.timeDisplay.value
+
+        when {
+            hasError && !hadInternet -> {
+                when (timeDisplay) {
+                    Relative -> {
+                        localizedString(
+                            en = {
+                                "No internet\nArrival times are relative to the current time, " +
+                                        "based on data from $formattedFetchTime"
+                                 },
+                            es = { "Sin internet, mostrando dados desde $formattedFetchTime" }
+                        )
+                    }
+                    TimeDisplay.Clock -> {
+                        localizedString(
+                            en = { "No internet, data from $formattedFetchTime" },
+                            es = { "Sin internet, mostrando dados desde $formattedFetchTime" }
+                        )
+                    }
+                }
             }
-        )
+
+            hasError -> when (timeDisplay) {
+                Relative -> {
+                    localizedString(
+                        en = {
+                            "Failed to update.\nArrival times are relative to the current time, " +
+                                    "based on data from $formattedFetchTime"
+                        },
+                        es = { "Error al actualizar, mostrando dados desde $formattedFetchTime" }
+                    )
+                }
+
+                TimeDisplay.Clock -> {
+                    localizedString(
+                        en = { "Failed to update, data from $formattedFetchTime" },
+                        es = { "Error al actualizar, mostrando dados desde $formattedFetchTime" }
+                    )
+                }
+
+            }
+
+            else -> {
+                localizedString(
+                    en = {
+                        "Updated at $formattedFetchTime, updating again in " +
+                                "${fetchData.timeUntilNextFetch.inWholeSeconds}s"
+                    },
+                    es = {
+                        "Se actualizó a las $formattedFetchTime, va actualizarse de nuevo en " +
+                                "${fetchData.timeUntilNextFetch.inWholeSeconds}s"
+                    }
+                )
+            }
+        }
     }
 
     private fun createDepartureBoardData(): DepartureBoardData? {
@@ -346,7 +394,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
                         val stationData = StationData(
                             station = station,
                             trains = data.trains
-                                .filter { it.projectedArrival >= now() - 1.minutes }
+                                .filter { it.projectedArrival >= now() - 30.seconds }
                                 .filter { matchesFilter(station, it, trainFilter) }
                                 .map { train ->
                                     TrainData(

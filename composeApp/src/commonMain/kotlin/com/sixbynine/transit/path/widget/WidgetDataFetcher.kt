@@ -47,6 +47,7 @@ import com.sixbynine.transit.path.util.isFailure
 import com.sixbynine.transit.path.util.isSuccess
 import com.sixbynine.transit.path.util.onFailure
 import com.sixbynine.transit.path.util.onSuccess
+import com.sixbynine.transit.path.util.orElse
 import com.sixbynine.transit.path.util.suspendRunCatching
 import com.sixbynine.transit.path.util.withTimeoutCatching
 import kotlinx.coroutines.CoroutineStart.LAZY
@@ -146,6 +147,7 @@ object WidgetDataFetcher {
         val (everbridgeAlerts, previousEverbridgeAlerts) = EverbridgeAlertsRepository.getAlerts(now)
 
         fun createWidgetData(
+            fetchTime: Instant,
             data: DepartureBoardTrainMap,
             githubAlerts: GithubAlerts?,
             everbridgeAlerts: EverbridgeAlerts?,
@@ -154,6 +156,7 @@ object WidgetDataFetcher {
         ): WidgetData {
             return createWidgetData(
                 now,
+                fetchTime,
                 stationLimit,
                 stations,
                 lines,
@@ -175,6 +178,7 @@ object WidgetDataFetcher {
             AgedValue(
                 data.age,
                 createWidgetData(
+                    now - data.age,
                     data.value,
                     previousGithubAlerts?.value,
                     previousEverbridgeAlerts?.value,
@@ -231,10 +235,33 @@ object WidgetDataFetcher {
                     null
                 }
 
-                val departureBoardTrainMap = live.data ?: scheduled?.data
+                val departureBoardTrainMap: DepartureBoardTrainMap?
+                val lastFetchTime: Instant?
+
+                when {
+                    live.data != null -> {
+                        departureBoardTrainMap = live.data
+                        lastFetchTime = if (live.isSuccess()) {
+                            now
+                        } else {
+                            now - previous?.age.orElse { Duration.ZERO }
+                        }
+                    }
+
+                    scheduled?.data != null -> {
+                        departureBoardTrainMap = scheduled.data
+                        lastFetchTime = now
+                    }
+
+                    else -> {
+                        departureBoardTrainMap = null
+                        lastFetchTime = null
+                    }
+                }
 
                 val widgetData = departureBoardTrainMap?.let { data ->
                     createWidgetData(
+                        lastFetchTime ?: now,
                         data,
                         githubAlerts.await().data,
                         everbridgeAlerts.await().data,
@@ -304,6 +331,7 @@ object WidgetDataFetcher {
 
     private fun createWidgetData(
         now: Instant,
+        fetchTime: Instant,
         stationLimit: Int,
         stations: List<Station>,
         lines: Collection<Line>,
@@ -424,7 +452,7 @@ object WidgetDataFetcher {
         val globalAlerts = githubAlerts?.alerts?.filter { it.isGlobal }.orEmpty()
         val globalEverbridgeAlerts = everbridgeAlerts?.getAlertsForLines(lines).orEmpty()
         return WidgetData(
-            fetchTime = now,
+            fetchTime = fetchTime,
             stations = stationDatas.take(stationLimit),
             nextFetchTime = nextFetchTime,
             closestStationId = closestStationToUse?.pathApiName,

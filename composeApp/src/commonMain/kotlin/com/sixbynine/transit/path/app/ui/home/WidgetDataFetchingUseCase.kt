@@ -145,10 +145,11 @@ class WidgetDataFetchingUseCase private constructor() {
             startFetch(if (force) ForcedStaleness else UnforcedStaleness).fetch.await()
         }
         _fetchData.value = FetchData(
-            lastFetchTime = now(),
+            lastFetchTime = result.data?.fetchTime,
             nextFetchTime = now() + FetchInterval,
             data = result.data,
             hasError = result.isFailure(),
+            hadInternet = !result.isFailure() || result.hadInternet,
             isPathApiBusted = (result.isFailure() && result.error is PathApiException) ||
                     result.data?.isPathApiBroken == true,
             isFetching = false,
@@ -173,6 +174,7 @@ class WidgetDataFetchingUseCase private constructor() {
         val nextFetchTime: Instant,
         val data: WidgetData?,
         val hasError: Boolean,
+        val hadInternet: Boolean,
         val isPathApiBusted: Boolean,
         val scheduleName: String?,
         val isFetching: Boolean
@@ -198,6 +200,7 @@ class WidgetDataFetchingUseCase private constructor() {
                     nextFetchTime = now,
                     data = null,
                     hasError = false,
+                    hadInternet = true,
                     isPathApiBusted = false,
                     isFetching = true,
                     scheduleName = null,
@@ -210,6 +213,7 @@ class WidgetDataFetchingUseCase private constructor() {
                 nextFetchTime = nextFetchTime,
                 data = lastFetchData,
                 hasError = false,
+                hadInternet = true,
                 isPathApiBusted = false,
                 isFetching = isFetching,
                 scheduleName = null,

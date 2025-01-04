@@ -13,6 +13,7 @@ import com.sixbynine.transit.path.util.FetchWithPrevious
 import com.sixbynine.transit.path.util.Staleness
 import com.sixbynine.transit.path.util.map
 import kotlinx.datetime.Instant
+import kotlin.time.Duration.Companion.seconds
 
 internal class PathApiImpl : PathApi {
 
@@ -30,7 +31,9 @@ internal class PathApiImpl : PathApi {
         return results.results.associate { result ->
             val trains = result.destinations
                 .flatMap { destination ->
-                    destination.messages.map {
+                    destination.messages.mapNotNull {
+                        val rawArrivalTime = it.lastUpdated + it.durationToArrival
+                        if (rawArrivalTime < now - 30.seconds) return@mapNotNull null
                         val directionState = when (destination.label) {
                             "ToNJ" -> NewJersey
                             "ToNY" -> NewYork
@@ -39,8 +42,7 @@ internal class PathApiImpl : PathApi {
                         val colors = it.lineColor.split(",").map(Colors::parse).map(::ColorWrapper)
                         DepartureBoardTrain(
                             headsign = it.headSign,
-                            projectedArrival = (it.lastUpdated + it.durationToArrival)
-                                .coerceAtLeast(now),
+                            projectedArrival = rawArrivalTime.coerceAtLeast(now),
                             lineColors = colors,
                             isDelayed = it.arrivalTimeMessage == "Delayed",
                             backfillSource = null,

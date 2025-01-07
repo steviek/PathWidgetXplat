@@ -352,6 +352,10 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
                                 )
                             }
                     )
+                },
+            globalAlerts = globalAlerts
+                .filter { alert ->
+                    SettingsManager.lineFilter.value.any { alert.lines?.contains(it) ?: false }
                 }
         )
     }
@@ -436,7 +440,8 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
                     GlobalAlert(
                         text = it.message?.unpack() ?: return@mapNotNull null,
                         url = it.url?.unpack(),
-                        isWarning = it.isWarning
+                        isWarning = it.isWarning,
+                        lines = it.lines,
                     )
                 }
             )
@@ -454,7 +459,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
                 if (isDelayed) append(localizedString(en = "Delayed - ", es = "Retrasado - "))
 
                 val time = when (timeDisplay) {
-                    TimeDisplay.Relative -> WidgetDataFormatter.formatRelativeTime(
+                    Relative -> WidgetDataFormatter.formatRelativeTime(
                         Clock.System.now(),
                         projectedArrival
                     )

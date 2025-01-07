@@ -1,5 +1,6 @@
 package com.sixbynine.transit.path.api.alerts
 
+import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.time.NewYorkTimeZone
 import com.sixbynine.transit.path.time.now
@@ -34,6 +35,8 @@ data class Alert(
     val level: String? = null,
     /** Whether this is a global level alert. Stations are ignored if so. */
     val isGlobal: Boolean = false,
+    /** Lines affected. */
+    val lines: Set<Line>? = null,
 )
 
 fun Alert(
@@ -44,6 +47,7 @@ fun Alert(
     url: AlertText? = null,
     displaySchedule: Schedule? = null,
     level: String? = null,
+    lines: Set<Line>? = null
 ): Alert {
     return Alert(
         stations = stations.map { it.pathApiName },
@@ -53,6 +57,7 @@ fun Alert(
         message = message,
         url = url,
         level = level,
+        lines = lines,
     )
 }
 

@@ -94,7 +94,8 @@ fun EverbridgeAlert.toGithubAlert(): Alert {
         message = AlertText(incidentMessage.preMessage),
         url = AlertText(PATH_ALERTS_URL),
         isGlobal = true,
-        level = "WARN"
+        level = "WARN",
+        lines = incidentMessage.lines,
     )
 }
 

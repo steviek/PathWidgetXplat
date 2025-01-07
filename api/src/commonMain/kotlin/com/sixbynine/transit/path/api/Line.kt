@@ -1,5 +1,6 @@
 package com.sixbynine.transit.path.api
 
+import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.api.templine.HobClosureConfigRepository
 import com.sixbynine.transit.path.preferences.IntPersistable
 import com.sixbynine.transit.path.time.NewYorkTimeZone
@@ -13,6 +14,7 @@ enum class Line(override val number: Int) : IntPersistable {
         val all: List<Line> by lazy {
             entries.filter {
                 if (it != Wtc33rd) return@filter true
+                if (Logging.isDeveloperMode) return@filter true
 
                 val now = now().toLocalDateTime(NewYorkTimeZone)
                 val config = HobClosureConfigRepository.getConfig()

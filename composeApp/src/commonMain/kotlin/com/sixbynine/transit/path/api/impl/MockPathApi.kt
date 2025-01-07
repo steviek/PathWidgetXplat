@@ -5,6 +5,7 @@ import com.sixbynine.transit.path.api.DepartureBoardTrainMap
 import com.sixbynine.transit.path.api.Line.Hoboken33rd
 import com.sixbynine.transit.path.api.Line.HobokenWtc
 import com.sixbynine.transit.path.api.Line.NewarkWtc
+import com.sixbynine.transit.path.api.Line.Wtc33rd
 import com.sixbynine.transit.path.api.PathApi
 import com.sixbynine.transit.path.api.State.NewJersey
 import com.sixbynine.transit.path.api.State.NewYork
@@ -51,7 +52,16 @@ internal class MockPathApi : PathApi {
                     backfillSource = null,
                     directionState = NewJersey,
                     lines = setOf(Hoboken33rd)
-                )
+                ),
+                DepartureBoardTrain(
+                    headsign = "33rd St",
+                    projectedArrival = now + 4.minutes,
+                    lineColors = Colors.Wtc33s,
+                    isDelayed = false,
+                    backfillSource = null,
+                    directionState = NewYork,
+                    lines = setOf(Wtc33rd)
+                ),
             )
         }.mapKeys { it.key.pathApiName }
         return FetchWithPrevious(

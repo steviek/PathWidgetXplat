@@ -2,6 +2,7 @@ package com.sixbynine.transit.path.app.ui
 
 import androidx.compose.ui.graphics.Color
 import com.sixbynine.transit.path.Logging
+import com.sixbynine.transit.path.api.templine.HobClosureConfigRepository
 import com.sixbynine.transit.path.app.ui.theme.md_theme_dark_background
 import com.sixbynine.transit.path.app.ui.theme.md_theme_light_background
 import com.sixbynine.transit.path.app.ui.theme.seed
@@ -18,11 +19,16 @@ object Colors {
     val Jsq33sSingle = Color(red = 0xff, green = 0x99, blue = 0x00).wrap()
     val Hob33sSingle = Color(red = 0x4d, green = 0x92, blue = 0xfb).wrap()
     val HobWtcSingle = Color(red = 0x65, green = 0xc1, blue = 0x00).wrap()
-
+    val Wtc33sSingle by lazy {
+        HobClosureConfigRepository.getConfig().tempLineInfo.lightColor
+            .let { parse(it) }
+            .wrap()
+    }
     val NwkWtc = listOf(NwkWtcSingle)
     val Jsq33s = listOf(Jsq33sSingle)
     val Hob33s = listOf(Hob33sSingle)
     val HobWtc = listOf(HobWtcSingle)
+    val Wtc33s by lazy { listOf(Wtc33sSingle) }
 
     fun background(isDark: Boolean): ColorWrapper {
         Logging.initialize()

@@ -25,7 +25,7 @@ fun LineFilterBottomSheet(
         title = stringResource(string.lines)
     ) {
         Column(Modifier.fillMaxWidth().padding(bottom = 24.dp)) {
-            Line.entries.forEach { line ->
+            Line.all.forEach { line ->
                 TrainLineCheckboxRow(
                     line = line,
                     checked = line in lines,

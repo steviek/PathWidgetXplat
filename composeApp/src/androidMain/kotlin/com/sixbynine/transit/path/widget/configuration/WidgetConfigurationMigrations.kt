@@ -39,5 +39,12 @@ fun StoredWidgetConfiguration.migrateToCurrentVersion(): StoredWidgetConfigurati
         )
     }
 
+    if (version < 4) {
+        configuration = configuration.copy(
+            version = 4,
+            linesBitmask = IntPersistable.createBitmask(configuration.lines + Line.Wtc33rd)
+        )
+    }
+
     return configuration
 }

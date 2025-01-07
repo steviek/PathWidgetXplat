@@ -4,6 +4,7 @@ import com.sixbynine.transit.path.api.Line.Hoboken33rd
 import com.sixbynine.transit.path.api.Line.HobokenWtc
 import com.sixbynine.transit.path.api.Line.JournalSquare33rd
 import com.sixbynine.transit.path.api.Line.NewarkWtc
+import com.sixbynine.transit.path.api.Line.Wtc33rd
 import com.sixbynine.transit.path.app.ui.ColorWrapper
 import com.sixbynine.transit.path.app.ui.Colors
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract
@@ -16,6 +17,7 @@ val Line.colors: List<ColorWrapper>
         HobokenWtc -> Colors.HobWtc
         JournalSquare33rd -> Colors.Jsq33s
         Hoboken33rd -> Colors.Hob33s
+        Wtc33rd -> Colors.Wtc33s
     }
 
 private fun Line.matches(colors: Collection<ColorWrapper>, title: String): Boolean {
@@ -34,6 +36,10 @@ private fun Line.matches(colors: Collection<ColorWrapper>, title: String): Boole
         }
         Hoboken33rd -> {
             if (colors.any { it in Colors.Hob33s}) return true
+            return false
+        }
+        Wtc33rd -> {
+            if (colors.any { it in Colors.Wtc33s }) return true
             return false
         }
     }

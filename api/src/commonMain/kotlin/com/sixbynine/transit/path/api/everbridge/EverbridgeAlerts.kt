@@ -5,6 +5,7 @@ import com.sixbynine.transit.path.api.Line.Hoboken33rd
 import com.sixbynine.transit.path.api.Line.HobokenWtc
 import com.sixbynine.transit.path.api.Line.JournalSquare33rd
 import com.sixbynine.transit.path.api.Line.NewarkWtc
+import com.sixbynine.transit.path.api.Line.Wtc33rd
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.alerts.Alert
 import com.sixbynine.transit.path.api.alerts.AlertText
@@ -132,6 +133,7 @@ private val IncidentMessage.lines: Set<Line>
                     "HOB-WTC" -> listOf(HobokenWtc)
                     "JSQ-33" -> listOf(JournalSquare33rd)
                     "HOB-33" -> listOf(Hoboken33rd)
+                    "WTC-33" -> listOf(Wtc33rd)
                     else -> emptyList()
                 }
             }

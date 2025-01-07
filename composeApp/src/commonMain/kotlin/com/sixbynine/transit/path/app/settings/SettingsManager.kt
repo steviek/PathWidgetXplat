@@ -11,6 +11,8 @@ import com.sixbynine.transit.path.location.LocationPermissionRequestResult.Grant
 import com.sixbynine.transit.path.location.LocationProvider
 import com.sixbynine.transit.path.location.awaitIsLocationSupportedByDevice
 import com.sixbynine.transit.path.preferences.IntPersistable
+import com.sixbynine.transit.path.preferences.IntPreferencesKey
+import com.sixbynine.transit.path.preferences.persisting
 import com.sixbynine.transit.path.util.JsonFormat
 import com.sixbynine.transit.path.util.collectIn
 import com.sixbynine.transit.path.util.globalDataStore
@@ -76,7 +78,16 @@ object SettingsManager {
 
     private val lightweightScope = CoroutineScope(Dispatchers.Default)
 
+    private var schemaVersion by persisting(IntPreferencesKey("settings_schema"))
+
     init {
+        val prevSchemaVersion = schemaVersion
+        val currentSchemaVersion = 2
+        if (prevSchemaVersion == null || prevSchemaVersion < currentSchemaVersion) {
+            performMigration(prevSchemaVersion)
+            schemaVersion = currentSchemaVersion
+        }
+
         lightweightScope.launch {
             if (!LocationProvider().awaitIsLocationSupportedByDevice() ||
                 !LocationProvider().hasLocationPermission()
@@ -219,5 +230,11 @@ object SettingsManager {
 
     fun updateDevOptionsEnabled(enabled: Boolean) = lightweightScope.launchAndReturnUnit {
         devOptionsPersister.update(enabled)
+    }
+
+    private fun performMigration(prevVersion: Int?) {
+        if (prevVersion == null && lineFilter.value.size < Line.entries.size) {
+            updateLineFilters(lineFilter.value + Line.Wtc33rd)
+        }
     }
 }

@@ -95,7 +95,8 @@ fun EverbridgeAlert.toGithubAlert(): Alert {
         message = AlertText(incidentMessage.preMessage),
         url = AlertText(PATH_ALERTS_URL),
         isGlobal = true,
-        level = "WARN"
+        level = "WARN",
+        lines = incidentMessage.lines,
     )
 }
 
@@ -108,7 +109,8 @@ fun EverbridgeAlert.toGithubAlert(station: Station): Alert {
         ),
         trains = TrainFilter(),
         message = AlertText(incidentMessage.preMessage),
-        url = AlertText(PATH_ALERTS_URL)
+        url = AlertText(PATH_ALERTS_URL),
+        level = "INFO", // TODO: determine if it's about elevator or more serious
     )
 }
 

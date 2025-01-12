@@ -2,6 +2,7 @@ package com.sixbynine.transit.path.app.ui.home
 
 import androidx.compose.ui.unit.Dp
 import com.sixbynine.transit.path.api.BackfillSource
+import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.state
@@ -77,6 +78,7 @@ object HomeScreenContract {
         val text: String,
         val url: String?,
         val isWarning: Boolean,
+        val lines: Set<Line>?,
     )
 
     sealed interface Intent {

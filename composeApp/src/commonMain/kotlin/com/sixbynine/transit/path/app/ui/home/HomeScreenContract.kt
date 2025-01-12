@@ -1,16 +1,14 @@
 package com.sixbynine.transit.path.app.ui.home
 
 import androidx.compose.ui.unit.Dp
-import com.sixbynine.transit.path.api.BackfillSource
 import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.state
 import com.sixbynine.transit.path.app.settings.TimeDisplay
 import com.sixbynine.transit.path.app.station.StationSelection
-import com.sixbynine.transit.path.app.ui.ColorWrapper
+import com.sixbynine.transit.path.app.ui.common.AppUiTrainData
 import com.sixbynine.transit.path.app.ui.layout.LayoutOption
-import kotlinx.datetime.Instant
 
 object HomeScreenContract {
     data class State(
@@ -40,7 +38,7 @@ object HomeScreenContract {
 
     data class StationData(
         val station: Station,
-        val trains: List<TrainData>,
+        val trains: List<AppUiTrainData>,
         val isClosest: Boolean,
         val alertText: String?,
         val alertUrl: String?,
@@ -48,30 +46,6 @@ object HomeScreenContract {
     ) {
         val id get() = station.pathApiName
         val state get() = station.state
-    }
-
-    data class TrainData(
-        val id: String,
-        val title: String,
-        val colors: List<ColorWrapper>,
-        val projectedArrival: Instant,
-        val displayText: String,
-        val isDelayed: Boolean = false,
-        val backfill: HomeBackfillSource? = null,
-    ) {
-        val isBackfilled: Boolean
-            get() = backfill != null
-    }
-
-    data class HomeBackfillSource(
-        val source: BackfillSource,
-        val displayText: String,
-    ) {
-        val projectedArrival: Instant
-            get() = source.projectedArrival
-
-        val station: Station
-            get() = source.station
     }
 
     data class GlobalAlert(

@@ -7,10 +7,10 @@ import com.sixbynine.transit.path.app.settings.StationLimit.OnePerLine
 import com.sixbynine.transit.path.app.settings.StationLimit.Six
 import com.sixbynine.transit.path.app.settings.StationLimit.ThreePerLine
 import com.sixbynine.transit.path.app.settings.StationLimit.TwoPerLine
-import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.TrainData
+import com.sixbynine.transit.path.app.ui.common.AppUiTrainData
 
 class StationLimitFilter(private val stationLimit: StationLimit) {
-    fun filter(trainData: List<TrainData>): List<TrainData> = when(stationLimit) {
+    fun filter(trainData: List<AppUiTrainData>): List<AppUiTrainData> = when(stationLimit) {
         None -> trainData
         Four -> filterByTotalCount(trainData, 4)
         Six -> filterByTotalCount(trainData, 6)
@@ -19,11 +19,11 @@ class StationLimitFilter(private val stationLimit: StationLimit) {
         ThreePerLine -> filterByLineCount(trainData, 3)
     }
 
-    private fun filterByTotalCount(trainData: List<TrainData>, count: Int): List<TrainData> {
+    private fun filterByTotalCount(trainData: List<AppUiTrainData>, count: Int): List<AppUiTrainData> {
         return trainData.take(count)
     }
 
-    private fun filterByLineCount(trainData: List<TrainData>, max: Int): List<TrainData> {
+    private fun filterByLineCount(trainData: List<AppUiTrainData>, max: Int): List<AppUiTrainData> {
         val headSignToCount = mutableMapOf<String, Int>()
         return trainData.sortedBy { it.projectedArrival }.filter {
             val count = headSignToCount[it.title] ?: 0
@@ -37,6 +37,6 @@ class StationLimitFilter(private val stationLimit: StationLimit) {
     }
 }
 
-fun List<TrainData>.filter(filter: StationLimitFilter): List<TrainData> {
+fun List<AppUiTrainData>.filter(filter: StationLimitFilter): List<AppUiTrainData> {
     return filter.filter(this)
 }

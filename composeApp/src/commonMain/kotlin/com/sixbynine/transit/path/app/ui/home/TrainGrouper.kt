@@ -9,11 +9,11 @@ import com.sixbynine.transit.path.api.Stations.Hoboken
 import com.sixbynine.transit.path.api.Stations.Newport
 import com.sixbynine.transit.path.api.Stations.NinthStreet
 import com.sixbynine.transit.path.api.Stations.TwentyThirdStreet
-import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.TrainData
+import com.sixbynine.transit.path.app.ui.common.AppUiTrainData
 
 object TrainGrouper {
-    fun groupTrains(station: Station, trains: List<TrainData>): List<List<TrainData>> {
-        val groupedTrains = arrayListOf<ArrayList<TrainData>>()
+    fun groupTrains(station: Station, trains: List<AppUiTrainData>): List<List<AppUiTrainData>> {
+        val groupedTrains = arrayListOf<ArrayList<AppUiTrainData>>()
 
         trains.fastForEach { train ->
             val updatedTrain = simplifyTitle(station, train)
@@ -28,7 +28,7 @@ object TrainGrouper {
         return groupedTrains
     }
 
-    private fun simplifyTitle(station: Station, trainData: TrainData): TrainData {
+    private fun simplifyTitle(station: Station, trainData: AppUiTrainData): AppUiTrainData {
         val newTitle = when (trainData.title) {
             "Journal Square via Hoboken" -> when (station) {
                 Newport, GroveStreet, Hoboken -> "Journal Square"

@@ -33,6 +33,7 @@ import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachIndexed
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.StationSort
+import com.sixbynine.transit.path.app.ui.common.AppUiTrainData
 import com.sixbynine.transit.path.app.ui.gutter
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.AddStationClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.MoveStationDownClicked
@@ -40,7 +41,6 @@ import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.MoveStat
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.RemoveStationClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StationClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.StationData
-import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.TrainData
 import com.sixbynine.transit.path.app.ui.home.TrainGrouper.groupTrains
 import com.sixbynine.transit.path.app.ui.icon.IconType
 import com.sixbynine.transit.path.app.ui.icon.NativeIconButton
@@ -270,7 +270,7 @@ private fun HomeScreenScope.StationHeader(
 @Composable
 private fun HomeScreenScope.TrainLine(
     station: Station,
-    data: TrainData,
+    data: AppUiTrainData,
     modifier: Modifier = Modifier
 ) {
     TrainLine(station, listOf(data), modifier)
@@ -279,7 +279,7 @@ private fun HomeScreenScope.TrainLine(
 @Composable
 private fun HomeScreenScope.TrainLine(
     station: Station,
-    data: List<TrainData>,
+    data: List<AppUiTrainData>,
     modifier: Modifier = Modifier
 ) {
     var showBottomSheet by remember { mutableStateOf(false) }

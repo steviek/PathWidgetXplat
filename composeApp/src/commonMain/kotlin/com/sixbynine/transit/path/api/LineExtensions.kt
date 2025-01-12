@@ -6,7 +6,7 @@ import com.sixbynine.transit.path.api.Line.JournalSquare33rd
 import com.sixbynine.transit.path.api.Line.NewarkWtc
 import com.sixbynine.transit.path.app.ui.ColorWrapper
 import com.sixbynine.transit.path.app.ui.Colors
-import com.sixbynine.transit.path.app.ui.home.HomeScreenContract
+import com.sixbynine.transit.path.app.ui.common.AppUiTrainData
 import com.sixbynine.transit.path.widget.WidgetData.SignData
 import com.sixbynine.transit.path.widget.WidgetData.TrainData
 
@@ -59,6 +59,6 @@ fun Collection<Line>.anyMatch(data: SignData): Boolean {
     return any { it.matches(data.colors, data.title) }
 }
 
-fun Line.matches(data: HomeScreenContract.TrainData): Boolean {
+fun Line.matches(data: AppUiTrainData): Boolean {
     return matches(data.colors, data.title)
 }

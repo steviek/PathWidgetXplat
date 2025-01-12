@@ -19,13 +19,13 @@ import androidx.compose.ui.util.fastForEach
 import com.sixbynine.transit.path.app.settings.TimeDisplay
 import com.sixbynine.transit.path.app.ui.ColorCircle
 import com.sixbynine.transit.path.app.ui.ColorWrapper
-import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.TrainData
+import com.sixbynine.transit.path.app.ui.common.AppUiTrainData
 import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.widget.GroupedWidgetLayoutHelper
 
 @Composable
 fun HomeScreenScope.TrainLineContent(
-    data: TrainData,
+    data: AppUiTrainData,
     modifier: Modifier = Modifier,
     textStyle: TextStyle = MaterialTheme.typography.titleMedium,
     subtitleTextStyle: TextStyle = MaterialTheme.typography.bodyLarge,
@@ -44,7 +44,7 @@ fun HomeScreenScope.TrainLineContent(
 
 @Composable
 fun HomeScreenScope.TrainLineContent(
-    data: List<TrainData>,
+    data: List<AppUiTrainData>,
     modifier: Modifier = Modifier,
     textStyle: TextStyle = MaterialTheme.typography.titleMedium,
     subtitleTextStyle: TextStyle = MaterialTheme.typography.bodyLarge,
@@ -65,7 +65,7 @@ fun HomeScreenScope.TrainLineContent(
 
 @Composable
 fun TrainLineContent(
-    data: List<TrainData>,
+    data: List<AppUiTrainData>,
     timeDisplay: TimeDisplay,
     modifier: Modifier = Modifier,
     textStyle: TextStyle = MaterialTheme.typography.titleMedium,

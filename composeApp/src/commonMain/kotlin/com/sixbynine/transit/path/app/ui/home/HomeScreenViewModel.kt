@@ -23,12 +23,13 @@ import com.sixbynine.transit.path.app.settings.isActiveAt
 import com.sixbynine.transit.path.app.station.StationSelection
 import com.sixbynine.transit.path.app.station.StationSelectionManager
 import com.sixbynine.transit.path.app.ui.PathViewModel
+import com.sixbynine.transit.path.app.ui.common.AppUiBackfillSource
+import com.sixbynine.transit.path.app.ui.common.AppUiTrainData
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.DepartureBoardData
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Effect
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Effect.NavigateToSettings
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Effect.NavigateToStation
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.GlobalAlert
-import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.HomeBackfillSource
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.AddStationClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.ConstraintsChanged
@@ -46,7 +47,6 @@ import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StopEdit
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.UpdateNowClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.State
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.StationData
-import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.TrainData
 import com.sixbynine.transit.path.app.ui.home.WidgetDataFetchingUseCase.FetchData
 import com.sixbynine.transit.path.app.ui.layout.LayoutOption.OneColumn
 import com.sixbynine.transit.path.app.ui.layout.LayoutOption.ThreeColumns
@@ -360,7 +360,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
         )
     }
 
-    private fun TrainData.shouldHideForPresumption(): Boolean {
+    private fun AppUiTrainData.shouldHideForPresumption(): Boolean {
         return isBackfilled && !SettingsManager.displayPresumedTrains.value
     }
 
@@ -401,7 +401,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
                                 .filter { it.projectedArrival >= now() - 30.seconds }
                                 .filter { matchesFilter(station, it, trainFilter) }
                                 .map { train ->
-                                    TrainData(
+                                    AppUiTrainData(
                                         id = train.id,
                                         title = train.title,
                                         colors = train.colors,
@@ -414,7 +414,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
                                         projectedArrival = train.projectedArrival,
                                         isDelayed = train.isDelayed,
                                         backfill = train.backfillSource?.let {
-                                            HomeBackfillSource(
+                                            AppUiBackfillSource(
                                                 it,
                                                 trainDisplayTime(
                                                     timeDisplay,

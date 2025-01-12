@@ -26,9 +26,9 @@ import androidx.compose.ui.unit.dp
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.app.settings.TimeDisplay
 import com.sixbynine.transit.path.app.ui.PathBottomSheet
+import com.sixbynine.transit.path.app.ui.common.AppUiBackfillSource
+import com.sixbynine.transit.path.app.ui.common.AppUiTrainData
 import com.sixbynine.transit.path.app.ui.gutter
-import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.HomeBackfillSource
-import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.TrainData
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import pathwidgetxplat.composeapp.generated.resources.Res.drawable
@@ -41,8 +41,8 @@ import pathwidgetxplat.composeapp.generated.resources.train_track
 fun HomeScreenScope.BackfillBottomSheet(
     isShown: Boolean,
     station: Station,
-    trainData: TrainData,
-    source: HomeBackfillSource,
+    trainData: AppUiTrainData,
+    source: AppUiBackfillSource,
     onDismiss: () -> Unit
 ) {
     PathBottomSheet(isShown = isShown, onDismissRequest = onDismiss) {
@@ -99,8 +99,8 @@ fun HomeScreenScope.BackfillBottomSheet(
 @Composable
 private fun HomeScreenScope.createSubtext(
     station: Station,
-    trainData: TrainData,
-    source: HomeBackfillSource,
+    trainData: AppUiTrainData,
+    source: AppUiBackfillSource,
 ): AnnotatedString {
     return when (stringResource(string.language_code)) {
         "es" -> createSpanishSubtext(station, trainData, source)
@@ -110,8 +110,8 @@ private fun HomeScreenScope.createSubtext(
 
 private fun HomeScreenScope.createEnglishSubtext(
     station: Station,
-    trainData: TrainData,
-    source: HomeBackfillSource,
+    trainData: AppUiTrainData,
+    source: AppUiBackfillSource,
 ) = buildAnnotatedString {
     append("This train is not yet reported for ")
     appendBolded(station.displayName)
@@ -134,8 +134,8 @@ private fun HomeScreenScope.createEnglishSubtext(
 
 private fun HomeScreenScope.createSpanishSubtext(
     station: Station,
-    trainData: TrainData,
-    source: HomeBackfillSource,
+    trainData: AppUiTrainData,
+    source: AppUiBackfillSource,
 ) = buildAnnotatedString {
     append("Este tren aún no está reportado por PATH para ")
     appendBolded(station.displayName)
@@ -163,7 +163,7 @@ private fun AnnotatedString.Builder.appendBolded(text: String) {
 }
 
 @Composable
-private fun HomeScreenScope.TrainBox(trainData: TrainData, station: Station, modifier: Modifier = Modifier) {
+private fun HomeScreenScope.TrainBox(trainData: AppUiTrainData, station: Station, modifier: Modifier = Modifier) {
     Column(
         modifier
             .clip(RoundedCornerShape(16.dp))

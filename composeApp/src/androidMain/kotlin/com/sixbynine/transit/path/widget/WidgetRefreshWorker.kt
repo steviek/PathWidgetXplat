@@ -16,6 +16,7 @@ import com.sixbynine.transit.path.api.PathApi
 import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.util.Staleness
 import com.sixbynine.transit.path.util.await
+import com.sixbynine.transit.path.util.onFailure
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -30,7 +31,7 @@ class WidgetRefreshWorker(
             cancel()
         }
 
-        val canRefreshLocation = params.inputData.getBoolean(CAN_REFRESH_LOCATION, true)
+        val isBackground = params.inputData.getBoolean(IS_BACKGROUND, true)
 
         PathApi.instance
             .getUpcomingDepartures(
@@ -38,10 +39,16 @@ class WidgetRefreshWorker(
                 staleness = Staleness(staleAfter = 30.seconds, invalidAfter = Duration.INFINITE)
             )
             .await()
+            .onFailure { _, hadInternet, data ->
+                if (!hadInternet && data != null && isBackground) {
+                    // If android didn't give us internet in the background, just give up for now.
+                    return Result.success()
+                }
+            }
 
         AndroidWidgetDataRepository.refreshWidgetData(
             force = false,
-            canRefreshLocation = canRefreshLocation,
+            canRefreshLocation = !isBackground,
             isBackgroundUpdate = true,
         )
 
@@ -51,7 +58,7 @@ class WidgetRefreshWorker(
     companion object {
         private const val WORK_TAG = "path_widget_refresh"
         private const val ONE_TIME_WORK_TAG = "path_widget_refresh_one_time"
-        private const val CAN_REFRESH_LOCATION = "can_refresh_location"
+        private const val IS_BACKGROUND = "is_background"
         private val context get() = MobilePathApplication.instance
         private val glanceAppWidgetManager get() = GlanceAppWidgetManager(context)
 
@@ -72,7 +79,7 @@ class WidgetRefreshWorker(
                             .setRequiresBatteryNotLow(true)
                             .build()
                     )
-                    .setInputData(Data.Builder().putBoolean(CAN_REFRESH_LOCATION, false).build())
+                    .setInputData(Data.Builder().putBoolean(IS_BACKGROUND, true).build())
                     .build()
             workManager.enqueueUniquePeriodicWork(WORK_TAG, KEEP, workRequest)
         }
@@ -86,7 +93,7 @@ class WidgetRefreshWorker(
             val workManager = WorkManager.getInstance(context)
             val workRequest = OneTimeWorkRequestBuilder<WidgetRefreshWorker>().setInputData(
                 Data.Builder()
-                    .putBoolean(CAN_REFRESH_LOCATION, true)
+                    .putBoolean(IS_BACKGROUND, false)
                     .build()
             ).build()
             workManager.enqueueUniqueWork(ONE_TIME_WORK_TAG, ExistingWorkPolicy.KEEP, workRequest)

@@ -145,7 +145,17 @@ private fun HomeScreenScope.Station(
             StationTrains(station)
         }
 
-        if (station.trains.isEmpty()) {
+        var showEmptyText by remember { mutableStateOf(false) }
+        LaunchedEffect(station.trains.isEmpty(), state.isLoading) {
+            if (station.trains.isEmpty()) {
+                if (!state.isLoading) {
+                    showEmptyText = true
+                }
+            } else {
+                showEmptyText = false
+            }
+        }
+        if (showEmptyText) {
             Box(
                 Modifier.fillMaxWidth().padding(horizontal = gutter()).padding(bottom = 8.dp),
                 contentAlignment = Alignment.Center

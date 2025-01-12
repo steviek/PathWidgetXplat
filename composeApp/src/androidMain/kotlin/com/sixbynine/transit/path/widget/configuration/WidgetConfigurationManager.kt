@@ -27,7 +27,7 @@ object WidgetConfigurationManager {
 
     private val context get() = MobilePathApplication.instance
     private val DEPARTURE_WIDGET_PREFS_KEY = stringPreferencesKey("departure_widget_data")
-    private const val SCHEMA_VERSION = 4
+    private const val SCHEMA_VERSION = 5
 
     init {
         GlobalScope.launch(Dispatchers.IO) {

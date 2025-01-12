@@ -68,8 +68,6 @@ extension LineChoice {
             Line.journalsquare33rd
         case .nwkWtc:
             Line.newarkwtc
-        case .wtc33:
-            Line.wtc33rd
         }
     }
 }

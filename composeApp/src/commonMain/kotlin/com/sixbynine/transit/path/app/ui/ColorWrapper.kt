@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.sixbynine.transit.path.api.templine.HobClosureConfigRepository
+import com.sixbynine.transit.path.app.ui.Colors.approxEquals
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -40,6 +41,10 @@ data class ColorWrapper(val color: Color) {
             }
             else -> color
         }
+    }
+
+    infix fun approxEquals(other: ColorWrapper): Boolean {
+        return unwrap(isDark = false).approxEquals(other.unwrap(isDark = false))
     }
 }
 

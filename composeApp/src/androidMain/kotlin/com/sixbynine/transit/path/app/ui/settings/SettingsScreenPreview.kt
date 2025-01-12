@@ -23,7 +23,7 @@ fun SettingsScreenPreview() {
             state = State(
                 locationSetting = LocationSettingState.Disabled,
                 trainFilter = Interstate,
-                lines = Line.entries.toSet(),
+                lines = Line.permanentLines.toSet(),
                 stationSort = StationSort.Alphabetical,
                 showPresumedTrains = false,
                 hasLocationPermission = false,

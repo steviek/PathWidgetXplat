@@ -2,10 +2,10 @@ package com.sixbynine.transit.path.api.impl
 
 import com.sixbynine.transit.path.api.DepartureBoardTrain
 import com.sixbynine.transit.path.api.DepartureBoardTrainMap
+import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.Line.Hoboken33rd
 import com.sixbynine.transit.path.api.Line.HobokenWtc
 import com.sixbynine.transit.path.api.Line.NewarkWtc
-import com.sixbynine.transit.path.api.Line.Wtc33rd
 import com.sixbynine.transit.path.api.PathApi
 import com.sixbynine.transit.path.api.State.NewJersey
 import com.sixbynine.transit.path.api.State.NewYork
@@ -60,7 +60,7 @@ internal class MockPathApi : PathApi {
                     isDelayed = false,
                     backfillSource = null,
                     directionState = NewYork,
-                    lines = setOf(Wtc33rd)
+                    lines = Line.permanentLinesForWtc33rd.toSet()
                 ),
             )
         }.mapKeys { it.key.pathApiName }

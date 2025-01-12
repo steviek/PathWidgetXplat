@@ -35,7 +35,7 @@ enum StationChoice : String, AppEnum {
 }
 
 enum LineChoice : String, AppEnum {
-    case nwkWtc, hobWtc, jsq33, hob33, wtc33
+    case nwkWtc, hobWtc, jsq33, hob33
     
     static var typeDisplayRepresentation: TypeDisplayRepresentation = "Lines"
     
@@ -44,7 +44,6 @@ enum LineChoice : String, AppEnum {
         .hobWtc: "Hoboken ⇆ World Trade Center",
         .jsq33: "Journal Square ⇆ 33rd Street",
         .hob33: "Hoboken ⇆ 33rd Street",
-        .wtc33: "33rd Street ⇆ World Trade Center",
     ]
 }
 
@@ -102,7 +101,7 @@ struct ConfigurationAppIntent: WidgetConfigurationIntent {
     @Parameter(title: "Stations", default: [])
     var stations: [StationChoice]
     
-    @Parameter(title: "Lines", default: [LineChoice.nwkWtc, LineChoice.hobWtc, LineChoice.jsq33, LineChoice.hob33, LineChoice.wtc33])
+    @Parameter(title: "Lines", default: [LineChoice.nwkWtc, LineChoice.hobWtc, LineChoice.jsq33, LineChoice.hob33])
     var lines: [LineChoice]
     
     @Parameter(title: "Filter", default: Filter.all)

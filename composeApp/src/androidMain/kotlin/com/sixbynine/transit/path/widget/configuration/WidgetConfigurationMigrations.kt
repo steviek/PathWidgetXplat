@@ -35,15 +35,12 @@ fun StoredWidgetConfiguration.migrateToCurrentVersion(): StoredWidgetConfigurati
     if (version < 3) {
         configuration = configuration.copy(
             version = 3,
-            linesBitmask = IntPersistable.createBitmask(Line.entries)
+            linesBitmask = IntPersistable.createBitmask(Line.permanentLines)
         )
     }
 
-    if (version < 4) {
-        configuration = configuration.copy(
-            version = 4,
-            linesBitmask = IntPersistable.createBitmask(configuration.lines + Line.Wtc33rd)
-        )
+    if (version < 5) {
+        configuration = configuration.copy(version = 5)
     }
 
     return configuration

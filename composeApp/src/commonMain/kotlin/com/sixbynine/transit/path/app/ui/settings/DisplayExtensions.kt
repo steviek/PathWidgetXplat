@@ -7,7 +7,6 @@ import com.sixbynine.transit.path.api.Line.Hoboken33rd
 import com.sixbynine.transit.path.api.Line.HobokenWtc
 import com.sixbynine.transit.path.api.Line.JournalSquare33rd
 import com.sixbynine.transit.path.api.Line.NewarkWtc
-import com.sixbynine.transit.path.api.Line.Wtc33rd
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.StationSort.Alphabetical
 import com.sixbynine.transit.path.api.StationSort.NjAm
@@ -16,7 +15,6 @@ import com.sixbynine.transit.path.api.StationSort.Proximity
 import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.api.TrainFilter.All
 import com.sixbynine.transit.path.api.TrainFilter.Interstate
-import com.sixbynine.transit.path.api.templine.HobClosureConfigRepository
 import com.sixbynine.transit.path.app.settings.AvoidMissingTrains
 import com.sixbynine.transit.path.app.settings.StationLimit
 import com.sixbynine.transit.path.app.settings.TimeDisplay
@@ -109,27 +107,26 @@ fun TimeDisplay.subtitle(): String = when (this) {
     )
 }
 
-val Line.title: String get() = when (this) {
-    NewarkWtc -> "Newark ⇆ World Trade Center"
-    HobokenWtc -> "Hoboken ⇆ World Trade Center"
-    JournalSquare33rd -> "Journal Square ⇆ 33rd Street"
-    Hoboken33rd -> "Hoboken ⇆ 33rd Street"
-    Wtc33rd -> HobClosureConfigRepository.getConfig().tempLineInfo.displayName
-}
+val Line.title: String
+    get() = when (this) {
+        NewarkWtc -> "Newark ⇆ World Trade Center"
+        HobokenWtc -> "Hoboken ⇆ World Trade Center"
+        JournalSquare33rd -> "Journal Square ⇆ 33rd Street"
+        Hoboken33rd -> "Hoboken ⇆ 33rd Street"
+    }
 
-val Line.colors: List<ColorWrapper> get() = when (this) {
-    NewarkWtc -> Colors.NwkWtc
-    HobokenWtc -> Colors.HobWtc
-    JournalSquare33rd -> Colors.Jsq33s
-    Hoboken33rd -> Colors.Hob33s
-    Wtc33rd -> Colors.Wtc33s
-
-}
+val Line.colors: List<ColorWrapper>
+    get() = when (this) {
+        NewarkWtc -> Colors.NwkWtc
+        HobokenWtc -> Colors.HobWtc
+        JournalSquare33rd -> Colors.Jsq33s
+        Hoboken33rd -> Colors.Hob33s
+    }
 
 val Set<Line>.title: String
     @Composable
     get() {
-        if (size == Line.entries.size) {
+        if (containsAll(Line.permanentLines)) {
             return stringResource(string.lines_show_all)
         }
 

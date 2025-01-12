@@ -5,7 +5,6 @@ import com.sixbynine.transit.path.api.Line.Hoboken33rd
 import com.sixbynine.transit.path.api.Line.HobokenWtc
 import com.sixbynine.transit.path.api.Line.JournalSquare33rd
 import com.sixbynine.transit.path.api.Line.NewarkWtc
-import com.sixbynine.transit.path.api.Line.Wtc33rd
 import com.sixbynine.transit.path.app.ui.ColorWrapper
 import com.sixbynine.transit.path.app.ui.Colors
 
@@ -19,12 +18,15 @@ object LineComputer {
 
         // First, make sure we match if there are any matching colors.
         colors.forEach {
+            if (it approxEquals Colors.Wtc33sSingle) {
+                lines += Line.permanentLinesForWtc33rd
+            }
+
             when (it) {
                 Colors.NwkWtcSingle -> lines += NewarkWtc
                 Colors.HobWtcSingle -> lines += HobokenWtc
                 Colors.Hob33sSingle -> lines += Hoboken33rd
                 Colors.Jsq33sSingle -> lines += JournalSquare33rd
-                Colors.Wtc33sSingle -> lines += Wtc33rd
             }
         }
 
@@ -70,14 +72,14 @@ object LineComputer {
                 "EXP" -> lines += listOf(NewarkWtc, HobokenWtc)
                 "NWK", "HAR", "JSQ", "GRV" -> lines += NewarkWtc
                 "NEW", "HOB" -> lines += HobokenWtc
-                in NyNorthStations -> lines += Wtc33rd
+                in NyNorthStations -> lines += Line.permanentLinesForWtc33rd
             }
 
             in NyNorthStations -> when (target) {
                 in NyNorthStations -> lines += listOf(JournalSquare33rd, Hoboken33rd)
                 "HOB" -> lines += Hoboken33rd
                 "GRV", "JSQ" -> lines += JournalSquare33rd
-                "WTC" -> lines += Wtc33rd
+                "WTC" -> lines += Line.permanentLinesForWtc33rd
             }
         }
 

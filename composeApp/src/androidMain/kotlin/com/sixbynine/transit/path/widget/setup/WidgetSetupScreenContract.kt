@@ -24,7 +24,7 @@ object WidgetSetupScreenContract {
         val nyStations: List<StationRow> = defaultStations(NewYork),
         val sortOrder: StationSort = StationSort.Alphabetical,
         val filter: TrainFilter = TrainFilter.All,
-        val lines: Set<Line> = Line.entries.toSet(),
+        val lines: Set<Line> = Line.permanentLines.toSet(),
         val appWidgetId: Int = INVALID_APPWIDGET_ID,
     ) {
         val isConfirmButtonEnabled =

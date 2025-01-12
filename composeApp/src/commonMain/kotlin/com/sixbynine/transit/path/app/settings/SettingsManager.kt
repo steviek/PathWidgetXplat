@@ -30,7 +30,7 @@ object SettingsManager {
 
     private val trainFilterPersister = SettingPersister("train_filter", TrainFilter.All)
     private val groupTrainsPersister = SettingPersister("group_trains", true)
-    private val lineFilterPersister = BitFlagSettingPersister("line_filter", Line.entries)
+    private val lineFilterPersister = BitFlagSettingPersister("line_filter", Line.permanentLines)
     private val timeDisplayPersister = SettingPersister("time_display", TimeDisplay.Relative)
     private val stationLimitPersister = SettingPersister("station_limit", StationLimit.ThreePerLine)
     private val stationSortPersister = SettingPersister("station_sort", StationSort.Alphabetical)
@@ -82,7 +82,7 @@ object SettingsManager {
 
     init {
         val prevSchemaVersion = schemaVersion
-        val currentSchemaVersion = 2
+        val currentSchemaVersion = 3
         if (prevSchemaVersion == null || prevSchemaVersion < currentSchemaVersion) {
             performMigration(prevSchemaVersion)
             schemaVersion = currentSchemaVersion
@@ -233,8 +233,6 @@ object SettingsManager {
     }
 
     private fun performMigration(prevVersion: Int?) {
-        if (prevVersion == null && lineFilter.value.size < Line.entries.size) {
-            updateLineFilters(lineFilter.value + Line.Wtc33rd)
-        }
+
     }
 }

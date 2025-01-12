@@ -42,4 +42,12 @@ object Colors {
     fun Color.wrap(): ColorWrapper {
         return ColorWrapper(this)
     }
+
+    infix fun Color.approxEquals(other: Color): Boolean {
+        val dR = red - other.red
+        val dG = green - other.green
+        val dB = blue - other.blue
+        val delta = (dR * dR) + (dG * dG) + (dB * dB)
+        return delta < .1f
+    }
 }

@@ -18,7 +18,7 @@ data class StoredWidgetConfiguration(
     val version: Int = 1,
 ) {
     val lines: Set<Line>
-        get() = IntPersistable.fromBitmask(linesBitmask ?: 0)
+        get() = IntPersistable.fromBitmask<Line>(linesBitmask ?: 0)
 }
 
 fun StoredWidgetConfiguration?.needsSetup(): Boolean {

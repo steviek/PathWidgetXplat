@@ -30,7 +30,7 @@ class WidgetDataFetcherTest {
         val data = WidgetDataFetcher.fetchWidgetDataWithPrevious(
             stationLimit = 1,
             stations = listOf(Stations.JournalSquare),
-            lines = Line.entries.toSet(),
+            lines = Line.permanentLines.toSet(),
             sort = StationSort.Alphabetical,
             filter = All,
             includeClosestStation = false,

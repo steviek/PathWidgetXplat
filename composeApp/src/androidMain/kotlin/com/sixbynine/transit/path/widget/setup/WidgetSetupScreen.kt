@@ -202,7 +202,7 @@ private fun WidgetSetupScreenScope.LinesSection() {
             style = TitleStyle
         )
 
-        Line.all.forEach { line ->
+        Line.permanentLines.forEach { line ->
             TrainLineCheckboxRow(
                 line = line,
                 checked = line in state.lines,

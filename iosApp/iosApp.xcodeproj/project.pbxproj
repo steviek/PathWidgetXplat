@@ -595,6 +595,7 @@
 					"$(inherited)",
 					"-framework",
 					composeApp,
+					"-ObjC",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "${BUNDLE_ID}${TEAM_ID}";
 				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.sixbynine.transit.path;
@@ -631,6 +632,7 @@
 					"$(inherited)",
 					"-framework",
 					composeApp,
+					"-ObjC",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "${BUNDLE_ID}${TEAM_ID}";
 				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.sixbynine.transit.path;

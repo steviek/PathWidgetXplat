@@ -12,6 +12,9 @@ def create_override(page: dict) -> dict:
             continue
         link = item['linkHref'].split(".html")[0]
         s, d = parse_schedule(page[":children"][link][":items"]["root"][":items"])
+        if s == None:
+            continue
+
         # get only the closest date
         if date == None:
             data = s

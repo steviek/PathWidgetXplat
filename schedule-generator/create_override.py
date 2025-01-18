@@ -26,6 +26,10 @@ def parse_schedule(d: dict) -> tuple:
     r['schedules'] = list()
     r['timings'] = list()
     # parse the title
+    if "imagewithtext_copy_c" not in d:
+        print("imagewithtext_copy_c not in override")
+        return None, None
+
     r['name'] = d["imagewithtext_copy_c"]["title"]
     # get every schedule block
     index = 0

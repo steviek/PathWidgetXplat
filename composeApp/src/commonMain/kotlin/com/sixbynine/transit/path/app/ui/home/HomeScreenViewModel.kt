@@ -24,8 +24,8 @@ import com.sixbynine.transit.path.app.settings.isActiveAt
 import com.sixbynine.transit.path.app.station.StationSelection
 import com.sixbynine.transit.path.app.station.StationSelectionManager
 import com.sixbynine.transit.path.app.ui.PathViewModel
-import com.sixbynine.transit.path.app.ui.common.AppUiBackfillSource
 import com.sixbynine.transit.path.app.ui.common.AppUiTrainData
+import com.sixbynine.transit.path.app.ui.common.trainDisplayTime
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.DepartureBoardData
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Effect
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Effect.NavigateToSettings
@@ -71,7 +71,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration.Companion.milliseconds
@@ -412,32 +411,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
                             trains = data.trains
                                 .filter { it.projectedArrival >= now() - 30.seconds }
                                 .filter { matchesFilter(station, it, trainFilter) }
-                                .map { train ->
-                                    AppUiTrainData(
-                                        id = train.id,
-                                        title = train.title,
-                                        colors = train.colors,
-                                        displayText = trainDisplayTime(
-                                            timeDisplay,
-                                            isDelayed = train.isDelayed,
-                                            isBackfilled = train.isBackfilled,
-                                            train.projectedArrival
-                                        ),
-                                        projectedArrival = train.projectedArrival,
-                                        isDelayed = train.isDelayed,
-                                        backfill = train.backfillSource?.let {
-                                            AppUiBackfillSource(
-                                                it,
-                                                trainDisplayTime(
-                                                    timeDisplay,
-                                                    isDelayed = train.isDelayed,
-                                                    isBackfilled = false,
-                                                    it.projectedArrival
-                                                )
-                                            )
-                                        },
-                                    )
-                                },
+                                .map { train -> AppUiTrainData.create(train, timeDisplay) },
                             isClosest = data.id == closestStationId && locationSetting == Enabled,
                             alertText = alertToDisplay?.message?.unpack(),
                             alertUrl = alertToDisplay?.url?.unpack(),
@@ -457,31 +431,6 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
                     )
                 }
             )
-        }
-
-        private fun trainDisplayTime(
-            timeDisplay: TimeDisplay,
-            isDelayed: Boolean,
-            isBackfilled: Boolean,
-            projectedArrival: Instant
-        ): String {
-            return with(StringBuilder()) {
-                if (isBackfilled) append("~")
-
-                if (isDelayed) append(localizedString(en = "Delayed - ", es = "Retrasado - "))
-
-                val time = when (timeDisplay) {
-                    Relative -> WidgetDataFormatter.formatRelativeTime(
-                        Clock.System.now(),
-                        projectedArrival
-                    )
-
-                    TimeDisplay.Clock -> WidgetDataFormatter.formatTime(projectedArrival)
-                }
-                append(time)
-
-                toString()
-            }
         }
 
         private fun AlertText.unpack(): String? {

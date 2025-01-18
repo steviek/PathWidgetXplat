@@ -22,40 +22,18 @@ import com.sixbynine.transit.path.api.isWestOf
 import com.sixbynine.transit.path.api.state
 import com.sixbynine.transit.path.app.lifecycle.AppLifecycleObserver
 import com.sixbynine.transit.path.app.settings.AvoidMissingTrains
-import com.sixbynine.transit.path.app.settings.AvoidMissingTrains.Always
-import com.sixbynine.transit.path.app.settings.AvoidMissingTrains.Disabled
-import com.sixbynine.transit.path.app.settings.AvoidMissingTrains.OffPeak
+import com.sixbynine.transit.path.app.settings.AvoidMissingTrains.*
 import com.sixbynine.transit.path.app.settings.SettingsManager.currentAvoidMissingTrains
 import com.sixbynine.transit.path.location.Location
-import com.sixbynine.transit.path.location.LocationCheckResult.Failure
-import com.sixbynine.transit.path.location.LocationCheckResult.JustChecked
-import com.sixbynine.transit.path.location.LocationCheckResult.NoPermission
-import com.sixbynine.transit.path.location.LocationCheckResult.NoProvider
-import com.sixbynine.transit.path.location.LocationCheckResult.Success
+import com.sixbynine.transit.path.location.LocationCheckResult.*
 import com.sixbynine.transit.path.location.LocationProvider
 import com.sixbynine.transit.path.time.NewYorkTimeZone
 import com.sixbynine.transit.path.time.now
-import com.sixbynine.transit.path.util.AgedValue
-import com.sixbynine.transit.path.util.DataResult
-import com.sixbynine.transit.path.util.FetchWithPrevious
-import com.sixbynine.transit.path.util.Staleness
-import com.sixbynine.transit.path.util.globalDataStore
-import com.sixbynine.transit.path.util.isFailure
-import com.sixbynine.transit.path.util.isSuccess
-import com.sixbynine.transit.path.util.onFailure
-import com.sixbynine.transit.path.util.onSuccess
-import com.sixbynine.transit.path.util.orElse
-import com.sixbynine.transit.path.util.suspendRunCatching
-import com.sixbynine.transit.path.util.withTimeoutCatching
+import com.sixbynine.transit.path.util.*
+import kotlinx.coroutines.*
 import kotlinx.coroutines.CoroutineStart.LAZY
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeout
 import kotlinx.datetime.DayOfWeek.SATURDAY
 import kotlinx.datetime.DayOfWeek.SUNDAY
 import kotlinx.datetime.Instant
@@ -395,18 +373,7 @@ object WidgetDataFetcher {
 
             val trains = apiTrains
                 .asSequence()
-                .map {
-                    val colors = it.lineColors.distinct()
-                    WidgetData.TrainData(
-                        id = it.headsign + ":" + it.projectedArrival,
-                        title = it.headsign,
-                        colors = colors,
-                        projectedArrival = it.projectedArrival,
-                        isDelayed = it.isDelayed,
-                        backfillSource = it.backfillSource,
-                        lines = it.lines,
-                    )
-                }
+                .map { it.toCommonUiTrainData() }
                 .filter { train ->
                     (train.lines == null || train.lines.any { line -> line in lines })
                         .also {

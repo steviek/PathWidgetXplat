@@ -18,7 +18,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
+import com.sixbynine.transit.path.app.settings.TimeDisplay.Clock
 import com.sixbynine.transit.path.app.ui.ViewModelScreen
+import com.sixbynine.transit.path.app.ui.common.TrainLineContent
 import com.sixbynine.transit.path.app.ui.common.TrainLineContentWithWithBackfillBottomSheet
 import com.sixbynine.transit.path.app.ui.home.AlertBox
 import com.sixbynine.transit.path.app.ui.home.AlertBoxColors
@@ -138,6 +140,20 @@ private fun StationScope.Content() {
                                     .padding(horizontal = 16.dp, vertical = 8.dp),
                             )
                         }
+                    }
+                }
+            }
+
+            LazyColumn(Modifier.weight(1f)) {
+                state.scheduledTrains.forEach { train ->
+                    item(train.id) {
+                        TrainLineContent(
+                            listOf(train),
+                            timeDisplay = Clock,
+                            modifier = Modifier.heightIn(48.dp)
+                                .animateItemPlacement()
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                        )
                     }
                 }
             }

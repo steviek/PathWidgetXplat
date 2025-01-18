@@ -1,12 +1,10 @@
 package com.sixbynine.transit.path.widget
 
-import com.sixbynine.transit.path.api.BackfillSource
-import com.sixbynine.transit.path.api.Line
-import com.sixbynine.transit.path.api.State
-import com.sixbynine.transit.path.api.Stations
+import com.sixbynine.transit.path.api.*
 import com.sixbynine.transit.path.api.alerts.Alert
 import com.sixbynine.transit.path.app.ui.ColorWrapper
 import com.sixbynine.transit.path.widget.WidgetData.StationData
+import com.sixbynine.transit.path.widget.WidgetData.TrainData
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.minutes
@@ -64,4 +62,17 @@ fun StationData.longId(): Long {
         .takeIf { it != -1 }
         ?.toLong()
         ?: (id.hashCode().toLong() + 10)
+}
+
+fun DepartureBoardTrain.toCommonUiTrainData(): TrainData {
+    val colors = lineColors.distinct()
+    return TrainData(
+        id = "$headsign:$projectedArrival",
+        title = headsign,
+        colors = colors,
+        projectedArrival = projectedArrival,
+        isDelayed = isDelayed,
+        backfillSource = backfillSource,
+        lines = lines,
+    )
 }

@@ -45,8 +45,6 @@ object AndroidPreferences : Preferences {
     }
 }
 
-var testInstance: Preferences? = null
-
-actual fun Preferences(): Preferences {
+actual fun createPreferences(): Preferences {
     return testInstance ?: AndroidPreferences
 }

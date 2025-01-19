@@ -84,10 +84,10 @@ class DepartureBoardWidget : GlanceAppWidget() {
         newStations.forEachIndexed { index, stationData ->
             newStations[index] = stationData.copy(
                 trains = stationData.trains.filter { trainData ->
-                    configuration.lines.anyMatch(trainData)
+                    configuration.lines.anyMatch(trainData, stationId = stationData.id)
                 },
                 signs = stationData.signs.filter {
-                    configuration.lines.anyMatch(it)
+                    configuration.lines.anyMatch(it, stationId = stationData.id)
                 }
             )
         }

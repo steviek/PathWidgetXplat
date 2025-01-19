@@ -70,6 +70,7 @@ kotlin {
 
         val androidUnitTest by getting {
             dependencies {
+                implementation(projects.test)
                 implementation(libs.kotlin.coroutines.test)
             }
         }

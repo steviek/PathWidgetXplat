@@ -230,10 +230,11 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
                             en = {
                                 "No internet\nArrival times are relative to the current time, " +
                                         "based on data from $formattedFetchTime"
-                                 },
+                            },
                             es = { "Sin internet, mostrando dados desde $formattedFetchTime" }
                         )
                     }
+
                     TimeDisplay.Clock -> {
                         localizedString(
                             en = { "No internet, data from $formattedFetchTime" },
@@ -330,7 +331,12 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
                         trains = data.trains
                             .filterNot { it.shouldHideForPresumption() }
                             .filter { train ->
-                                SettingsManager.lineFilter.value.any { it.matches(train) }
+                                SettingsManager.lineFilter.value.any {
+                                    it.matches(
+                                        train,
+                                        stationId = data.station.pathApiName
+                                    )
+                                }
                             }
                             .let {
                                 if (SettingsManager.groupTrains.value) {

@@ -1,0 +1,56 @@
+{
+  "status": "Success",
+  "data": [
+    {
+      "incidentMessage": {
+        "subject": "Hack River Bridge Lift Fri 01-17-2025",
+        "preMessage": "Plan Ahead: Fri 01-17-2025 12:30pm: Mandatory Hack River Bridge lift scheduled. Time subject to change. Possible NWK-WTC impacts. Please allow extra travel time.",
+        "formVariableItems": [
+          {
+            "val": [
+              "NWK-WTC"
+            ],
+            "variableName": "Lines",
+            "isRequired": true,
+            "seq": 1,
+            "variableId": 367103739691127
+          },
+          {
+            "val": [
+              "01-17-2025"
+            ],
+            "variableName": "Date",
+            "isRequired": true,
+            "seq": 2,
+            "variableId": 392942262944022,
+            "prefixName": "1"
+          },
+          {
+            "val": [
+              "Fri"
+            ],
+            "variableName": "Day of the Week",
+            "isRequired": true,
+            "seq": 3,
+            "variableId": 392942262944016,
+            "prefixName": "1"
+          },
+          {
+            "val": [
+              "12:30pm"
+            ],
+            "variableName": "Time Range 1",
+            "isRequired": true,
+            "seq": 4,
+            "variableId": 2626187817910379,
+            "prefixName": "1"
+          }
+        ],
+        "sysVarTodayDateFormat": "mm-dd-yyyy",
+        "sysVarCurrentTimeFormat": "HH:mm:ss"
+      },
+      "CreatedDate": "1737118615522",
+      "ModifiedDate": "1737118615522"
+    }
+  ]
+}

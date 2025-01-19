@@ -41,4 +41,4 @@ object IosPreferences : Preferences {
     }
 }
 
-actual fun Preferences(): Preferences = IosPreferences
+actual fun createPreferences(): Preferences = IosPreferences

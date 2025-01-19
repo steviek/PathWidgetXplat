@@ -12,7 +12,13 @@ interface Preferences {
     fun clear()
 }
 
-expect fun Preferences(): Preferences
+var testInstance: Preferences? = null
+
+fun Preferences(): Preferences {
+    return testInstance ?: createPreferences()
+}
+
+expect fun createPreferences(): Preferences
 
 sealed interface PreferencesKey<T> {
     val key: String

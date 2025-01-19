@@ -1,4 +1,4 @@
-package com.sixbynine.transit.path
+package com.sixbynine.transit.path.test
 
 import com.sixbynine.transit.path.util.IsTest
 import com.sixbynine.transit.path.util.TestRemoteFileProvider

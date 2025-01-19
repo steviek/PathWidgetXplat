@@ -31,14 +31,12 @@
 
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
-
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                    android:scheme="https"
-                    android:host="play.google.com"
-                    android:pathPattern="/store/apps/details?id=com.sixbynine.transit.path"/>
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:host="play.google.com" />
+                <data android:path="/store/apps/details" />
             </intent-filter>
         </activity>
 

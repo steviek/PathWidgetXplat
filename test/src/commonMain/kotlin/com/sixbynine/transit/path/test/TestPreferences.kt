@@ -1,4 +1,4 @@
-package com.sixbynine.transit.path
+package com.sixbynine.transit.path.test
 
 import com.sixbynine.transit.path.preferences.Preferences
 import com.sixbynine.transit.path.preferences.PreferencesKey

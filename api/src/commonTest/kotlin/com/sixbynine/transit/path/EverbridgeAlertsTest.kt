@@ -11,18 +11,25 @@ import com.sixbynine.transit.path.api.everbridge.IncidentMessage
 import com.sixbynine.transit.path.api.everbridge.Variable
 import com.sixbynine.transit.path.api.everbridge.getAlertsForLines
 import com.sixbynine.transit.path.api.everbridge.getAlertsForStation
+import com.sixbynine.transit.path.test.TestSetupHelper
 import com.sixbynine.transit.path.util.JsonFormat
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.Month.DECEMBER
 import kotlinx.datetime.Month.OCTOBER
 import kotlinx.serialization.encodeToString
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class EverbridgeAlertsTest {
+    @BeforeTest
+    fun setUp() {
+        TestSetupHelper.setUp()
+    }
+
     @Test
     fun `current alerts text`() {
         val alerts = EverbridgeAlerts(
@@ -86,7 +93,8 @@ class EverbridgeAlertsTest {
                         isRequired = false,
                         seq = 3
                     ),
-                )
+                ),
+                dateFormat = "mm-dd-yyyy",
             ),
             createdDate = Instant.fromEpochMilliseconds(1734988841776),
             modifiedDate = Instant.fromEpochMilliseconds(1734988841776)
@@ -162,7 +170,8 @@ class EverbridgeAlertsTest {
                         isRequired = false,
                         seq = 12
                     )
-                )
+                ),
+                dateFormat = "mm-dd-yyyy",
             ),
             createdDate = Instant.fromEpochMilliseconds(1729533384417),
             modifiedDate = Instant.fromEpochMilliseconds(1729533384417)

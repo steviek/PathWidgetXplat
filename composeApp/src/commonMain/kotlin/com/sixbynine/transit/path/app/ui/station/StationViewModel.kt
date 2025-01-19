@@ -29,6 +29,8 @@ class StationViewModel(private val stationId: String?) : BaseViewModel<State, In
     init {
         lightweightScope.launch {
             fetchingUseCase.fetchData.collectLatest { fetchData ->
+                stationId ?: return@collectLatest
+
                 repeatEvery(250.milliseconds) {
                     AppLifecycleObserver.isActive.first { it } // Make sure the UI is visible
 
@@ -42,7 +44,8 @@ class StationViewModel(private val stationId: String?) : BaseViewModel<State, In
                     val allTrains = stationData?.trains.orEmpty()
                     val trainFilter = SettingsManager.trainFilter.value
                     val (matching, notMatching) = allTrains.partition { train ->
-                        SettingsManager.lineFilter.value.any { it.matches(train) } &&
+                        SettingsManager.lineFilter.value
+                            .any { it.matches(train, stationId = stationId) } &&
                                 matchesFilter(
                                     stationData?.station ?: return@partition false,
                                     train,

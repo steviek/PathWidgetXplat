@@ -10,7 +10,7 @@ class StoredWidgetConfigurationTest {
         val configuration = JsonFormat.decodeFromString<StoredWidgetConfiguration>(V17_Data)
             .migrateToCurrentVersion()
 
-        assertEquals(2, configuration.version)
+        assertEquals(5, configuration.version)
         assertEquals(setOf("NEW", "EXP", "WTC"), configuration.fixedStations)
     }
 

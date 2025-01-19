@@ -12,7 +12,7 @@ object LineComputer {
     fun computeLines(
         station: String,
         target: String,
-        colors: List<ColorWrapper>
+        colors: Collection<ColorWrapper>
     ): Set<Line> {
         val lines = mutableSetOf<Line>()
 
@@ -28,11 +28,6 @@ object LineComputer {
                 Colors.Hob33sSingle -> lines += Hoboken33rd
                 Colors.Jsq33sSingle -> lines += JournalSquare33rd
             }
-        }
-
-        if (colors.size == lines.size) {
-            // All the colors matched a line, no need for any more logic.
-            return lines
         }
 
         // This logic is an attempt to cover the case where schedules have changed to different
@@ -55,10 +50,11 @@ object LineComputer {
             "EXP" -> when (target) {
                 "NWK", "HAR", "WTC", "EXP", "GRV" -> lines += NewarkWtc
                 "NEW", "HOB" -> lines += HobokenWtc
+                in NyNorthStations -> lines += Line.permanentLinesForWtc33rd
             }
 
             "NEW" -> when (target) {
-                "EXP", "HOB" -> lines += HobokenWtc
+                "EXP", "HOB", "WTC" -> lines += HobokenWtc
                 "GRV", "JSQ", in NyNorthStations -> lines += JournalSquare33rd
             }
 

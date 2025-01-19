@@ -70,6 +70,7 @@ object HomeScreenContract {
         data object AddStationClicked : Intent
         data class ConstraintsChanged(val maxWidth: Dp, val maxHeight: Dp) : Intent
         data class StationClicked(val id: String) : Intent
+        data class StationLongClicked(val id: String) : Intent
     }
 
     sealed interface Effect {

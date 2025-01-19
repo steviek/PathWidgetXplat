@@ -42,6 +42,7 @@ import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.Settings
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StationBottomSheetDismissed
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StationBottomSheetSelection
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StationClicked
+import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StationLongClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StationSelectionDialogDismissed
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StopEditingClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.UpdateNowClicked
@@ -208,6 +209,10 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
 
             is StationClicked -> {
                 sendEffect(NavigateToStation(intent.id))
+            }
+
+            is StationLongClicked -> {
+                updateState { copy(isEditing = !isEditing) }
             }
         }
     }

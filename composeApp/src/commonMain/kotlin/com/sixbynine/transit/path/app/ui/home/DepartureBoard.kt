@@ -2,6 +2,7 @@ package com.sixbynine.transit.path.app.ui.home
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +41,7 @@ import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.MoveStat
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.MoveStationUpClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.RemoveStationClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StationClicked
+import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StationLongClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.StationData
 import com.sixbynine.transit.path.app.ui.home.TrainGrouper.groupTrains
 import com.sixbynine.transit.path.app.ui.icon.IconType
@@ -122,7 +124,12 @@ private fun HomeScreenScope.Station(
         nextStation.state == station.state
     }
 
-    Card(modifier.clickable { onIntent(StationClicked(station.id)) }) {
+    Card(
+        modifier.combinedClickable(
+            onLongClick = { onIntent(StationLongClicked(station.id)) },
+            onClick = { onIntent(StationClicked(station.id)) }
+        )
+    ) {
         Column(Modifier.padding(bottom = 8.dp)) {
             StationHeader(
                 modifier = Modifier.fillMaxSize(),

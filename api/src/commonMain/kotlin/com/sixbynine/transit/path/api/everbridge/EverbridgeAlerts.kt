@@ -163,6 +163,7 @@ private val IncidentMessage.lines: Set<Line>
                     "JSQ-33" -> listOf(JournalSquare33rd)
                     "HOB-33" -> listOf(Hoboken33rd)
                     "WTC-33" -> Line.permanentLinesForWtc33rd
+                    "PATH" -> Line.permanentLines
                     else -> emptyList()
                 }
             }

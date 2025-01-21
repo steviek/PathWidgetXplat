@@ -55,4 +55,4 @@ def parse_schedule(d: dict) -> tuple:
         index += 1
     r['validFrom'] = dates[0].strftime("%Y-%m-%dT00:00")
     r['validTo'] = (dates[-1] + timedelta(days=1)).strftime("%Y-%m-%dT00:00")
-    return r, dates[0]
+    return r, (dates[-1] + timedelta(days=1))

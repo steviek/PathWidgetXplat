@@ -7,6 +7,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy.KEEP
 import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType.CONNECTED
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
@@ -77,6 +78,7 @@ class WidgetRefreshWorker(
                     .setConstraints(
                         Constraints.Builder()
                             .setRequiresBatteryNotLow(true)
+                            .setRequiredNetworkType(CONNECTED)
                             .build()
                     )
                     .setInputData(Data.Builder().putBoolean(IS_BACKGROUND, true).build())

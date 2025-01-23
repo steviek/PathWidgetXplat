@@ -3,6 +3,7 @@ package com.sixbynine.transit.path
 import com.sixbynine.transit.path.api.Stations.ExchangePlace
 import com.sixbynine.transit.path.api.Stations.FourteenthStreet
 import com.sixbynine.transit.path.api.Stations.GroveStreet
+import com.sixbynine.transit.path.api.Stations.Hoboken
 import com.sixbynine.transit.path.api.Stations.NinthStreet
 import com.sixbynine.transit.path.api.Stations.TwentyThirdStreet
 import com.sixbynine.transit.path.api.Stations.WorldTradeCenter
@@ -25,10 +26,12 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.Month.APRIL
 import kotlinx.datetime.Month.DECEMBER
+import kotlinx.datetime.Month.FEBRUARY
 import kotlinx.datetime.Month.JANUARY
 import kotlinx.datetime.Month.JULY
 import kotlinx.datetime.Month.JUNE
 import kotlinx.datetime.Month.MAY
+import kotlinx.datetime.atTime
 import kotlinx.serialization.encodeToString
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -42,6 +45,7 @@ class GithubAlertsTest {
             GeneralOvernightCleaning,
             FourteenthStreetOvernight,
             ChristmasOvernightCleaning,
+            HobokenClosure,
         )
 
         val json = JsonFormat.encodeToString(alerts)
@@ -345,6 +349,27 @@ class GithubAlertsTest {
             url = AlertText(
                 en = "https://www.panynj.gov/path/en/planned-service-changes.html",
             )
+        )
+
+        val HobokenClosure = Alert(
+            stations = listOf(Hoboken),
+            schedule = Schedule.once(
+                from = LocalDate(2025, JANUARY, 30).atTime(23, 59),
+                to = LocalDate(2025, FEBRUARY, 25).atTime(5, 0)
+            ),
+            displaySchedule = Schedule.once(
+                from = LocalDate(2025, JANUARY, 30).atTime(7, 0),
+                to = LocalDate(2025, FEBRUARY, 25).atTime(5, 0)
+            ),
+            trains = TrainFilter.all(),
+            message = AlertText(
+                en = "Hoboken Station is closed until February 25 for significant track and station upgrades. ",
+                es = "La estación de Hoboken está cerrada hasta el 25 de febrero"
+            ),
+            url = AlertText(
+                en = "https://www.panynj.gov/HobokenClosure"
+            ),
+            level = "WARN"
         )
     }
 }

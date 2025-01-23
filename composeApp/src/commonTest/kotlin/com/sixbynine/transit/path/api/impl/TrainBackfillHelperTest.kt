@@ -172,7 +172,7 @@ class TrainBackfillHelperTest {
     }
 
     @Test
-    fun `do not backfill when no trains matching head sign`() {
+    fun `backfill even when no trains matching head sign`() {
         val trains = departuresMap {
             station(WorldTradeCenter) {
                 newarkTrainAt(10, 0)
@@ -185,19 +185,20 @@ class TrainBackfillHelperTest {
 
             station(GroveStreet) {
                 nwkWtcTrainAt(10, 5)
-                // No Newark train stopping here :'(
             }
         }
 
         val backfilled = TrainBackfillHelper.withBackfill(trains)
 
         val grvTrains = backfilled[GroveStreet.pathApiName]
-        val grvTrainsTimes = grvTrains?.map { it.projectedArrival.printForAssertions() }
-        assertEquals(listOf("10:05"), grvTrainsTimes)
+        val grvTrainsTimes = grvTrains
+            ?.filter { it.headsign == "Newark" }
+            ?.map { it.projectedArrival.printForAssertions() }
+        assertEquals(listOf("10:06"), grvTrainsTimes)
     }
 
     @Test
-    fun `do not backfill earlier train that one matching head sign`() {
+    fun `can backfill earlier train that one matching head sign`() {
         val trains = departuresMap {
             station(WorldTradeCenter) {
                 newarkTrainAt(10, 0)
@@ -214,7 +215,7 @@ class TrainBackfillHelperTest {
 
         val grvTrains = backfilled[GroveStreet.pathApiName]
         val grvTrainsTimes = grvTrains?.map { it.projectedArrival.printForAssertions() }
-        assertEquals(listOf("10:25", "10:46"), grvTrainsTimes)
+        assertEquals(listOf("10:06", "10:25", "10:46"), grvTrainsTimes)
     }
 
     @Test

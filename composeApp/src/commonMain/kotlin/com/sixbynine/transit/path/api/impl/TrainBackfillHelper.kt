@@ -280,12 +280,13 @@ object TrainBackfillHelper {
             "33S_HOB" -> checkpoints[OK_33S_HOB]
             "WTC_JSQ" -> checkpoints[WTC_NWK]
                 ?.filterKeys { it != Harrison && it != JournalSquare }
+
             "JSQ_WTC" -> checkpoints[NWK_WTC]
                 ?.filterKeys { it != Newark && it != Harrison }
-                ?.mapValues {
-                    (_, checkpoint) ->
+                ?.mapValues { (_, checkpoint) ->
                     checkpoint - checkpoints[NWK_WTC]!![JournalSquare]!!
                 }
+
             "NWK_HAR" -> mapOf(Newark to 0.minutes)
             "HAR_NWK" -> mapOf(Harrison to 0.minutes)
             else -> null
@@ -309,116 +310,85 @@ object TrainBackfillHelper {
     fun withBackfill(
         trains: Map<String, List<DepartureBoardTrain>>,
     ): Map<String, List<DepartureBoardTrain>> {
-        val backfilled = trains.toMutableMap()
-        trains.keys.forEach eachStation@{ stationKey ->
-            val station =
-                Stations.All.firstOrNull { it.pathApiName == stationKey }
-                    ?: return@eachStation
+        val backfilled = trains.mapValues { (_, value) -> value.toMutableList() }.toMutableMap()
+
+        trains.forEach eachStation@{ (stationKey, stationTrains) ->
+            val station = Stations.byId(stationKey) ?: return@eachStation
             if (ShouldLog) {
-                Logging.d("Backfill station: ${station.displayName}")
+                Logging.d("Backfill from station: ${station.displayName}")
             }
-            val lineIdToEarliestTrain =
-                trains[stationKey]
-                    .orElse { return@eachStation }
-                    .groupBy { it.lineId }
-                    .mapValues { (_, trains) ->
-                        trains.minByOrNull { it.projectedArrival }?.projectedArrival
-                    }
-                    .toMutableMap()
-            if (station == ExchangePlace) {
-                // We avoid backfilling from lines that aren't already on the departure board for
-                // the station. But Exchange Place is a special case, if we have a train going there
-                // from one of the WTC lines, we assume the other line is also stopping there.
-                lineIdToEarliestTrain[HOB_WTC] =
-                    listOfNotNull(
-                        lineIdToEarliestTrain[HOB_WTC],
-                        lineIdToEarliestTrain[NWK_WTC]
-                    ).minOrNull()
-                lineIdToEarliestTrain[NWK_WTC] =
-                    listOfNotNull(
-                        lineIdToEarliestTrain[HOB_WTC],
-                        lineIdToEarliestTrain[NWK_WTC]
-                    ).minOrNull()
-            }
-            lineIdToEarliestTrain.forEach eachHeadSign@{ (lineId, earliestTrain) ->
-                val checkpointsInLine = LineIdToCheckpointsFaster[lineId] ?: run {
+            stationTrains.forEach eachTrain@{ train ->
+                val lineId = train.lineId
+                val checkpoints = LineIdToCheckpointsFaster[lineId].orElse {
                     if (ShouldLog) {
-                        Logging.d("    Backfill: No checkpoints for ${station.displayName} for" +
-                                "$lineId!")
+                        Logging.d(
+                            "    Backfill: No checkpoints for ${station.displayName} for" +
+                                    "$lineId!"
+                        )
                     }
-                    return@eachHeadSign
+                    return@eachTrain
                 }
-                val stationCheckpoint = checkpointsInLine[station] ?: return@eachHeadSign
-                checkpointsInLine
-                    .filterValues { it < stationCheckpoint }
-                    .toList()
-                    .sortedByDescending { (_, checkpoint) -> checkpoint }
-                    .forEach { (priorStation, priorStationCheckpoint) ->
-                        val travelTimeBetweenStations = stationCheckpoint - priorStationCheckpoint
-                        trains[priorStation.pathApiName]
-                            ?.filter { it.lineId == lineId }
-                            ?.map {
-                                it.copy(
-                                    projectedArrival = it.projectedArrival +
-                                            travelTimeBetweenStations,
-                                    backfillSource = BackfillSource(
-                                        station = priorStation,
-                                        projectedArrival = it.projectedArrival,
-                                    )
-                                )
-                            }
-                            ?.filter { earliestTrain != null && it.projectedArrival > earliestTrain }
-                            ?.forEach eachTrain@ { hypotheticalTrain ->
-                                val trainMatches: (DepartureBoardTrain) -> Boolean = trainMatches@{
-                                    if (it.lineId != lineId) return@trainMatches false
-                                    val timeDelta =
-                                        (hypotheticalTrain.projectedArrival - it.projectedArrival)
-                                            .absoluteValue
-                                    timeDelta <= getCloseTrainThreshold()
-                                }
-                                val currentTrains =
-                                    backfilled[station.pathApiName] ?: return@eachStation
 
-                                val trainTerminalStation =
-                                    Stations.fromHeadSign(hypotheticalTrain.headsign)
-                                val trainTerminalCheckpoint =
-                                    trainTerminalStation?.let { checkpointsInLine[it] }
-                                if (trainTerminalCheckpoint != null &&
-                                    trainTerminalCheckpoint <= stationCheckpoint) {
-                                    // This covers a case where the train is running on a modified
-                                    // route stopping before this station. Example: don't backfill
-                                    // Harrison with a 'Newark'-line train from WTC that is
-                                    // terminating at JSQ.
-                                    return@eachTrain
-                                }
+                infix fun Station.isLaterInLineThan(other: Station): Boolean {
+                    val d1 = checkpoints[this] ?: return false
+                    val d2 = checkpoints[other] ?: return true
+                    return d2 < d1
+                }
 
-                                if (currentTrains.none { trainMatches(it) }) {
-                                    if (ShouldLog) {
-                                        Logging.d(
-                                            "    Backfilling ${station.displayName} with a train " +
-                                                    "from ${priorStation.displayName} to $lineId" +
-                                                    " hypothetically departing at " +
-                                                    "${hypotheticalTrain.projectedArrival}," +
-                                                    "train going to $trainTerminalStation"
-                                        )
-                                    }
-
-                                    backfilled[station.pathApiName] =
-                                        currentTrains + hypotheticalTrain
-                                } else {
-                                    if (ShouldLog) {
-                                        Logging.d(
-                                            "    Skip backfilling ${station.displayName} with a " +
-                                                    "train from ${priorStation.displayName} to " +
-                                                    "$lineId hypothetically departing at " +
-                                                    "${hypotheticalTrain.projectedArrival}"
-                                        )
-                                    }
-                                }
-                            }
+                val stationCheckpointDuration = checkpoints[station] ?: return@eachTrain
+                checkpoints.forEach eachCheckpoint@{ (futureStation, futureStationDuration) ->
+                    val travelTime = futureStationDuration - stationCheckpointDuration
+                    if (travelTime <= Duration.ZERO) {
+                        // earlier station in the line if this is negative...
+                        return@eachCheckpoint
                     }
+
+                    val trainTerminalStation = Stations.fromHeadSign(train.headsign)
+                    if (trainTerminalStation != null &&
+                        checkpoints.containsKey(trainTerminalStation) &&
+                        !(trainTerminalStation isLaterInLineThan futureStation)
+                    ) {
+                        // Don't backfill stations with trains that stop earlier than the station.
+                        // e.g. don't backfill Harrison with a WTC-JSQ train.
+                        return@eachCheckpoint
+                    }
+
+                    val hypotheticalTrain = train.copy(
+                        projectedArrival = train.projectedArrival + travelTime,
+                        backfillSource = train.backfillSource ?: BackfillSource(
+                            station = station,
+                            projectedArrival = train.projectedArrival,
+                        )
+                    )
+
+                    val trainsForStation =
+                        backfilled.getOrPut(futureStation.pathApiName) { arrayListOf() }
+                    for (i in trainsForStation.indices.reversed()) {
+                        val knownTrain = trainsForStation[i]
+                        if (knownTrain.lineId != lineId) continue
+                        if ((knownTrain.projectedArrival - hypotheticalTrain.projectedArrival)
+                            .absoluteValue > getCloseTrainThreshold()) {
+                            continue
+                        }
+
+                        if (knownTrain.backfillSource == null ||
+                            knownTrain.backfillSource.station isLaterInLineThan station) {
+                            // live time or better backfill. move along
+                            return@eachCheckpoint
+                        }
+
+                        trainsForStation.removeAt(i)
+                    }
+
+                    trainsForStation.add(hypotheticalTrain)
+                    if (ShouldLog) {
+                        Logging.d("Add train to ${futureStation.displayName} at ${hypotheticalTrain.projectedArrival} from ${station.displayName} train at ${train.projectedArrival}")
+                    }
+                }
             }
         }
+
+        backfilled.values.forEach { it.sortBy { it.projectedArrival } }
         return backfilled
     }
 

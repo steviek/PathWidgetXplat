@@ -93,9 +93,9 @@ fun EverbridgeAlert.toCommonAlert(): Alert {
     val isElevatorAlert = elevatorStations.isNotEmpty()
     return Alert(
         stations = elevatorStations,
-        schedule = Schedule(),
+        hideTrainsSchedule = Schedule(),
         displaySchedule = schedule,
-        trains = TrainFilter(),
+        hiddenTrainsFilter = TrainFilter(),
         message = AlertText(incidentMessage.preMessage),
         url = AlertText(PATH_ALERTS_URL),
         isGlobal = !isElevatorAlert,

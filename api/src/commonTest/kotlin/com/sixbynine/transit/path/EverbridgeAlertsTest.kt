@@ -3,6 +3,7 @@ package com.sixbynine.transit.path
 import com.sixbynine.transit.path.api.Line.NewarkWtc
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.alerts.AlertText
+import com.sixbynine.transit.path.api.alerts.canHideTrainsAt
 import com.sixbynine.transit.path.api.alerts.everbridge.EverbridgeAlert
 import com.sixbynine.transit.path.api.alerts.everbridge.EverbridgeAlerts
 import com.sixbynine.transit.path.api.alerts.everbridge.IncidentMessage
@@ -22,7 +23,6 @@ import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
-import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class EverbridgeAlertsTest {
@@ -64,9 +64,8 @@ class EverbridgeAlertsTest {
         assertEquals(result.stations, emptyList())
         assertEquals(setOf(NewarkWtc), result.lines)
         assertEquals(result.message, AlertText(NwkWtcDown.incidentMessage.preMessage))
-        assertNull(result.trains.all)
-        assertNull(result.trains.headSigns)
         assertTrue(result.isDisplayedAt(LocalDateTime(2024, OCTOBER, 21, 13, 57)))
+        assertFalse(result.canHideTrainsAt(LocalDateTime(2024, OCTOBER, 21, 13, 57)))
         assertTrue(result.isGlobal)
     }
 

@@ -10,34 +10,51 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.toLocalDateTime
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class Alert(
     /** Path 3 letter station code. */
     val stations: List<String>,
-    /** When the alert takes effect. */
-    val schedule: Schedule,
+
+    /**
+     * When the alert takes effect. While effective, the alert will hide trains matching the
+     * [trains] filter for [stations].
+     */
+    @SerialName("schedule")
+    val hideTrainsSchedule: Schedule,
+
+    /**
+     * When the alert should display in the app. If the alert does not hide trains, this is the only
+     * schedule that should be set.
+     */
+    val displaySchedule: Schedule? = null,
+
     /** Trains that are skipping the stations while the alert is active. */
-    val trains: TrainFilter,
+    @SerialName("trains")
+    val hiddenTrainsFilter: TrainFilter,
+
     /** Optional text to display with the alert. */
     val message: AlertText? = null,
+
     /** Optional web link where the user can read more. */
     val url: AlertText? = null,
-    /** When the alert should display in the app. */
-    val displaySchedule: Schedule? = null,
+
     /** The level of the alert's value. */
     val level: String? = null,
+
     /** Whether this is a global level alert. Stations are ignored if so. */
     val isGlobal: Boolean = false,
+
     /** Lines affected. */
     val lines: Set<Line>? = null,
 )
 
 fun Alert(
     stations: List<Station>,
-    schedule: Schedule,
-    trains: TrainFilter,
+    hideTrainsSchedule: Schedule,
+    hiddenTrainsFilter: TrainFilter,
     message: AlertText? = null,
     url: AlertText? = null,
     displaySchedule: Schedule? = null,
@@ -48,8 +65,8 @@ fun Alert(
     return Alert(
         stations = stations.map { it.pathApiName },
         displaySchedule = displaySchedule,
-        schedule = schedule,
-        trains = trains,
+        hideTrainsSchedule = hideTrainsSchedule,
+        hiddenTrainsFilter = hiddenTrainsFilter,
         message = message,
         url = url,
         level = level,
@@ -202,8 +219,8 @@ data class TrainFilter(
     }
 }
 
-fun Alert.isActiveAt(dateTime: LocalDateTime): Boolean {
-    return schedule.isActiveAt(dateTime)
+fun Alert.canHideTrainsAt(dateTime: LocalDateTime): Boolean {
+    return hideTrainsSchedule.isActiveAt(dateTime)
 }
 
 fun Alert.isDisplayedNow(): Boolean {
@@ -212,7 +229,7 @@ fun Alert.isDisplayedNow(): Boolean {
 }
 
 fun Alert.isDisplayedAt(dateTime: LocalDateTime): Boolean {
-    return displaySchedule?.isActiveAt(dateTime) == true || isActiveAt(dateTime)
+    return displaySchedule?.isActiveAt(dateTime) == true || canHideTrainsAt(dateTime)
 }
 
 val Alert.isWarning: Boolean get() = level == null || level.startsWith("WARN", ignoreCase = true)
@@ -265,9 +282,9 @@ fun Schedule.isActiveAt(dateTime: LocalDateTime): Boolean {
 fun Alert.hidesTrain(stationName: String, headSign: String): Boolean {
     if (stationName !in stations) return false
 
-    if (trains.all == true) return true
+    if (hiddenTrainsFilter.all == true) return true
 
-    trains.headSigns?.forEach {
+    hiddenTrainsFilter.headSigns?.forEach {
         if (headSign.contains(it, ignoreCase = true)) return true
     }
 
@@ -276,7 +293,7 @@ fun Alert.hidesTrain(stationName: String, headSign: String): Boolean {
 
 fun Alert.hidesTrainAt(stationName: String, headSign: String, time: Instant): Boolean {
     val dateTime = time.toLocalDateTime(NewYorkTimeZone)
-    return isActiveAt(dateTime) && hidesTrain(stationName, headSign)
+    return canHideTrainsAt(dateTime) && hidesTrain(stationName, headSign)
 }
 
 private val DayOfWeek.previousDay: DayOfWeek

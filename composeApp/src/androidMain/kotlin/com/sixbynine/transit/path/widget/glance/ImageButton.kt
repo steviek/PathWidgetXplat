@@ -12,6 +12,7 @@ import androidx.glance.ImageProvider
 import androidx.glance.action.Action
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.cornerRadius
+import androidx.glance.unit.ColorProvider
 import org.jetbrains.compose.resources.StringResource
 
 @GlanceComposable
@@ -22,6 +23,7 @@ fun ImageButton(
     contentDesc: StringResource,
     onClick: Action,
     isClickable: Boolean = true,
+    tintColor: ColorProvider = GlanceTheme.colors.primary
 ) {
     Image(
         modifier = modifier
@@ -29,6 +31,6 @@ fun ImageButton(
             .cornerRadius(200.dp),
         provider = ImageProvider(srcResId),
         contentDescription = stringResource(contentDesc),
-        colorFilter = ColorFilter.tint(GlanceTheme.colors.primary),
+        colorFilter = ColorFilter.tint(tintColor),
     )
 }

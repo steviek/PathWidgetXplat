@@ -19,6 +19,7 @@ import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.size
 import androidx.glance.visibility
+import com.sixbynine.transit.path.MainActivity.Companion.createAppWidgetLaunchAction
 import com.sixbynine.transit.path.R.drawable
 import com.sixbynine.transit.path.util.isFailure
 import com.sixbynine.transit.path.util.isLoading
@@ -31,6 +32,7 @@ import com.sixbynine.transit.path.widget.glance.Text
 import com.sixbynine.transit.path.widget.glance.stringResource
 import com.sixbynine.transit.path.widget.startConfigurationActivityAction
 import pathwidgetxplat.composeapp.generated.resources.Res.string
+import pathwidgetxplat.composeapp.generated.resources.alerts
 import pathwidgetxplat.composeapp.generated.resources.edit
 import pathwidgetxplat.composeapp.generated.resources.error_long
 import pathwidgetxplat.composeapp.generated.resources.error_short
@@ -50,15 +52,28 @@ fun WidgetFooter(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.fillMaxWidth()
     ) {
-        ImageButton(
-            modifier =
-            GlanceModifier
-                .visibility(if (VERSION.SDK_INT >= 31) Invisible else Visible),
-            isClickable = VERSION.SDK_INT < 31,
-            srcResId = drawable.ic_edit_inset,
-            contentDesc = string.edit,
-            onClick = startConfigurationActivityAction()
-        )
+        if (VERSION.SDK_INT >= 31) {
+            val alertCount = result.data?.globalAlerts?.size ?: 0
+            if (alertCount > 0) {
+                ImageButton(
+                    srcResId = drawable.ic_warning_inset,
+                    contentDesc = string.alerts,
+                    onClick = createAppWidgetLaunchAction(),
+                    tintColor = GlanceTheme.colors.error,
+                )
+            } else {
+                Spacer(GlanceModifier.size(40.dp))
+            }
+        } else {
+            // sorry old phones, I don't want to think about your real estate situation yet. You
+            // need this edit button.
+            ImageButton(
+                srcResId = drawable.ic_edit_inset,
+                contentDesc = string.edit,
+                onClick = startConfigurationActivityAction()
+            )
+        }
+
 
         Spacer(modifier = GlanceModifier.defaultWeight().height(1.dp))
 

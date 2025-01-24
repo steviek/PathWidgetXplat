@@ -39,15 +39,31 @@ struct DepartureBoardView: View {
                         .frame(width: innerWidth, height: innerHeight)
 
                     HStack(alignment: .center, spacing: 0) {
-                        Button(intent: RefreshIntent()) {
-                            Image(systemName: "arrow.2.circlepath")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 24, height: 24)
+                        if (entry.hasGlobalPathAlerts) {
+                            // Show the error indicator if there are alerts. Clicking anywhere will open the app, which is fine.
+                            let isDark = colorScheme == .dark
+                            ZStack {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .resizable()
+                                    .foregroundStyle(isDark ? .red : .orange)
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 20, height: 20)
+                                    .padding(4)
+                            }
+                            .padding(4)
+                            
+                        } else {
+                            Button(intent: RefreshIntent()) {
+                                Image(systemName: "arrow.2.circlepath")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 24, height: 24)
+                            }
+                            .padding(4)
+                            .buttonStyle(.borderless)
+                            .hidden()
                         }
-                        .padding(4)
-                        .buttonStyle(.borderless)
-                        .hidden()
+                        
 
                         Spacer()
 

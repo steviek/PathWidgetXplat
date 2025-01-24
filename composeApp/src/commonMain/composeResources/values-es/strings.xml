@@ -1,6 +1,7 @@
 <resources>
     <string name="add_station">Añadir una estación</string>
     <string name="advanced_settings">Configuraciones avanzadas</string>
+    <string name="alerts">Alertas</string>
     <string name="and_or">y/o</string>
     <string name="app_and_widget_settings">Configuraciones para la app y widgets</string>
     <string name="app_name">Salidas para PATH</string>

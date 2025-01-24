@@ -21,6 +21,7 @@ struct Provider: AppIntentTimelineProvider {
             data: nil,
             hasError: false,
             hasPathError: false,
+            hasGlobalPathAlerts: false,
             dataFrom: Date()
         )
         return entry
@@ -109,6 +110,7 @@ struct Provider: AppIntentTimelineProvider {
                     data: widgetData,
                     hasError: hasError,
                     hasPathError: hasPathError,
+                    hasGlobalPathAlerts: (widgetData?.globalAlerts.count ?? 0) > 0,
                     dataFrom: now
                 )
             )
@@ -126,6 +128,7 @@ struct SimpleEntry: TimelineEntry {
     let data: WidgetData?
     let hasError: Bool
     let hasPathError: Bool
+    let hasGlobalPathAlerts: Bool
     let dataFrom: Date
 }
 

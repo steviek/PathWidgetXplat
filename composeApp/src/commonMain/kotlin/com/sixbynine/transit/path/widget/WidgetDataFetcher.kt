@@ -10,13 +10,10 @@ import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.TrainFilter
-import com.sixbynine.transit.path.api.alerts.GithubAlerts
-import com.sixbynine.transit.path.api.alerts.GithubAlertsRepository
+import com.sixbynine.transit.path.api.alerts.Alert
+import com.sixbynine.transit.path.api.alerts.AlertsRepository
+import com.sixbynine.transit.path.api.alerts.affectsLines
 import com.sixbynine.transit.path.api.alerts.hidesTrainAt
-import com.sixbynine.transit.path.api.everbridge.EverbridgeAlerts
-import com.sixbynine.transit.path.api.everbridge.EverbridgeAlertsRepository
-import com.sixbynine.transit.path.api.everbridge.getAlertsForLines
-import com.sixbynine.transit.path.api.everbridge.getAlertsForStation
 import com.sixbynine.transit.path.api.impl.SchedulePathApi
 import com.sixbynine.transit.path.api.isEastOf
 import com.sixbynine.transit.path.api.isInNewJersey
@@ -143,14 +140,12 @@ object WidgetDataFetcher {
         Logging.d("Fetch widget data with previous, includeClosestStation = $includeClosestStation")
         val (liveDepartures, previousDepartures) =
             PathApi.instance.getUpcomingDepartures(now, staleness)
-        val (githubAlerts, previousGithubAlerts) = GithubAlertsRepository.getAlerts(now)
-        val (everbridgeAlerts, previousEverbridgeAlerts) = EverbridgeAlertsRepository.getAlerts(now)
+        val (alerts, previousAlerts) = AlertsRepository.getAlerts(now)
 
         fun createWidgetData(
             fetchTime: Instant,
             data: DepartureBoardTrainMap,
-            githubAlerts: GithubAlerts?,
-            everbridgeAlerts: EverbridgeAlerts?,
+            alerts: List<Alert>?,
             closestStations: List<Station>?,
             isPathApiBroken: Boolean,
         ): WidgetData {
@@ -163,8 +158,7 @@ object WidgetDataFetcher {
                 sort,
                 filter,
                 closestStations,
-                githubAlerts,
-                everbridgeAlerts,
+                alerts,
                 data,
                 isPathApiBroken
             )
@@ -180,8 +174,7 @@ object WidgetDataFetcher {
                 createWidgetData(
                     now - data.age,
                     data.value,
-                    previousGithubAlerts?.value,
-                    previousEverbridgeAlerts?.value,
+                    previousAlerts?.value.orEmpty(),
                     lastClosestStations,
                     isPathApiBroken = false,
                 )
@@ -191,7 +184,7 @@ object WidgetDataFetcher {
         val fetch: Deferred<DataResult<WidgetData>> = GlobalScope.async(start = LAZY) {
             coroutineScope {
                 liveDepartures.start()
-                githubAlerts.start()
+                alerts.start()
 
                 val stationsByProximity = when {
                     !includeClosestStation -> null
@@ -263,8 +256,7 @@ object WidgetDataFetcher {
                     createWidgetData(
                         lastFetchTime ?: now,
                         data,
-                        githubAlerts.await().data,
-                        everbridgeAlerts.await().data,
+                        alerts.await().data,
                         stationsByProximity,
                         isPathApiBroken = isPathApiBroken,
                     )
@@ -338,8 +330,7 @@ object WidgetDataFetcher {
         sort: StationSort,
         filter: TrainFilter,
         closestStations: List<Station>?,
-        githubAlerts: GithubAlerts?,
-        everbridgeAlerts: EverbridgeAlerts?,
+        alerts: List<Alert>?,
         data: DepartureBoardTrainMap,
         isPathApiBroken: Boolean,
     ): WidgetData {
@@ -356,10 +347,7 @@ object WidgetDataFetcher {
         }
 
         for (station in adjustedStations) {
-            val stationAlerts =
-                githubAlerts?.alerts?.filter { station.pathApiName in it.stations }.orEmpty()
-            val everbridgeStationAlerts =
-                everbridgeAlerts?.getAlertsForStation(station).orEmpty()
+            val stationAlerts = alerts?.filter { station.pathApiName in it.stations }.orEmpty()
 
             val apiTrains =
                 data.getTrainsAt(station)
@@ -439,7 +427,7 @@ object WidgetDataFetcher {
                 signs = signs,
                 trains = trains,
                 state = station.state,
-                alerts = stationAlerts + everbridgeStationAlerts,
+                alerts = stationAlerts,
             )
         }
         val nextFetchTime =
@@ -449,8 +437,8 @@ object WidgetDataFetcher {
                 .mapNotNull { it.projectedArrivals.maxOrNull() }
                 .minOrNull()
                 ?: (now + 15.minutes)
-        val globalAlerts = githubAlerts?.alerts?.filter { it.isGlobal }.orEmpty()
-        val globalEverbridgeAlerts = everbridgeAlerts?.getAlertsForLines(lines).orEmpty()
+        val globalAlerts =
+            alerts.orEmpty().filter { alert -> alert.isGlobal && alert.affectsLines(lines) }
         return WidgetData(
             fetchTime = fetchTime,
             stations = stationDatas.take(stationLimit),
@@ -458,7 +446,7 @@ object WidgetDataFetcher {
             closestStationId = closestStationToUse?.pathApiName,
             isPathApiBroken = isPathApiBroken,
             scheduleName = data.scheduleName,
-            globalAlerts = globalAlerts + globalEverbridgeAlerts,
+            globalAlerts = globalAlerts,
         )
     }
 

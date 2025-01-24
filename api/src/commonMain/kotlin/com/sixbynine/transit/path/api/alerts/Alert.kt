@@ -13,11 +13,6 @@ import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class GithubAlerts(val alerts: List<Alert>) {
-    constructor(vararg alerts: Alert) : this(alerts.toList())
-}
-
-@Serializable
 data class Alert(
     /** Path 3 letter station code. */
     val stations: List<String>,
@@ -46,6 +41,7 @@ fun Alert(
     message: AlertText? = null,
     url: AlertText? = null,
     displaySchedule: Schedule? = null,
+    isGlobal: Boolean = false,
     level: String? = null,
     lines: Set<Line>? = null
 ): Alert {
@@ -57,8 +53,13 @@ fun Alert(
         message = message,
         url = url,
         level = level,
+        isGlobal = isGlobal,
         lines = lines,
     )
+}
+
+fun Alert.affectsLines(lineSet: Collection<Line>): Boolean {
+    return lines.isNullOrEmpty() || lineSet.any { it in lines }
 }
 
 /** Schedule for an alert being active. All local times are local to NYC...duh. */
@@ -174,6 +175,16 @@ data class AlertText(val localizations: List<TextAndLocale>) {
     constructor(en: String) : this(
         listOf(TextAndLocale(text = en, locale = "en"))
     )
+}
+
+/**
+ * Resolves the best match for the alert text for the language.
+ *
+ * @param languageCode a two letter language code, e.g. "en" or "es"
+ */
+fun AlertText.getText(languageCode: String): String? {
+    return localizations.find { it.locale == languageCode }?.text
+        ?: localizations.firstOrNull()?.text
 }
 
 @Serializable

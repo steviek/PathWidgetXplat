@@ -1,10 +1,11 @@
 package com.sixbynine.transit.path
 
-import com.sixbynine.transit.path.api.Line.NewarkWtc
+import com.sixbynine.transit.path.api.Line
+import com.sixbynine.transit.path.api.alerts.everbridge.EverbridgeAlerts
+import com.sixbynine.transit.path.api.alerts.everbridge.date
+import com.sixbynine.transit.path.api.alerts.everbridge.toCommonAlert
+import com.sixbynine.transit.path.api.alerts.getText
 import com.sixbynine.transit.path.api.alerts.isDisplayedAt
-import com.sixbynine.transit.path.api.everbridge.EverbridgeAlerts
-import com.sixbynine.transit.path.api.everbridge.date
-import com.sixbynine.transit.path.api.everbridge.getAlertsForLines
 import com.sixbynine.transit.path.test.TestSetupHelper
 import com.sixbynine.transit.path.time.NewYorkTimeZone
 import com.sixbynine.transit.path.util.JsonFormat
@@ -15,6 +16,7 @@ import org.junit.Before
 import java.time.Month.DECEMBER
 import java.time.Month.JANUARY
 import kotlin.test.Test
+import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -59,21 +61,31 @@ class EverbridgeAlertsParsingTest {
                 .readText()
 
         val alerts = JsonFormat.decodeFromString<EverbridgeAlerts>(json)
-        val alert = alerts.data.single()
 
-        val line =
-            alert.incidentMessage
-                .formVariableItems
-                .first { it.variableName == "Lines" }
-                .value
-                .orEmpty()
-                .single()
-        assertEquals("NWK-WTC", line)
+        val alert = alerts.data.single()
         assertEquals(LocalDate(2025, JANUARY, 17), alert.incidentMessage.date)
 
-        val result = alerts.getAlertsForLines(listOf(NewarkWtc)).first()
+        val result = alert.toCommonAlert()
+        assertEquals(setOf(Line.NewarkWtc), result.lines)
         assertTrue { result.isDisplayedAt(LocalDateTime(2025, JANUARY, 17, 12, 0)) }
         assertFalse { result.isDisplayedAt(LocalDateTime(2025, JANUARY, 18, 12, 0)) }
+    }
+
+    @Test
+    fun `jan 23 parsing`() {
+        val json =
+            EverbridgeAlertsParsingTest::class.java
+                .getResource("everbridge_alert_jan23.json")!!
+                .readText()
+
+        val alerts = JsonFormat.decodeFromString<EverbridgeAlerts>(json)
+        val alert = alerts.data.single().toCommonAlert()
+
+        assertEquals(setOf(Line.HobokenWtc), alert.lines)
+        assertEquals("WARN", alert.level)
+        assertTrue(alert.isGlobal)
+        assertTrue(alert.isDisplayedAt(LocalDateTime(2025, JANUARY, 23, 20, 52)))
+        assertContains(alert.message?.getText("en")!!, "HOB-WTC suspended until the late evening")
     }
 
     @Test

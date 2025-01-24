@@ -10,6 +10,7 @@ import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.api.TrainFilter.Companion.matchesFilter
 import com.sixbynine.transit.path.api.alerts.AlertText
+import com.sixbynine.transit.path.api.alerts.getText
 import com.sixbynine.transit.path.api.alerts.isDisplayedNow
 import com.sixbynine.transit.path.api.alerts.isWarning
 import com.sixbynine.transit.path.api.isInNewJersey
@@ -485,8 +486,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
 
         private fun AlertText.unpack(): String? {
             val languageCode = localizedString(en = "en", es = "es")
-            return localizations.find { it.locale == languageCode }?.text
-                ?: localizations.firstOrNull()?.text
+            return getText(languageCode = languageCode)
         }
     }
 }

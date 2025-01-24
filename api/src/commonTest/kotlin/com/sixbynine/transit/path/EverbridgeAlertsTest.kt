@@ -1,16 +1,15 @@
 package com.sixbynine.transit.path
 
-import com.sixbynine.transit.path.api.Line.HobokenWtc
 import com.sixbynine.transit.path.api.Line.NewarkWtc
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.alerts.AlertText
-import com.sixbynine.transit.path.api.alerts.isActiveAt
-import com.sixbynine.transit.path.api.everbridge.EverbridgeAlert
-import com.sixbynine.transit.path.api.everbridge.EverbridgeAlerts
-import com.sixbynine.transit.path.api.everbridge.IncidentMessage
-import com.sixbynine.transit.path.api.everbridge.Variable
-import com.sixbynine.transit.path.api.everbridge.getAlertsForLines
-import com.sixbynine.transit.path.api.everbridge.getAlertsForStation
+import com.sixbynine.transit.path.api.alerts.everbridge.EverbridgeAlert
+import com.sixbynine.transit.path.api.alerts.everbridge.EverbridgeAlerts
+import com.sixbynine.transit.path.api.alerts.everbridge.IncidentMessage
+import com.sixbynine.transit.path.api.alerts.everbridge.Variable
+import com.sixbynine.transit.path.api.alerts.everbridge.toCommonAlert
+import com.sixbynine.transit.path.api.alerts.getText
+import com.sixbynine.transit.path.api.alerts.isDisplayedAt
 import com.sixbynine.transit.path.test.TestSetupHelper
 import com.sixbynine.transit.path.util.JsonFormat
 import kotlinx.datetime.Instant
@@ -20,7 +19,9 @@ import kotlinx.datetime.Month.OCTOBER
 import kotlinx.serialization.encodeToString
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.test.assertContains
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -46,27 +47,27 @@ class EverbridgeAlertsTest {
 
     @Test
     fun `station alert conversion`() {
-        val alerts = EverbridgeAlerts(HobokenElevatorDown)
-        val result = alerts.getAlertsForStation(Stations.Hoboken).first()
-        assertEquals(result.stations, listOf(Stations.Hoboken.pathApiName))
-        assertEquals(result.message, AlertText(HobokenElevatorDown.incidentMessage.preMessage))
-        assertNull(result.trains.all)
-        assertNull(result.trains.headSigns)
-        assertTrue(result.isActiveAt(LocalDateTime(2024, DECEMBER, 23, 16, 21)))
-        assertTrue(alerts.getAlertsForStation(Stations.JournalSquare).isEmpty())
+        val alerts = EverbridgeAlerts(HobokenElevatorDown).data.map { it.toCommonAlert() }
+        val hobokenAlert = alerts.single()
+
+        assertEquals(listOf(Stations.Hoboken.pathApiName), hobokenAlert.stations)
+        assertContains(hobokenAlert.message?.getText("en").orEmpty(), "At Hoboken, elevator")
+        assertTrue(hobokenAlert.isDisplayedAt(LocalDateTime(2024, DECEMBER, 23, 16, 21)))
+        assertFalse(hobokenAlert.isGlobal)
+        assertEquals("INFO", hobokenAlert.level)
     }
 
     @Test
     fun `global alert conversion`() {
-        val alerts = EverbridgeAlerts(NwkWtcDown)
-        val result = alerts.getAlertsForLines(listOf(NewarkWtc)).first()
+        val alerts = EverbridgeAlerts(NwkWtcDown).data.map { it.toCommonAlert() }
+        val result = alerts.single()
         assertEquals(result.stations, emptyList())
+        assertEquals(setOf(NewarkWtc), result.lines)
         assertEquals(result.message, AlertText(NwkWtcDown.incidentMessage.preMessage))
         assertNull(result.trains.all)
         assertNull(result.trains.headSigns)
-        assertTrue(result.isActiveAt(LocalDateTime(2024, OCTOBER, 21, 13, 57)))
+        assertTrue(result.isDisplayedAt(LocalDateTime(2024, OCTOBER, 21, 13, 57)))
         assertTrue(result.isGlobal)
-        assertTrue(alerts.getAlertsForLines(listOf(HobokenWtc)).isEmpty())
     }
 
     private companion object {

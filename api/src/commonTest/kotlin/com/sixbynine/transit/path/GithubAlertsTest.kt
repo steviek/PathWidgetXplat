@@ -9,9 +9,9 @@ import com.sixbynine.transit.path.api.Stations.TwentyThirdStreet
 import com.sixbynine.transit.path.api.Stations.WorldTradeCenter
 import com.sixbynine.transit.path.api.alerts.Alert
 import com.sixbynine.transit.path.api.alerts.AlertText
-import com.sixbynine.transit.path.api.alerts.GithubAlerts
 import com.sixbynine.transit.path.api.alerts.Schedule
 import com.sixbynine.transit.path.api.alerts.TrainFilter
+import com.sixbynine.transit.path.api.alerts.github.GithubAlerts
 import com.sixbynine.transit.path.api.alerts.hidesTrain
 import com.sixbynine.transit.path.api.alerts.isActiveAt
 import com.sixbynine.transit.path.util.JsonFormat

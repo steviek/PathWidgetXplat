@@ -1,4 +1,4 @@
-package com.sixbynine.transit.path.api.everbridge
+package com.sixbynine.transit.path.api.alerts.everbridge
 
 import com.sixbynine.transit.path.util.FetchWithPrevious
 import com.sixbynine.transit.path.util.RemoteFileRepository

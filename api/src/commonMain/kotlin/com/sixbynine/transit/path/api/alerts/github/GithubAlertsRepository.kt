@@ -1,4 +1,4 @@
-package com.sixbynine.transit.path.api.alerts
+package com.sixbynine.transit.path.api.alerts.github
 
 import com.sixbynine.transit.path.util.FetchWithPrevious
 import com.sixbynine.transit.path.util.RemoteFileRepository

@@ -1,0 +1,122 @@
+{
+  "status": "Success",
+  "data": [
+    {
+      "incidentMessage": {
+        "subject": "PATHAlert Update - Broken Rail HOB-WTC Suspended.",
+        "preMessage": "HOB-WTC suspended until the late evening. Broken rail between EXPL, WTC. HOB-33rd, JSQ-33rd operating normal. NWK-WTC operating on 20 min schedule. NJT rail is cross honoring PATH at HOB, NWK, NYPS. HBLR will cross honor at EXCH, HOB, NWPT. NYWW cross honoring PATH at HOB, Paulus Hook, Brookfield Place. \n\n",
+        "formVariableItems": [
+          {
+            "val": [
+              "HOB-WTC"
+            ],
+            "variableName": "Lines",
+            "isRequired": true,
+            "seq": 1,
+            "variableId": 367103739691127
+          },
+          {
+            "val": [
+              "suspended."
+            ],
+            "variableName": "Status",
+            "isRequired": true,
+            "seq": 2,
+            "variableId": 367103739691118
+          },
+          {
+            "val": [
+              "Maintenance crews investigating issue"
+            ],
+            "variableName": "Broken Rail Reason Update",
+            "isRequired": true,
+            "seq": 3,
+            "variableId": 392942262944012
+          },
+          {
+            "val": [
+              "between"
+            ],
+            "variableName": "Preposition",
+            "isRequired": true,
+            "seq": 4,
+            "variableId": 367103739691119
+          },
+          {
+            "val": [
+              "EXPL",
+              "WTC"
+            ],
+            "variableName": "Station",
+            "isRequired": true,
+            "seq": 5,
+            "variableId": 367103739691117
+          },
+          {
+            "val": [
+              "NJT rail is cross honoring PATH at"
+            ],
+            "variableName": "NJT Cross Honor Status",
+            "isRequired": false,
+            "seq": 6,
+            "variableId": 367103739691125
+          },
+          {
+            "val": [
+              "HOB",
+              "NWK",
+              "NYPS",
+              "HBLR"
+            ],
+            "variableName": "NJT Cross Honoring at",
+            "isRequired": false,
+            "seq": 7,
+            "variableId": 367103739691123
+          },
+          {
+            "val": [
+              "NYWW will begin cross honoring PATH at"
+            ],
+            "variableName": "NYWW Cross Honor Status",
+            "isRequired": false,
+            "seq": 8,
+            "variableId": 367103739691126
+          },
+          {
+            "val": [
+              "HOB",
+              "Paulus Hook",
+              "Brookfield Place"
+            ],
+            "variableName": "NYWW Cross Honoring at",
+            "isRequired": false,
+            "seq": 9,
+            "variableId": 367103739691122
+          },
+          {
+            "variableName": "Cross Honor Start/End Time",
+            "isRequired": false,
+            "seq": 10,
+            "variableId": 367103739691120
+          },
+          {
+            "variableName": "Time Select",
+            "isRequired": false,
+            "seq": 11,
+            "variableId": 366828861784496
+          },
+          {
+            "variableName": "Guidance",
+            "isRequired": false,
+            "seq": 12,
+            "variableId": 367103739691116
+          }
+        ],
+        "sysVarTodayDateFormat": "mm-dd-yyyy",
+        "sysVarCurrentTimeFormat": "HH:mm:ss"
+      },
+      "CreatedDate": "1737683115366",
+      "ModifiedDate": "1737683115366"
+    }
+  ]
+}

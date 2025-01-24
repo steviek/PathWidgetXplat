@@ -1,4 +1,4 @@
-package com.sixbynine.transit.path.api.everbridge
+package com.sixbynine.transit.path.api.alerts.everbridge
 
 import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.Line.Hoboken33rd
@@ -6,6 +6,7 @@ import com.sixbynine.transit.path.api.Line.HobokenWtc
 import com.sixbynine.transit.path.api.Line.JournalSquare33rd
 import com.sixbynine.transit.path.api.Line.NewarkWtc
 import com.sixbynine.transit.path.api.Station
+import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.alerts.Alert
 import com.sixbynine.transit.path.api.alerts.AlertText
 import com.sixbynine.transit.path.api.alerts.Schedule
@@ -76,7 +77,7 @@ data class Variable(
     val seq: Int
 )
 
-fun EverbridgeAlert.isForStation(station: Station): Boolean {
+private fun EverbridgeAlert.isElevatorMessageFor(station: Station): Boolean {
     val elevatorDesc = incidentMessage.formVariableItems.firstOrNull {
         it.variableName.contains("elevator", ignoreCase = true)
     }
@@ -87,31 +88,19 @@ fun EverbridgeAlert.isForStation(station: Station): Boolean {
     return elevatorValue.contains(regex)
 }
 
-fun EverbridgeAlert.isForLines(lines: Collection<Line>): Boolean {
-    return lines.intersect(incidentMessage.lines).isNotEmpty()
-}
-
-fun EverbridgeAlert.toGithubAlert(): Alert {
+fun EverbridgeAlert.toCommonAlert(): Alert {
+    val elevatorStations = Stations.All.filter { isElevatorMessageFor(it) }
+    val isElevatorAlert = elevatorStations.isNotEmpty()
     return Alert(
-        stations = emptyList(),
-        schedule = schedule,
+        stations = elevatorStations,
+        schedule = Schedule(),
+        displaySchedule = schedule,
         trains = TrainFilter(),
         message = AlertText(incidentMessage.preMessage),
         url = AlertText(PATH_ALERTS_URL),
-        isGlobal = true,
-        level = "WARN",
+        isGlobal = !isElevatorAlert,
+        level = if (isElevatorAlert) "INFO" else "WARN",
         lines = incidentMessage.lines,
-    )
-}
-
-fun EverbridgeAlert.toGithubAlert(station: Station): Alert {
-    return Alert(
-        stations = listOf(station),
-        schedule = schedule,
-        trains = TrainFilter(),
-        message = AlertText(incidentMessage.preMessage),
-        url = AlertText(PATH_ALERTS_URL),
-        level = "INFO", // TODO: determine if it's about elevator or more serious
     )
 }
 
@@ -129,14 +118,6 @@ private val EverbridgeAlert.schedule: Schedule
             }
         )
     }
-
-fun EverbridgeAlerts.getAlertsForStation(station: Station): List<Alert> {
-    return data.filter { it.isForStation(station) }.map { it.toGithubAlert(station) }
-}
-
-fun EverbridgeAlerts.getAlertsForLines(lines: Collection<Line>): List<Alert> {
-    return data.filter { it.isForLines(lines) }.map { it.toGithubAlert() }
-}
 
 private operator fun IncidentMessage.get(name: String): Variable? {
     return getVariable(name)

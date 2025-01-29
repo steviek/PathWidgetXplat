@@ -69,6 +69,8 @@ object IosLocationProvider : LocationProvider {
         requestDelegate?.requestLocationPermission()
     }
 
+    override val defaultLocationCheckTimeout = 300.seconds
+
     override suspend fun tryToGetLocation(): LocationCheckResult {
         lastLocationRequestTime?.let {
             if (now() - it <= 30.seconds) {

@@ -316,7 +316,7 @@ class GithubAlertsTest {
             ),
             displaySchedule = Schedule.repeatingDaily(
                 days = DayOfWeek.values().toList(),
-                start = LocalTime(17, 0),
+                start = LocalTime(22, 0),
                 end = LocalTime(5, 0),
                 from = LocalDate(2025, JANUARY, 5),
                 to = LocalDate(2025, DECEMBER, 30),

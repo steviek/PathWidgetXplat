@@ -1,4 +1,4 @@
-package com.sixbynine.transit.path.app.ui.home
+package com.sixbynine.transit.path.app.ui.common
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -26,8 +26,6 @@ import androidx.compose.ui.unit.dp
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.app.settings.TimeDisplay
 import com.sixbynine.transit.path.app.ui.PathBottomSheet
-import com.sixbynine.transit.path.app.ui.common.AppUiBackfillSource
-import com.sixbynine.transit.path.app.ui.common.AppUiTrainData
 import com.sixbynine.transit.path.app.ui.gutter
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -38,11 +36,12 @@ import pathwidgetxplat.composeapp.generated.resources.presumed_train
 import pathwidgetxplat.composeapp.generated.resources.train_track
 
 @Composable
-fun HomeScreenScope.BackfillBottomSheet(
+fun BackfillBottomSheet(
     isShown: Boolean,
     station: Station,
     trainData: AppUiTrainData,
     source: AppUiBackfillSource,
+    timeDisplay: TimeDisplay,
     onDismiss: () -> Unit
 ) {
     PathBottomSheet(isShown = isShown, onDismissRequest = onDismiss) {
@@ -68,6 +67,7 @@ fun HomeScreenScope.BackfillBottomSheet(
                     displayText = source.displayText,
                     backfill = null,
                 ),
+                timeDisplay = timeDisplay,
                 station = source.station
             )
 
@@ -81,13 +81,14 @@ fun HomeScreenScope.BackfillBottomSheet(
             TrainBox(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 trainData = trainData,
+                timeDisplay = timeDisplay,
                 station = station
             )
 
             Spacer(Modifier.height(16.dp))
 
             Text(
-                createSubtext(station, trainData, source),
+                createSubtext(station, trainData, source, timeDisplay),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface
@@ -97,21 +98,23 @@ fun HomeScreenScope.BackfillBottomSheet(
 }
 
 @Composable
-private fun HomeScreenScope.createSubtext(
+private fun createSubtext(
     station: Station,
     trainData: AppUiTrainData,
     source: AppUiBackfillSource,
+    timeDisplay: TimeDisplay,
 ): AnnotatedString {
     return when (stringResource(string.language_code)) {
-        "es" -> createSpanishSubtext(station, trainData, source)
-        else -> createEnglishSubtext(station, trainData, source)
+        "es" -> createSpanishSubtext(station, trainData, source, timeDisplay)
+        else -> createEnglishSubtext(station, trainData, source, timeDisplay)
     }
 }
 
-private fun HomeScreenScope.createEnglishSubtext(
+private fun createEnglishSubtext(
     station: Station,
     trainData: AppUiTrainData,
     source: AppUiBackfillSource,
+    timeDisplay: TimeDisplay,
 ) = buildAnnotatedString {
     append("This train is not yet reported for ")
     appendBolded(station.displayName)
@@ -119,7 +122,7 @@ private fun HomeScreenScope.createEnglishSubtext(
     appendBolded(trainData.title)
     append(" is departing from ")
     appendBolded(source.station.displayName)
-    when (state.timeDisplay) {
+    when (timeDisplay) {
         TimeDisplay.Relative -> {
             append(" in ")
             appendBolded(source.displayText)
@@ -132,10 +135,11 @@ private fun HomeScreenScope.createEnglishSubtext(
     }
 }
 
-private fun HomeScreenScope.createSpanishSubtext(
+private fun createSpanishSubtext(
     station: Station,
     trainData: AppUiTrainData,
     source: AppUiBackfillSource,
+    timeDisplay: TimeDisplay,
 ) = buildAnnotatedString {
     append("Este tren aún no está reportado por PATH para ")
     appendBolded(station.displayName)
@@ -143,7 +147,7 @@ private fun HomeScreenScope.createSpanishSubtext(
     appendBolded(trainData.title)
     append(" está saliendo de ")
     appendBolded(source.station.displayName)
-    when (state.timeDisplay) {
+    when (timeDisplay) {
         TimeDisplay.Relative -> {
             append(" en ")
             appendBolded(source.displayText)
@@ -163,7 +167,7 @@ private fun AnnotatedString.Builder.appendBolded(text: String) {
 }
 
 @Composable
-private fun HomeScreenScope.TrainBox(trainData: AppUiTrainData, station: Station, modifier: Modifier = Modifier) {
+private fun TrainBox(trainData: AppUiTrainData, station: Station, timeDisplay: TimeDisplay, modifier: Modifier = Modifier) {
     Column(
         modifier
             .clip(RoundedCornerShape(16.dp))
@@ -180,7 +184,8 @@ private fun HomeScreenScope.TrainBox(trainData: AppUiTrainData, station: Station
         )
         Spacer(Modifier.height(4.dp))
         TrainLineContent(
-            trainData,
+            listOf(trainData),
+            timeDisplay = timeDisplay,
             textStyle = MaterialTheme.typography.bodyMedium,
             textColor = MaterialTheme.colorScheme.onSurfaceVariant,
             fullWidth = false,

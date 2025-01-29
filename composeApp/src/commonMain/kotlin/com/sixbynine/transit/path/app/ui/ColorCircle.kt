@@ -38,5 +38,15 @@ fun ColorCircle(colors: List<ColorWrapper>, modifier: Modifier = Modifier) {
                     .background(it.unwrap())
             )
         }
+
+        colors.getOrNull(2)?.let {
+            Box(
+                Modifier.size(24.dp)
+                    .clip(CircleShape)
+                    .padding(start = 12.dp, top = 12.dp)
+                    .clip(RectangleShape)
+                    .background(it.unwrap())
+            )
+        }
     }
 }

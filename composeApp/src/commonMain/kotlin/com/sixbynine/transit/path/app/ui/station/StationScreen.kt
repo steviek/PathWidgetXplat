@@ -19,10 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import com.sixbynine.transit.path.app.ui.ViewModelScreen
+import com.sixbynine.transit.path.app.ui.common.TrainLineContentWithWithBackfillBottomSheet
 import com.sixbynine.transit.path.app.ui.home.AlertBox
 import com.sixbynine.transit.path.app.ui.home.AlertBoxColors
 import com.sixbynine.transit.path.app.ui.home.TrainGrouper.groupTrains
-import com.sixbynine.transit.path.app.ui.home.TrainLineContent
 import com.sixbynine.transit.path.app.ui.icon.IconType.Back
 import com.sixbynine.transit.path.app.ui.icon.NativeIconButton
 import com.sixbynine.transit.path.app.ui.station.StationContract.Effect.GoBack
@@ -78,9 +78,10 @@ private fun StationScope.Content() {
                         state.trainsMatchingFilters,
                     ).fastForEach { trains ->
                         item(trains.firstOrNull()?.id) {
-                            TrainLineContent(
-                                trains,
+                            TrainLineContentWithWithBackfillBottomSheet(
+                                data = trains,
                                 timeDisplay = state.timeDisplay,
+                                station = state.station.station,
                                 modifier = Modifier.heightIn(48.dp)
                                     .animateItemPlacement()
                                     .padding(horizontal = 16.dp, vertical = 8.dp),
@@ -96,9 +97,10 @@ private fun StationScope.Content() {
 
                     groupTrains(state.station.station, state.otherTrains).fastForEach { trains ->
                         item(trains.firstOrNull()?.id) {
-                            TrainLineContent(
-                                trains,
+                            TrainLineContentWithWithBackfillBottomSheet(
+                                data = trains,
                                 timeDisplay = state.timeDisplay,
+                                station = state.station.station,
                                 modifier = Modifier.heightIn(48.dp)
                                     .animateItemPlacement()
                                     .padding(horizontal = 16.dp, vertical = 8.dp),
@@ -108,9 +110,10 @@ private fun StationScope.Content() {
                 } else {
                     state.trainsMatchingFilters.fastForEach { train ->
                         item(train.id) {
-                            TrainLineContent(
-                                listOf(train),
+                            TrainLineContentWithWithBackfillBottomSheet(
+                                data = listOf(train),
                                 timeDisplay = state.timeDisplay,
+                                station = state.station.station,
                                 modifier = Modifier.heightIn(48.dp)
                                     .animateItemPlacement()
                                     .padding(horizontal = 16.dp, vertical = 8.dp),
@@ -126,9 +129,10 @@ private fun StationScope.Content() {
 
                     state.otherTrains.fastForEach { train ->
                         item(train.id) {
-                            TrainLineContent(
-                                listOf(train),
+                            TrainLineContentWithWithBackfillBottomSheet(
+                                data = listOf(train),
                                 timeDisplay = state.timeDisplay,
+                                station = state.station.station,
                                 modifier = Modifier.heightIn(48.dp)
                                     .animateItemPlacement()
                                     .padding(horizontal = 16.dp, vertical = 8.dp),

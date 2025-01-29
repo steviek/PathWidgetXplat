@@ -1,7 +1,6 @@
 package com.sixbynine.transit.path.app.ui.home
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,6 +34,7 @@ import androidx.compose.ui.util.fastForEachIndexed
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.app.ui.common.AppUiTrainData
+import com.sixbynine.transit.path.app.ui.common.TrainLineContentWithWithBackfillBottomSheet
 import com.sixbynine.transit.path.app.ui.gutter
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.AddStationClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.MoveStationDownClicked
@@ -289,32 +289,12 @@ private fun HomeScreenScope.TrainLine(
     data: List<AppUiTrainData>,
     modifier: Modifier = Modifier
 ) {
-    var showBottomSheet by remember { mutableStateOf(false) }
-    TrainLineContent(
-        data,
-        modifier = Modifier.run {
-            if (data.firstOrNull()?.isBackfilled == true) {
-                clickable { showBottomSheet = true }
-            } else {
-                this
-            }
-        }
-            .then(modifier)
-            .padding(horizontal = gutter(), vertical = 4.dp)
-            .fillMaxWidth()
+    TrainLineContentWithWithBackfillBottomSheet(
+        data = data,
+        timeDisplay = state.timeDisplay,
+        station = station,
+        modifier = modifier.padding(horizontal = gutter(), vertical = 4.dp),
     )
-
-    val firstTrain = data.firstOrNull()
-    val backfill = firstTrain?.backfill
-    if (backfill != null) {
-        BackfillBottomSheet(
-            isShown = showBottomSheet,
-            station = station,
-            trainData = firstTrain,
-            source = backfill,
-            onDismiss = { showBottomSheet = false }
-        )
-    }
 }
 
 

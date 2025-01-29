@@ -9,6 +9,8 @@ import androidx.compose.ui.graphics.toComposeImageBitmap
 import com.sixbynine.transit.path.app.ui.icon.IconType.ArrowDown
 import com.sixbynine.transit.path.app.ui.icon.IconType.ArrowUp
 import com.sixbynine.transit.path.app.ui.icon.IconType.Back
+import com.sixbynine.transit.path.app.ui.icon.IconType.Calendar
+import com.sixbynine.transit.path.app.ui.icon.IconType.Clock
 import com.sixbynine.transit.path.app.ui.icon.IconType.Delete
 import com.sixbynine.transit.path.app.ui.icon.IconType.Edit
 import com.sixbynine.transit.path.app.ui.icon.IconType.ExpandDown
@@ -42,6 +44,8 @@ actual fun IconPainter(icon: IconType): Painter {
         Back -> "chevron.left"
         ExpandDown -> "chevron.down.circle.fill"
         Internet -> "safari.fill"
+        Clock -> "clock"
+        Calendar -> "calendar"
     }
     val bitmap = rememberImageBitmapWithSystemName(imageName)
     return BitmapPainter(bitmap)

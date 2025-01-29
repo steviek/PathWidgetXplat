@@ -51,6 +51,7 @@
     <string name="learn_more">Aprender más (en inglés)</string>
     <string name="lines">Líneas</string>
     <string name="lines_show_all">Mostrar todos las líneas</string>
+    <string name="live">En vivo</string>
     <string name="move_down">Bajar</string>
     <string name="move_up">Subir</string>
     <string name="no_internet">Sin Internet</string>
@@ -67,6 +68,7 @@
     <string name="report_a_problem">Informar sobre un problema</string>
     <string name="retry">Reintentar</string>
     <string name="save">Guardar</string>
+    <string name="schedule">Horario</string>
     <string name="send_feedback">Enviar comentarios</string>
     <string name="setting_header_time_display">Formato de la hora</string>
     <string name="setting_header_train_grouping">Agrupar trenes por destino</string>

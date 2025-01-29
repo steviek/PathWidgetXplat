@@ -51,6 +51,7 @@
     <string name="learn_more">Learn more</string>
     <string name="lines">Lines</string>
     <string name="lines_show_all">Show all lines</string>
+    <string name="live">Live</string>
     <string name="move_down">Move down</string>
     <string name="move_up">Move up</string>
     <string name="no_internet">No internet</string>
@@ -67,6 +68,7 @@
     <string name="report_a_problem">Report a problem</string>
     <string name="retry">Retry</string>
     <string name="save">Save</string>
+    <string name="schedule">Schedule</string>
     <string name="send_feedback">Send feedback</string>
     <string name="setting_header_time_display">Time display</string>
     <string name="setting_header_train_grouping">Group trains by destination</string>

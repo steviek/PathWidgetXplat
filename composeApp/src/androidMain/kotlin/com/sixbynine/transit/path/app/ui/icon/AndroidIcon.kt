@@ -13,6 +13,8 @@ import com.sixbynine.transit.path.R
 import com.sixbynine.transit.path.app.ui.icon.IconType.ArrowDown
 import com.sixbynine.transit.path.app.ui.icon.IconType.ArrowUp
 import com.sixbynine.transit.path.app.ui.icon.IconType.Back
+import com.sixbynine.transit.path.app.ui.icon.IconType.Calendar
+import com.sixbynine.transit.path.app.ui.icon.IconType.Clock
 import com.sixbynine.transit.path.app.ui.icon.IconType.Delete
 import com.sixbynine.transit.path.app.ui.icon.IconType.Edit
 import com.sixbynine.transit.path.app.ui.icon.IconType.ExpandDown
@@ -38,5 +40,7 @@ actual fun IconPainter(icon: IconType): Painter {
         Back -> rememberVectorPainter(Filled.ArrowBack)
         ExpandDown -> painterResource(R.drawable.ic_down)
         Internet -> painterResource(R.drawable.ic_open_in_new)
+        Clock -> painterResource(R.drawable.ic_clock)
+        Calendar -> painterResource(R.drawable.ic_calendar)
     }
 }

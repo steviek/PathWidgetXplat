@@ -17,7 +17,7 @@ import getPlatform
 
 enum class IconType {
     Edit, Station, Filter, Sort, LayoutOneColumn, ArrowUp, ArrowDown, Settings, Delete, Back,
-    ExpandDown, Internet
+    ExpandDown, Internet, Clock, Calendar
 }
 
 @Composable

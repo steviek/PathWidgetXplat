@@ -13,6 +13,7 @@ object StationContract {
         val trainsMatchingFilters: List<AppUiTrainData>,
         val otherTrains: List<AppUiTrainData>,
         val scheduledTrains: List<AppUiTrainData>,
+        val scheduleName: String?,
         val timeDisplay: TimeDisplay,
         val groupByDestination: Boolean,
     )

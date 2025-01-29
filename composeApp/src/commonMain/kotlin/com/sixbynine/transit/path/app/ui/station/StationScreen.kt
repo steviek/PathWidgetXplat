@@ -1,40 +1,41 @@
 package com.sixbynine.transit.path.app.ui.station
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Icon
+import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.fastForEach
-import com.sixbynine.transit.path.app.settings.TimeDisplay.Clock
 import com.sixbynine.transit.path.app.ui.ViewModelScreen
-import com.sixbynine.transit.path.app.ui.common.TrainLineContent
-import com.sixbynine.transit.path.app.ui.common.TrainLineContentWithWithBackfillBottomSheet
-import com.sixbynine.transit.path.app.ui.home.AlertBox
-import com.sixbynine.transit.path.app.ui.home.AlertBoxColors
-import com.sixbynine.transit.path.app.ui.home.TrainGrouper.groupTrains
+import com.sixbynine.transit.path.app.ui.icon.IconPainter
 import com.sixbynine.transit.path.app.ui.icon.IconType.Back
+import com.sixbynine.transit.path.app.ui.icon.IconType.Calendar
+import com.sixbynine.transit.path.app.ui.icon.IconType.Clock
 import com.sixbynine.transit.path.app.ui.icon.NativeIconButton
 import com.sixbynine.transit.path.app.ui.station.StationContract.Effect.GoBack
 import com.sixbynine.transit.path.app.ui.station.StationContract.Intent
 import com.sixbynine.transit.path.app.ui.station.StationContract.Intent.BackClicked
 import com.sixbynine.transit.path.app.ui.station.StationContract.State
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import pathwidgetxplat.composeapp.generated.resources.Res.string
 import pathwidgetxplat.composeapp.generated.resources.back
-import pathwidgetxplat.composeapp.generated.resources.other_trains
+import pathwidgetxplat.composeapp.generated.resources.live
+import pathwidgetxplat.composeapp.generated.resources.schedule
 
 @Composable
 fun StationScreen(stationId: String?) {
@@ -72,118 +73,54 @@ private fun StationScope.Content() {
             )
         }
     ) { contentPadding ->
-        Column(Modifier.padding(contentPadding)) {
-            LazyColumn(Modifier.weight(1f)) {
-                if (state.groupByDestination) {
-                    groupTrains(
-                        state.station.station,
-                        state.trainsMatchingFilters,
-                    ).fastForEach { trains ->
-                        item(trains.firstOrNull()?.id) {
-                            TrainLineContentWithWithBackfillBottomSheet(
-                                data = trains,
-                                timeDisplay = state.timeDisplay,
-                                station = state.station.station,
-                                modifier = Modifier.heightIn(48.dp)
-                                    .animateItemPlacement()
-                                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                            )
-                        }
-                    }
+        var selectedIndex by remember { mutableIntStateOf(0) }
+        val pagerState = rememberPagerState(pageCount = { 2 })
 
-                    if (state.trainsMatchingFilters.isNotEmpty() &&
-                        state.otherTrains.isNotEmpty()
-                    ) {
-                        otherTrainsHeader()
-                    }
-
-                    groupTrains(state.station.station, state.otherTrains).fastForEach { trains ->
-                        item(trains.firstOrNull()?.id) {
-                            TrainLineContentWithWithBackfillBottomSheet(
-                                data = trains,
-                                timeDisplay = state.timeDisplay,
-                                station = state.station.station,
-                                modifier = Modifier.heightIn(48.dp)
-                                    .animateItemPlacement()
-                                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                            )
-                        }
-                    }
-                } else {
-                    state.trainsMatchingFilters.fastForEach { train ->
-                        item(train.id) {
-                            TrainLineContentWithWithBackfillBottomSheet(
-                                data = listOf(train),
-                                timeDisplay = state.timeDisplay,
-                                station = state.station.station,
-                                modifier = Modifier.heightIn(48.dp)
-                                    .animateItemPlacement()
-                                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                            )
-                        }
-                    }
-
-                    if (state.trainsMatchingFilters.isNotEmpty() &&
-                        state.otherTrains.isNotEmpty()
-                    ) {
-                        otherTrainsHeader()
-                    }
-
-                    state.otherTrains.fastForEach { train ->
-                        item(train.id) {
-                            TrainLineContentWithWithBackfillBottomSheet(
-                                data = listOf(train),
-                                timeDisplay = state.timeDisplay,
-                                station = state.station.station,
-                                modifier = Modifier.heightIn(48.dp)
-                                    .animateItemPlacement()
-                                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                            )
-                        }
-                    }
-                }
-            }
-
-            LazyColumn(Modifier.weight(1f)) {
-                state.scheduledTrains.forEach { train ->
-                    item(train.id) {
-                        TrainLineContent(
-                            listOf(train),
-                            timeDisplay = Clock,
-                            modifier = Modifier.heightIn(48.dp)
-                                .animateItemPlacement()
-                                .padding(horizontal = 16.dp, vertical = 8.dp),
-                        )
-                    }
-                }
-            }
-
-            if (stationData.alertText != null) {
-                Spacer(Modifier.height(8.dp))
-                AlertBox(
-                    text = stationData.alertText,
-                    url = stationData.alertUrl,
-                    colors = if (stationData.alertIsWarning) {
-                        AlertBoxColors.Warning
-                    } else {
-                        AlertBoxColors.Info
-                    },
-                    isAlwaysExpanded = true,
-                )
+        LaunchedEffect(pagerState) {
+            snapshotFlow { pagerState.currentPage }.collect {
+                selectedIndex = it
             }
         }
-    }
-}
 
-private fun LazyListScope.otherTrainsHeader() {
-    item("other_train_header") {
-        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-            Text(
-                modifier = Modifier.padding(16.dp),
-                text = stringResource(string.other_trains),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
+        val scope = rememberCoroutineScope()
+        Column(modifier = Modifier.padding(contentPadding)) {
+            PrimaryTabRow(
+                selectedTabIndex = selectedIndex,
+            ) {
+                Tab(
+                    selected = selectedIndex == 0,
+                    onClick = {
+                        selectedIndex = 0
+                        scope.launch {
+                            pagerState.animateScrollToPage(0)
+                        }
+                    },
+                    text = { Text(stringResource(string.live)) },
+                    icon = { Icon(IconPainter(Clock), contentDescription = null) }
+                )
+
+                Tab(
+                    selected = selectedIndex == 1,
+                    onClick = {
+                        selectedIndex = 1
+                        scope.launch {
+                            pagerState.animateScrollToPage(1)
+                        }
+                    },
+                    text = { Text(stringResource(string.schedule)) },
+                    icon = { Icon(IconPainter(Calendar), contentDescription = null) }
+                )
+            }
+
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize()
+            ) { index ->
+                when (index) {
+                    0 -> LiveStationScreen()
+                    1 -> ScheduleStationScreen()
+                }
+            }
         }
     }
 }

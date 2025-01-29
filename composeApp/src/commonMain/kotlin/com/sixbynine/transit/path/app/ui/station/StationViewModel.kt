@@ -105,7 +105,7 @@ class StationViewModel(private val stationId: String?) : BaseViewModel<State, In
                     .map { it.toCommonUiTrainData().toAppUiTrainData(timeDisplay = TimeDisplay.Clock) }
                     .sortedBy { it.projectedArrival }
             updateState {
-                copy(scheduledTrains = allScheduledTrains)
+                copy(scheduledTrains = allScheduledTrains, scheduleName = scheduleData.scheduleName)
             }
         }
     }
@@ -126,6 +126,7 @@ class StationViewModel(private val stationId: String?) : BaseViewModel<State, In
                 trainsMatchingFilters = emptyList(),
                 otherTrains = emptyList(),
                 scheduledTrains = emptyList(),
+                scheduleName = null,
                 timeDisplay = SettingsManager.timeDisplay.value,
                 groupByDestination = SettingsManager.groupTrains.value,
             )

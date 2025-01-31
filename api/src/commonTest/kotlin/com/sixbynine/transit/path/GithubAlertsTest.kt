@@ -311,15 +311,15 @@ class GithubAlertsTest {
                 days = DayOfWeek.values().toList(),
                 start = LocalTime(0, 0),
                 end = LocalTime(5, 0),
-                from = LocalDate(2025, FEBRUARY, 25),
-                to = LocalDate(2025, DECEMBER, 31),
+                from = LocalDate(2024, FEBRUARY, 25),
+                to = LocalDate(2025, JANUARY, 31),
             ),
             displaySchedule = Schedule.repeatingDaily(
                 days = DayOfWeek.values().toList(),
                 start = LocalTime(22, 0),
                 end = LocalTime(5, 0),
-                from = LocalDate(2025, FEBRUARY, 25),
-                to = LocalDate(2025, DECEMBER, 30),
+                from = LocalDate(2024, FEBRUARY, 25),
+                to = LocalDate(2025, JANUARY, 31),
             ),
             hiddenTrainsFilter = TrainFilter.all(),
             message = AlertText(
@@ -339,7 +339,7 @@ class GithubAlertsTest {
                 days = DayOfWeek.values().toList(),
                 start = LocalTime(22, 0),
                 end = LocalTime(7, 0),
-                from = LocalDate(2025, FEBRUARY, 25),
+                from = LocalDate(2024, FEBRUARY, 25),
                 to = LocalDate(2025, DECEMBER, 31),
             ),
             hiddenTrainsFilter = TrainFilter(),
@@ -348,7 +348,8 @@ class GithubAlertsTest {
             ),
             url = AlertText(
                 en = "https://www.panynj.gov/path/en/planned-service-changes.html",
-            )
+            ),
+            level = "INFO",
         )
 
         val HobokenClosure = Alert(

@@ -311,14 +311,14 @@ class GithubAlertsTest {
                 days = DayOfWeek.values().toList(),
                 start = LocalTime(0, 0),
                 end = LocalTime(5, 0),
-                from = LocalDate(2025, JANUARY, 6),
+                from = LocalDate(2025, FEBRUARY, 25),
                 to = LocalDate(2025, DECEMBER, 31),
             ),
             displaySchedule = Schedule.repeatingDaily(
                 days = DayOfWeek.values().toList(),
                 start = LocalTime(22, 0),
                 end = LocalTime(5, 0),
-                from = LocalDate(2025, JANUARY, 5),
+                from = LocalDate(2025, FEBRUARY, 25),
                 to = LocalDate(2025, DECEMBER, 30),
             ),
             hiddenTrainsFilter = TrainFilter.all(),
@@ -339,7 +339,7 @@ class GithubAlertsTest {
                 days = DayOfWeek.values().toList(),
                 start = LocalTime(22, 0),
                 end = LocalTime(7, 0),
-                from = LocalDate(2024, JANUARY, 5),
+                from = LocalDate(2025, FEBRUARY, 25),
                 to = LocalDate(2025, DECEMBER, 31),
             ),
             hiddenTrainsFilter = TrainFilter(),
@@ -363,7 +363,7 @@ class GithubAlertsTest {
             ),
             hiddenTrainsFilter = TrainFilter.all(),
             message = AlertText(
-                en = "Hoboken Station is closed until February 25 for significant track and station upgrades. ",
+                en = "Hoboken station is closed until February 25 for significant track and station upgrades",
                 es = "La estación de Hoboken está cerrada hasta el 25 de febrero"
             ),
             url = AlertText(

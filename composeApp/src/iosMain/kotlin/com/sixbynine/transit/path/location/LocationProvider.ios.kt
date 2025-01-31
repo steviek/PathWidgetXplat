@@ -28,6 +28,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import platform.CoreLocation.CLLocationManager
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TimeMark
 import kotlin.time.TimeSource.Monotonic
@@ -69,7 +70,7 @@ object IosLocationProvider : LocationProvider {
         requestDelegate?.requestLocationPermission()
     }
 
-    override val defaultLocationCheckTimeout = 300.seconds
+    override val defaultLocationCheckTimeout = 300.milliseconds
 
     override suspend fun tryToGetLocation(): LocationCheckResult {
         lastLocationRequestTime?.let {

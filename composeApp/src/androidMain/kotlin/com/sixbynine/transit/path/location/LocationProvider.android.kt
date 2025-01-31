@@ -33,8 +33,8 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.nanoseconds
-import kotlin.time.Duration.Companion.seconds
 
 object AndroidLocationProvider : LocationProvider {
 
@@ -52,7 +52,7 @@ object AndroidLocationProvider : LocationProvider {
     override val locationPermissionResults: SharedFlow<LocationPermissionRequestResult> =
         _locationPermissionResultsChannel.receiveAsFlow().shareIn(GlobalScope, WhileSubscribed())
 
-    override val defaultLocationCheckTimeout = 700.seconds
+    override val defaultLocationCheckTimeout = 700.milliseconds
 
     override fun hasLocationPermission(): Boolean {
         if (VERSION.SDK_INT < 23 || !isLocationSupportedByDevice) return false

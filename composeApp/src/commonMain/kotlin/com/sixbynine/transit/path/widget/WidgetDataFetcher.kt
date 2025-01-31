@@ -39,23 +39,25 @@ import com.sixbynine.transit.path.util.AgedValue
 import com.sixbynine.transit.path.util.DataResult
 import com.sixbynine.transit.path.util.FetchWithPrevious
 import com.sixbynine.transit.path.util.Staleness
+import com.sixbynine.transit.path.util.flatten
 import com.sixbynine.transit.path.util.globalDataStore
 import com.sixbynine.transit.path.util.isFailure
 import com.sixbynine.transit.path.util.isSuccess
 import com.sixbynine.transit.path.util.onFailure
+import com.sixbynine.transit.path.util.onLoading
 import com.sixbynine.transit.path.util.onSuccess
 import com.sixbynine.transit.path.util.orElse
-import com.sixbynine.transit.path.util.suspendRunCatching
+import com.sixbynine.transit.path.util.toDataResult
 import com.sixbynine.transit.path.util.withTimeoutCatching
 import kotlinx.coroutines.CoroutineStart.LAZY
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeout
 import kotlinx.datetime.DayOfWeek.SATURDAY
 import kotlinx.datetime.DayOfWeek.SUNDAY
 import kotlinx.datetime.Instant
@@ -135,8 +137,13 @@ object WidgetDataFetcher {
         canRefreshLocation: Boolean = true,
         isBackgroundUpdate: Boolean = false,
         now: Instant = now(),
+        fetchId: Int? = null,
     ): FetchWithPrevious<WidgetData> {
-        Logging.d("Fetch widget data with previous, includeClosestStation = $includeClosestStation")
+        val fetchIdLabel = fetchId?.let { " [$fetchId]" }.orEmpty()
+        Logging.d(
+            "Fetch$fetchIdLabel widget data with previous, " +
+                    "includeClosestStation = $includeClosestStation"
+        )
         val (liveDepartures, previousDepartures) =
             PathApi.instance.getUpcomingDepartures(now, staleness)
         val (alerts, previousAlerts) = AlertsRepository.getAlerts(now)
@@ -205,7 +212,10 @@ object WidgetDataFetcher {
                             JustChecked -> lastClosestStations
 
                             is Failure -> {
-                                Logging.w("Failed to get location", locationResult.throwable)
+                                Logging.w(
+                                    "Fetch$fetchIdLabel: failed to get location",
+                                    locationResult.throwable
+                                )
                                 lastClosestStations
                             }
 
@@ -220,7 +230,27 @@ object WidgetDataFetcher {
                     }
                 }
 
-                val live = liveDepartures.await()
+                val live =
+                    withTimeoutCatching(5.seconds) {
+                        liveDepartures.await()
+                    }
+                        .toDataResult()
+                        .flatten()
+                        .onSuccess {
+                            Logging.d("Fetch$fetchIdLabel: received live departures")
+                        }
+                        .onLoading {
+                            Logging.w(
+                                "Fetch$fetchIdLabel: received loading live departures"
+                            )
+                        }
+                        .onFailure { error, hadInternet, _ ->
+                            Logging.w(
+                                "Fetch$fetchIdLabel: failed fetching live departures, " +
+                                        "hadInternet = $hadInternet",
+                                error
+                            )
+                        }
                 val isPathApiBroken = live.isFailure() && live.error is PathApiException
                 val scheduled = if (isPathApiBroken) {
                     SchedulePathApi().getUpcomingDepartures(now, staleness).fetch.await()
@@ -252,14 +282,35 @@ object WidgetDataFetcher {
                     }
                 }
 
+                val alertsResult = withTimeoutCatching(2.seconds) {
+                    alerts.await()
+                }.toDataResult().flatten()
+                    .onSuccess {
+                        Logging.d("Fetch$fetchIdLabel: Received alerts ")
+                    }
+                    .onFailure { error, hadInternet, data ->
+                        Logging.w("Fetch$fetchIdLabel: Failed to get alerts", error)
+                    }
+                    .onLoading {
+                        Logging.w("Fetch$fetchIdLabel: Received loading for alerts!")
+                    }
+
                 val widgetData = departureBoardTrainMap?.let { data ->
                     createWidgetData(
                         lastFetchTime ?: now,
                         data,
-                        alerts.await().data,
+                        alertsResult.data,
                         stationsByProximity,
                         isPathApiBroken = isPathApiBroken,
                     )
+                }
+
+                (this as? Job)?.children?.let {
+                    if (it.toList().isNotEmpty()) {
+                        Logging.w("Fetch$fetchIdLabel: Ready to return data, but there are " +
+                                "ongoing jobs to cancel")
+                        it.forEach { it.cancel() }
+                    }
                 }
 
                 when {
@@ -274,7 +325,9 @@ object WidgetDataFetcher {
                             // this is likely just the Android widget being throttled by the system.
                             // Let's treat it as success and just re-use the previous data.
                             Logging.d(
-                                "Re-using previous data since the system denied us internet " +
+                                "Fetch$fetchIdLabel: " +
+                                        "Re-using previous data since the system denied us " +
+                                        "internet " +
                                         "during a background update",
                             )
                             DataResult.success(widgetData)
@@ -306,10 +359,8 @@ object WidgetDataFetcher {
             }
         }
         val fetchWithTimeout = GlobalScope.async(start = LAZY) {
-            suspendRunCatching {
-                withTimeout(5.seconds) {
-                    fetch.await()
-                }
+            withTimeoutCatching(5.seconds) {
+                fetch.await()
             }
                 .fold(
                     onSuccess = { it },
@@ -334,7 +385,6 @@ object WidgetDataFetcher {
         data: DepartureBoardTrainMap,
         isPathApiBroken: Boolean,
     ): WidgetData {
-        Logging.d("createWidgetData, stations = ${stations.map { it.pathApiName }}, lines=$lines")
         val adjustedStations = stations.toMutableList()
         val stationDatas = arrayListOf<WidgetData.StationData>()
         val avoidMissingTrains = currentAvoidMissingTrains()
@@ -539,7 +589,8 @@ object WidgetDataFetcher {
     ): List<Station> {
         return Stations.byProximityTo(location).also { stations ->
             Logging.d(
-                "Received current location as $location in ${duration}, closest stations are " +
+                "Received current location as (${location.latitude},${location.longitude}) in " +
+                        "${duration}, closest stations are " +
                         stations.map { it.displayName }
             )
             lastClosestStations = stations

@@ -24,7 +24,7 @@ actual fun exportDevLogs(logs: List<LogRecord>) {
         writer.write("timestamp\tlevel\tmessage")
         writer.newLine()
 
-        logs.forEach { log ->
+        logs.asReversed().forEach { log ->
             writer.write(log.timestamp.toLocalDateTime(NewYorkTimeZone).toString())
             writer.write("\t")
             writer.write(log.level.toString())

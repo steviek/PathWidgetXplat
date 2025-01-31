@@ -2,6 +2,7 @@ package com.sixbynine.transit.path.widget
 
 import android.annotation.SuppressLint
 import android.content.Context
+import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.MobilePathApplication
 import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.StationSort.Alphabetical
@@ -12,6 +13,7 @@ import com.sixbynine.transit.path.util.DataResult
 import com.sixbynine.transit.path.util.FetchWithPrevious
 import com.sixbynine.transit.path.util.Staleness
 import com.sixbynine.transit.path.util.isFailure
+import com.sixbynine.transit.path.util.isSuccess
 import com.sixbynine.transit.path.widget.configuration.WidgetConfigurationManager
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
@@ -29,6 +31,8 @@ object AndroidWidgetDataRepository {
     private const val IsLoadingKey = "is_loading"
     private const val HasErrorKey = "has_error"
     private const val HadInternetKey = "had_internet"
+
+    private var fetchId = 1
 
     private val context: Context = MobilePathApplication.instance
     private val prefs = context.getSharedPreferences("widget_data_store", Context.MODE_PRIVATE)
@@ -59,6 +63,7 @@ object AndroidWidgetDataRepository {
                 startFetch(
                     force = false,
                     canRefreshLocation = false,
+                    fetchId = 0,
                 ).previous?.value
             )
         )
@@ -101,10 +106,14 @@ object AndroidWidgetDataRepository {
         isBackgroundUpdate: Boolean,
     ) = coroutineScope {
         if (isLoading && hasLoadedOnce) {
+            Logging.d("WDR: join fetch $fetchId")
             return@coroutineScope
         }
 
-        val (fetch, previous) = startFetch(force, canRefreshLocation, isBackgroundUpdate)
+        val fetchId = fetchId++
+        Logging.d("WDR: start fetch $fetchId")
+
+        val (fetch, previous) = startFetch(force, canRefreshLocation, isBackgroundUpdate, fetchId)
 
         hasLoadedOnce = true
         isLoading = true
@@ -117,9 +126,13 @@ object AndroidWidgetDataRepository {
 
         isLoading = false
         if (result.isFailure()) {
+            Logging.w("WDR: fetch $fetchId error loading widget data", result.error)
             hasError = true
             hadInternet = result.hadInternet
+        } else if (result.isSuccess()) {
+            Logging.d("WDR: fetch $fetchId completed successfully")
         }
+
         _data.await().value = result
         DepartureBoardWidget.onDataChanged()
     }
@@ -128,6 +141,7 @@ object AndroidWidgetDataRepository {
         force: Boolean,
         canRefreshLocation: Boolean,
         isBackgroundUpdate: Boolean = !AppLifecycleObserver.isActive.value,
+        fetchId: Int,
     ): FetchWithPrevious<WidgetData> {
         val anyWidgetsUseLocation =
             WidgetConfigurationManager.getWidgetConfigurations().values.any { it.useClosestStation }
@@ -144,7 +158,9 @@ object AndroidWidgetDataRepository {
             staleness = Staleness(
                 staleAfter = if (force) 5.seconds else 30.seconds,
                 invalidAfter = Duration.INFINITE, // Always show old data while loading widget.
-            )
+            ),
+            fetchId = fetchId,
+
         )
     }
 }

@@ -9,6 +9,7 @@ import ComposeApp
 import Foundation
 import FirebaseCore
 import FirebaseAnalytics
+import FirebaseCrashlytics
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication,
@@ -30,7 +31,13 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         }
         IOSPlatform().setFirstDayOfWeek(firstDayOfWeek: firstDayOfWeek)
         
-        NativeHolder().initialize(widgetReloader: IosWidgetReloader())
+        NativeHolder().initialize(
+            widgetReloader: IosWidgetReloader(),
+            nonFatalReporter: { e in
+                Crashlytics.crashlytics()
+                    .record(error: e.asError())
+            }
+        )
         
         return true
     }

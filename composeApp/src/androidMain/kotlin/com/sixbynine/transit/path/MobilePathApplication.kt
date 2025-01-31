@@ -1,5 +1,7 @@
 package com.sixbynine.transit.path
 
+import com.google.firebase.Firebase
+import com.google.firebase.crashlytics.crashlytics
 import com.sixbynine.transit.path.analytics.Analytics
 import com.sixbynine.transit.path.app.ui.ActivityRegistry
 import com.sixbynine.transit.path.native.NativeHolder
@@ -24,7 +26,8 @@ class MobilePathApplication : PathApplication() {
                         WidgetRefreshWorker.scheduleOneTime()
                     }
                 }
-            }
+            },
+            Firebase.crashlytics::recordException
         )
 
         ActivityRegistry.register(this)

@@ -19,9 +19,11 @@ import com.sixbynine.transit.path.MobilePathApplication
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.api.anyMatch
+import com.sixbynine.transit.path.time.NewYorkTimeZone
 import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.time.today
 import com.sixbynine.transit.path.util.DataResult
+import com.sixbynine.transit.path.util.dropSubSeconds
 import com.sixbynine.transit.path.util.map
 import com.sixbynine.transit.path.widget.configuration.StoredWidgetConfiguration
 import com.sixbynine.transit.path.widget.configuration.WidgetConfigurationManager
@@ -35,6 +37,7 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atTime
 import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import java.util.Locale
 
 class DepartureBoardWidget : GlanceAppWidget() {
@@ -45,13 +48,14 @@ class DepartureBoardWidget : GlanceAppWidget() {
         launch { WidgetRefreshWorker.schedule() }
 
         val data = AndroidWidgetDataRepository.getData()
-        Logging.d("provideGlance")
+
         provideContent {
             val updateTime =
                 currentState(key = LastUpdateKey)
                     ?.let { Instant.fromEpochMilliseconds(it) } ?: now()
             val configuration = with(WidgetConfigurationManager) { getWidgetConfiguration() }
-            Logging.d("provideContent invoked, updateTime = $updateTime")
+            Logging.d("provideContent invoked, updateTime = ${updateTime.toLocalDateTime(
+                NewYorkTimeZone).dropSubSeconds()}")
 
             val widgetState = if (configuration.needsSetup()) {
                 WidgetState(
@@ -68,7 +72,6 @@ class DepartureBoardWidget : GlanceAppWidget() {
                 )
             }
             WidgetContent(widgetState)
-            Logging.d("composed widget content with data fetched at ${widgetState.result.data?.fetchTime}")
         }
     }
 

@@ -12,11 +12,13 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.MobilePathApplication
 import com.sixbynine.transit.path.api.PathApi
 import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.util.Staleness
 import com.sixbynine.transit.path.util.await
+import com.sixbynine.transit.path.util.isSuccess
 import com.sixbynine.transit.path.util.onFailure
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
@@ -34,6 +36,8 @@ class WidgetRefreshWorker(
 
         val isBackground = params.inputData.getBoolean(IS_BACKGROUND, true)
 
+        Logging.d("Refresh widget data from worker, isBackground=$isBackground")
+
         PathApi.instance
             .getUpcomingDepartures(
                 now = now(),
@@ -45,6 +49,9 @@ class WidgetRefreshWorker(
                     // If android didn't give us internet in the background, just give up for now.
                     return Result.success()
                 }
+            }
+            .also {
+                Logging.d("Refresh widget data from worker complete, isBackground=$isBackground, wasSuccess=${it.isSuccess()}")
             }
 
         AndroidWidgetDataRepository.refreshWidgetData(
@@ -93,11 +100,18 @@ class WidgetRefreshWorker(
             }
 
             val workManager = WorkManager.getInstance(context)
-            val workRequest = OneTimeWorkRequestBuilder<WidgetRefreshWorker>().setInputData(
-                Data.Builder()
-                    .putBoolean(IS_BACKGROUND, false)
-                    .build()
-            ).build()
+            val workRequest = OneTimeWorkRequestBuilder<WidgetRefreshWorker>()
+                .setConstraints(
+                    Constraints.Builder()
+                        .setRequiredNetworkType(CONNECTED)
+                        .build()
+                )
+                .setInputData(
+                    Data.Builder()
+                        .putBoolean(IS_BACKGROUND, false)
+                        .build()
+                )
+                .build()
             workManager.enqueueUniqueWork(ONE_TIME_WORK_TAG, ExistingWorkPolicy.KEEP, workRequest)
         }
 

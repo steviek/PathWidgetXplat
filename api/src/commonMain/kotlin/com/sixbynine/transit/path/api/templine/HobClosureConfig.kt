@@ -32,7 +32,7 @@ data class TempLineInfo(
         val fallback get() = TempLineInfo(
             displayName = "33rd Street ⇆ World Trade Center",
             codes = listOf("WTC-33", "33-WTC"),
-            lightColor = "782C94",
+            lightColor = "65C100",
             darkColor = null,
         )
     }

@@ -6,8 +6,13 @@ import com.sixbynine.transit.path.util.IsTest
 import com.sixbynine.transit.path.util.globalDataStore
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.Instant
@@ -33,6 +38,8 @@ object Logging {
                 devLoggingStore = null
             }
         }
+
+    var nonFatalReporter: NonFatalReporter? = null
 
     private val hasInitialized = MutableStateFlow(false)
 
@@ -73,10 +80,21 @@ object Logging {
         initialize()
         Napier.e(message, throwable)
         devLoggingStore?.log('E', message + (throwable?.message?.let { ": $it" } ?: ""))
+        reportNonFatal(throwable)
     }
 
     fun getLogRecords(): List<LogRecord> {
         return devLoggingStore?.getRecords()?.records ?: emptyList()
+    }
+
+    private fun reportNonFatal(e: Throwable?) {
+        if (IsTest) return
+        val reporter = nonFatalReporter ?: return
+        if (e == null) return
+        when (e) {
+            is CancellationException -> return
+        }
+        reporter.report(e)
     }
 }
 

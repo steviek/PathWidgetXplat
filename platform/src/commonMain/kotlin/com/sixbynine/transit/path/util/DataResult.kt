@@ -78,6 +78,13 @@ inline fun <T> DataResult<T>.onFailure(
     return this
 }
 
+inline fun <T> DataResult<T>.onLoading(action: (T?) -> Unit): DataResult<T> {
+    if (this is DataResult.Loading) {
+        action(data)
+    }
+    return this
+}
+
 fun <T> Result<T>.toDataResult(): DataResult<T> {
     return fold(
         onSuccess = { DataResult.success(it) },
@@ -108,4 +115,16 @@ inline fun <A, B, C> DataResult<A>.combine(
     transform: (A, B) -> C
 ): DataResult<C> {
     return combine(this, other, transform)
+}
+
+fun <T> DataResult<DataResult<T>>.flatten(): DataResult<T> {
+    return fold(
+        onSuccess = { it },
+        onError = { error, hadInternet, data ->
+            DataResult.failure(error, hadInternet, data?.data)
+        },
+        onLoading = { data ->
+            DataResult.loading(data?.data)
+        }
+    )
 }

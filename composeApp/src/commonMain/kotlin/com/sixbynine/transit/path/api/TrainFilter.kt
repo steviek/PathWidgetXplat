@@ -36,6 +36,9 @@ enum class TrainFilter(override val number: Int) : IntPersistable {
             if (filter == All) return true
 
             return when {
+                // Trains to/from WTC are always interstate.
+                station == Stations.WorldTradeCenter ||
+                        destination == Stations.WorldTradeCenter -> true
                 // Newport -> Hoboken is the only time an NJ-terminating train travels east.
                 destination == Stations.Hoboken -> station.isInNewYork
                 station.isInNewYork -> destination.isInNewJersey || destination isWestOf station

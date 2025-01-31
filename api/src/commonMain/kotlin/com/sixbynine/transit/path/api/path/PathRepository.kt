@@ -31,7 +31,6 @@ object PathRepository {
     private val mutex = Mutex()
 
     fun getResults(now: Instant, staleness: Staleness): FetchWithPrevious<PathServiceResults> {
-        Logging.d("getResults, staleAfter: ${staleness.staleAfter}, invalidAfter: ${staleness.invalidAfter}")
         val previous = getCachedResults(now)
         return FetchWithPrevious.create(
             previous = previous,

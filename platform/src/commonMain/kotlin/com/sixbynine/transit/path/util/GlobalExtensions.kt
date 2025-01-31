@@ -1,5 +1,9 @@
 package com.sixbynine.transit.path.util
 
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.atTime
+
 inline fun <T: Any> T?.orElse(other: () -> T): T {
     return this ?: other()
 }
@@ -18,4 +22,19 @@ inline fun <A : Any, B : Any, C> ifNotNull(first: A?, second: B?, transform: (A,
     first ?: return null
     second ?: return null
     return transform(first, second)
+}
+
+fun <T> Result<Result<T>>.flatten(): Result<T> {
+    return fold(
+        onSuccess = { it },
+        onFailure = { Result.failure(it) }
+    )
+}
+
+fun LocalDateTime.dropSubSeconds(): LocalDateTime {
+    return date.atTime(time.dropSubSeconds())
+}
+
+fun LocalTime.dropSubSeconds(): LocalTime {
+    return LocalTime(hour, minute, second)
 }

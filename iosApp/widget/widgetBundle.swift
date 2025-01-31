@@ -23,8 +23,13 @@ struct widgetBundle: WidgetBundle {
             firstDayOfWeek = Locale.current.firstDayOfWeek.rawValue
         }
         IOSPlatform().setFirstDayOfWeek(firstDayOfWeek: firstDayOfWeek)
-        
-        NativeHolder().initialize(widgetReloader: IosWidgetReloader())
+                
+        NativeHolder().initialize(
+            widgetReloader: IosWidgetReloader(),
+            nonFatalReporter: { e in
+                
+            }
+        )
     }
 
     var body: some Widget {

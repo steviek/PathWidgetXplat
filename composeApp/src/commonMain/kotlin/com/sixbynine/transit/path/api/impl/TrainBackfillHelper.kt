@@ -29,8 +29,11 @@ import com.sixbynine.transit.path.api.impl.TrainBackfillHelper.LineId.Companion.
 import com.sixbynine.transit.path.api.impl.TrainBackfillHelper.LineId.Companion.OK_JSQ_33S
 import com.sixbynine.transit.path.api.impl.TrainBackfillHelper.LineId.Companion.PAIN_33S_JSQ
 import com.sixbynine.transit.path.api.impl.TrainBackfillHelper.LineId.Companion.PAIN_JSQ_33S
+import com.sixbynine.transit.path.api.impl.TrainBackfillHelper.LineId.Companion.WTC_33S
+import com.sixbynine.transit.path.api.impl.TrainBackfillHelper.LineId.Companion.WTC_FROM_33S
 import com.sixbynine.transit.path.api.impl.TrainBackfillHelper.LineId.Companion.WTC_HOB
 import com.sixbynine.transit.path.api.impl.TrainBackfillHelper.LineId.Companion.WTC_NWK
+import com.sixbynine.transit.path.api.isInNewYork
 import com.sixbynine.transit.path.app.ui.ColorWrapper
 import com.sixbynine.transit.path.app.ui.Colors
 import com.sixbynine.transit.path.time.NewYorkTimeZone
@@ -50,10 +53,10 @@ object TrainBackfillHelper {
     private data class LineId(
         val headSign: String,
         val colors: List<ColorWrapper>,
-        val direction: State?
+        val direction: State?,
+        val code: String? = null,
     ) {
         companion object {
-
             val NWK_WTC = LineId(
                 headSign = "World Trade Center",
                 colors = Colors.NwkWtc,
@@ -103,6 +106,18 @@ object TrainBackfillHelper {
                 headSign = "Hoboken",
                 colors = Colors.Hob33s,
                 direction = NewJersey
+            )
+            val WTC_33S = LineId(
+                headSign = "33rd Street",
+                colors = Colors.HobWtc,
+                direction = NewYork,
+                code = "WTC_33S",
+            )
+            val WTC_FROM_33S = LineId(
+                headSign = "World Trade Center",
+                colors = Colors.HobWtc,
+                direction = NewYork,
+                code = "33S_WTC",
             )
         }
     }
@@ -184,6 +199,24 @@ object TrainBackfillHelper {
             FourteenthStreet to 11.minutes + 43.seconds,
             TwentyThirdStreet to 13.minutes + 43.seconds,
         ),
+        WTC_33S to mapOf(
+            WorldTradeCenter to 0.minutes,
+            ExchangePlace to 3.minutes + 42.seconds,
+            Newport to 8.minutes + 38.seconds,
+            ChristopherStreet to 15.minutes + 13.seconds,
+            NinthStreet to 17.minutes + 13.seconds,
+            FourteenthStreet to 18.minutes + 14.seconds,
+            TwentyThirdStreet to 20.minutes + 14.seconds,
+        ),
+        WTC_FROM_33S to mapOf(
+            ThirtyThirdStreet to 0.minutes,
+            TwentyThirdStreet to 1.minutes + 42.seconds,
+            FourteenthStreet to 3.minutes + 31.seconds,
+            NinthStreet to 4.minutes + 31.seconds,
+            ChristopherStreet to 6.minutes + 31.seconds,
+            Newport to 16.minutes + 31.seconds,
+            ExchangePlace to 21.minutes + 31.seconds,
+        )
     )
 
     private val LineIdToCheckpointsSlower = mapOf(
@@ -263,10 +296,13 @@ object TrainBackfillHelper {
             FourteenthStreet to 11.minutes + 43.seconds,
             TwentyThirdStreet to 13.minutes + 43.seconds,
         ),
+        WTC_33S to LineIdToCheckpointsFaster[WTC_33S],
+        WTC_FROM_33S to LineIdToCheckpointsFaster[WTC_FROM_33S],
     )
 
     fun getCheckpoints(route: String, isSlowTime: Boolean): Map<Station, Duration>? {
-        val checkpoints = if (isSlowTime) LineIdToCheckpointsSlower else LineIdToCheckpointsFaster
+        val checkpoints =
+            if (isSlowTime) LineIdToCheckpointsSlower else LineIdToCheckpointsFaster
         return when (route) {
             "NWK_WTC" -> checkpoints[NWK_WTC]
             "WTC_NWK" -> checkpoints[WTC_NWK]
@@ -289,6 +325,8 @@ object TrainBackfillHelper {
 
             "NWK_HAR" -> mapOf(Newark to 0.minutes)
             "HAR_NWK" -> mapOf(Harrison to 0.minutes)
+            "WTC_33S" -> checkpoints[WTC_33S]
+            "33S_WTC" -> checkpoints[WTC_FROM_33S]
             else -> null
         }
     }
@@ -310,7 +348,8 @@ object TrainBackfillHelper {
     fun withBackfill(
         trains: Map<String, List<DepartureBoardTrain>>,
     ): Map<String, List<DepartureBoardTrain>> {
-        val backfilled = trains.mapValues { (_, value) -> value.toMutableList() }.toMutableMap()
+        val backfilled =
+            trains.mapValues { (_, value) -> value.toMutableList() }.toMutableMap()
 
         trains.forEach eachStation@{ (stationKey, stationTrains) ->
             val station = Stations.byId(stationKey) ?: return@eachStation
@@ -318,7 +357,7 @@ object TrainBackfillHelper {
                 Logging.d("Backfill from station: ${station.displayName}")
             }
             stationTrains.forEach eachTrain@{ train ->
-                val lineId = train.lineId
+                val lineId = train.getLineId(station)
                 val checkpoints = LineIdToCheckpointsFaster[lineId].orElse {
                     if (ShouldLog) {
                         Logging.d(
@@ -365,14 +404,16 @@ object TrainBackfillHelper {
                         backfilled.getOrPut(futureStation.pathApiName) { arrayListOf() }
                     for (i in trainsForStation.indices.reversed()) {
                         val knownTrain = trainsForStation[i]
-                        if (knownTrain.lineId != lineId) continue
+                        if (knownTrain.getLineId(station) != lineId) continue
                         if ((knownTrain.projectedArrival - hypotheticalTrain.projectedArrival)
-                            .absoluteValue > getCloseTrainThreshold()) {
+                                .absoluteValue > getCloseTrainThreshold()
+                        ) {
                             continue
                         }
 
                         if (knownTrain.backfillSource == null ||
-                            knownTrain.backfillSource.station isLaterInLineThan station) {
+                            knownTrain.backfillSource.station isLaterInLineThan station
+                        ) {
                             // live time or better backfill. move along
                             return@eachCheckpoint
                         }
@@ -405,9 +446,25 @@ object TrainBackfillHelper {
         return 10.minutes
     }
 
-    private val DepartureBoardTrain.lineId: LineId
-        get() {
-            val id = LineId(headsign, lineColors, directionState)
-            return LineIdAliases[id] ?: id
+    private fun DepartureBoardTrain.getLineId(station: Station): LineId {
+        val destination = Stations.fromHeadSign(headsign)
+        if (station.isInNewYork && destination == WorldTradeCenter) {
+            return WTC_FROM_33S
         }
+
+        if (station == ExchangePlace && destination == ThirtyThirdStreet) {
+            return WTC_33S
+        }
+
+        if (station == WorldTradeCenter && destination == ThirtyThirdStreet) {
+            return WTC_33S
+        }
+
+        if (station == Newport && destination == ThirtyThirdStreet && lineColors == Colors.HobWtc) {
+            return WTC_33S
+        }
+
+        val id = LineId(headsign, lineColors, directionState)
+        return LineIdAliases[id] ?: id
+    }
 }

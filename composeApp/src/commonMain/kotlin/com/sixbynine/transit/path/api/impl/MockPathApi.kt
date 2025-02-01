@@ -56,7 +56,7 @@ internal class MockPathApi : PathApi {
                 DepartureBoardTrain(
                     headsign = "33rd St",
                     projectedArrival = now + 4.minutes,
-                    lineColors = Colors.Wtc33s,
+                    lineColors = Colors.HobWtc,
                     isDelayed = false,
                     backfillSource = null,
                     directionState = NewYork,

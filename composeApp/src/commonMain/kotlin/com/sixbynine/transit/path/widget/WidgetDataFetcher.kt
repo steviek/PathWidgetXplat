@@ -517,6 +517,7 @@ object WidgetDataFetcher {
 
         val destination = Stations.fromHeadSign(headSign) ?: return true
         return when {
+            station == Stations.WorldTradeCenter || destination == Stations.WorldTradeCenter -> true
             // Newport -> Hoboken is the only time an NJ-terminating train travels east.
             destination == Stations.Hoboken -> station.isInNewYork
             station.isInNewYork -> destination.isInNewJersey || destination isWestOf station

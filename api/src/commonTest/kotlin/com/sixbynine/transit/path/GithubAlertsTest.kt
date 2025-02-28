@@ -1,12 +1,9 @@
 package com.sixbynine.transit.path
 
-import com.sixbynine.transit.path.api.Stations.ExchangePlace
 import com.sixbynine.transit.path.api.Stations.FourteenthStreet
 import com.sixbynine.transit.path.api.Stations.GroveStreet
-import com.sixbynine.transit.path.api.Stations.Hoboken
 import com.sixbynine.transit.path.api.Stations.NinthStreet
 import com.sixbynine.transit.path.api.Stations.TwentyThirdStreet
-import com.sixbynine.transit.path.api.Stations.WorldTradeCenter
 import com.sixbynine.transit.path.api.alerts.Alert
 import com.sixbynine.transit.path.api.alerts.AlertText
 import com.sixbynine.transit.path.api.alerts.Schedule
@@ -19,7 +16,6 @@ import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.DayOfWeek.FRIDAY
 import kotlinx.datetime.DayOfWeek.MONDAY
 import kotlinx.datetime.DayOfWeek.SATURDAY
-import kotlinx.datetime.DayOfWeek.SUNDAY
 import kotlinx.datetime.DayOfWeek.WEDNESDAY
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
@@ -27,11 +23,8 @@ import kotlinx.datetime.LocalTime
 import kotlinx.datetime.Month.APRIL
 import kotlinx.datetime.Month.DECEMBER
 import kotlinx.datetime.Month.FEBRUARY
-import kotlinx.datetime.Month.JANUARY
 import kotlinx.datetime.Month.JULY
 import kotlinx.datetime.Month.JUNE
-import kotlinx.datetime.Month.MAY
-import kotlinx.datetime.atTime
 import kotlinx.serialization.encodeToString
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -44,8 +37,6 @@ class GithubAlertsTest {
         val alerts = GithubAlerts(
             GeneralOvernightCleaning,
             FourteenthStreetOvernight,
-            ChristmasOvernightCleaning,
-            HobokenClosure,
         )
 
         val json = JsonFormat.encodeToString(alerts)
@@ -218,108 +209,21 @@ class GithubAlertsTest {
     }
 
     private companion object {
-        val MoreTrains = Alert(
-            stations = listOf(ExchangePlace, WorldTradeCenter),
-            hideTrainsSchedule = Schedule(),
-            displaySchedule = Schedule.repeatingDaily(
-                days = listOf(SATURDAY, SUNDAY),
-                start = LocalTime(0, 0),
-                end = LocalTime(0, 0),
-                from = LocalDate(2024, APRIL, 17),
-                to = LocalDate(2024, JUNE, 30),
-            ),
-            hiddenTrainsFilter = TrainFilter(),
-            message = AlertText(
-                en = "Additional service is being provided between World Trade Center and Exchange Place during weekends until June 30",
-                es = "Hay servicio adicional entre World Trade Center y Exchange Place durante los fines de semana hasta el 30 de junio"
-            ),
-            url = AlertText(
-                en = "https://x.com/PATHAlerts/status/1788917634077007880",
-            )
-        )
-
-        val MemorialDayGroveStAlert = Alert(
-            stations = listOf(GroveStreet),
-            hideTrainsSchedule = Schedule(),
-            displaySchedule = Schedule.once(
-                from = LocalDateTime(2024, MAY, 24, 19, 0),
-                to = LocalDateTime(2024, MAY, 28, 3, 0),
-            ),
-            hiddenTrainsFilter = TrainFilter(),
-            message = AlertText(
-                en = "Grove Street has service in both directions during Memorial Day Weekend",
-                es = "Grove Street tiene servicio en ambas direcciones durante el fin de semana del Memorial Day"
-            ),
-            url = AlertText(
-                en = "https://www.panynj.gov/path/en/planned-service-changes.html"
-            ),
-            level = "INFO"
-        )
-
-        val GeneralGroveStAlert = Alert(
-            stations = listOf(GroveStreet),
-            hideTrainsSchedule = Schedule.repeatingWeekly(
-                startDay = SATURDAY,
-                startTime = LocalTime(6, 0),
-                endDay = MONDAY,
-                endTime = LocalTime(0, 0),
-                from = LocalDate(2024, MAY, 28),
-                to = LocalDate(2024, JUNE, 30),
-            ),
-            displaySchedule = Schedule.repeatingDaily(
-                days = listOf(SATURDAY, SUNDAY),
-                start = LocalTime(0, 0),
-                end = LocalTime(0, 0),
-                from = LocalDate(2024, MAY, 28),
-                to = LocalDate(2024, JUNE, 30),
-            ),
-            hiddenTrainsFilter = TrainFilter.headSigns("33rd", "World Trade"),
-            message = AlertText(
-                en = "Due to construction, World Trade Center- and 33 St.-bound trains will not stop at Grove Street Station from 6 AM Saturday - 11:59 PM Sunday.",
-                es = "Debido a construcción, los trenes con destino al World Trade Center y a 33 Street no pararán en la estación Grove Street entre el 6 de abril y el 30 de junio, desde las 6 a. m. del sábado hasta las 11:59 p. m. del domingo."
-            ),
-            url = AlertText(
-                en = "https://www.panynj.gov/path/en/modernizing-path/grove-st-improvements.html"
-            ),
-            level = "WARN",
-        )
-
-        val ChristmasOvernightCleaning = Alert(
-            stations = listOf(NinthStreet, TwentyThirdStreet),
-            hideTrainsSchedule = Schedule(),
-            displaySchedule = Schedule.repeatingDaily(
-                days = DayOfWeek.values().toList(),
-                start = LocalTime(17, 0),
-                end = LocalTime(5, 0),
-                from = LocalDate(2024, DECEMBER, 23),
-                to = LocalDate(2025, JANUARY, 5),
-            ),
-            hiddenTrainsFilter = TrainFilter(),
-            message = AlertText(
-                en = "9 St. & 23 St. stations will remain open overnight during the holiday season until January 6",
-                es = "Las estaciones de 9 St. y 23 St. permanecerán abiertas durante la noche hasta el 6 de enero"
-            ),
-            url = AlertText(
-                en = "https://www.panynj.gov/path/en/schedules-maps/weekend-schedules.html"
-            ),
-            level = "INFO"
-        )
-
         val GeneralOvernightCleaning = Alert(
             stations = listOf(NinthStreet, TwentyThirdStreet),
             hideTrainsSchedule = Schedule.repeatingDaily(
-                days = DayOfWeek.values().toList(),
+                days = DayOfWeek.entries,
                 start = LocalTime(0, 0),
                 end = LocalTime(5, 0),
-                from = LocalDate(2024, FEBRUARY, 25),
-                to = LocalDate(2025, JANUARY, 31),
+                from = LocalDate(2025, FEBRUARY, 28),
+                to = LocalDate(2025, DECEMBER, 31),
             ),
             displaySchedule = Schedule.repeatingDaily(
-                days = DayOfWeek.values().toList(),
+                days = DayOfWeek.entries,
                 start = LocalTime(22, 0),
                 end = LocalTime(5, 0),
-                from = LocalDate(2024, FEBRUARY, 25),
-                to = LocalDate(2025, JANUARY, 31),
+                from = LocalDate(2025, FEBRUARY, 28),
+                to = LocalDate(2025, DECEMBER, 31),
             ),
             hiddenTrainsFilter = TrainFilter.all(),
             message = AlertText(
@@ -336,7 +240,7 @@ class GithubAlertsTest {
             stations = listOf(FourteenthStreet),
             hideTrainsSchedule = Schedule(),
             displaySchedule = Schedule.repeatingDaily(
-                days = DayOfWeek.values().toList(),
+                days = DayOfWeek.entries,
                 start = LocalTime(22, 0),
                 end = LocalTime(7, 0),
                 from = LocalDate(2024, FEBRUARY, 25),
@@ -350,27 +254,6 @@ class GithubAlertsTest {
                 en = "https://www.panynj.gov/path/en/planned-service-changes.html",
             ),
             level = "INFO",
-        )
-
-        val HobokenClosure = Alert(
-            stations = listOf(Hoboken),
-            hideTrainsSchedule = Schedule.once(
-                from = LocalDate(2025, JANUARY, 30).atTime(23, 59),
-                to = LocalDate(2025, FEBRUARY, 25).atTime(5, 0)
-            ),
-            displaySchedule = Schedule.once(
-                from = LocalDate(2025, JANUARY, 30).atTime(7, 0),
-                to = LocalDate(2025, FEBRUARY, 25).atTime(5, 0)
-            ),
-            hiddenTrainsFilter = TrainFilter.all(),
-            message = AlertText(
-                en = "Hoboken station is closed until February 25 for significant track and station upgrades",
-                es = "La estación de Hoboken está cerrada hasta el 25 de febrero"
-            ),
-            url = AlertText(
-                en = "https://www.panynj.gov/HobokenClosure"
-            ),
-            level = "WARN"
         )
     }
 }

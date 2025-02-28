@@ -38,7 +38,7 @@ def create_regular(page: dict) -> dict:
         # process schedule
         data = page[":children"][link][":items"]["root"][":items"]
         dates.append(datetime.strptime(
-            data["textblock"]["text"].replace("&nbsp;", " ").split("Effective ")[1].split("</p>")[0],
+            data["textblock_copy"]["text"].replace("&nbsp;", " ").split("Effective ")[1].split("</p>")[0],
             "%B %d, %Y"
         ))
         title = data["simplehero_copy"]["title"]

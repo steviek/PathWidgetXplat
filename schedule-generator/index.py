@@ -37,13 +37,30 @@ def create_regular(page: dict) -> dict:
         r['timings'].append(t)
         # process schedule
         data = page[":children"][link][":items"]["root"][":items"]
+
+        textblock_key = 'textblock'
+        if not textblock_key in data:
+            textblock_key = 'textblock_copy'
+        if not textblock_key in data:
+            textblock_key = 'textblock_copy_copy'
+
+        if not textblock_key in data:
+            raise Exception("No textblock for " + link)
+
         dates.append(datetime.strptime(
-            data["textblock_copy"]["text"].replace("&nbsp;", " ").split("Effective ")[1].split("</p>")[0],
+            data[textblock_key]["text"].replace("&nbsp;", " ").split("Effective ")[1].split("</p>")[0],
             "%B %d, %Y"
         ))
         title = data["simplehero_copy"]["title"]
+
+        accordion_list_key = 'accordionlist'
+        if not accordion_list_key in data:
+            accordion_list_key = 'accordionlist_copy'
+        if not accordion_list_key in data:
+            raise Exception("No accordion list for " + link)
+
         r['schedules'].append(parse_schedule_times(
-            data["accordionlist"][":items"].items(),
+            data[accordion_list_key][":items"].items(),
             scheduleId,
             title
         ))

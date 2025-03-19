@@ -1,6 +1,7 @@
 package com.sixbynine.transit.path.app.ui
 
-import com.sixbynine.transit.path.app.ui.Colors.approxEquals
+import com.sixbynine.transit.path.model.Colors
+import com.sixbynine.transit.path.model.Colors.approxEquals
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue

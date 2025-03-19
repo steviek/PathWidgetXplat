@@ -58,7 +58,6 @@ import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.util.localizedString
 import com.sixbynine.transit.path.util.repeatEvery
 import com.sixbynine.transit.path.util.runUnless
-import com.sixbynine.transit.path.widget.WidgetData
 import com.sixbynine.transit.path.widget.WidgetDataFormatter
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -389,7 +388,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
     }
 
     companion object {
-        fun WidgetData.toDepartureBoardData(
+        fun com.sixbynine.transit.path.model.DepartureBoardData.toDepartureBoardData(
             trainFilter: TrainFilter = SettingsManager.trainFilter.value,
             timeDisplay: TimeDisplay = SettingsManager.timeDisplay.value,
             locationSetting: LocationSetting = SettingsManager.locationSetting.value,

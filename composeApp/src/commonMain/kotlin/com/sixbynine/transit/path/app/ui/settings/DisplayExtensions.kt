@@ -18,8 +18,8 @@ import com.sixbynine.transit.path.api.TrainFilter.Interstate
 import com.sixbynine.transit.path.app.settings.AvoidMissingTrains
 import com.sixbynine.transit.path.app.settings.StationLimit
 import com.sixbynine.transit.path.app.settings.TimeDisplay
-import com.sixbynine.transit.path.app.ui.ColorWrapper
-import com.sixbynine.transit.path.app.ui.Colors
+import com.sixbynine.transit.path.model.ColorWrapper
+import com.sixbynine.transit.path.model.Colors
 import com.sixbynine.transit.path.time.is24HourClock
 import com.sixbynine.transit.path.widget.WidgetDataFormatter
 import kotlinx.datetime.Clock.System

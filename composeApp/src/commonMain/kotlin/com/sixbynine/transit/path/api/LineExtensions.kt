@@ -5,11 +5,11 @@ import com.sixbynine.transit.path.api.Line.HobokenWtc
 import com.sixbynine.transit.path.api.Line.JournalSquare33rd
 import com.sixbynine.transit.path.api.Line.NewarkWtc
 import com.sixbynine.transit.path.api.impl.LineComputer
-import com.sixbynine.transit.path.app.ui.ColorWrapper
-import com.sixbynine.transit.path.app.ui.Colors
 import com.sixbynine.transit.path.app.ui.common.AppUiTrainData
-import com.sixbynine.transit.path.widget.WidgetData.SignData
-import com.sixbynine.transit.path.widget.WidgetData.TrainData
+import com.sixbynine.transit.path.model.ColorWrapper
+import com.sixbynine.transit.path.model.Colors
+import com.sixbynine.transit.path.model.DepartureBoardData.SignData
+import com.sixbynine.transit.path.model.DepartureBoardData.TrainData
 
 val Line.colors: List<ColorWrapper>
     get() = when (this) {

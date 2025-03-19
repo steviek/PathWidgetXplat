@@ -5,10 +5,13 @@ import com.sixbynine.transit.path.api.Line.Hoboken33rd
 import com.sixbynine.transit.path.api.Line.HobokenWtc
 import com.sixbynine.transit.path.api.Line.JournalSquare33rd
 import com.sixbynine.transit.path.api.Line.NewarkWtc
-import com.sixbynine.transit.path.app.ui.ColorWrapper
-import com.sixbynine.transit.path.app.ui.Colors
+import com.sixbynine.transit.path.model.ColorWrapper
+import com.sixbynine.transit.path.model.Colors
 
 object LineComputer {
+
+    private val NyNorthStations = setOf("CHR", "09S", "14S", "23S", "33S")
+
     fun computeLines(
         station: String,
         target: String,
@@ -82,5 +85,3 @@ object LineComputer {
         return lines
     }
 }
-
-private val NyNorthStations = setOf("CHR", "09S", "14S", "23S", "33S")

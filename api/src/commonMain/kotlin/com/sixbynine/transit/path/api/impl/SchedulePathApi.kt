@@ -1,7 +1,6 @@
 package com.sixbynine.transit.path.api.impl
 
-import com.sixbynine.transit.path.api.DepartureBoardTrain
-import com.sixbynine.transit.path.api.DepartureBoardTrainMap
+import com.sixbynine.transit.path.api.DepartingTrain
 import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.PathApi
 import com.sixbynine.transit.path.api.State
@@ -9,10 +8,11 @@ import com.sixbynine.transit.path.api.State.NewJersey
 import com.sixbynine.transit.path.api.State.NewYork
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.Stations
+import com.sixbynine.transit.path.api.UpcomingDepartures
 import com.sixbynine.transit.path.api.schedule.GithubScheduleRepository
 import com.sixbynine.transit.path.api.schedule.ScheduleAndOverride
-import com.sixbynine.transit.path.app.ui.ColorWrapper
-import com.sixbynine.transit.path.app.ui.Colors
+import com.sixbynine.transit.path.model.ColorWrapper
+import com.sixbynine.transit.path.model.Colors
 import com.sixbynine.transit.path.schedule.ScheduleTiming
 import com.sixbynine.transit.path.schedule.Schedules
 import com.sixbynine.transit.path.time.NewYorkTimeZone
@@ -35,7 +35,7 @@ class SchedulePathApi : PathApi {
     override fun getUpcomingDepartures(
         now: Instant,
         staleness: Staleness
-    ): FetchWithPrevious<DepartureBoardTrainMap> {
+    ): FetchWithPrevious<UpcomingDepartures> {
         return GithubScheduleRepository.getSchedules(now)
             .map { createDepartureBoardMap(now, schedules = it) }
     }
@@ -43,7 +43,7 @@ class SchedulePathApi : PathApi {
     private fun createDepartureBoardMap(
         now: Instant,
         schedules: ScheduleAndOverride
-    ): DepartureBoardTrainMap {
+    ): UpcomingDepartures {
         val (schedule, override) = schedules
 
         val localNow = now.toLocalDateTime(NewYorkTimeZone)
@@ -82,7 +82,7 @@ class SchedulePathApi : PathApi {
                 }
                 ?.let { createDepartureBoardMap(now, it) }
 
-        val allTrains = mutableMapOf<String, List<DepartureBoardTrain>>()
+        val allTrains = mutableMapOf<String, List<DepartingTrain>>()
 
         (overrideTrains?.keys.orEmpty() + regularTrains?.keys.orEmpty())
             .distinct()
@@ -102,14 +102,14 @@ class SchedulePathApi : PathApi {
                 .orElse { schedule }
                 .name
 
-        return DepartureBoardTrainMap(allTrains, scheduleName = scheduleName)
+        return UpcomingDepartures(allTrains, scheduleName = scheduleName)
     }
 
     private fun createDepartureBoardMap(
         now: Instant,
         schedules: Schedules
-    ): Map<String, List<DepartureBoardTrain>> {
-        val results = mutableMapOf<String, MutableList<DepartureBoardTrain>>()
+    ): Map<String, List<DepartingTrain>> {
+        val results = mutableMapOf<String, MutableList<DepartingTrain>>()
 
         val localNow = now.toLocalDateTime(NewYorkTimeZone)
         schedules.timings.forEach { timing ->
@@ -262,7 +262,7 @@ class SchedulePathApi : PathApi {
                     }
 
                     dates.forEach { date ->
-                        val originTrain = DepartureBoardTrain(
+                        val originTrain = DepartingTrain(
                             headsign = headsign,
                             projectedArrival = date.atTime(time).toInstant(NewYorkTimeZone),
                             lineColors = lineColors,

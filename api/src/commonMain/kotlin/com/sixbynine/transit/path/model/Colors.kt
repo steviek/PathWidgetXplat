@@ -1,11 +1,8 @@
-package com.sixbynine.transit.path.app.ui
+package com.sixbynine.transit.path.model
 
 import androidx.compose.ui.graphics.Color
 import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.api.templine.HobClosureConfigRepository
-import com.sixbynine.transit.path.app.ui.theme.md_theme_dark_background
-import com.sixbynine.transit.path.app.ui.theme.md_theme_light_background
-import com.sixbynine.transit.path.app.ui.theme.seed
 
 object Colors {
     fun parse(hexString: String): Color {
@@ -13,7 +10,7 @@ object Colors {
     }
 
     val Path: ColorWrapper
-        get() = ColorWrapper(seed)
+        get() = ColorWrapper(Color(0xFF1896D1))
 
     val NwkWtcSingle = Color(red = 0xd9, green = 0x3a, blue = 0x30).wrap()
     val Jsq33sSingle = Color(red = 0xff, green = 0x99, blue = 0x00).wrap()
@@ -33,9 +30,9 @@ object Colors {
     fun background(isDark: Boolean): ColorWrapper {
         Logging.initialize()
         return if (isDark) {
-            md_theme_dark_background.wrap()
+            Color(0xFF191C1E).wrap()
         } else {
-            md_theme_light_background.wrap()
+            Color(0xFFFCFCFF).wrap()
         }
     }
 

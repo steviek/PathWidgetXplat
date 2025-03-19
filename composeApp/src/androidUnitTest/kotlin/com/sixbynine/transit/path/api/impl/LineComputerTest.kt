@@ -1,7 +1,7 @@
 package com.sixbynine.transit.path.api.impl
 
 import com.sixbynine.transit.path.api.Line
-import com.sixbynine.transit.path.app.ui.Colors
+import com.sixbynine.transit.path.model.Colors
 import com.sixbynine.transit.path.test.TestSetupHelper
 import org.junit.Before
 import kotlin.test.Test

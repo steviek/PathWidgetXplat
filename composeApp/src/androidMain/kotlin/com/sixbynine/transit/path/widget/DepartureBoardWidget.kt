@@ -19,6 +19,7 @@ import com.sixbynine.transit.path.MobilePathApplication
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.api.anyMatch
+import com.sixbynine.transit.path.model.DepartureBoardData
 import com.sixbynine.transit.path.time.NewYorkTimeZone
 import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.time.today
@@ -75,9 +76,9 @@ class DepartureBoardWidget : GlanceAppWidget() {
         }
     }
 
-    private fun WidgetData.adjustForConfiguration(
+    private fun DepartureBoardData.adjustForConfiguration(
         configuration: StoredWidgetConfiguration
-    ): WidgetData {
+    ): DepartureBoardData {
         val newStations = stations.toMutableList()
 
         newStations.removeAll { it.id !in configuration.fixedStations.orEmpty() }

@@ -3,7 +3,7 @@ package com.sixbynine.transit.path.widget
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.time.now
-import com.sixbynine.transit.path.widget.WidgetData.StationData
+import com.sixbynine.transit.path.model.DepartureBoardData.StationData
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime

@@ -1,14 +1,14 @@
 package com.sixbynine.transit.path.api.impl
 
-import com.sixbynine.transit.path.api.DepartureBoardTrain
-import com.sixbynine.transit.path.api.DepartureBoardTrainMap
+import com.sixbynine.transit.path.api.DepartingTrain
 import com.sixbynine.transit.path.api.PathApi
 import com.sixbynine.transit.path.api.State.NewJersey
 import com.sixbynine.transit.path.api.State.NewYork
+import com.sixbynine.transit.path.api.UpcomingDepartures
 import com.sixbynine.transit.path.api.path.PathRepository
 import com.sixbynine.transit.path.api.path.PathRepository.PathServiceResults
-import com.sixbynine.transit.path.app.ui.ColorWrapper
-import com.sixbynine.transit.path.app.ui.Colors
+import com.sixbynine.transit.path.model.ColorWrapper
+import com.sixbynine.transit.path.model.Colors
 import com.sixbynine.transit.path.util.FetchWithPrevious
 import com.sixbynine.transit.path.util.Staleness
 import com.sixbynine.transit.path.util.map
@@ -20,14 +20,14 @@ internal class PathApiImpl : PathApi {
     override fun getUpcomingDepartures(
         now: Instant,
         staleness: Staleness
-    ): FetchWithPrevious<DepartureBoardTrainMap> {
+    ): FetchWithPrevious<UpcomingDepartures> {
         return PathRepository.getResults(now, staleness).map { resultsToMap(now, it) }
     }
 
     private fun resultsToMap(
         now: Instant,
         results: PathServiceResults
-    ): DepartureBoardTrainMap {
+    ): UpcomingDepartures {
         return results.results.associate { result ->
             val trains = result.destinations
                 .flatMap { destination ->
@@ -40,7 +40,7 @@ internal class PathApiImpl : PathApi {
                             else -> null
                         }
                         val colors = it.lineColor.split(",").map(Colors::parse).map(::ColorWrapper)
-                        DepartureBoardTrain(
+                        DepartingTrain(
                             headsign = it.headSign,
                             projectedArrival = rawArrivalTime.coerceAtLeast(now),
                             lineColors = colors,
@@ -59,6 +59,6 @@ internal class PathApiImpl : PathApi {
             result.consideredStation to trains
         }
             .let { TrainBackfillHelper.withBackfill(it) }
-            .let { DepartureBoardTrainMap(it, scheduleName = null) }
+            .let { UpcomingDepartures(it, scheduleName = null) }
     }
 }

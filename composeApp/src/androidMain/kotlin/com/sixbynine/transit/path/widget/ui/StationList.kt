@@ -25,19 +25,19 @@ import androidx.glance.unit.ColorProvider
 import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.MainActivity
 import com.sixbynine.transit.path.R.drawable
-import com.sixbynine.transit.path.app.ui.ColorWrapper
+import com.sixbynine.transit.path.model.ColorWrapper
+import com.sixbynine.transit.path.model.DepartureBoardData
 import com.sixbynine.transit.path.time.NewYorkTimeZone
 import com.sixbynine.transit.path.util.DataResult
 import com.sixbynine.transit.path.util.dropSubSeconds
 import com.sixbynine.transit.path.util.secondOrNull
-import com.sixbynine.transit.path.widget.WidgetData
 import com.sixbynine.transit.path.widget.WidgetDataFormatter
 import com.sixbynine.transit.path.widget.glance.GlanceTheme
 import com.sixbynine.transit.path.widget.glance.Text
 import kotlinx.datetime.toLocalDateTime
 
 @Composable
-fun DepartureBoard(result: DataResult<WidgetData>, modifier: GlanceModifier = GlanceModifier) {
+fun DepartureBoard(result: DataResult<DepartureBoardData>, modifier: GlanceModifier = GlanceModifier) {
     Logging.d(
         "compose departure board with data fetched at " +
                 result.data?.fetchTime?.toLocalDateTime(NewYorkTimeZone)?.time?.dropSubSeconds()

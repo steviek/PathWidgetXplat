@@ -2,7 +2,7 @@ package com.sixbynine.transit.path.api.impl
 
 import com.sixbynine.transit.path.app.settings.StationLimit.OnePerLine
 import com.sixbynine.transit.path.app.ui.ColorWrapper
-import com.sixbynine.transit.path.app.ui.Colors
+import com.sixbynine.transit.path.model.Colors
 import com.sixbynine.transit.path.app.ui.common.AppUiTrainData
 import com.sixbynine.transit.path.app.ui.home.StationLimitFilter
 import com.sixbynine.transit.path.app.ui.home.filter

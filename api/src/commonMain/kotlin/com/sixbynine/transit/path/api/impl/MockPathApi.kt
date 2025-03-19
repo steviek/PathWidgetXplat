@@ -1,7 +1,6 @@
 package com.sixbynine.transit.path.api.impl
 
-import com.sixbynine.transit.path.api.DepartureBoardTrain
-import com.sixbynine.transit.path.api.DepartureBoardTrainMap
+import com.sixbynine.transit.path.api.DepartingTrain
 import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.Line.Hoboken33rd
 import com.sixbynine.transit.path.api.Line.HobokenWtc
@@ -10,7 +9,8 @@ import com.sixbynine.transit.path.api.PathApi
 import com.sixbynine.transit.path.api.State.NewJersey
 import com.sixbynine.transit.path.api.State.NewYork
 import com.sixbynine.transit.path.api.Stations
-import com.sixbynine.transit.path.app.ui.Colors
+import com.sixbynine.transit.path.api.UpcomingDepartures
+import com.sixbynine.transit.path.model.Colors
 import com.sixbynine.transit.path.util.AgedValue
 import com.sixbynine.transit.path.util.FetchWithPrevious
 import com.sixbynine.transit.path.util.Staleness
@@ -23,10 +23,10 @@ internal class MockPathApi : PathApi {
     override fun getUpcomingDepartures(
         now: Instant,
         staleness: Staleness
-    ): FetchWithPrevious<DepartureBoardTrainMap> {
+    ): FetchWithPrevious<UpcomingDepartures> {
         val stationsToDepartures = Stations.All.associateWith { station ->
             listOf(
-                DepartureBoardTrain(
+                DepartingTrain(
                     headsign = "World Trade Center",
                     projectedArrival = now + 2.minutes,
                     lineColors = Colors.HobWtc,
@@ -35,7 +35,7 @@ internal class MockPathApi : PathApi {
                     directionState = NewYork,
                     lines = setOf(HobokenWtc)
                 ),
-                DepartureBoardTrain(
+                DepartingTrain(
                     headsign = "Newark",
                     projectedArrival = now + 4.minutes,
                     lineColors = Colors.NwkWtc,
@@ -44,7 +44,7 @@ internal class MockPathApi : PathApi {
                     directionState = NewJersey,
                     lines = setOf(NewarkWtc)
                 ),
-                DepartureBoardTrain(
+                DepartingTrain(
                     headsign = "Hoboken",
                     projectedArrival = now + 7.minutes,
                     lineColors = Colors.Hob33s,
@@ -53,7 +53,7 @@ internal class MockPathApi : PathApi {
                     directionState = NewJersey,
                     lines = setOf(Hoboken33rd)
                 ),
-                DepartureBoardTrain(
+                DepartingTrain(
                     headsign = "33rd St",
                     projectedArrival = now + 4.minutes,
                     lineColors = Colors.HobWtc,
@@ -67,7 +67,7 @@ internal class MockPathApi : PathApi {
         return FetchWithPrevious(
             AgedValue(
                 0.seconds,
-                DepartureBoardTrainMap(stationsToDepartures, scheduleName = null)
+                UpcomingDepartures(stationsToDepartures, scheduleName = null)
             )
         )
     }

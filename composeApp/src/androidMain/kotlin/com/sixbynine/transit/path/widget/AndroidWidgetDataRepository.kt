@@ -9,6 +9,7 @@ import com.sixbynine.transit.path.api.StationSort.Alphabetical
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.app.lifecycle.AppLifecycleObserver
+import com.sixbynine.transit.path.model.DepartureBoardData
 import com.sixbynine.transit.path.util.DataResult
 import com.sixbynine.transit.path.util.FetchWithPrevious
 import com.sixbynine.transit.path.util.Staleness
@@ -70,7 +71,7 @@ object AndroidWidgetDataRepository {
 
     }
 
-    suspend fun getData(): StateFlow<DataResult<WidgetData>> {
+    suspend fun getData(): StateFlow<DataResult<DepartureBoardData>> {
         return _data.await().asStateFlow()
     }
 
@@ -86,17 +87,17 @@ object AndroidWidgetDataRepository {
         }
     }
 
-    private fun getDataResult(widgetData: WidgetData?): DataResult<WidgetData> {
+    private fun getDataResult(departureBoardData: DepartureBoardData?): DataResult<DepartureBoardData> {
         return if (isLoading) {
-            DataResult.loading(widgetData)
-        } else if (hasError || widgetData == null) {
+            DataResult.loading(departureBoardData)
+        } else if (hasError || departureBoardData == null) {
             DataResult.failure(
                 Exception("Error loading widget data"),
                 hadInternet = hadInternet,
-                widgetData
+                departureBoardData
             )
         } else {
-            DataResult.success(widgetData)
+            DataResult.success(departureBoardData)
         }
     }
 
@@ -142,7 +143,7 @@ object AndroidWidgetDataRepository {
         canRefreshLocation: Boolean,
         isBackgroundUpdate: Boolean = !AppLifecycleObserver.isActive.value,
         fetchId: Int,
-    ): FetchWithPrevious<WidgetData> {
+    ): FetchWithPrevious<DepartureBoardData> {
         val anyWidgetsUseLocation =
             WidgetConfigurationManager.getWidgetConfigurations().values.any { it.useClosestStation }
 

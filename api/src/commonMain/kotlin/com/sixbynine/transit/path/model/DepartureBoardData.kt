@@ -1,18 +1,17 @@
-package com.sixbynine.transit.path.widget
+package com.sixbynine.transit.path.model
 
 import com.sixbynine.transit.path.api.BackfillSource
 import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.State
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.alerts.Alert
-import com.sixbynine.transit.path.app.ui.ColorWrapper
-import com.sixbynine.transit.path.widget.WidgetData.StationData
+import com.sixbynine.transit.path.model.DepartureBoardData.StationData
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.minutes
 
 @Serializable
-data class WidgetData(
+data class DepartureBoardData(
     val stations: List<StationData>,
     val fetchTime: Instant,
     val nextFetchTime: Instant,

@@ -2,7 +2,7 @@ package com.sixbynine.transit.path.api.impl
 
 import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.api.BackfillSource
-import com.sixbynine.transit.path.api.DepartureBoardTrain
+import com.sixbynine.transit.path.api.DepartingTrain
 import com.sixbynine.transit.path.api.State
 import com.sixbynine.transit.path.api.State.NewJersey
 import com.sixbynine.transit.path.api.State.NewYork
@@ -34,8 +34,8 @@ import com.sixbynine.transit.path.api.impl.TrainBackfillHelper.LineId.Companion.
 import com.sixbynine.transit.path.api.impl.TrainBackfillHelper.LineId.Companion.WTC_HOB
 import com.sixbynine.transit.path.api.impl.TrainBackfillHelper.LineId.Companion.WTC_NWK
 import com.sixbynine.transit.path.api.isInNewYork
-import com.sixbynine.transit.path.app.ui.ColorWrapper
-import com.sixbynine.transit.path.app.ui.Colors
+import com.sixbynine.transit.path.model.ColorWrapper
+import com.sixbynine.transit.path.model.Colors
 import com.sixbynine.transit.path.time.NewYorkTimeZone
 import com.sixbynine.transit.path.util.orElse
 import kotlinx.datetime.Clock
@@ -346,8 +346,8 @@ object TrainBackfillHelper {
     }
 
     fun withBackfill(
-        trains: Map<String, List<DepartureBoardTrain>>,
-    ): Map<String, List<DepartureBoardTrain>> {
+        trains: Map<String, List<DepartingTrain>>,
+    ): Map<String, List<DepartingTrain>> {
         val backfilled =
             trains.mapValues { (_, value) -> value.toMutableList() }.toMutableMap()
 
@@ -446,7 +446,7 @@ object TrainBackfillHelper {
         return 10.minutes
     }
 
-    private fun DepartureBoardTrain.getLineId(station: Station): LineId {
+    private fun DepartingTrain.getLineId(station: Station): LineId {
         val destination = Stations.fromHeadSign(headsign)
         if (station.isInNewYork && destination == WorldTradeCenter) {
             return WTC_FROM_33S

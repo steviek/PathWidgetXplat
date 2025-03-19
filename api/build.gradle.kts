@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.kotlinSerialization)
 }
 
@@ -27,6 +28,8 @@ kotlin {
             implementation(projects.flipper)
             implementation(projects.schedule)
 
+            implementation(compose.foundation)
+            implementation(compose.ui)
             implementation(libs.ktor.core)
             implementation(libs.ktor.logging)
 

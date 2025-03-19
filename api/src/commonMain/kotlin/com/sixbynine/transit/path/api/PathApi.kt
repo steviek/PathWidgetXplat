@@ -10,7 +10,7 @@ interface PathApi {
     fun getUpcomingDepartures(
         now: Instant,
         staleness: Staleness,
-    ): FetchWithPrevious<DepartureBoardTrainMap>
+    ): FetchWithPrevious<UpcomingDepartures>
 
     companion object {
         val instance: PathApi = PathApiImpl()

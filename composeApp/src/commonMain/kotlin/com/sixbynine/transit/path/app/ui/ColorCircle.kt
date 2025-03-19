@@ -13,6 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
+import com.sixbynine.transit.path.model.ColorWrapper
+import com.sixbynine.transit.path.model.unwrap
 import com.sixbynine.transit.path.util.conditional
 
 @Composable

@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import com.sixbynine.transit.path.app.settings.TimeDisplay
 import com.sixbynine.transit.path.app.ui.ColorCircle
-import com.sixbynine.transit.path.app.ui.ColorWrapper
+import com.sixbynine.transit.path.model.ColorWrapper
 import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.widget.GroupedWidgetLayoutHelper
 

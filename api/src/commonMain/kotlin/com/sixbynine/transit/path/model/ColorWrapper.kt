@@ -1,11 +1,11 @@
-package com.sixbynine.transit.path.app.ui
+package com.sixbynine.transit.path.model
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.sixbynine.transit.path.api.templine.HobClosureConfigRepository
-import com.sixbynine.transit.path.app.ui.Colors.approxEquals
+import com.sixbynine.transit.path.model.Colors.approxEquals
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.PrimitiveKind

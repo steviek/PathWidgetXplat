@@ -1,10 +1,10 @@
 package com.sixbynine.transit.path.api
 
-import com.sixbynine.transit.path.app.ui.ColorWrapper
+import com.sixbynine.transit.path.model.ColorWrapper
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
-data class DepartureBoardTrain(
+data class DepartingTrain(
     val headsign: String,
     val projectedArrival: Instant,
     val lineColors: List<ColorWrapper>,

@@ -3,13 +3,13 @@ package com.sixbynine.transit.path.widget
 import com.sixbynine.transit.path.app.settings.TimeDisplay
 import com.sixbynine.transit.path.app.settings.TimeDisplay.Clock
 import com.sixbynine.transit.path.app.settings.TimeDisplay.Relative
-import com.sixbynine.transit.path.app.ui.ColorWrapper
 import com.sixbynine.transit.path.app.ui.FontInfo
 import com.sixbynine.transit.path.app.ui.SizeWrapper
+import com.sixbynine.transit.path.model.ColorWrapper
+import com.sixbynine.transit.path.model.DepartureBoardData.SignData
+import com.sixbynine.transit.path.model.DepartureBoardData.StationData
 import com.sixbynine.transit.path.util.localizedString
 import com.sixbynine.transit.path.widget.GroupedWidgetLayoutInfo.SignLayoutInfo
-import com.sixbynine.transit.path.widget.WidgetData.SignData
-import com.sixbynine.transit.path.widget.WidgetData.StationData
 import kotlinx.datetime.Instant
 
 @Suppress("unused") // Called by swift

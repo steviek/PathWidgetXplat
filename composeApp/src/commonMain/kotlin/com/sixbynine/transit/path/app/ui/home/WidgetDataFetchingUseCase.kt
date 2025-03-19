@@ -19,7 +19,7 @@ import com.sixbynine.transit.path.util.collect
 import com.sixbynine.transit.path.util.collectIn
 import com.sixbynine.transit.path.util.collectLatest
 import com.sixbynine.transit.path.util.isFailure
-import com.sixbynine.transit.path.widget.WidgetData
+import com.sixbynine.transit.path.model.DepartureBoardData
 import com.sixbynine.transit.path.widget.WidgetDataFetcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -40,7 +40,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * Encapsulates the logic for what the latest fetched [WidgetData] is and when we should fetch
+ * Encapsulates the logic for what the latest fetched [DepartureBoardData] is and when we should fetch
  * again.
  */
 class WidgetDataFetchingUseCase private constructor() {
@@ -157,7 +157,7 @@ class WidgetDataFetchingUseCase private constructor() {
         )
     }
 
-    private fun startFetch(staleness: Staleness): FetchWithPrevious<WidgetData> {
+    private fun startFetch(staleness: Staleness): FetchWithPrevious<DepartureBoardData> {
         return WidgetDataFetcher.fetchWidgetDataWithPrevious(
             stationLimit = Int.MAX_VALUE,
             stations = Stations.All,
@@ -172,7 +172,7 @@ class WidgetDataFetchingUseCase private constructor() {
     data class FetchData(
         val lastFetchTime: Instant?,
         val nextFetchTime: Instant,
-        val data: WidgetData?,
+        val data: DepartureBoardData?,
         val hasError: Boolean,
         val hadInternet: Boolean,
         val isPathApiBusted: Boolean,
@@ -189,7 +189,7 @@ class WidgetDataFetchingUseCase private constructor() {
         private val UnforcedStaleness = Staleness(staleAfter = 30.seconds, invalidAfter = FetchInvalidAfter)
         private val FetchInterval = 1.minutes
 
-        private fun createInitialFetchData(data: FetchWithPrevious<WidgetData>): FetchData {
+        private fun createInitialFetchData(data: FetchWithPrevious<DepartureBoardData>): FetchData {
             val lastFetch = data.previous
             val lastFetchAge = lastFetch?.age
             val lastFetchData = lastFetch?.value

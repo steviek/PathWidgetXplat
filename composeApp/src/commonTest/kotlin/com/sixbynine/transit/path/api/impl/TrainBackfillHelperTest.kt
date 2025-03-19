@@ -1,7 +1,8 @@
 package com.sixbynine.transit.path.api.impl
 
-import com.sixbynine.transit.path.api.DepartureBoardTrain
-import com.sixbynine.transit.path.api.Line
+import com.sixbynine.transit.path.api.DepartingTrain
+import com.sixbynine.transit.path.api.Line.HobokenWtc
+import com.sixbynine.transit.path.api.Line.NewarkWtc
 import com.sixbynine.transit.path.api.State.NewJersey
 import com.sixbynine.transit.path.api.State.NewYork
 import com.sixbynine.transit.path.api.Station
@@ -12,7 +13,7 @@ import com.sixbynine.transit.path.api.Stations.JournalSquare
 import com.sixbynine.transit.path.api.Stations.Newark
 import com.sixbynine.transit.path.api.Stations.Newport
 import com.sixbynine.transit.path.api.Stations.WorldTradeCenter
-import com.sixbynine.transit.path.app.ui.Colors
+import com.sixbynine.transit.path.model.Colors
 import com.sixbynine.transit.path.util.IsTest
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
@@ -373,12 +374,12 @@ class TrainBackfillHelperTest {
 
     private fun departuresMap(
         builder: DeparturesMapBuilder.() -> Unit
-    ): Map<String, List<DepartureBoardTrain>> {
+    ): Map<String, List<DepartingTrain>> {
         return DeparturesMapBuilder().apply(builder).build()
     }
 
     private class DeparturesMapBuilder(private val date: LocalDate = LocalDate(2021, JANUARY, 21)) {
-        private val map = mutableMapOf<Station, MutableList<DepartureBoardTrain>>()
+        private val map = mutableMapOf<Station, MutableList<DepartingTrain>>()
 
         fun station(station: Station, block: StationScope.() -> Unit) {
             val scope = object : StationScope {
@@ -430,7 +431,7 @@ class TrainBackfillHelperTest {
             fun nwkHarTrainAt(hour: Int, minute: Int)
         }
 
-        fun build(): Map<String, List<DepartureBoardTrain>> {
+        fun build(): Map<String, List<DepartingTrain>> {
             return map.mapKeys { it.key.pathApiName }
         }
     }
@@ -450,75 +451,75 @@ class TrainBackfillHelperTest {
                     time.minute.toString().padStart(2, '0')
         }
 
-        fun newarkTrain(projectedArrival: Instant): DepartureBoardTrain {
-            return DepartureBoardTrain(
+        fun newarkTrain(projectedArrival: Instant): DepartingTrain {
+            return DepartingTrain(
                 headsign = "Newark",
                 projectedArrival = projectedArrival,
                 lineColors = Colors.NwkWtc,
                 isDelayed = false,
                 backfillSource = null,
                 directionState = NewJersey,
-                lines = setOf(Line.NewarkWtc)
+                lines = setOf(NewarkWtc)
             )
         }
 
-        fun nwkWtcTrain(projectedArrival: Instant): DepartureBoardTrain {
-            return DepartureBoardTrain(
+        fun nwkWtcTrain(projectedArrival: Instant): DepartingTrain {
+            return DepartingTrain(
                 headsign = "World Trade Center",
                 projectedArrival = projectedArrival,
                 lineColors = Colors.NwkWtc,
                 isDelayed = false,
                 backfillSource = null,
                 directionState = NewYork,
-                lines = setOf(Line.NewarkWtc)
+                lines = setOf(NewarkWtc)
             )
         }
 
-        fun hobWtcTrain(projectedArrival: Instant): DepartureBoardTrain {
-            return DepartureBoardTrain(
+        fun hobWtcTrain(projectedArrival: Instant): DepartingTrain {
+            return DepartingTrain(
                 headsign = "World Trade Center",
                 projectedArrival = projectedArrival,
                 lineColors = Colors.HobWtc,
                 isDelayed = false,
                 backfillSource = null,
                 directionState = NewYork,
-                lines = setOf(Line.HobokenWtc)
+                lines = setOf(HobokenWtc)
             )
         }
 
-        fun wtcHobTrain(projectedArrival: Instant): DepartureBoardTrain {
-            return DepartureBoardTrain(
+        fun wtcHobTrain(projectedArrival: Instant): DepartingTrain {
+            return DepartingTrain(
                 headsign = "Hoboken",
                 projectedArrival = projectedArrival,
                 lineColors = Colors.HobWtc,
                 isDelayed = false,
                 backfillSource = null,
                 directionState = NewJersey,
-                lines = setOf(Line.HobokenWtc)
+                lines = setOf(HobokenWtc)
             )
         }
 
-        fun wtcJsqTrain(projectedArrival: Instant): DepartureBoardTrain {
-            return DepartureBoardTrain(
+        fun wtcJsqTrain(projectedArrival: Instant): DepartingTrain {
+            return DepartingTrain(
                 headsign = "Journal Square",
                 projectedArrival = projectedArrival,
                 lineColors = Colors.NwkWtc,
                 isDelayed = false,
                 backfillSource = null,
                 directionState = NewJersey,
-                lines = setOf(Line.NewarkWtc)
+                lines = setOf(NewarkWtc)
             )
         }
 
-        fun nwkHarTrain(projectedArrival: Instant): DepartureBoardTrain {
-            return DepartureBoardTrain(
+        fun nwkHarTrain(projectedArrival: Instant): DepartingTrain {
+            return DepartingTrain(
                 headsign = "Harrison",
                 projectedArrival = projectedArrival,
                 lineColors = Colors.NwkWtc,
                 isDelayed = false,
                 backfillSource = null,
                 directionState = NewYork,
-                lines = setOf(Line.NewarkWtc)
+                lines = setOf(NewarkWtc)
             )
         }
     }

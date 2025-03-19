@@ -2,7 +2,6 @@ package com.sixbynine.transit.path.widget
 
 import androidx.compose.ui.graphics.toArgb
 import com.sixbynine.transit.path.Logging
-import com.sixbynine.transit.path.api.DepartureBoardTrainMap
 import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.PathApi
 import com.sixbynine.transit.path.api.PathApiException
@@ -10,6 +9,7 @@ import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.TrainFilter
+import com.sixbynine.transit.path.api.UpcomingDepartures
 import com.sixbynine.transit.path.api.alerts.Alert
 import com.sixbynine.transit.path.api.alerts.AlertsRepository
 import com.sixbynine.transit.path.api.alerts.affectsLines
@@ -33,6 +33,7 @@ import com.sixbynine.transit.path.location.LocationCheckResult.NoPermission
 import com.sixbynine.transit.path.location.LocationCheckResult.NoProvider
 import com.sixbynine.transit.path.location.LocationCheckResult.Success
 import com.sixbynine.transit.path.location.LocationProvider
+import com.sixbynine.transit.path.model.DepartureBoardData
 import com.sixbynine.transit.path.time.NewYorkTimeZone
 import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.util.AgedValue
@@ -101,14 +102,14 @@ object WidgetDataFetcher {
         filter: TrainFilter,
         includeClosestStation: Boolean,
         staleness: Staleness,
-        onSuccess: (WidgetData) -> Unit,
+        onSuccess: (DepartureBoardData) -> Unit,
         onFailure: (
             error: Throwable,
             hadInternet: Boolean,
             isPathError: Boolean,
-            data: WidgetData?,
+            data: DepartureBoardData?,
         ) -> Unit,
-    ): AgedValue<WidgetData>? {
+    ): AgedValue<DepartureBoardData>? {
         val (fetch, previous) = fetchWidgetDataWithPrevious(
             stationLimit = stationLimit,
             stations,
@@ -138,7 +139,7 @@ object WidgetDataFetcher {
         isBackgroundUpdate: Boolean = false,
         now: Instant = now(),
         fetchId: Int? = null,
-    ): FetchWithPrevious<WidgetData> {
+    ): FetchWithPrevious<DepartureBoardData> {
         val fetchIdLabel = fetchId?.let { " [$fetchId]" }.orEmpty()
         Logging.d(
             "Fetch$fetchIdLabel widget data with previous, " +
@@ -150,11 +151,11 @@ object WidgetDataFetcher {
 
         fun createWidgetData(
             fetchTime: Instant,
-            data: DepartureBoardTrainMap,
+            data: UpcomingDepartures,
             alerts: List<Alert>?,
             closestStations: List<Station>?,
             isPathApiBroken: Boolean,
-        ): WidgetData {
+        ): DepartureBoardData {
             return createWidgetData(
                 now,
                 fetchTime,
@@ -187,7 +188,7 @@ object WidgetDataFetcher {
             )
         }
 
-        val fetch: Deferred<DataResult<WidgetData>> = GlobalScope.async(start = LAZY) {
+        val fetch: Deferred<DataResult<DepartureBoardData>> = GlobalScope.async(start = LAZY) {
             coroutineScope {
                 liveDepartures.start()
                 alerts.start()
@@ -258,12 +259,12 @@ object WidgetDataFetcher {
                     null
                 }
 
-                val departureBoardTrainMap: DepartureBoardTrainMap?
+                val upcomingDepartures: UpcomingDepartures?
                 val lastFetchTime: Instant?
 
                 when {
                     live.data != null -> {
-                        departureBoardTrainMap = live.data
+                        upcomingDepartures = live.data
                         lastFetchTime = if (live.isSuccess()) {
                             now
                         } else {
@@ -272,12 +273,12 @@ object WidgetDataFetcher {
                     }
 
                     scheduled?.data != null -> {
-                        departureBoardTrainMap = scheduled.data
+                        upcomingDepartures = scheduled.data
                         lastFetchTime = now
                     }
 
                     else -> {
-                        departureBoardTrainMap = null
+                        upcomingDepartures = null
                         lastFetchTime = null
                     }
                 }
@@ -295,7 +296,7 @@ object WidgetDataFetcher {
                         Logging.w("Fetch$fetchIdLabel: Received loading for alerts!")
                     }
 
-                val widgetData = departureBoardTrainMap?.let { data ->
+                val widgetData = upcomingDepartures?.let { data ->
                     createWidgetData(
                         lastFetchTime ?: now,
                         data,
@@ -382,11 +383,11 @@ object WidgetDataFetcher {
         filter: TrainFilter,
         closestStations: List<Station>?,
         alerts: List<Alert>?,
-        data: DepartureBoardTrainMap,
+        data: UpcomingDepartures,
         isPathApiBroken: Boolean,
-    ): WidgetData {
+    ): DepartureBoardData {
         val adjustedStations = stations.toMutableList()
-        val stationDatas = arrayListOf<WidgetData.StationData>()
+        val stationDatas = arrayListOf<DepartureBoardData.StationData>()
         val avoidMissingTrains = currentAvoidMissingTrains()
 
         adjustedStations.sortWith(StationComparator(sort, closestStations))
@@ -439,7 +440,7 @@ object WidgetDataFetcher {
                                 .distinct()
                                 .sorted()
                         if (arrivals.isEmpty()) return@mapNotNull null
-                        WidgetData.SignData(headSign, colors, arrivals)
+                        DepartureBoardData.SignData(headSign, colors, arrivals)
                     }
                     .sortedBy { it.projectedArrivals.min() }
 
@@ -447,7 +448,7 @@ object WidgetDataFetcher {
                 .asSequence()
                 .map {
                     val colors = it.lineColors.distinct()
-                    WidgetData.TrainData(
+                    DepartureBoardData.TrainData(
                         id = it.headsign + ":" + it.projectedArrival,
                         title = it.headsign,
                         colors = colors,
@@ -458,7 +459,7 @@ object WidgetDataFetcher {
                     )
                 }
                 .filter { train ->
-                    (train.lines == null || train.lines.any { line -> line in lines })
+                    (train.lines == null || train.lines.orEmpty().any { line -> line in lines })
                         .also {
                             if (!it) {
                                 Logging.d("Filtering out train $train because it's not in the right lines")
@@ -471,7 +472,7 @@ object WidgetDataFetcher {
                 .sortedBy { it.projectedArrival }
                 .toList()
 
-            stationDatas += WidgetData.StationData(
+            stationDatas += DepartureBoardData.StationData(
                 id = station.pathApiName,
                 displayName = station.displayName,
                 signs = signs,
@@ -489,7 +490,7 @@ object WidgetDataFetcher {
                 ?: (now + 15.minutes)
         val globalAlerts =
             alerts.orEmpty().filter { alert -> alert.isGlobal && alert.affectsLines(lines) }
-        return WidgetData(
+        return DepartureBoardData(
             fetchTime = fetchTime,
             stations = stationDatas.take(stationLimit),
             nextFetchTime = nextFetchTime,
@@ -502,7 +503,7 @@ object WidgetDataFetcher {
 
     private fun matchesFilter(
         station: Station,
-        train: WidgetData.TrainData,
+        train: DepartureBoardData.TrainData,
         filter: TrainFilter
     ): Boolean {
         return matchesFilter(station, train.title, filter)
@@ -526,10 +527,10 @@ object WidgetDataFetcher {
         }
     }
 
-    private fun WidgetData.TrainData.adjustedToAvoidMissingTrains(
+    private fun DepartureBoardData.TrainData.adjustedToAvoidMissingTrains(
         now: Instant,
         avoidMissingTrains: AvoidMissingTrains
-    ): WidgetData.TrainData {
+    ): DepartureBoardData.TrainData {
         val adjustedArrival =
             adjustToAvoidMissingTrains(now, projectedArrival, avoidMissingTrains)
         val delta = projectedArrival - adjustedArrival
@@ -568,7 +569,7 @@ object WidgetDataFetcher {
     }
 
     @Suppress("UNUSED") // Used by swift code
-    fun prunePassedDepartures(data: WidgetData?, time: Instant): WidgetData? {
+    fun prunePassedDepartures(data: DepartureBoardData?, time: Instant): DepartureBoardData? {
         data ?: return null
         return data.copy(
             stations = data.stations.map { station ->

@@ -12,7 +12,7 @@ import ComposeApp
 struct DepartureBoardStations: View {
     
     let entry: SimpleEntry
-    let data: WidgetData
+    let data: DepartureBoardData
     let width: CGFloat
     let height: CGFloat
     
@@ -64,7 +64,7 @@ struct DepartureBoardStations: View {
     
     @ViewBuilder
     private func stationView(
-        _ station: WidgetData.StationData,
+        _ station: DepartureBoardData.StationData,
         width: CGFloat,
         height: CGFloat
     ) -> some View {

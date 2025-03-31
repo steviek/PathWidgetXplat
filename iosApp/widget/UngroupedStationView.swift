@@ -12,7 +12,7 @@ import ComposeApp
 struct UngroupedStationView: EntryView {
     
     let entry: SimpleEntry
-    let station: WidgetData.StationData
+    let station: DepartureBoardData.StationData
     let width: CGFloat
     let height: CGFloat
     
@@ -65,7 +65,7 @@ struct UngroupedStationView: EntryView {
         .frame(width: width, height: height)
     }
     
-    private func formatArrivalTime(_ train: WidgetData.TrainData) -> String {
+    private func formatArrivalTime(_ train: DepartureBoardData.TrainData) -> String {
         var arrivalTime: String
         if (entry.configuration.timeDisplay == .clock) {
             arrivalTime = WidgetDataFormatter().formatTime(instant: train.projectedArrival)

@@ -61,7 +61,7 @@ struct Provider: AppIntentTimelineProvider {
             WidgetConfigurationUtils.getWidgetLimit(family: context.family)
 
         let effectiveConfiguration: ConfigurationAppIntent
-        var widgetData: WidgetData?
+        var widgetData: DepartureBoardData?
         let hasError: Bool
         let hasPathError: Bool
         if (context.isPreview) {
@@ -125,7 +125,7 @@ struct SimpleEntry: TimelineEntry {
     let date: Date
     let size: CGSize
     let configuration: ConfigurationAppIntent
-    let data: WidgetData?
+    let data: DepartureBoardData?
     let hasError: Bool
     let hasPathError: Bool
     let hasGlobalPathAlerts: Bool

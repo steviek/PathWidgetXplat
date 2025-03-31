@@ -9,7 +9,7 @@
 import ComposeApp
 
 struct FetchResult {
-    let data: WidgetData?
+    let data: DepartureBoardData?
     let hadInternet: Bool
     let hasError: Bool
     let hasPathError: Bool

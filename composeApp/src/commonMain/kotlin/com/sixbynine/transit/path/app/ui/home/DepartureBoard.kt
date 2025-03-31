@@ -59,6 +59,7 @@ import pathwidgetxplat.composeapp.generated.resources.delete
 import pathwidgetxplat.composeapp.generated.resources.move_down
 import pathwidgetxplat.composeapp.generated.resources.move_up
 import pathwidgetxplat.composeapp.generated.resources.station_empty
+import pathwidgetxplat.composeapp.generated.resources.station_empty_filters
 
 @Composable
 fun HomeScreenScope.DepartureBoard() {
@@ -168,7 +169,13 @@ private fun HomeScreenScope.Station(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = stringResource(string.station_empty),
+                    text = stringResource(
+                        if (station.hasTrainsBeforeFilters) {
+                            string.station_empty_filters
+                        } else {
+                            string.station_empty
+                        }
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

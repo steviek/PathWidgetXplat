@@ -406,10 +406,13 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
                             Stations.All.firstOrNull { it.pathApiName == data.id }
                                 ?: return@mapNotNull null
                         val alertToDisplay = data.alerts?.firstOrNull { it.isDisplayedNow() }
+                        val allUpcomingTrains =
+                            data.trains
+                                .filter { it.projectedArrival >= now() - 30.seconds }
                         val stationData = StationData(
                             station = station,
-                            trains = data.trains
-                                .filter { it.projectedArrival >= now() - 30.seconds }
+                            hasTrainsBeforeFilters = allUpcomingTrains.isNotEmpty(),
+                            trains = allUpcomingTrains
                                 .filter { matchesFilter(station, it, trainFilter) }
                                 .map { train ->
                                     AppUiTrainData(

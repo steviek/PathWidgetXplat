@@ -84,7 +84,8 @@
     <string name="show_presumed_trains">Show presumed trains</string>
     <string name="sort">Sort</string>
     <string name="start">Start</string>
-    <string name="station_empty">No trains announced for station matching your filters</string>
+    <string name="station_empty">No trains announced for station</string>
+    <string name="station_empty_filters">No trains announced for station matching your filters</string>
     <string name="station_filter_four">4 trains</string>
     <string name="station_filter_none">No limit</string>
     <string name="station_filter_one_per_line">1 train per line</string>

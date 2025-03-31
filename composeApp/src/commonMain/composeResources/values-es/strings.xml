@@ -85,6 +85,7 @@
     <string name="sort">Ordenar</string>
     <string name="start">Inicio</string>
     <string name="station_empty">No se anuncian trenes para la estación</string>
+    <string name="station_empty_filters">No se anuncian trenes para la estación</string>
     <string name="station_filter_four">4 trenes</string>
     <string name="station_filter_none">Sin límite</string>
     <string name="station_filter_one_per_line">1 tren por ruta</string>

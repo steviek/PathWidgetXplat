@@ -39,6 +39,7 @@ object HomeScreenContract {
     data class StationData(
         val station: Station,
         val trains: List<AppUiTrainData>,
+        val hasTrainsBeforeFilters: Boolean,
         val isClosest: Boolean,
         val alertText: String?,
         val alertUrl: String?,

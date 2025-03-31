@@ -21,9 +21,9 @@
 	<key>CFBundlePackageType</key>
 	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleShortVersionString</key>
-	<string>3.6.6</string>
+	<string>3.6.7</string>
 	<key>CFBundleVersion</key>
-	<string>42</string>
+	<string>43</string>
 	<key>CFBundleLocalizations</key>
 	<array>
 		<string>en</string>

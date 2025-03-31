@@ -21,10 +21,6 @@ object LineComputer {
 
         // First, make sure we match if there are any matching colors.
         colors.forEach {
-            if (it approxEquals Colors.Wtc33sSingle) {
-                lines += Line.permanentLinesForWtc33rd
-            }
-
             when (it) {
                 Colors.NwkWtcSingle -> lines += NewarkWtc
                 Colors.HobWtcSingle -> lines += HobokenWtc

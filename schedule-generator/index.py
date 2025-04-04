@@ -1,3 +1,4 @@
+from typing import Any
 import requests
 import json
 from create_override import create_override
@@ -64,7 +65,7 @@ def create_regular(page: dict) -> dict:
     r['validFrom'] = dates[0].strftime("%Y-%m-%dT00:00")
     return r
 
-def write_json(d: dict, file: str):
+def write_json(d: dict[str, Any], file: str):
     if d == dict():
         return
     with open(file, 'r+') as f:

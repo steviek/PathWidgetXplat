@@ -1,7 +1,8 @@
+from typing import Any
 from bs4 import BeautifulSoup
 import re
 
-def parse_schedule_times(services: list, scheduleId: int, title: str) -> dict:
+def parse_schedule_times(services: list, scheduleId: int, title: str) -> dict[str, Any]:
     # process schedule
     s = dict()
     s['id'] = scheduleId
@@ -25,7 +26,9 @@ def parse_schedule_times(services: list, scheduleId: int, title: str) -> dict:
             # process timetable
             for train in soup.select("table tr td:nth-of-type(1)"):
                 if first_row_read:
-                    departures.append(parse_time(train.string))
+                    parsed = parse_time(train.string)
+                    if parsed is not None:
+                        departures.append(parse_time(train.string))
                 else:
                     first_row_read = True
             if len(departures) > 0:
@@ -59,8 +62,12 @@ def get_code(service: str) -> str:
             return "HOB_33S"
     return ""
 
-def parse_time(time: str) -> int:
+def parse_time(time: str | None) -> int | None:
+    if time is None:
+        return None
     m = re.search("^(\\d{1,2}):(\\d{2}) (AM|PM)$", time)
+    if m is None:
+        return None
     hour = 0 if m.group(1) == "12" else int(m.group(1))
     hour = hour if m.group(3) == "AM" else hour + 12
     return hour * 100 + int(m.group(2))

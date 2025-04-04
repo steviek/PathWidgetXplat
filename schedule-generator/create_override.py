@@ -4,7 +4,7 @@ from parser import parse_schedule_times, find_element_key
 schedule_id_offset = 10
 
 def create_override(page: dict) -> dict:
-    date = None
+    date: datetime | None = None
     data = dict()
     # get every link
     for _, item in page[":children"]["/path/en/planned-service-changes"][":items"]["root"][":items"].items():
@@ -15,7 +15,7 @@ def create_override(page: dict) -> dict:
             continue
         s, d = parse_schedule(page[":children"][link][":items"]["root"][":items"])
         # if no schedule or date is before today
-        if s == None or d < datetime.now():
+        if s == None or d == None or d < datetime.now():
             continue
         # get only the closest date
         if date == None:
@@ -26,7 +26,7 @@ def create_override(page: dict) -> dict:
             date = d
     return data
 
-def parse_schedule(d: dict) -> tuple:
+def parse_schedule(d: dict) -> tuple[dict | None, datetime | None]:
     r = dict()
     r['schedules'] = list()
     r['timings'] = list()
@@ -39,7 +39,7 @@ def parse_schedule(d: dict) -> tuple:
     r['name'] = d[imagewithtext_key]["title"]
     # get every schedule block
     index = 0
-    dates = []
+    dates: list[datetime] = []
     for key, block in d.items():
         if not key.startswith("accordionlist_copy_c"):
             continue

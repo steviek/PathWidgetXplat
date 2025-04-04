@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from parser import parse_schedule_times
+from parser import parse_schedule_times, find_element_key
 
 schedule_id_offset = 10
 
@@ -29,11 +29,12 @@ def parse_schedule(d: dict) -> tuple:
     r['schedules'] = list()
     r['timings'] = list()
     # parse the title
-    if "imagewithtext_copy_c" not in d:
+    imagewithtext_key = find_element_key(list(d.keys()), "imagewithtext")
+    if imagewithtext_key is None:
         print("imagewithtext_copy_c not in override")
         return None, None
 
-    r['name'] = d["imagewithtext_copy_c"]["title"]
+    r['name'] = d[imagewithtext_key]["title"]
     # get every schedule block
     index = 0
     dates = []

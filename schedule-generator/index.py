@@ -1,7 +1,7 @@
 import requests
 import json
 from create_override import create_override
-from parser import parse_schedule_times
+from parser import parse_schedule_times, find_element_key
 from datetime import datetime
 
 def run():
@@ -37,14 +37,11 @@ def create_regular(page: dict) -> dict:
         r['timings'].append(t)
         # process schedule
         data = page[":children"][link][":items"]["root"][":items"]
+        itemsOrder = page[":children"][link][":items"]["root"][":itemsOrder"]
 
-        textblock_key = 'textblock'
-        if not textblock_key in data:
-            textblock_key = 'textblock_copy'
-        if not textblock_key in data:
-            textblock_key = 'textblock_copy_copy'
+        textblock_key = find_element_key(itemsOrder, "textblock")
 
-        if not textblock_key in data:
+        if textblock_key is None:
             raise Exception("No textblock for " + link)
 
         dates.append(datetime.strptime(
@@ -53,10 +50,9 @@ def create_regular(page: dict) -> dict:
         ))
         title = data["simplehero_copy"]["title"]
 
-        accordion_list_key = 'accordionlist'
-        if not accordion_list_key in data:
-            accordion_list_key = 'accordionlist_copy'
-        if not accordion_list_key in data:
+        accordion_list_key = find_element_key(itemsOrder, "accordionlist")
+
+        if accordion_list_key is None:
             raise Exception("No accordion list for " + link)
 
         r['schedules'].append(parse_schedule_times(

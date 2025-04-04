@@ -64,3 +64,6 @@ def parse_time(time: str) -> int:
     hour = 0 if m.group(1) == "12" else int(m.group(1))
     hour = hour if m.group(3) == "AM" else hour + 12
     return hour * 100 + int(m.group(2))
+
+def find_element_key(o: list[str], prefix: str) -> str | None:
+    return next((x for x in o if x.startswith(prefix)), None)

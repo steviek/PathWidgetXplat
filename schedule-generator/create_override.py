@@ -8,9 +8,11 @@ def create_override(page: dict) -> dict:
     data = dict()
     # get every link
     for _, item in page[":children"]["/path/en/planned-service-changes"][":items"]["root"][":items"].items():
-        if 'linkTitle' not in item or item['linkTitle'] != "See schedules":
+        if 'linkTitle' not in item or 'linkHref' not in item:
             continue
         link = item['linkHref'].split(".html")[0]
+        if not link.startswith("/path/en/schedules-maps/"):
+            continue
         s, d = parse_schedule(page[":children"][link][":items"]["root"][":items"])
         # if no schedule or date is before today
         if s == None or d < datetime.now():

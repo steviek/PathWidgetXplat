@@ -2,9 +2,6 @@ package com.sixbynine.transit.path
 
 import com.sixbynine.transit.path.api.Stations.FourteenthStreet
 import com.sixbynine.transit.path.api.Stations.GroveStreet
-import com.sixbynine.transit.path.api.Stations.Harrison
-import com.sixbynine.transit.path.api.Stations.JournalSquare
-import com.sixbynine.transit.path.api.Stations.Newark
 import com.sixbynine.transit.path.api.Stations.NinthStreet
 import com.sixbynine.transit.path.api.Stations.TwentyThirdStreet
 import com.sixbynine.transit.path.api.alerts.Alert
@@ -41,10 +38,7 @@ class GithubAlertsTest {
         val alerts = GithubAlerts(
             GeneralOvernightCleaning,
             FourteenthStreetOvernight,
-            OvernightHarrison,
-            OvernightGrove,
-            OvernightJsq,
-            OvernightNewark,
+            EasterWeekendOvernightCleaning,
         )
 
         val json = JsonFormat.encodeToString(alerts)
@@ -223,14 +217,14 @@ class GithubAlertsTest {
                 days = DayOfWeek.entries,
                 start = LocalTime(0, 0),
                 end = LocalTime(5, 0),
-                from = LocalDate(2025, FEBRUARY, 28),
+                from = LocalDate(2025, APRIL, 22),
                 to = LocalDate(2025, DECEMBER, 31),
             ),
             displaySchedule = Schedule.repeatingDaily(
                 days = DayOfWeek.entries,
                 start = LocalTime(22, 0),
                 end = LocalTime(5, 0),
-                from = LocalDate(2025, FEBRUARY, 28),
+                from = LocalDate(2025, APRIL, 21),
                 to = LocalDate(2025, DECEMBER, 31),
             ),
             hiddenTrainsFilter = TrainFilter.all(),
@@ -242,6 +236,27 @@ class GithubAlertsTest {
                 en = "https://www.panynj.gov/path/en/schedules-maps.html"
             ),
             level = "WARN"
+        )
+
+        val EasterWeekendOvernightCleaning = Alert(
+            stations = listOf(NinthStreet, TwentyThirdStreet),
+            hideTrainsSchedule = Schedule(),
+            displaySchedule = Schedule.repeatingDaily(
+                from = LocalDate(2025, APRIL, 18),
+                to = LocalDate(2025, APRIL, 21),
+                days = listOf(FRIDAY, SATURDAY, SUNDAY),
+                start = LocalTime(22, 0),
+                end = LocalTime(5, 0),
+            ),
+            hiddenTrainsFilter = TrainFilter(),
+            message = AlertText(
+                en = "9 St. & 23 St. stations will remain open overnight during Easter Weekend",
+                es = "Las estaciones de 9 St. y 23 St. permanecerán abiertas durante la noche durante el fin de semana de la Pascua"
+            ),
+            url = AlertText(
+                en = "https://www.panynj.gov/path/en/schedules-maps/weekend-schedules.html"
+            ),
+            level = "INFO"
         )
 
         val FourteenthStreetOvernight = Alert(
@@ -262,47 +277,6 @@ class GithubAlertsTest {
                 en = "https://www.panynj.gov/path/en/planned-service-changes.html",
             ),
             level = "INFO",
-        )
-
-        val OvernightHarrison = Alert(
-            stations = listOf(Harrison),
-            hideTrainsSchedule = Schedule.repeatingDaily(
-                days = listOf(SATURDAY, SUNDAY),
-                start = LocalTime(0, 0),
-                end = LocalTime(8, 0),
-                from = LocalDate(2025, APRIL, 5),
-                to = LocalDate(2025, APRIL, 7),
-            ),
-            displaySchedule = Schedule.repeatingDaily(
-                days = DayOfWeek.entries,
-                start = LocalTime(22, 0),
-                end = LocalTime(8, 0),
-                from = LocalDate(2024, APRIL, 4),
-                to = LocalDate(2025, APRIL, 6),
-            ),
-            hiddenTrainsFilter = TrainFilter.headSigns("World Trade Center"),
-            message = AlertText(
-                en = "No PATH Service Between Harrison & Grove St. Stations from 12AM-8AM. Shuttle buses provided.",
-                es = "No hay trenes entre Harrison y Grove St entre 12AM-8AM. Se proporcionan autobuses lanzadera."
-            ),
-            url = AlertText(
-                en = "https://www.panynj.gov/path/en/schedules-maps/weekend-schedules/Weekend-Apr5-6.html",
-            ),
-            level = "WARN",
-        )
-
-        val OvernightJsq = OvernightHarrison.copy(
-            stations = listOf(JournalSquare.pathApiName),
-            hiddenTrainsFilter = TrainFilter.all()
-        )
-
-        val OvernightGrove = OvernightHarrison.copy(
-            stations = listOf(GroveStreet.pathApiName),
-            hiddenTrainsFilter = TrainFilter.headSigns("Newark", "Journal Square", "Journal Square via Hoboken")
-        )
-
-        val OvernightNewark = OvernightHarrison.copy(
-            stations = listOf(Newark.pathApiName),
         )
     }
 }

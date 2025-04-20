@@ -20,7 +20,14 @@ def parse_schedule_times(services: list, scheduleId: int, title: str) -> dict[st
         items = service[":items"]
         first_key = next(iter(items))
         for _, textblock in items.items():
-            soup = BeautifulSoup(textblock["text"], "html.parser")
+            text_key = find_element_key(textblock, "text")
+            if text_key is None:
+                if find_element_key(textblock, ":type"):
+                    # /components/text component, not sure what it's for...
+                    continue
+                raise Exception("Item under " + subkey + "'s items is missing the text block")
+
+            soup = BeautifulSoup(textblock[text_key], "html.parser")
             departures = list()
             first_row_read = False
             # process timetable

@@ -17,6 +17,19 @@ struct DepartureBoardView: View {
 
     var body: some View {
         return ZStack {
+            // Background image
+            GeometryReader { geometry in
+                Image("WidgetBackground")
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .clipped()
+                    .edgesIgnoringSafeArea(.all)
+            }
+            
+            // Semi-transparent overlay for better readability
+            //Color.black.opacity(0.3)
+            
             VStack(spacing: 0) {
                 if let data = entry.data {
                     let footerHeight = max(
@@ -27,8 +40,8 @@ struct DepartureBoardView: View {
                         ),
                         32
                     )
-                    let innerWidth = entry.size.width - 32
-                    let innerHeight = entry.size.height - 20 - footerHeight
+                    let innerWidth = entry.size.width - 16
+                    let innerHeight = entry.size.height - 16 - footerHeight
 
                     DepartureBoardStations(
                         entry: entry,
@@ -69,6 +82,7 @@ struct DepartureBoardView: View {
 
                         Text(getFooterText())
                             .font(Font.system(size: 12))
+                            .foregroundColor(.white)
 
                         Spacer()
 
@@ -77,6 +91,7 @@ struct DepartureBoardView: View {
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: 24, height: 24)
+                                .foregroundColor(.white)
                         }
                         .padding(4)
                         .buttonStyle(.borderless)
@@ -84,10 +99,7 @@ struct DepartureBoardView: View {
                 }
             }
         }
-        .padding([.horizontal], 12)
-        .padding([.bottom], 4)
-        .padding([.top], 16)
-        .frame(width: entry.size.width, height: entry.size.height, alignment: .topLeading)
+        .frame(width: entry.size.width, height: entry.size.height)
     }
 
     private func getFooterText() -> String {

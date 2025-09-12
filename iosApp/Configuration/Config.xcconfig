@@ -1,3 +1,4 @@
 TEAM_ID=
 BUNDLE_ID=com.sixbynine.transit.path
 APP_NAME=Departures for PATH
+IPHONEOS_DEPLOYMENT_TARGET = 17.0

@@ -1,0 +1,19 @@
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+// Include base configuration
+#include "../Configuration/Config.xcconfig"
+
+// Widget-specific settings
+PRODUCT_BUNDLE_IDENTIFIER = com.sixbynine.transit.path.widget
+INFOPLIST_KEY_CFBundleDisplayName = widget
+INFOPLIST_KEY_NSHumanReadableCopyright = Copyright © 2023 orgName. All rights reserved.
+SKIP_INSTALL = YES
+PRODUCT_NAME = $(TARGET_NAME)
+ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor
+ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground
+IPHONEOS_DEPLOYMENT_TARGET = 17.0
+
+// Kotlin Framework settings
+KOTLIN_FRAMEWORK_PATH = $(SRCROOT)/../composeApp/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)
+KOTLIN_FRAMEWORK = $(KOTLIN_FRAMEWORK_PATH)/composeApp.framework

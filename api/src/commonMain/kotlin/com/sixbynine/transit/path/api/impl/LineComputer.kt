@@ -8,10 +8,28 @@ import com.sixbynine.transit.path.api.Line.NewarkWtc
 import com.sixbynine.transit.path.model.ColorWrapper
 import com.sixbynine.transit.path.model.Colors
 
+/**
+ * Computes which PATH train lines are running between stations based on:
+ * 1. Train colors displayed in the station
+ * 2. Origin and destination station pairs
+ * 
+ * This is needed because sometimes the same physical train can serve different lines
+ * at different times of day, and the color indicators at stations may not always
+ * match the actual service pattern.
+ */
 object LineComputer {
 
+    // Stations on the northern Manhattan portion of PATH (33rd St line)
     private val NyNorthStations = setOf("CHR", "09S", "14S", "23S", "33S")
 
+    /**
+     * Determines which PATH train lines could be running between two stations.
+     *
+     * @param station The station code where the train is currently located
+     * @param target The destination station code
+     * @param colors The colors shown for this train in the station display
+     * @return Set of possible PATH lines this train could be running on
+     */
     fun computeLines(
         station: String,
         target: String,

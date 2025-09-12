@@ -139,6 +139,9 @@
         }
       }
     },
+    "Destination Station" : {
+
+    },
     "Exchange Place" : {
       "localizations" : {
         "es" : {
@@ -340,6 +343,9 @@
         }
       }
     },
+    "Origin Station" : {
+
+    },
     "Refresh" : {
       "localizations" : {
         "es" : {
@@ -361,6 +367,7 @@
       }
     },
     "Stations" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {

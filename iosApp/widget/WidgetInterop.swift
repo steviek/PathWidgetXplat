@@ -85,22 +85,36 @@ extension Filter {
 
 extension WidgetDataFetcher {
     func fetchWidgetDataAsync(
-        includeClosestStation: Bool,
-        stationLimit: Int32,
-        stations: [Station],
-        lines: [Line],
+        originStation: StationChoice,
+        destinationStation: StationChoice,
         filter: TrainFilter,
         sort: StationSort
     ) async -> FetchResult {
+        // Convert station choices to actual stations
+        let origin = originStation.toStation()
+        let destination = destinationStation.toStation()
+        
+        // If either station is nil (closest) or both stations are the same, return error
+        guard let originStn = origin, let destStn = destination, originStn != destStn else {
+            return FetchResult(data: nil, hadInternet: true, hasError: true, hasPathError: false)
+        }
+        
+        // Get the lines that serve this station pair
+        let lines = WidgetDataFetcher().getLinesForStationPair(departure: originStn.pathApiName, destination: destStn.pathApiName)
+        
+        // If no lines found between these stations, return error
+        guard !lines.isEmpty else {
+            return FetchResult(data: nil, hadInternet: true, hasError: true, hasPathError: false)
+        }
         do {
             return try await withCheckedThrowingContinuation { continuation in
                 fetchWidgetData(
-                    stationLimit: stationLimit,
-                    stations: stations,
-                    lines: lines,
+                    stationLimit: 1, // We only want to show one station
+                    stations: [originStn], // Only show origin station
+                    lines: Array(lines), // Convert Set to Array
                     sort: sort,
                     filter: filter,
-                    includeClosestStation: includeClosestStation,
+                    includeClosestStation: false, // We're using specific stations
                     staleness: widgetFetchStaleness(force: false),
                     onSuccess: { data in
                         continuation.resume(returning: FetchResult(data: data, hadInternet: true, hasError: false, hasPathError: false))

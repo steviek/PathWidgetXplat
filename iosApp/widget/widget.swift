@@ -17,7 +17,7 @@ struct Provider: AppIntentTimelineProvider {
         let entry = SimpleEntry(
             date: Date(),
             size: context.displaySize,
-            configuration: ConfigurationAppIntent(stations: [.jsq]),
+            configuration: ConfigurationAppIntent(originStation: .jsq, destinationStation: .wtc),
             data: nil,
             hasError: false,
             hasPathError: false,
@@ -67,20 +67,15 @@ struct Provider: AppIntentTimelineProvider {
         if (context.isPreview) {
             widgetData = Fixtures().widgetData(limit: Int32(stationLimit))
             effectiveConfiguration = ConfigurationAppIntent(
-                stations: [.jsq, .wtc]
+                originStation: .jsq,
+                destinationStation: .wtc
             )
             hasError = false
             hasPathError = false
         } else {
             let fetchResult = await WidgetDataFetcher().fetchWidgetDataAsync(
-                includeClosestStation: configuration.stations.contains(where: { $0 == .closest }),
-                stationLimit: Int32(stationLimit),
-                stations: configuration.stations.compactMap {
-                    $0.toStation()
-                },
-                lines: configuration.lines.map {
-                    $0.toLine()
-                },
+                originStation: configuration.originStation,
+                destinationStation: configuration.destinationStation,
                 filter: configuration.filter.toTrainFilter(),
                 sort: configuration.sortOrder.toStationSort()
             )
@@ -155,17 +150,11 @@ struct widget: Widget {
     }
 
     private func showEmptyView(_ entry: SimpleEntry) -> Bool {
-    
-        let choices = entry.configuration.stations
-        if choices.count >= 2 {
-            return false
+        // Show empty view if origin is "closest" and we don't have location permission
+        if entry.configuration.originStation == .closest {
+            return !CLLocationManager().isAuthorizedForWidgetUpdates
         }
-
-        if let single = choices.first {
-            return single == .closest && !CLLocationManager().isAuthorizedForWidgetUpdates
-        } else {
-            return true
-        }
+        return false
     }
 }
 

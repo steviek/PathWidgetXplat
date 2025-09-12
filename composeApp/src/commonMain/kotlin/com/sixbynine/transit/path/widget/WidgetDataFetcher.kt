@@ -1,6 +1,8 @@
 package com.sixbynine.transit.path.widget
 
 import androidx.compose.ui.graphics.toArgb
+import kotlin.native.ObjCName
+import kotlin.experimental.ExperimentalObjCName
 import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.PathApi
@@ -68,7 +70,85 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TimeSource.Monotonic
 
+@OptIn(ExperimentalObjCName::class)
 object WidgetDataFetcher {
+
+    /**
+     * Determines which PATH lines run between a departure station and destination station.
+     * 
+     * This function analyzes the PATH system routes to find all possible lines that could
+     * take a passenger from their departure station to their destination station.
+     *
+     * For example:
+     * - Newark (NWK) to World Trade Center (WTC): [NewarkWtc]
+     * - Journal Square (JSQ) to 33rd St (33S): [JournalSquare33rd, Hoboken33rd]
+     * - Newport (NEW) to Hoboken (HOB): [HobokenWtc]
+     *
+     * @param departure pathAPIName of departure station (e.g. "NWK", "JSQ", "HOB").
+     * @param destination pathAPIName of destination station (e.g. "WTC", "33S", "HOB")
+     * @return Set of PATH lines that serve this station pair
+     */
+    /**
+     * Determines which PATH lines run between a departure station and destination station.
+     * This function is exposed to iOS through Kotlin Multiplatform.
+     */
+    @ObjCName(name = "getLinesForStationPair") // This exposes the function directly to Swift
+    fun getLinesForStationPair(departure: String, destination: String): Set<Line> {
+        // Helper function to check if a station is between two other stations on a route
+        fun isStationBetween(station: String, start: String, end: String, route: List<String>): Boolean {
+            val startIdx = route.indexOf(start)
+            val endIdx = route.indexOf(end)
+            val stationIdx = route.indexOf(station)
+            return when {
+                startIdx == -1 || endIdx == -1 || stationIdx == -1 -> false
+                startIdx < endIdx -> stationIdx in startIdx..endIdx
+                else -> stationIdx in endIdx..startIdx
+            }
+        }
+
+        // Define the main PATH routes
+        val nwkWtcRoute = listOf("NWK", "HAR", "JSQ", "GRV", "EXP", "WTC")
+        val jsq33sRoute = listOf("JSQ", "GRV", "NEW", "CHR", "09S", "14S", "23S", "33S")
+        val hobWtcRoute = listOf("HOB", "NEW", "EXP", "WTC")
+        val hob33sRoute = listOf("HOB", "CHR", "09S", "14S", "23S", "33S")
+        val jsqHob33sRoute = listOf("JSQ", "GRV", "NEW", "HOB", "CHR", "09S", "14S", "23S", "33S")
+
+        val lines = mutableSetOf<Line>()
+
+        // Check each route to see if it connects our station pair
+        if (isStationBetween(departure, "NWK", "WTC", nwkWtcRoute) && 
+            isStationBetween(destination, "NWK", "WTC", nwkWtcRoute)) {
+            lines.add(Line.NewarkWtc)
+        }
+
+        if (isStationBetween(departure, "JSQ", "33S", jsq33sRoute) && 
+            isStationBetween(destination, "JSQ", "33S", jsq33sRoute)) {
+            lines.add(Line.JournalSquare33rd)
+        }
+
+        if (isStationBetween(departure, "HOB", "WTC", hobWtcRoute) && 
+            isStationBetween(destination, "HOB", "WTC", hobWtcRoute)) {
+            lines.add(Line.HobokenWtc)
+        }
+
+        if (isStationBetween(departure, "HOB", "33S", hob33sRoute) && 
+            isStationBetween(destination, "HOB", "33S", hob33sRoute)) {
+            lines.add(Line.Hoboken33rd)
+        }
+
+        // Special case for JSQ-HOB-33S service
+        if (isStationBetween(departure, "JSQ", "33S", jsqHob33sRoute) && 
+            isStationBetween(destination, "JSQ", "33S", jsqHob33sRoute)) {
+            // This route runs during off-peak hours
+            if (isStationBetween("HOB", departure, destination, jsqHob33sRoute) || 
+                isStationBetween("HOB", destination, departure, jsqHob33sRoute)) {
+                lines.add(Line.Hoboken33rd)
+                lines.add(Line.JournalSquare33rd)
+            }
+        }
+
+        return lines
+    }
 
     private val lastClosestStationsKey = "fetcher_lastClosestStations"
     private var lastClosestStations: List<Station>?
@@ -373,6 +453,29 @@ object WidgetDataFetcher {
         return FetchWithPrevious(fetchWithTimeout, previous)
     }
 
+    /**
+     * Creates widget display data by processing raw train departures and applying various filters and transformations.
+     *
+     * This function:
+     * 1. Sorts and filters stations based on user preferences and location
+     * 2. Processes alerts that may affect train service
+     * 3. Groups trains by destination and applies line/interstate filters
+     * 4. Adjusts arrival times to help users avoid missing trains
+     * 5. Formats data for widget display
+     *
+     * @param now Current time used for calculations
+     * @param fetchTime When the train data was fetched from PATH API
+     * @param stationLimit Maximum number of stations to show in widget
+     * @param stations List of stations user wants to see
+     * @param lines Which PATH train lines to include
+     * @param sort How to sort the stations (alphabetical, NJ morning commute, NY morning commute)
+     * @param filter Whether to show all trains or only interstate trains
+     * @param closestStations Ordered list of stations near user's location (if available)
+     * @param alerts Current service alerts that may affect trains
+     * @param data Raw train departure data from PATH API
+     * @param isPathApiBroken Whether PATH API is currently having issues
+     * @return Processed and formatted data ready for widget display
+     */
     private fun createWidgetData(
         now: Instant,
         fetchTime: Instant,

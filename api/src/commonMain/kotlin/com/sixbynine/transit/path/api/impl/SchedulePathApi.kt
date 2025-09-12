@@ -31,6 +31,16 @@ import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration.Companion.minutes
 
+/**
+ * Implementation of PATH API that provides train schedules based on timetables.
+ * 
+ * This class:
+ * 1. Loads schedule data from GitHub repository
+ * 2. Handles schedule overrides for service changes
+ * 3. Computes arrival times based on schedules
+ * 4. Supports different service patterns for weekdays/weekends
+ * 5. Handles schedule validity periods and transitions
+ */
 class SchedulePathApi : PathApi {
     override fun getUpcomingDepartures(
         now: Instant,

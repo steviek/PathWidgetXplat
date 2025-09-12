@@ -15,6 +15,15 @@ import com.sixbynine.transit.path.util.map
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.seconds
 
+/**
+ * Main implementation of the PATH train API that fetches real-time train departures.
+ * 
+ * This class:
+ * 1. Fetches raw train data from the PATH API
+ * 2. Processes arrival times and train statuses
+ * 3. Computes train lines based on colors and destinations
+ * 4. Handles train delays and direction information
+ */
 internal class PathApiImpl : PathApi {
 
     override fun getUpcomingDepartures(

@@ -98,11 +98,11 @@ struct ConfigurationAppIntent: WidgetConfigurationIntent {
     static var title: LocalizedStringResource = "Departure board for PATH"
     static var description = IntentDescription("Departure board for PATH trains")
     
-    @Parameter(title: "Stations", default: [])
-    var stations: [StationChoice]
+    @Parameter(title: "Origin Station", default: .closest)
+    var originStation: StationChoice
     
-    @Parameter(title: "Lines", default: [LineChoice.nwkWtc, LineChoice.hobWtc, LineChoice.jsq33, LineChoice.hob33])
-    var lines: [LineChoice]
+    @Parameter(title: "Destination Station", default: .wtc)
+    var destinationStation: StationChoice
     
     @Parameter(title: "Filter", default: Filter.all)
     var filter: Filter
@@ -117,8 +117,8 @@ struct ConfigurationAppIntent: WidgetConfigurationIntent {
     var sortOrder: SortOrder
     
     init() {
-        self.stations = []
-        self.lines = LineChoice.allCases
+        self.originStation = .closest
+        self.destinationStation = .wtc
         self.filter = .all
         self.timeDisplay = .relative
         self.trainGrouping = .byHeadsign
@@ -126,15 +126,15 @@ struct ConfigurationAppIntent: WidgetConfigurationIntent {
     }
     
     init(
-        stations: [StationChoice] = [],
-        lines: [LineChoice] = LineChoice.allCases,
+        originStation: StationChoice = .closest,
+        destinationStation: StationChoice = .wtc,
         filter: Filter = .all,
         timeDisplay: TimeDisplay = .relative,
         trainGrouping: TrainGrouping = .byHeadsign,
         sortOrder: SortOrder = .alphabetical
     ) {
-        self.stations = stations
-        self.lines = lines
+        self.originStation = originStation
+        self.destinationStation = destinationStation
         self.filter = filter
         self.timeDisplay = timeDisplay
         self.trainGrouping = trainGrouping

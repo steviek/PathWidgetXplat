@@ -46,6 +46,16 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+/**
+ * Helper class that predicts train arrivals at future stations based on known departures.
+ * 
+ * This class:
+ * 1. Maintains travel time data between station pairs
+ * 2. Has different timing tables for peak/off-peak service
+ * 3. Handles train routing logic for different service patterns
+ * 4. Helps fill in arrival predictions when real-time data is missing
+ * 5. Accounts for different travel times based on time of day and day of week
+ */
 object TrainBackfillHelper {
 
     private const val ShouldLog = false

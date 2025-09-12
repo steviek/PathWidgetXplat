@@ -30,6 +30,15 @@ import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+/**
+ * Mock implementation of PATH API for testing and development.
+ * 
+ * This class:
+ * 1. Provides realistic but static train departure data
+ * 2. Simulates trains on all major PATH lines
+ * 3. Uses fixed time offsets from the current time
+ * 4. Helps test the app without hitting real PATH API
+ */
 internal class MockPathApi : PathApi {
 
     override fun getUpcomingDepartures(

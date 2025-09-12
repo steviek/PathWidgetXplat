@@ -17,49 +17,10 @@ struct DepartureBoardStations: View {
     let height: CGFloat
     
     var body: some View {
-        // If we have multiple columns, then pad the sides of the station tiles.
-        let multiColumn = data.stations.count > 1
-        let tileWidth = multiColumn ? (width / 2) - 24 : width
-        let tileHeight = data.stations.count > 2 ? (height / 2) - 8 : height
-        HStack(spacing: 0) {
-            if (multiColumn) {
-                Spacer().frame(width: 8)
-            }
-            
-            VStack(alignment: .leading, spacing: 0) {
-                if (data.stations.count > 0) {
-                    stationView(data.stations[0], width: tileWidth, height: tileHeight)
-                }
-                
-                if (data.stations.count > 2) {
-                    Spacer().frame(height: 16)
-                    stationView(data.stations[2], width: tileWidth, height: tileHeight)
-                }
-            }
-            .frame(width: tileWidth, height: height)
-            
-            if (multiColumn) {
-                Spacer().frame(width: 32)
-                VStack(alignment: .leading, spacing: 0) {
-                    if (data.stations.count > 1) {
-                        stationView(data.stations[1], width: tileWidth, height: tileHeight)
-                    }
-                    
-                    if (data.stations.count > 3) {
-                        Spacer().frame(height: 16)
-                        stationView(data.stations[3], width: tileWidth, height: tileHeight)
-                    } else if (data.stations.count > 2) {
-                        Spacer()
-                    }
-                }
-                .frame(width: tileWidth, height: height)
-            }
-            
-            if (multiColumn) {
-                Spacer().frame(width: 8)
-            }
+        // We only show one station (the origin station)
+        if data.stations.count > 0 {
+            stationView(data.stations[0], width: width, height: height)
         }
-        .frame(width: width, height: height)
     }
     
     @ViewBuilder

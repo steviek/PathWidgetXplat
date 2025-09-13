@@ -110,8 +110,8 @@ extension WidgetDataFetcher {
             return try await withCheckedThrowingContinuation { continuation in
                 fetchWidgetData(
                     stationLimit: 1, // We only want to show one station
-                    stations: [originStn], // Only show origin station
-                    lines: Array(lines), // Convert Set to Array
+                    stations: [originStn, destStn], // Only show origin station
+                    lines: Array(lines.map { $0.line }), // Convert Set<LineDirection> to Array<Line>
                     sort: sort,
                     filter: filter,
                     includeClosestStation: false, // We're using specific stations

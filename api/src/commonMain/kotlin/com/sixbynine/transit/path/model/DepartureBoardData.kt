@@ -47,6 +47,7 @@ data class DepartureBoardData(
         val isDelayed: Boolean = false,
         val backfillSource: BackfillSource? = null,
         val lines: Set<Line>? = null,
+        val directionState: State? = null,
     ) {
         fun isPast(now: Instant): Boolean {
             return projectedArrival < now - 1.minutes

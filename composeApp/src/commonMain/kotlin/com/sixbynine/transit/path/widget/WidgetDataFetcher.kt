@@ -21,6 +21,8 @@ import com.sixbynine.transit.path.api.isEastOf
 import com.sixbynine.transit.path.api.isInNewJersey
 import com.sixbynine.transit.path.api.isInNewYork
 import com.sixbynine.transit.path.api.isWestOf
+import com.sixbynine.transit.path.api.State.NewJersey
+import com.sixbynine.transit.path.api.State.NewYork
 import com.sixbynine.transit.path.api.state
 import com.sixbynine.transit.path.app.lifecycle.AppLifecycleObserver
 import com.sixbynine.transit.path.app.settings.AvoidMissingTrains
@@ -92,20 +94,13 @@ object WidgetDataFetcher {
      * Determines which PATH lines run between a departure station and destination station.
      * This function is exposed to iOS through Kotlin Multiplatform.
      */
-    @ObjCName(name = "getLinesForStationPair") // This exposes the function directly to Swift
-    fun getLinesForStationPair(departure: String, destination: String): Set<Line> {
-        // Helper function to check if a station is between two other stations on a route
-        fun isStationBetween(station: String, start: String, end: String, route: List<String>): Boolean {
-            val startIdx = route.indexOf(start)
-            val endIdx = route.indexOf(end)
-            val stationIdx = route.indexOf(station)
-            return when {
-                startIdx == -1 || endIdx == -1 || stationIdx == -1 -> false
-                startIdx < endIdx -> stationIdx in startIdx..endIdx
-                else -> stationIdx in endIdx..startIdx
-            }
-        }
+    data class LineDirection(
+        val line: Line,
+        val wantToNY: Boolean
+    )
 
+    @ObjCName(name = "getLinesForStationPair") // This exposes the function directly to Swift
+    fun getLinesForStationPair(departure: String, destination: String): Set<LineDirection> {
         // Define the main PATH routes
         val nwkWtcRoute = listOf("NWK", "HAR", "JSQ", "GRV", "EXP", "WTC")
         val jsq33sRoute = listOf("JSQ", "GRV", "NEW", "CHR", "09S", "14S", "23S", "33S")
@@ -113,41 +108,63 @@ object WidgetDataFetcher {
         val hob33sRoute = listOf("HOB", "CHR", "09S", "14S", "23S", "33S")
         val jsqHob33sRoute = listOf("JSQ", "GRV", "NEW", "HOB", "CHR", "09S", "14S", "23S", "33S")
 
-        val lines = mutableSetOf<Line>()
+        val lineDirections = mutableSetOf<LineDirection>()
 
-        // Check each route to see if it connects our station pair
-        if (isStationBetween(departure, "NWK", "WTC", nwkWtcRoute) && 
-            isStationBetween(destination, "NWK", "WTC", nwkWtcRoute)) {
-            lines.add(Line.NewarkWtc)
+        // Check NWK-WTC route
+        val nwkWtcDep = nwkWtcRoute.indexOf(departure)
+        val nwkWtcDest = nwkWtcRoute.indexOf(destination)
+        if (nwkWtcDep != -1 && nwkWtcDest != -1) {
+            lineDirections.add(LineDirection(
+                line = Line.NewarkWtc,
+                wantToNY = nwkWtcDep < nwkWtcDest
+            ))
         }
 
-        if (isStationBetween(departure, "JSQ", "33S", jsq33sRoute) && 
-            isStationBetween(destination, "JSQ", "33S", jsq33sRoute)) {
-            lines.add(Line.JournalSquare33rd)
+        // Check JSQ-33S route
+        val jsq33sDep = jsq33sRoute.indexOf(departure)
+        val jsq33sDest = jsq33sRoute.indexOf(destination)
+        if (jsq33sDep != -1 && jsq33sDest != -1) {
+            lineDirections.add(LineDirection(
+                line = Line.JournalSquare33rd,
+                wantToNY = jsq33sDep < jsq33sDest
+            ))
         }
 
-        if (isStationBetween(departure, "HOB", "WTC", hobWtcRoute) && 
-            isStationBetween(destination, "HOB", "WTC", hobWtcRoute)) {
-            lines.add(Line.HobokenWtc)
+        // Check HOB-WTC route
+        val hobWtcDep = hobWtcRoute.indexOf(departure)
+        val hobWtcDest = hobWtcRoute.indexOf(destination)
+        if (hobWtcDep != -1 && hobWtcDest != -1) {
+            lineDirections.add(LineDirection(
+                line = Line.HobokenWtc,
+                wantToNY = hobWtcDep < hobWtcDest
+            ))
         }
 
-        if (isStationBetween(departure, "HOB", "33S", hob33sRoute) && 
-            isStationBetween(destination, "HOB", "33S", hob33sRoute)) {
-            lines.add(Line.Hoboken33rd)
+        // Check HOB-33S route
+        val hob33sDep = hob33sRoute.indexOf(departure)
+        val hob33sDest = hob33sRoute.indexOf(destination)
+        if (hob33sDep != -1 && hob33sDest != -1) {
+            lineDirections.add(LineDirection(
+                line = Line.Hoboken33rd,
+                wantToNY = hob33sDep < hob33sDest
+            ))
         }
 
-        // Special case for JSQ-HOB-33S service
-        if (isStationBetween(departure, "JSQ", "33S", jsqHob33sRoute) && 
-            isStationBetween(destination, "JSQ", "33S", jsqHob33sRoute)) {
-            // This route runs during off-peak hours
-            if (isStationBetween("HOB", departure, destination, jsqHob33sRoute) || 
-                isStationBetween("HOB", destination, departure, jsqHob33sRoute)) {
-                lines.add(Line.Hoboken33rd)
-                lines.add(Line.JournalSquare33rd)
+        // Check JSQ-HOB-33S route (weekend/late night)
+        val jsqHobDep = jsqHob33sRoute.indexOf(departure)
+        val jsqHobDest = jsqHob33sRoute.indexOf(destination)
+        if (jsqHobDep != -1 && jsqHobDest != -1) {
+            val hobIdx = jsqHob33sRoute.indexOf("HOB")
+            // If HOB is between departure and destination
+            if ((jsqHobDep < hobIdx && hobIdx < jsqHobDest) || 
+                (jsqHobDest < hobIdx && hobIdx < jsqHobDep)) {
+                val wantToNY = jsqHobDep < jsqHobDest
+                lineDirections.add(LineDirection(line = Line.Hoboken33rd, wantToNY = wantToNY))
+                lineDirections.add(LineDirection(line = Line.JournalSquare33rd, wantToNY = wantToNY))
             }
         }
 
-        return lines
+        return lineDirections
     }
 
     private val lastClosestStationsKey = "fetcher_lastClosestStations"
@@ -363,7 +380,7 @@ object WidgetDataFetcher {
                     }
                 }
 
-                val alertsResult = withTimeoutCatching(2.seconds) {
+                val alertsResult = withTimeoutCatching(5.seconds) {
                     alerts.await()
                 }.toDataResult().flatten()
                     .onSuccess {
@@ -503,6 +520,9 @@ object WidgetDataFetcher {
         for (station in adjustedStations) {
             val stationAlerts = alerts?.filter { station.pathApiName in it.stations }.orEmpty()
 
+            // // Pre-compute line directions for this station pair
+            val lineDirections = getLinesForStationPair(station.pathApiName, adjustedStations.last().pathApiName)
+            
             val apiTrains =
                 data.getTrainsAt(station)
                     ?.filterNot { train ->
@@ -515,39 +535,59 @@ object WidgetDataFetcher {
                         }
                     }
                     ?: continue
-            val signs =
-                apiTrains
-                    .groupBy { it.headsign }
-                    .mapNotNull { (headSign, trains) ->
-                        if (!matchesFilter(station, headSign, filter)) {
-                            return@mapNotNull null
+            // First filter trains by direction
+            val filteredTrains = apiTrains.filter { train ->
+                val direction = train.directionState
+                if (direction == null) {
+                    // No direction state, allow the train
+                    true
+                } else {
+                    // Check if this train is on any of our lines AND going in the right direction
+                    train.lines?.any { line ->
+                        lineDirections.any { lineDir ->
+                            lineDir.line == line && (
+                                (lineDir.wantToNY && direction == NewYork) ||
+                                (!lineDir.wantToNY && direction == NewJersey)
+                            )
                         }
+                    } ?: false // No lines on train, filter it out
+                }
+            }
 
-                        val headSignLines = trains.flatMap { it.lines }.toSet()
-                        if (headSignLines.isNotEmpty() && headSignLines.none { it in lines }) {
-                            return@mapNotNull null
-                        }
-
-                        val colors =
-                            trains.flatMap { it.lineColors }
-                                .distinct()
-                                .sortedBy { it.color.toArgb() }
-                        val arrivals =
-                            trains.map {
-                                adjustToAvoidMissingTrains(
-                                    now,
-                                    it.projectedArrival,
-                                    avoidMissingTrains
-                                )
-                            }
-                                .distinct()
-                                .sorted()
-                        if (arrivals.isEmpty()) return@mapNotNull null
-                        DepartureBoardData.SignData(headSign, colors, arrivals)
+            // Process signs from filtered trains, this is grouped by headsign
+            val signs = filteredTrains
+                .groupBy { it.headsign }
+                .mapNotNull { (headSign, trains) ->
+                    if (!matchesFilter(station, headSign, filter)) {
+                        return@mapNotNull null
                     }
-                    .sortedBy { it.projectedArrivals.min() }
 
-            val trains = apiTrains
+                    val headSignLines = trains.flatMap { it.lines }.toSet()
+                    if (headSignLines.isNotEmpty() && headSignLines.none { it in lines }) {
+                        return@mapNotNull null
+                    }
+
+                    val colors =
+                        trains.flatMap { it.lineColors }
+                            .distinct()
+                            .sortedBy { it.color.toArgb() }
+                    val arrivals =
+                        trains.map {
+                            adjustToAvoidMissingTrains(
+                                now,
+                                it.projectedArrival,
+                                avoidMissingTrains
+                            )
+                        }
+                            .distinct()
+                            .sorted()
+                    if (arrivals.isEmpty()) return@mapNotNull null
+                    DepartureBoardData.SignData(headSign, colors, arrivals)
+                }
+                .sortedBy { it.projectedArrivals.min() }
+
+            // Process trains from filtered trains, each train is a single headsign
+            val trains = filteredTrains
                 .asSequence()
                 .map {
                     val colors = it.lineColors.distinct()
@@ -559,15 +599,8 @@ object WidgetDataFetcher {
                         isDelayed = it.isDelayed,
                         backfillSource = it.backfillSource,
                         lines = it.lines,
+                        directionState = it.directionState,
                     )
-                }
-                .filter { train ->
-                    (train.lines == null || train.lines.orEmpty().any { line -> line in lines })
-                        .also {
-                            if (!it) {
-                                Logging.d("Filtering out train $train because it's not in the right lines")
-                            }
-                        }
                 }
                 .filter { station == closestStationToUse || matchesFilter(station, it, filter) }
                 .map { it.adjustedToAvoidMissingTrains(now, avoidMissingTrains) }
@@ -575,6 +608,10 @@ object WidgetDataFetcher {
                 .sortedBy { it.projectedArrival }
                 .toList()
 
+            Logging.d("For station ${station.displayName}:")
+            Logging.d("  Signs count: ${signs.size}")
+            Logging.d("  Trains count: ${trains.size}")
+            
             stationDatas += DepartureBoardData.StationData(
                 id = station.pathApiName,
                 displayName = station.displayName,
@@ -670,7 +707,7 @@ object WidgetDataFetcher {
 
         return projectedDateTime.hour !in 6..9 && projectedDateTime.hour !in 16..19
     }
-
+    
     @Suppress("UNUSED") // Used by swift code
     fun prunePassedDepartures(data: DepartureBoardData?, time: Instant): DepartureBoardData? {
         data ?: return null

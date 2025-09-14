@@ -88,7 +88,8 @@ extension WidgetDataFetcher {
         originStation: StationChoice,
         destinationStation: StationChoice,
         filter: TrainFilter,
-        sort: StationSort
+        sort: StationSort,
+        lines: [Line]
     ) async -> FetchResult {
         // Convert station choices to actual stations
         let origin = originStation.toStation()
@@ -99,19 +100,12 @@ extension WidgetDataFetcher {
             return FetchResult(data: nil, hadInternet: true, hasError: true, hasPathError: false)
         }
         
-        // Get the lines that serve this station pair
-        let lines = WidgetDataFetcher().getLinesForStationPair(departure: originStn.pathApiName, destination: destStn.pathApiName)
-        
-        // If no lines found between these stations, return error
-        guard !lines.isEmpty else {
-            return FetchResult(data: nil, hadInternet: true, hasError: true, hasPathError: false)
-        }
         do {
             return try await withCheckedThrowingContinuation { continuation in
                 fetchWidgetData(
                     stationLimit: 1, // We only want to show one station
                     stations: [originStn, destStn], // Only show origin station
-                    lines: Array(lines.map { $0.line }), // Convert Set<LineDirection> to Array<Line>
+                    lines: lines,
                     sort: sort,
                     filter: filter,
                     includeClosestStation: false, // We're using specific stations

@@ -77,7 +77,10 @@ struct Provider: AppIntentTimelineProvider {
                 originStation: configuration.originStation,
                 destinationStation: configuration.destinationStation,
                 filter: configuration.filter.toTrainFilter(),
-                sort: configuration.sortOrder.toStationSort()
+                sort: configuration.sortOrder.toStationSort(),
+                lines: configuration.lines.map {
+                    $0.toLine()
+                }
             )
             widgetData = fetchResult.data
             hasError = fetchResult.hasError

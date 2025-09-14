@@ -115,6 +115,8 @@ struct ConfigurationAppIntent: WidgetConfigurationIntent {
     
     @Parameter(title: "Order", default: SortOrder.alphabetical)
     var sortOrder: SortOrder
+
+    var lines: [LineChoice] = LineChoice.allCases
     
     init() {
         self.originStation = .closest

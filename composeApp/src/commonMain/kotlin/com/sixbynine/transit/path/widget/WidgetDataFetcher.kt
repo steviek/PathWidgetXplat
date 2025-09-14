@@ -519,9 +519,6 @@ object WidgetDataFetcher {
 
         for (station in adjustedStations) {
             val stationAlerts = alerts?.filter { station.pathApiName in it.stations }.orEmpty()
-
-            // // Pre-compute line directions for this station pair
-            val lineDirections = getLinesForStationPair(station.pathApiName, adjustedStations.last().pathApiName)
             
             val apiTrains =
                 data.getTrainsAt(station)
@@ -535,22 +532,34 @@ object WidgetDataFetcher {
                         }
                     }
                     ?: continue
-            // First filter trains by direction
-            val filteredTrains = apiTrains.filter { train ->
-                val direction = train.directionState
-                if (direction == null) {
-                    // No direction state, allow the train
-                    true
-                } else {
-                    // Check if this train is on any of our lines AND going in the right direction
-                    train.lines?.any { line ->
-                        lineDirections.any { lineDir ->
-                            lineDir.line == line && (
-                                (lineDir.wantToNY && direction == NewYork) ||
-                                (!lineDir.wantToNY && direction == NewJersey)
-                            )
-                        }
-                    } ?: false // No lines on train, filter it out
+
+            val filteredTrains = if (adjustedStations.size > 2) {
+                // If we have 0 or 1 stations, don't filter by direction
+                // but still filter by the provided lines
+                apiTrains.filter { train ->
+                    train.lines?.any { line -> line in lines } ?: false
+                }
+            } else {
+                // Pre-compute line directions for this station pair
+                val lineDirections = getLinesForStationPair(station.pathApiName, adjustedStations.last().pathApiName)
+                
+                // Filter trains by direction
+                apiTrains.filter { train ->
+                    val direction = train.directionState
+                    if (direction == null) {
+                        // No direction state, allow the train
+                        true
+                    } else {
+                        // Check if this train is on any of our lines AND going in the right direction
+                        train.lines?.any { line ->
+                            lineDirections.any { lineDir ->
+                                lineDir.line == line && (
+                                    (lineDir.wantToNY && direction == NewYork) ||
+                                    (!lineDir.wantToNY && direction == NewJersey)
+                                )
+                            }
+                        } ?: false // No lines on train, filter it out
+                    }
                 }
             }
 

@@ -52,49 +52,46 @@ struct DepartureBoardView: View {
                         .frame(width: innerWidth, height: innerHeight)
 
                     HStack(alignment: .center, spacing: 0) {
-                        if (entry.hasGlobalPathAlerts) {
-                            // Show the error indicator if there are alerts. Clicking anywhere will open the app, which is fine.
-                            let isDark = colorScheme == .dark
-                            ZStack {
-                                Image(systemName: "exclamationmark.triangle.fill")
-                                    .resizable()
-                                    .foregroundStyle(isDark ? .red : .orange)
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: 20, height: 20)
-                                    .padding(4)
+                        // Left side: Group refresh button with time text
+                        HStack(spacing: 8) {
+                            if (entry.hasGlobalPathAlerts) {
+                                // Show the error indicator if there are alerts. Clicking anywhere will open the app, which is fine.
+                                let isDark = colorScheme == .dark
+                                ZStack {
+                                    Image(systemName: "exclamationmark.triangle.fill")
+                                        .resizable()
+                                        .foregroundStyle(isDark ? .red : .orange)
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 20, height: 20)
+                                        .padding(4)
+                                }
+                                .padding(4)
+                                
+                            } else {
+                                Button(intent: RefreshIntent()) {
+                                    Image(systemName: "arrow.2.circlepath")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 24, height: 24)
+                                        .foregroundColor(.white)
+                                }
+                                .padding(4)
+                                .buttonStyle(.borderless)
                             }
-                            .padding(4)
                             
-                        } else {
-                            Button(intent: RefreshIntent()) {
-                                Image(systemName: "arrow.2.circlepath")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: 24, height: 24)
-                            }
-                            .padding(4)
-                            .buttonStyle(.borderless)
-                            .hidden()
-                        }
-                        
-
-                        Spacer()
-
-                        Text(getFooterText())
-                            .font(Font.system(size: 12))
-                            .foregroundColor(.white)
-
-                        Spacer()
-
-                        Button(intent: RefreshIntent()) {
-                            Image(systemName: "arrow.triangle.2.circlepath")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 24, height: 24)
+                            // Time text grouped with refresh button
+                            Text(getFooterText())
+                                .font(Font.system(size: 12))
                                 .foregroundColor(.white)
                         }
-                        .padding(4)
-                        .buttonStyle(.borderless)
+
+                        Spacer()
+
+                        // Right side: Destination station
+                        Text(getDestinationStationName())
+                            .font(Font.system(size: 12))
+                            .foregroundColor(.white)
+                            .opacity(0.8)
                     }
                 }
             }
@@ -102,28 +99,42 @@ struct DepartureBoardView: View {
         .frame(width: entry.size.width, height: entry.size.height)
     }
 
+    /// Generates the footer text that appears at the bottom of the widget
+    /// The text shows either error messages or time information based on the widget state
+    /// and user preferences. It uses a progressive fallback system to fit within available space.
     private func getFooterText() -> String {
+        // Format the time when the data was last fetched from the API
         let formattedFetchTime = WidgetDataFormatter().formatTime(instant: entry.dataFrom.toKotlinInstant())
 
+        // Priority 1: Show error messages if there's an error state
         if entry.hasError {
             return if footerTextFits(IosResourceProvider().getErrorLong()) {
+                // Use the full error message if it fits
                 IosResourceProvider().getErrorLong()
             } else {
+                // Fall back to shorter error message if space is limited
                 IosResourceProvider().getErrorShort()
             }
         }
 
+        // Priority 2: Handle clock time display mode (shows actual clock times)
         if entry.configuration.timeDisplay == .clock {
             let longText = IosResourceProvider().getUpdatedAtTime(formattedFetchTime: formattedFetchTime)
 
             return if footerTextFits(longText) {
+                // Show "Updated at [time]" if it fits
                 longText
             } else {
+                // Just show the time if space is limited
                 formattedFetchTime
             }
         }
 
+        // Priority 3: Handle relative time display mode (shows "X minutes ago" style)
+        // Format the current display time (when the widget is showing data for)
         let displayTime = WidgetDataFormatter().formatTime(instant: entry.date.toKotlinInstant())
+        
+        // Try the full relative time text first (e.g., "Updated at 2:30 PM, data from 2:25 PM")
         let fullText = IosResourceProvider().getFullRelativeUpdatedAtTime(
             displayTime: displayTime,
             dataTime: formattedFetchTime
@@ -132,6 +143,7 @@ struct DepartureBoardView: View {
             return fullText
         }
 
+        // Try a shorter version of the relative time text
         let shorterText = IosResourceProvider().getShorterRelativeUpdatedAtTime(
             displayTime: displayTime,
             dataTime: formattedFetchTime
@@ -140,12 +152,21 @@ struct DepartureBoardView: View {
             return shorterText
         }
 
+        // Final fallback: just show the display time
         return displayTime
     }
 
-    private func footerTextFits(_ text: String) -> Bool {
-        let maxWidth = entry.size.width - (64 + 24 + 16)
-        return measureTextWidth(maxSize: entry.size, text: text, font: UIFont.systemFont(ofSize: 12)) <= maxWidth
+    /// Gets the display name for the destination station from the configuration
+    private func getDestinationStationName() -> String {
+        return entry.configuration.destinationStation.toStation()?.displayName ?? "Unknown"
+    }
 
+    /// Checks if the footer text fits within the available space
+    /// Accounts for the refresh button, destination station, and padding
+    private func footerTextFits(_ text: String) -> Bool {
+        // Calculate available width: total width - refresh button (24) - destination station text - padding (16)
+        let destinationStationWidth = measureTextWidth(maxSize: entry.size, text: getDestinationStationName(), font: UIFont.systemFont(ofSize: 12))
+        let maxWidth = entry.size.width - (24 + 16 + 8 + destinationStationWidth) // 8 for spacing between refresh and time
+        return measureTextWidth(maxSize: entry.size, text: text, font: UIFont.systemFont(ofSize: 12)) <= maxWidth
     }
 }

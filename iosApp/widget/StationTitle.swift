@@ -25,7 +25,7 @@ struct StationTitle: View {
                         let textWidth = measureTextWidth(
                             maxSize: CGSize(width: width, height: maxHeight),
                             text: $0,
-                            font: UIFont.systemFont(ofSize: 14, weight: .bold)
+                            font: UIFont.systemFont(ofSize: 14, weight: .medium)
                         )
                         return (textWidth <= titleSpace).toKotlinBoolean()
                     }

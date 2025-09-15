@@ -51,7 +51,7 @@ struct DepartureBoardView: View {
                     )
                         .frame(width: innerWidth, height: innerHeight)
 
-                    HStack(alignment: .center, spacing: 0) {
+                    ZStack(alignment: .bottom) {
                         // Left side: Group refresh button with time text
                         HStack(spacing: 8) {
                             if (entry.hasGlobalPathAlerts) {
@@ -72,10 +72,10 @@ struct DepartureBoardView: View {
                                     Image(systemName: "arrow.2.circlepath")
                                         .resizable()
                                         .aspectRatio(contentMode: .fit)
-                                        .frame(width: 24, height: 24)
+                                        .frame(width: 16, height: 16)
                                         .foregroundColor(.white)
                                 }
-                                .padding(4)
+                                .padding(2)
                                 .buttonStyle(.borderless)
                             }
                             
@@ -84,14 +84,13 @@ struct DepartureBoardView: View {
                                 .font(Font.system(size: 12))
                                 .foregroundColor(.white)
                         }
+                        .frame(maxWidth: .infinity, alignment: .leading)
 
-                        Spacer()
-
-                        // Right side: Destination station
+                        // Right side: Destination station - always aligned to the right edge
                         Text(getDestinationStationName())
-                            .font(Font.system(size: 12))
+                            .font(Font.system(size: 12, weight: .medium))
                             .foregroundColor(.white)
-                            .opacity(0.8)
+                            .frame(maxWidth: .infinity, alignment: .trailing)
                     }
                 }
             }

@@ -16,7 +16,7 @@ struct StationTitle: View {
     
     var body: some View {
         HStack(spacing: 0) {
-            Spacer()
+            //Spacer()
             Text(
                 WidgetDataFormatter().formatHeadSign(
                     title: title,
@@ -31,10 +31,9 @@ struct StationTitle: View {
                     }
                 )
             )
-            .multilineTextAlignment(.center)
-            .font(Font.system(size: 14))
-            .fontWeight(.bold)
-            Spacer()
+            .multilineTextAlignment(.leading)
+            .font(Font.system(size: 14, weight: .medium))
+            //Spacer()
         }
     }
 }

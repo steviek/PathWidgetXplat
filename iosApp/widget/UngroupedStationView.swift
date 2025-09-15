@@ -27,27 +27,32 @@ struct UngroupedStationView: EntryView {
             let trains = station.trains
                 .filter { train in !train.isPast(now: entry.date.toKotlinInstant())}
                 .prefix(rowCount)
-            VStack(alignment: .leading, spacing: 0) {
-                ForEach(trains, id: \.id) { train in
-                    Spacer().frame(height: rowSpacing)
-                    HStack(alignment: .center, spacing: 0) {
-                        let destination = WidgetDataFormatter().formatHeadSign(title: train.title, width: HeadSignWidth.narrow)
-                        ColorCircle(size: 12, colors: train.colors)
-                        Spacer().frame(width: 4)
-                        Text(destination)
+            
+            if !trains.isEmpty {
+                VStack(alignment: .center, spacing: 4) {
+                    // First train - prominent display
+                    let firstTrain = trains.first!
+                    let firstTime = formatArrivalTime(firstTrain)
+                    
+                    Text(firstTime)
+                        .font(Font.system(size: 24, weight: .bold))
+                        .foregroundColor(.blue)
+                        .multilineTextAlignment(.center)
+                    
+                    // Remaining trains - secondary line
+                    if trains.count > 1 {
+                        let remainingTrains = Array(trains.dropFirst())
+                        let remainingTimes = remainingTrains.map { formatArrivalTime($0) }
+                        let alsoText = entry.configuration.timeDisplay == .clock ? "also at " : "also in "
+                        let timesString = alsoText + remainingTimes.joined(separator: ", ")
+                        
+                        Text(timesString)
                             .font(Font.system(size: 12))
-                            .lineLimit(1)
-                        
-                        let arrivalTime = formatArrivalTime(train)
-                        
-                        Spacer()
-                        Text(arrivalTime)
-                            .font(Font.system(size: 12)
-                            .monospacedDigit())
-                            .lineLimit(1)
+                            .foregroundColor(.blue)
+                            .multilineTextAlignment(.center)
                     }
                 }
-                
+                .frame(maxWidth: .infinity)
             }
             
             if (trains.isEmpty) {

@@ -22,22 +22,40 @@ struct UngroupedStationView: EntryView {
         let rowCount = max(rowCountWith4Spacing, rowCountWith6Spacing)
         let rowSpacing: CGFloat = rowCountWith4Spacing > rowCountWith6Spacing ? 4 : 6
         VStack(alignment: .leading, spacing: 0) {
-            StationTitle(title: station.displayName, width: width, maxHeight: height)
+            StationTitle(
+                title: station.displayName, 
+                destinationStation: entry.configuration.destinationStation.toStation()?.displayName,
+                width: width, 
+                maxHeight: height
+            )
                         
             let trains = station.trains
                 .filter { train in !train.isPast(now: entry.date.toKotlinInstant())}
                 .prefix(rowCount)
             
             if !trains.isEmpty {
-                VStack(alignment: .center, spacing: 4) {
+                VStack(alignment: .leading, spacing: 2) {
                     // First train - prominent display
                     let firstTrain = trains.first!
                     let firstTime = formatArrivalTime(firstTrain)
                     
-                    Text(firstTime)
-                        .font(Font.system(size: 24, weight: .bold))
-                        .foregroundColor(.blue)
-                        .multilineTextAlignment(.center)
+                    HStack(alignment: .firstTextBaseline, spacing: 0) {
+                        if entry.configuration.timeDisplay == .clock {
+                            // For clock time, display as single text
+                            Text(firstTime)
+                                .font(Font.arimaStyleBold(size: 32))
+                                .foregroundColor(.white)
+                        } else {
+                            // For relative time, split number and "min"
+                            let (numberPart, minPart) = splitTimeString(firstTime)
+                            Text(numberPart)
+                                .font(Font.arimaStyleBold(size: 32))
+                                .foregroundColor(.white)
+                            Text(minPart)
+                                .font(Font.arimaStyleBold(size: 24))
+                                .foregroundColor(.white)
+                        }
+                    }
                     
                     // Remaining trains - secondary line
                     if trains.count > 1 {
@@ -47,9 +65,10 @@ struct UngroupedStationView: EntryView {
                         let timesString = alsoText + remainingTimes.joined(separator: ", ")
                         
                         Text(timesString)
-                            .font(Font.system(size: 12))
-                            .foregroundColor(.blue)
+                            .font(Font.arimaStyle(size: 12))
+                            .foregroundColor(.white)
                             .multilineTextAlignment(.center)
+                            .offset(x: 2)
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -59,7 +78,7 @@ struct UngroupedStationView: EntryView {
                 HStack {
                     Spacer()
                     Text(IosResourceProvider().getNoTrainsText())
-                        .font(Font.system(size: 11))
+                        .font(Font.arimaStyle(size: 11))
                         .multilineTextAlignment(.center)
                     Spacer()
                 }
@@ -68,6 +87,23 @@ struct UngroupedStationView: EntryView {
             Spacer()
         }
         .frame(width: width, height: height)
+    }
+    
+    private func splitTimeString(_ timeString: String) -> (String, String) {
+        // Handle cases like "5 min", "1 min", "~5 min", "now"
+        if timeString == "now" {
+            return ("now", "")
+        }
+        
+        // Check if string contains "min"
+        if let minRange = timeString.range(of: " min") {
+            let numberPart = String(timeString[..<minRange.lowerBound])
+            let minPart = String(timeString[minRange.lowerBound...])
+            return (numberPart, minPart)
+        }
+        
+        // If no "min" found, return the whole string as number part
+        return (timeString, "")
     }
     
     private func formatArrivalTime(_ train: DepartureBoardData.TrainData) -> String {
@@ -89,10 +125,10 @@ struct UngroupedStationView: EntryView {
     
     private func measureRowCount(initialHeight: CGFloat, rowSpacing: CGFloat) -> Int {
         var height = initialHeight
-        let headerHeight = measureTextHeight(text: "Updated", font: UIFont.systemFont(ofSize: 14, weight: .bold))
+        let headerHeight = measureTextHeight(text: "Updated", font: UIFont.arimaStyleBold(size: 14))
         height -= headerHeight
         
-        let rowHeight = measureTextHeight(text: "To", font: UIFont.systemFont(ofSize: 12)) + rowSpacing
+        let rowHeight = measureTextHeight(text: "To", font: UIFont.arimaStyle(size: 12)) + rowSpacing
         return Int(floor(height / rowHeight))
     }
 }

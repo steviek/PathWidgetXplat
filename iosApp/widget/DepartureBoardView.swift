@@ -19,7 +19,7 @@ struct DepartureBoardView: View {
         return ZStack {
             // Background image
             GeometryReader { geometry in
-                Image("WidgetBackground")
+                Image("SummerBackground")
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: geometry.size.width, height: geometry.size.height)
@@ -62,8 +62,8 @@ struct DepartureBoardView: View {
                                         .resizable()
                                         .foregroundStyle(isDark ? .red : .orange)
                                         .aspectRatio(contentMode: .fit)
-                                        .frame(width: 20, height: 20)
-                                        .padding(4)
+                                        .frame(width: 16, height: 16)
+                                        //.padding(4)
                                 }
                                 .padding(4)
                                 
@@ -75,22 +75,20 @@ struct DepartureBoardView: View {
                                         .frame(width: 16, height: 16)
                                         .foregroundColor(.white)
                                 }
-                                .padding(2)
+                                //.padding(4)
                                 .buttonStyle(.borderless)
                             }
                             
                             // Time text grouped with refresh button
                             Text(getFooterText())
-                                .font(Font.system(size: 12))
+                                .font(Font.arimaStyle(size: 12))
+                                .italic()
                                 .foregroundColor(.white)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
 
-                        // Right side: Destination station - always aligned to the right edge
-                        Text(getDestinationStationName())
-                            .font(Font.system(size: 12, weight: .medium))
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity, alignment: .trailing)
+                        // Right side: Empty space (destination now in title)
+                        Spacer()
                     }
                 }
             }

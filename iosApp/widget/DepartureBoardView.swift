@@ -159,6 +159,7 @@ struct DepartureBoardView: View {
 
     /// Checks if the footer text fits within the available space
     /// Accounts for the refresh button, destination station, and padding
+    // Desai: delete if not using, same with helper above
     private func footerTextFits(_ text: String) -> Bool {
         // Calculate available width: total width - refresh button (24) - destination station text - padding (16)
         let destinationStationWidth = measureTextWidth(maxSize: entry.size, text: getDestinationStationName(), font: UIFont.systemFont(ofSize: 12))

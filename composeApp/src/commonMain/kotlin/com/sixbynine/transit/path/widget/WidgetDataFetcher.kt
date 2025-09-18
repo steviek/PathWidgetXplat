@@ -510,7 +510,9 @@ object WidgetDataFetcher {
         val stationDatas = arrayListOf<DepartureBoardData.StationData>()
         val avoidMissingTrains = currentAvoidMissingTrains()
 
-        adjustedStations.sortWith(StationComparator(sort, closestStations))
+        //disable sorting (TODO-Desai: delete this and remove sorting all together)
+        //look into how NY/NJ evening/morning sort works
+        //adjustedStations.sortWith(StationComparator(sort, closestStations))
         val closestStationToUse = closestStations?.firstOrNull()
         if (closestStationToUse != null) {
             adjustedStations.remove(closestStationToUse)

@@ -27,8 +27,6 @@ struct DepartureBoardView: View {
                     .edgesIgnoringSafeArea(.all)
             }
             
-            // Semi-transparent overlay for better readability
-            //Color.black.opacity(0.3)
             
             VStack(spacing: 0) {
                 if let data = entry.data {
@@ -40,8 +38,8 @@ struct DepartureBoardView: View {
                         ),
                         32
                     )
-                    let innerWidth = entry.size.width - 16
-                    let innerHeight = entry.size.height - 16 - footerHeight
+                    let innerWidth = entry.size.width - 8
+                    let innerHeight = entry.size.height - 8 - footerHeight
 
                     DepartureBoardStations(
                         entry: entry,
@@ -49,11 +47,12 @@ struct DepartureBoardView: View {
                         width: innerWidth,
                         height: innerHeight
                     )
-                        .frame(width: innerWidth, height: innerHeight)
+                    .frame(width: innerWidth, height: innerHeight)
+
 
                     ZStack(alignment: .bottom) {
                         // Left side: Group refresh button with time text
-                        HStack(spacing: 8) {
+                        HStack(spacing: 0) {
                             if (entry.hasGlobalPathAlerts) {
                                 // Show the error indicator if there are alerts. Clicking anywhere will open the app, which is fine.
                                 let isDark = colorScheme == .dark
@@ -75,20 +74,20 @@ struct DepartureBoardView: View {
                                         .frame(width: 16, height: 16)
                                         .foregroundColor(.white)
                                 }
-                                //.padding(4)
+                                .padding(.horizontal, 8)
                                 .buttonStyle(.borderless)
                             }
                             
-                            // Time text grouped with refresh button
-                            Text(getFooterText())
-                                .font(Font.arimaStyle(size: 12))
-                                .italic()
-                                .foregroundColor(.white)
+                            // Time text grouped with refresh button. TODO-Desai: add as an optional param.
+                            // Text(getFooterText())
+                            //     .font(Font.arimaStyle(size: 12))
+                            //     .italic()
+                            //     .foregroundColor(.white)
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .frame(maxWidth: .infinity, alignment: .trailing)
 
                         // Right side: Empty space (destination now in title)
-                        Spacer()
+                        // Spacer()
                     }
                 }
             }

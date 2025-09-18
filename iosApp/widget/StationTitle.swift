@@ -16,7 +16,7 @@ struct StationTitle: View {
     let maxHeight: CGFloat
     
     var body: some View {
-        VStack(spacing: 0) {
+        VStack(alignment: .leading, spacing: 0) {
             // Left side: Station name
             Text(
                 WidgetDataFormatter().formatHeadSign(
@@ -32,20 +32,23 @@ struct StationTitle: View {
                     }
                 )
             )
-            .multilineTextAlignment(.leading)
             .font(Font.arimaStyleMedium(size: 14))
             .foregroundColor(.white)
             .italic()
             
             // Right side: Destination station with arrow
             if let destination = destinationStation {
-                Text("→ " + destination)
-                    .font(Font.arimaStyle(size: 14))
-                    .italic()
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-                    .offset(x: -8)
+                HStack(spacing: 2) {
+                    Image(systemName: "arrow.right")
+                        .font(.system(size: 12))
+                        .foregroundColor(.white)
+                    Text(destination)
+                        .font(Font.arimaStyle(size: 14))
+                        .italic()
+                        .foregroundColor(.white)
+                }
             }
         }
+        .padding(.leading, 8)
     }
 }

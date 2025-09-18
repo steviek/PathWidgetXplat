@@ -21,7 +21,7 @@ struct UngroupedStationView: EntryView {
         let rowCountWith4Spacing = measureRowCount(initialHeight: height, rowSpacing: 4)
         let rowCount = max(rowCountWith4Spacing, rowCountWith6Spacing)
         let rowSpacing: CGFloat = rowCountWith4Spacing > rowCountWith6Spacing ? 4 : 6
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: 4) {
             StationTitle(
                 title: station.displayName, 
                 destinationStation: entry.configuration.destinationStation.toStation()?.displayName,
@@ -62,7 +62,7 @@ struct UngroupedStationView: EntryView {
                         let remainingTrains = Array(trains.dropFirst())
                         let remainingTimes = remainingTrains.map { formatArrivalTime($0) }
                         let alsoText = entry.configuration.timeDisplay == .clock ? "also at " : "also in "
-                        let timesString = alsoText + remainingTimes.joined(separator: ", ")
+                        let timesString = formatRemainingTimes(remainingTimes: remainingTimes, alsoText: alsoText)
                         
                         Text(timesString)
                             .font(Font.arimaStyle(size: 12))
@@ -121,6 +121,23 @@ struct UngroupedStationView: EntryView {
         }
         
         return arrivalTime
+    }
+    
+    private func formatRemainingTimes(remainingTimes: [String], alsoText: String) -> String {
+        if entry.configuration.timeDisplay == .clock {
+            // For clock times, join as-is
+            return alsoText + remainingTimes.joined(separator: ", ")
+        } else {
+            // For relative times, extract numbers and add "mins" at the end
+            let timeNumbers = remainingTimes.map { time in
+                // Remove " mins" suffix if present
+                if time.hasSuffix(" min") {
+                    return String(time.dropLast(4))
+                }
+                return time
+            }
+            return alsoText + timeNumbers.joined(separator: ", ") + " min"
+        }
     }
     
     private func measureRowCount(initialHeight: CGFloat, rowSpacing: CGFloat) -> Int {

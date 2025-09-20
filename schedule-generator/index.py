@@ -37,6 +37,12 @@ def create_regular(page: dict) -> dict:
         t['endTime'] = 0
         r['timings'].append(t)
         # process schedule
+        if link not in page[":children"]:
+            if link == "/path/en/schedules-maps/saturday-schedules":
+                # no saturday schedule on page temporarily
+                continue
+            raise Exception("Link " + link + " not found")
+
         data = page[":children"][link][":items"]["root"][":items"]
         itemsOrder = page[":children"][link][":items"]["root"][":itemsOrder"]
 

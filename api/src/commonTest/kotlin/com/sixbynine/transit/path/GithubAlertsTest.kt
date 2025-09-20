@@ -301,8 +301,8 @@ class GithubAlertsTest {
             ),
             hiddenTrainsFilter = TrainFilter.headSigns("World Trade Center"),
             displaySchedule = Schedule.repeatingDaily(
-                days = listOf(FRIDAY, SATURDAY),
-                start = LocalTime(22, 0),
+                days = listOf(SATURDAY, SUNDAY),
+                start = LocalTime(0, 0),
                 end = LocalTime(5, 0),
                 from = LocalDate(2025, SEPTEMBER, 19),
                 to = LocalDate(2025, SEPTEMBER, 22),

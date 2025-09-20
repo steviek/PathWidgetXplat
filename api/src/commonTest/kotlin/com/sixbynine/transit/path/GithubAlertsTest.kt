@@ -1,9 +1,14 @@
 package com.sixbynine.transit.path
 
+import com.sixbynine.transit.path.api.Stations.ExchangePlace
 import com.sixbynine.transit.path.api.Stations.FourteenthStreet
 import com.sixbynine.transit.path.api.Stations.GroveStreet
+import com.sixbynine.transit.path.api.Stations.Harrison
+import com.sixbynine.transit.path.api.Stations.JournalSquare
+import com.sixbynine.transit.path.api.Stations.Newark
 import com.sixbynine.transit.path.api.Stations.NinthStreet
 import com.sixbynine.transit.path.api.Stations.TwentyThirdStreet
+import com.sixbynine.transit.path.api.Stations.WorldTradeCenter
 import com.sixbynine.transit.path.api.alerts.Alert
 import com.sixbynine.transit.path.api.alerts.AlertText
 import com.sixbynine.transit.path.api.alerts.Schedule
@@ -26,6 +31,7 @@ import kotlinx.datetime.Month.DECEMBER
 import kotlinx.datetime.Month.FEBRUARY
 import kotlinx.datetime.Month.JULY
 import kotlinx.datetime.Month.JUNE
+import kotlinx.datetime.Month.SEPTEMBER
 import kotlinx.serialization.encodeToString
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -38,7 +44,8 @@ class GithubAlertsTest {
         val alerts = GithubAlerts(
             GeneralOvernightCleaning,
             FourteenthStreetOvernight,
-            EasterWeekendOvernightCleaning,
+            ConrailDemolition1,
+            ConrailDemolition2,
         )
 
         val json = JsonFormat.encodeToString(alerts)
@@ -277,6 +284,47 @@ class GithubAlertsTest {
                 en = "https://www.panynj.gov/path/en/planned-service-changes.html",
             ),
             level = "INFO",
+        )
+
+        val ConrailDemolition1 = Alert(
+            stations = listOf(
+                Newark,
+                Harrison,
+            ),
+            hideTrainsSchedule = Schedule.repeatingWeekly(
+                startDay = SATURDAY,
+                startTime = LocalTime(0, 0),
+                endDay = MONDAY,
+                endTime = LocalTime(5, 0),
+                from = LocalDate(2025, SEPTEMBER, 20),
+                to = LocalDate(2025, SEPTEMBER, 22),
+            ),
+            hiddenTrainsFilter = TrainFilter.headSigns("World Trade Center"),
+            displaySchedule = Schedule.repeatingDaily(
+                days = listOf(FRIDAY, SATURDAY),
+                start = LocalTime(22, 0),
+                end = LocalTime(5, 0),
+                from = LocalDate(2025, SEPTEMBER, 19),
+                to = LocalDate(2025, SEPTEMBER, 22),
+            ),
+            message = AlertText(
+                en = "No service between Harrison and Journal Square. Shuttle buses are running between HAR-JSQ and NWK-JSQ.",
+                es = "No hay servicio entre Harrison y Journal Square. Los autobuses están circulando entre HAR-JSQ y NWK-JSQ."
+            ),
+            url = AlertText(
+                en = "https://www.panynj.gov/path/en/schedules-maps.html"
+            ),
+            level = "WARN"
+        )
+
+        val ConrailDemolition2 = ConrailDemolition1.copy(
+            stations = listOf(
+                JournalSquare,
+                GroveStreet,
+                ExchangePlace,
+                WorldTradeCenter,
+            ).map { it.pathApiName },
+            hiddenTrainsFilter = TrainFilter.headSigns("Newark"),
         )
     }
 }

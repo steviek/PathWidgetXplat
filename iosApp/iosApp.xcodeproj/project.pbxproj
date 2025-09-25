@@ -10,6 +10,7 @@
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
 		091BEDE52E6FCC300034EE6E /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 091BEDE42E6FCC300034EE6E /* FirebaseAnalytics */; };
 		091BEDE72E6FCC440034EE6E /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 091BEDE62E6FCC440034EE6E /* FirebaseAnalytics */; };
+		09A7BDAB2E84EB60006DAC5D /* SeasonalUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09A7BDAA2E84EB60006DAC5D /* SeasonalUtils.swift */; };
 		09BC03732E7A59280067FC7D /* FontExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09BC03722E7A59280067FC7D /* FontExtensions.swift */; };
 		09E0CAB72E712B0400FAB725 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 09E0CAB62E712B0400FAB725 /* Assets.xcassets */; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
@@ -78,6 +79,7 @@
 
 /* Begin PBXFileReference section */
 		058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		09A7BDAA2E84EB60006DAC5D /* SeasonalUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeasonalUtils.swift; sourceTree = "<group>"; };
 		09BC03722E7A59280067FC7D /* FontExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontExtensions.swift; sourceTree = "<group>"; };
 		09E0CAB62E712B0400FAB725 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2152FB032600AC8F00CF470E /* iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSApp.swift; sourceTree = "<group>"; };
@@ -202,6 +204,7 @@
 		AAB47C1C2B15A46400079022 /* widget */ = {
 			isa = PBXGroup;
 			children = (
+				09A7BDAA2E84EB60006DAC5D /* SeasonalUtils.swift */,
 				09BC03722E7A59280067FC7D /* FontExtensions.swift */,
 				09E0CAB62E712B0400FAB725 /* Assets.xcassets */,
 				AAB47C1D2B15A46400079022 /* widgetBundle.swift */,
@@ -450,6 +453,7 @@
 				AAB47C1E2B15A46400079022 /* widgetBundle.swift in Sources */,
 				AAB47C202B15A46400079022 /* widget.swift in Sources */,
 				AA9B5F7E2C1F83C100251F59 /* ViewExtensions.swift in Sources */,
+				09A7BDAB2E84EB60006DAC5D /* SeasonalUtils.swift in Sources */,
 				AA9B5F882C23785800251F59 /* EntryView.swift in Sources */,
 				AAB47C402B15AD2300079022 /* RefreshIntent.swift in Sources */,
 			);

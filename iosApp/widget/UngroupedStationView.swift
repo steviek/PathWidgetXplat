@@ -15,6 +15,7 @@ struct UngroupedStationView: EntryView {
     let station: DepartureBoardData.StationData
     let width: CGFloat
     let height: CGFloat
+    let textColor: Color
     
     var body: some View {
         let rowCountWith6Spacing = measureRowCount(initialHeight: height, rowSpacing: 6)
@@ -26,7 +27,8 @@ struct UngroupedStationView: EntryView {
                 title: station.displayName, 
                 destinationStation: entry.configuration.destinationStation.toStation()?.displayName,
                 width: width, 
-                maxHeight: height
+                maxHeight: height,
+                textColor: textColor
             )
                         
             let trains = station.trains
@@ -34,7 +36,7 @@ struct UngroupedStationView: EntryView {
                 .prefix(rowCount)
             
             if !trains.isEmpty {
-                VStack(alignment: .leading, spacing: 2) {
+                VStack(alignment: .leading, spacing: 1) {
                     // First train - prominent display
                     let firstTrain = trains.first!
                     let firstTime = formatArrivalTime(firstTrain)
@@ -44,34 +46,37 @@ struct UngroupedStationView: EntryView {
                             // For clock time, display as single text
                             Text(firstTime)
                                 .font(Font.arimaStyleBold(size: 32))
-                                .foregroundColor(.white)
+                                .foregroundColor(textColor)
                         } else {
                             // For relative time, split number and "min"
                             let (numberPart, minPart) = splitTimeString(firstTime)
                             Text(numberPart)
                                 .font(Font.arimaStyleBold(size: 32))
-                                .foregroundColor(.white)
+                                .foregroundColor(textColor)
                             Text(minPart)
                                 .font(Font.arimaStyleBold(size: 24))
-                                .foregroundColor(.white)
+                                .foregroundColor(textColor)
                         }
                     }
                     
                     // Remaining trains - secondary line
                     if trains.count > 1 {
-                        let remainingTrains = Array(trains.dropFirst())
+                        let remainingTrains = Array(trains.dropFirst().prefix(5))
                         let remainingTimes = remainingTrains.map { formatArrivalTime($0) }
                         let alsoText = entry.configuration.timeDisplay == .clock ? "also at " : "also in "
                         let timesString = formatRemainingTimes(remainingTimes: remainingTimes, alsoText: alsoText)
                         
+                        //Text("also at ~8:14, 8:18, 8:22, 8:32, 8:45") //testing a long string
                         Text(timesString)
                             .font(Font.arimaStyle(size: 12))
-                            .foregroundColor(.white)
-                            .multilineTextAlignment(.center)
-                            .offset(x: 2)
+                            .foregroundColor(textColor)
+                            .multilineTextAlignment(.leading)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .frame(maxWidth: width - 16, alignment: .leading)
+                            //.padding(.leading, 2)
                     }
                 }
-                .frame(maxWidth: .infinity)
+                //.frame(maxWidth: .infinity)
             }
             
             if (trains.isEmpty) {
@@ -79,6 +84,7 @@ struct UngroupedStationView: EntryView {
                     Spacer()
                     Text(IosResourceProvider().getNoTrainsText())
                         .font(Font.arimaStyle(size: 11))
+                        .foregroundColor(textColor)
                         .multilineTextAlignment(.center)
                     Spacer()
                 }
@@ -125,16 +131,29 @@ struct UngroupedStationView: EntryView {
     
     private func formatRemainingTimes(remainingTimes: [String], alsoText: String) -> String {
         if entry.configuration.timeDisplay == .clock {
-            // For clock times, join as-is
-            return alsoText + remainingTimes.joined(separator: ", ")
+            // For clock times, remove "~" from all except the first one
+            let processedTimes = remainingTimes.enumerated().map { index, time in
+                if index == 0 {
+                    return time // Keep first time as-is (with or without ~)
+                } else {
+                    // Remove "~" from subsequent times
+                    return time.hasPrefix("~") ? String(time.dropFirst()) : time
+                }
+            }
+            return alsoText + processedTimes.joined(separator: ", ")
         } else {
             // For relative times, extract numbers and add "mins" at the end
-            let timeNumbers = remainingTimes.map { time in
-                // Remove " mins" suffix if present
-                if time.hasSuffix(" min") {
-                    return String(time.dropLast(4))
+            let timeNumbers = remainingTimes.enumerated().map { index, time in
+                var processedTime = time
+                // Remove "~" from all except the first one
+                if index > 0 && processedTime.hasPrefix("~") {
+                    processedTime = String(processedTime.dropFirst())
                 }
-                return time
+                // Remove " mins" suffix if present
+                if processedTime.hasSuffix(" min") {
+                    return String(processedTime.dropLast(4))
+                }
+                return processedTime
             }
             return alsoText + timeNumbers.joined(separator: ", ") + " min"
         }

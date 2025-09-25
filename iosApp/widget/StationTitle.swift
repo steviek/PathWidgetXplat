@@ -14,6 +14,7 @@ struct StationTitle: View {
     let destinationStation: String?
     let width: CGFloat
     let maxHeight: CGFloat
+    let textColor: Color
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -33,22 +34,23 @@ struct StationTitle: View {
                 )
             )
             .font(Font.arimaStyleMedium(size: 14))
-            .foregroundColor(.white)
+            .foregroundColor(textColor)
             .italic()
             
-            // Right side: Destination station with arrow
+            // destination station
             if let destination = destinationStation {
                 HStack(spacing: 2) {
                     Image(systemName: "arrow.right")
                         .font(.system(size: 12))
-                        .foregroundColor(.white)
+                        .foregroundColor(textColor)
                     Text(destination)
                         .font(Font.arimaStyle(size: 14))
                         .italic()
-                        .foregroundColor(.white)
+                        .foregroundColor(textColor)
                 }
             }
         }
-        .padding(.leading, 8)
+        .padding(.leading, 4)
+        .padding(.top, 2)
     }
 }

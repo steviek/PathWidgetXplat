@@ -8,6 +8,7 @@
 
 import SwiftUI
 import ComposeApp
+import Foundation
 
 struct DepartureBoardStations: View {
     
@@ -15,6 +16,11 @@ struct DepartureBoardStations: View {
     let data: DepartureBoardData
     let width: CGFloat
     let height: CGFloat
+    
+    /// Gets the seasonal text color
+    private var seasonalTextColor: Color {
+        SeasonalUtils.getSeasonalTextColor(for: entry.date)
+    }
     
     var body: some View {
         // We only show one station (the origin station)
@@ -35,14 +41,16 @@ struct DepartureBoardStations: View {
                 entry: entry,
                 station: station,
                 width: width,
-                height: height
+                height: height,
+                textColor: seasonalTextColor
             )
         case .byHeadsign:
             GroupedStationView(
                 entry: entry,
                 station: station,
                 width: width,
-                height: height
+                height: height,
+                textColor: seasonalTextColor
             )
         }
     }

@@ -15,6 +15,7 @@ struct GroupedStationView: EntryView {
     let station: DepartureBoardData.StationData
     let width: CGFloat
     let height: CGFloat
+    let textColor: Color
     
     var body: some View {
         let layoutInfo = GroupedWidgetLayoutHelper(
@@ -40,7 +41,8 @@ struct GroupedStationView: EntryView {
                 title: station.displayName, 
                 destinationStation: entry.configuration.destinationStation.toStation()?.displayName,
                 width: width, 
-                maxHeight: height
+                maxHeight: height,
+                textColor: textColor
             )
             Spacer().frame(height: layoutInfo.spacingBelowTitle)
             

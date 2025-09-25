@@ -104,42 +104,28 @@ struct ConfigurationAppIntent: WidgetConfigurationIntent {
     @Parameter(title: "Destination Station", default: .wtc)
     var destinationStation: StationChoice
     
-    @Parameter(title: "Filter", default: Filter.all)
-    var filter: Filter
-    
     @Parameter(title: "Time", default: TimeDisplay.relative)
     var timeDisplay: TimeDisplay
     
-    @Parameter(title: "Group By Destination", default: TrainGrouping.byHeadsign)
-    var trainGrouping: TrainGrouping
-    
-    @Parameter(title: "Order", default: SortOrder.alphabetical)
-    var sortOrder: SortOrder
-
+    //past variables, keeping here for backwards compatibility
+    var filter: Filter = .all
+    var trainGrouping: TrainGrouping = .ungrouped
+    var sortOrder: SortOrder = .alphabetical
     var lines: [LineChoice] = LineChoice.allCases
     
     init() {
         self.originStation = .closest
         self.destinationStation = .wtc
-        self.filter = .all
         self.timeDisplay = .relative
-        self.trainGrouping = .byHeadsign
-        self.sortOrder = .alphabetical
     }
     
     init(
         originStation: StationChoice = .closest,
         destinationStation: StationChoice = .wtc,
-        filter: Filter = .all,
         timeDisplay: TimeDisplay = .relative,
-        trainGrouping: TrainGrouping = .byHeadsign,
-        sortOrder: SortOrder = .alphabetical
     ) {
         self.originStation = originStation
         self.destinationStation = destinationStation
-        self.filter = filter
         self.timeDisplay = timeDisplay
-        self.trainGrouping = trainGrouping
-        self.sortOrder = sortOrder
     }
 }

@@ -8,18 +8,29 @@
 
 import SwiftUI
 import ComposeApp
+import Foundation
 
 struct DepartureBoardView: View {
 
     @Environment(\.colorScheme) var colorScheme
 
     let entry: SimpleEntry
+    
+    /// Gets the seasonal background image name
+    private var seasonalBackgroundName: String {
+        SeasonalUtils.getSeasonalBackgroundName(for: entry.date)
+    }
+    
+    /// Gets the seasonal text color
+    private var seasonalTextColor: Color {
+        SeasonalUtils.getSeasonalTextColor(for: entry.date)
+    }
 
     var body: some View {
         return ZStack {
             // Background image
             GeometryReader { geometry in
-                Image("SummerBackground")
+                Image(seasonalBackgroundName)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: geometry.size.width, height: geometry.size.height)
@@ -72,7 +83,7 @@ struct DepartureBoardView: View {
                                         .resizable()
                                         .aspectRatio(contentMode: .fit)
                                         .frame(width: 16, height: 16)
-                                        .foregroundColor(.white)
+                                        .foregroundColor(seasonalTextColor)
                                 }
                                 .padding(.horizontal, 8)
                                 .buttonStyle(.borderless)

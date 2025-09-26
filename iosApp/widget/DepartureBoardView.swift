@@ -39,7 +39,7 @@ struct DepartureBoardView: View {
             }
             
             
-            VStack(spacing: 0) {
+            VStack(alignment: .leading, spacing: -8) {
                 if let data = entry.data {
                     let footerHeight = max(
                         measureTextHeight(
@@ -47,10 +47,10 @@ struct DepartureBoardView: View {
                             text: "Updated",
                             font: UIFont.systemFont(ofSize: 12)
                         ),
-                        32
+                        28
                     )
-                    let innerWidth = entry.size.width - 8
-                    let innerHeight = entry.size.height - 8 - footerHeight
+                    let innerWidth = entry.size.width - 4
+                    let innerHeight = entry.size.height - 4 - footerHeight
 
                     DepartureBoardStations(
                         entry: entry,

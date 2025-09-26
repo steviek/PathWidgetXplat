@@ -30,6 +30,7 @@ struct UngroupedStationView: EntryView {
                 maxHeight: height,
                 textColor: textColor
             )
+            .padding(.leading, 4)
                         
             let trains = station.trains
                 .filter { train in !train.isPast(now: entry.date.toKotlinInstant())}
@@ -73,10 +74,11 @@ struct UngroupedStationView: EntryView {
                             .multilineTextAlignment(.leading)
                             .fixedSize(horizontal: false, vertical: true)
                             .frame(maxWidth: width - 16, alignment: .leading)
-                            //.padding(.leading, 2)
+                            .padding(.leading, 2)
                     }
                 }
-                //.frame(maxWidth: .infinity)
+                .frame(maxWidth: .infinity)
+                .padding(.leading, 4)
             }
             
             if (trains.isEmpty) {
@@ -85,7 +87,7 @@ struct UngroupedStationView: EntryView {
                     Text(IosResourceProvider().getNoTrainsText())
                         .font(Font.arimaStyle(size: 11))
                         .foregroundColor(textColor)
-                        .multilineTextAlignment(.center)
+                        .multilineTextAlignment(.leading)
                     Spacer()
                 }
             }

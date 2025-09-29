@@ -1,6 +1,6 @@
-package com.sixbynine.transit.path.api
+package com.desaiwang.transit.path.api
 
-import com.sixbynine.transit.path.flipper.FlipperUtil
+import com.desaiwang.transit.path.flipper.FlipperUtil
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.okhttp.OkHttp

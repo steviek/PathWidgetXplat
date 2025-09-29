@@ -25,7 +25,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.sixbynine.transit.path.logging"
+    namespace = "com.desaiwang.transit.path.logging"
 
     buildFeatures {
         buildConfig = true

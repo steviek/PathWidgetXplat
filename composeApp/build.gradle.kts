@@ -19,6 +19,7 @@ kotlin {
             export(projects.api)
             baseName = "ComposeApp"
             isStatic = true
+            binaryOption("bundleId", "com.desaiwang.transit.path")
         }
     }
 
@@ -94,21 +95,20 @@ kotlin {
             languageSettings.optIn("kotlinx.cinterop.ExperimentalForeignApi")
             languageSettings.optIn("kotlinx.coroutines.DelicateCoroutinesApi")
             languageSettings.optIn("kotlinx.serialization.ExperimentalSerializationApi")
-            languageSettings.optIn("com.google.accompanist.permissions.ExperimentalPermissionsApi")
             languageSettings.optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
         }
     }
 }
 
 android {
-    namespace = "com.sixbynine.transit.path"
+    namespace = "com.desaiwang.transit.path"
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].res.srcDirs("src/androidMain/res")
     sourceSets["main"].res.srcDirs("src/commonMain/composeResources")
 
     defaultConfig {
-        applicationId = "com.sixbynine.transit.path"
+        applicationId = "com.desaiwang.transit.path"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 62

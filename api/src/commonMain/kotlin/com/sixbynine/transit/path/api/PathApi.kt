@@ -1,8 +1,8 @@
-package com.sixbynine.transit.path.api
+package com.desaiwang.transit.path.api
 
-import com.sixbynine.transit.path.api.impl.PathApiImpl
-import com.sixbynine.transit.path.util.FetchWithPrevious
-import com.sixbynine.transit.path.util.Staleness
+import com.desaiwang.transit.path.api.impl.PathApiImpl
+import com.desaiwang.transit.path.util.FetchWithPrevious
+import com.desaiwang.transit.path.util.Staleness
 import kotlinx.datetime.Instant
 
 interface PathApi {

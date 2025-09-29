@@ -1,6 +1,6 @@
-import com.sixbynine.transit.path.schedule.Schedule
-import com.sixbynine.transit.path.schedule.ScheduleTiming
-import com.sixbynine.transit.path.schedule.Schedules
+import com.desaiwang.transit.path.schedule.Schedule
+import com.desaiwang.transit.path.schedule.ScheduleTiming
+import com.desaiwang.transit.path.schedule.Schedules
 import kotlinx.datetime.DayOfWeek.MONDAY
 import kotlinx.datetime.DayOfWeek.SATURDAY
 import kotlinx.datetime.DayOfWeek.SUNDAY

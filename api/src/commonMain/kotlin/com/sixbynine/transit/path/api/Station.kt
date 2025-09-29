@@ -1,6 +1,6 @@
-package com.sixbynine.transit.path.api
+package com.desaiwang.transit.path.api
 
-import com.sixbynine.transit.path.location.Location
+import com.desaiwang.transit.path.location.Location
 import kotlinx.serialization.Serializable
 
 @Serializable

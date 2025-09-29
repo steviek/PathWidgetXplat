@@ -1,10 +1,10 @@
 @file:Suppress("UNCHECKED_CAST")
 
-package com.sixbynine.transit.path.preferences
+package com.desaiwang.transit.path.preferences
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.sixbynine.transit.path.PathApplication
+import com.desaiwang.transit.path.PathApplication
 
 object AndroidPreferences : Preferences {
     private val preferences: SharedPreferences

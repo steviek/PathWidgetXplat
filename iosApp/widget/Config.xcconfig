@@ -5,7 +5,7 @@
 #include "../Configuration/Config.xcconfig"
 
 // Widget-specific settings
-PRODUCT_BUNDLE_IDENTIFIER = com.sixbynine.transit.path.widget
+PRODUCT_BUNDLE_IDENTIFIER = com.desaiwang.transit.path.widget
 INFOPLIST_KEY_CFBundleDisplayName = widget
 INFOPLIST_KEY_NSHumanReadableCopyright = Copyright © 2023 orgName. All rights reserved.
 SKIP_INSTALL = YES

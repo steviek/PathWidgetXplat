@@ -1,11 +1,11 @@
-package com.sixbynine.transit.path.model
+package com.desaiwang.transit.path.model
 
-import com.sixbynine.transit.path.api.BackfillSource
-import com.sixbynine.transit.path.api.Line
-import com.sixbynine.transit.path.api.State
-import com.sixbynine.transit.path.api.Stations
-import com.sixbynine.transit.path.api.alerts.Alert
-import com.sixbynine.transit.path.model.DepartureBoardData.StationData
+import com.desaiwang.transit.path.api.BackfillSource
+import com.desaiwang.transit.path.api.Line
+import com.desaiwang.transit.path.api.State
+import com.desaiwang.transit.path.api.Stations
+import com.desaiwang.transit.path.api.alerts.Alert
+import com.desaiwang.transit.path.model.DepartureBoardData.StationData
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.minutes

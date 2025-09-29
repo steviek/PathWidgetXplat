@@ -14,7 +14,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.sixbynine.transit.path.flipper"
+    namespace = "com.desaiwang.transit.path.flipper"
 
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()

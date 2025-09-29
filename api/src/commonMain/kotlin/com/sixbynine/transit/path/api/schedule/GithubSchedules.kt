@@ -1,6 +1,6 @@
-package com.sixbynine.transit.path.api.schedule
+package com.desaiwang.transit.path.api.schedule
 
-import com.sixbynine.transit.path.schedule.Schedules
+import com.desaiwang.transit.path.schedule.Schedules
 
 data class ScheduleAndOverride(
     val regularSchedule: Schedules,

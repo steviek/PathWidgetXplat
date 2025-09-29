@@ -1,7 +1,7 @@
-package com.sixbynine.transit.path
+package com.desaiwang.transit.path
 
 import android.app.Application
-import com.sixbynine.transit.path.flipper.FlipperUtil
+import com.desaiwang.transit.path.flipper.FlipperUtil
 
 abstract class PathApplication : Application() {
 

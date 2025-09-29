@@ -1,4 +1,4 @@
-package com.sixbynine.transit.path.flipper
+package com.desaiwang.transit.path.flipper
 
 import android.content.Context
 import com.facebook.flipper.android.AndroidFlipperClient

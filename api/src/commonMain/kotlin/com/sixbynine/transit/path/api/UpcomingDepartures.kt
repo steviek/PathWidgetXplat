@@ -1,4 +1,4 @@
-package com.sixbynine.transit.path.api
+package com.desaiwang.transit.path.api
 
 class UpcomingDepartures(
     private val stationToTrains: Map<String, List<DepartingTrain>>,

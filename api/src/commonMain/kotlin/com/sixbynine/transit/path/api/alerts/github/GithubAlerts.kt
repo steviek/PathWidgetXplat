@@ -1,6 +1,6 @@
-package com.sixbynine.transit.path.api.alerts.github
+package com.desaiwang.transit.path.api.alerts.github
 
-import com.sixbynine.transit.path.api.alerts.Alert
+import com.desaiwang.transit.path.api.alerts.Alert
 import kotlinx.serialization.Serializable
 
 @Serializable

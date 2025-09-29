@@ -1,11 +1,11 @@
-package com.sixbynine.transit.path.util
+package com.desaiwang.transit.path.util
 
 import platform.Foundation.NSUserDefaults
 
 object NativeGlobalDataStore : GlobalDataStore {
 
     private val defaults: NSUserDefaults =
-        NSUserDefaults(suiteName = "group.com.sixbynine.transit.path")
+        NSUserDefaults(suiteName = "group.com.desaiwang.transit.path")
 
     override fun set(key: String, value: String?) {
         if (value == null) {

@@ -1,7 +1,7 @@
-package com.sixbynine.transit.path.util
+package com.desaiwang.transit.path.util
 
-import com.sixbynine.transit.path.preferences.LongPreferencesKey
-import com.sixbynine.transit.path.preferences.StringPreferencesKey
+import com.desaiwang.transit.path.preferences.LongPreferencesKey
+import com.desaiwang.transit.path.preferences.StringPreferencesKey
 import kotlinx.datetime.Instant
 
 /** Like preferences, but shared between the main app and widgets. */

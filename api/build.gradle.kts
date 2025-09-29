@@ -64,7 +64,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.sixbynine.transit.path.api"
+    namespace = "com.desaiwang.transit.path.api"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()

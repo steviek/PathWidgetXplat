@@ -1,4 +1,4 @@
-package com.sixbynine.transit.path.time
+package com.desaiwang.transit.path.time
 
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DayOfWeek

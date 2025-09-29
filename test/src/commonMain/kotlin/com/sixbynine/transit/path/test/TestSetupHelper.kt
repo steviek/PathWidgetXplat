@@ -1,7 +1,7 @@
-package com.sixbynine.transit.path.test
+package com.desaiwang.transit.path.test
 
-import com.sixbynine.transit.path.util.IsTest
-import com.sixbynine.transit.path.util.TestRemoteFileProvider
+import com.desaiwang.transit.path.util.IsTest
+import com.desaiwang.transit.path.util.TestRemoteFileProvider
 
 object TestSetupHelper {
     fun setUp() {

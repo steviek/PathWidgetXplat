@@ -1,7 +1,7 @@
-package com.sixbynine.transit.path.util
+package com.desaiwang.transit.path.util
 
-import com.sixbynine.transit.path.util.DataResult.Failure
-import com.sixbynine.transit.path.util.DataResult.Success
+import com.desaiwang.transit.path.util.DataResult.Failure
+import com.desaiwang.transit.path.util.DataResult.Success
 import kotlin.contracts.contract
 import kotlin.jvm.JvmName
 

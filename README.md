@@ -17,7 +17,7 @@ You can use any of the following options to work with the code here:
 
 ## App store links
 
-[Android](https://play.google.com/store/apps/details?id=com.sixbynine.transit.path)
+[Android](https://play.google.com/store/apps/details?id=com.desaiwang.transit.path)
 
 [iOS](https://apps.apple.com/id/app/departures-widget-for-path/id6470330823?platform=iphone)
 

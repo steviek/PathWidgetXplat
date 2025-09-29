@@ -1,4 +1,4 @@
-package com.sixbynine.transit.path.util
+package com.desaiwang.transit.path.util
 
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime

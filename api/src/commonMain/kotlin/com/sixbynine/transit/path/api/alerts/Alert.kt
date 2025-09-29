@@ -1,9 +1,9 @@
-package com.sixbynine.transit.path.api.alerts
+package com.desaiwang.transit.path.api.alerts
 
-import com.sixbynine.transit.path.api.Line
-import com.sixbynine.transit.path.api.Station
-import com.sixbynine.transit.path.time.NewYorkTimeZone
-import com.sixbynine.transit.path.time.now
+import com.desaiwang.transit.path.api.Line
+import com.desaiwang.transit.path.api.Station
+import com.desaiwang.transit.path.time.NewYorkTimeZone
+import com.desaiwang.transit.path.time.now
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate

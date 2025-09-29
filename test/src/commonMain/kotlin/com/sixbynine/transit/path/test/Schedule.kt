@@ -1,4 +1,4 @@
-package com.sixbynine.transit.path.test
+package com.desaiwang.transit.path.test
 
 internal val Schedule = """
     {

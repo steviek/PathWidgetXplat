@@ -1,6 +1,6 @@
-package com.sixbynine.transit.path.api
+package com.desaiwang.transit.path.api
 
-import com.sixbynine.transit.path.model.ColorWrapper
+import com.desaiwang.transit.path.model.ColorWrapper
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 

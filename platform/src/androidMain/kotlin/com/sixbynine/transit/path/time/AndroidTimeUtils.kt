@@ -1,10 +1,10 @@
-package com.sixbynine.transit.path.time
+package com.desaiwang.transit.path.time
 
 import android.text.format.DateFormat
 import androidx.core.text.util.LocalePreferences
 import androidx.core.text.util.LocalePreferences.FirstDayOfWeek
-import com.sixbynine.transit.path.PathApplication
-import com.sixbynine.transit.path.PreviewContext
+import com.desaiwang.transit.path.PathApplication
+import com.desaiwang.transit.path.PreviewContext
 import kotlinx.datetime.DayOfWeek
 
 object AndroidPlatformTimeUtils : PlatformTimeUtils {

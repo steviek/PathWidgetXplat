@@ -1,4 +1,4 @@
-package com.sixbynine.transit.path.preferences
+package com.desaiwang.transit.path.preferences
 
 import kotlin.enums.EnumEntries
 import kotlin.enums.enumEntries

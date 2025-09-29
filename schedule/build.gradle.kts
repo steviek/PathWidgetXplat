@@ -36,7 +36,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.sixbynine.transit.path.schedule"
+    namespace = "com.desaiwang.transit.path.schedule"
 
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()

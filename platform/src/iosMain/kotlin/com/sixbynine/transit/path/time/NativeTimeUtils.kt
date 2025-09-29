@@ -1,4 +1,4 @@
-package com.sixbynine.transit.path.time
+package com.desaiwang.transit.path.time
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.datetime.DayOfWeek

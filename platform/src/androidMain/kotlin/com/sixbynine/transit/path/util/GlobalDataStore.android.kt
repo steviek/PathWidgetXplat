@@ -1,8 +1,8 @@
-package com.sixbynine.transit.path.util
+package com.desaiwang.transit.path.util
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.sixbynine.transit.path.PathApplication
+import com.desaiwang.transit.path.PathApplication
 
 object AndroidGlobalDataStore : GlobalDataStore {
     private val prefs =

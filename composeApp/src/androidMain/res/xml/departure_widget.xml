@@ -4,7 +4,7 @@
     android:minWidth="180dp"
     android:minHeight="100dp"
     android:updatePeriodMillis="1800000"
-    android:configure="com.sixbynine.transit.path.widget.setup.WidgetSetupActivity"
+    android:configure="com.desaiwang.transit.path.widget.setup.WidgetSetupActivity"
     android:initialLayout="@layout/widget_loading"
     android:resizeMode="horizontal|vertical"
     android:previewImage="@drawable/widget_preview"

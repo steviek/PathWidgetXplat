@@ -21,7 +21,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.sixbynine.transit.path.test"
+    namespace = "com.desaiwang.transit.path.test"
 
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()

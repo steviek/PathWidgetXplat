@@ -1,7 +1,7 @@
-package com.sixbynine.transit.path.api.alerts.everbridge
+package com.desaiwang.transit.path.api.alerts.everbridge
 
-import com.sixbynine.transit.path.util.FetchWithPrevious
-import com.sixbynine.transit.path.util.RemoteFileRepository
+import com.desaiwang.transit.path.util.FetchWithPrevious
+import com.desaiwang.transit.path.util.RemoteFileRepository
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.minutes
 

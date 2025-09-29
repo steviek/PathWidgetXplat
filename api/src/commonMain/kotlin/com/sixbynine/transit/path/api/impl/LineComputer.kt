@@ -1,12 +1,12 @@
-package com.sixbynine.transit.path.api.impl
+package com.desaiwang.transit.path.api.impl
 
-import com.sixbynine.transit.path.api.Line
-import com.sixbynine.transit.path.api.Line.Hoboken33rd
-import com.sixbynine.transit.path.api.Line.HobokenWtc
-import com.sixbynine.transit.path.api.Line.JournalSquare33rd
-import com.sixbynine.transit.path.api.Line.NewarkWtc
-import com.sixbynine.transit.path.model.ColorWrapper
-import com.sixbynine.transit.path.model.Colors
+import com.desaiwang.transit.path.api.Line
+import com.desaiwang.transit.path.api.Line.Hoboken33rd
+import com.desaiwang.transit.path.api.Line.HobokenWtc
+import com.desaiwang.transit.path.api.Line.JournalSquare33rd
+import com.desaiwang.transit.path.api.Line.NewarkWtc
+import com.desaiwang.transit.path.model.ColorWrapper
+import com.desaiwang.transit.path.model.Colors
 
 /**
  * Computes which PATH train lines are running between stations based on:

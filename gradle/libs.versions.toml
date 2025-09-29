@@ -1,5 +1,5 @@
 [versions]
-compose = "1.7.0-beta07"
+compose = "1.6.11"
 compose-plugin = "1.6.11"
 compose-compiler = "1.5.3"
 agp = "8.2.2"

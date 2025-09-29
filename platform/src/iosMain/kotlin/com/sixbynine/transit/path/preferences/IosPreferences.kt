@@ -1,6 +1,6 @@
 @file:Suppress("UNCHECKED_CAST")
 
-package com.sixbynine.transit.path.preferences
+package com.desaiwang.transit.path.preferences
 
 import platform.Foundation.NSUserDefaults
 

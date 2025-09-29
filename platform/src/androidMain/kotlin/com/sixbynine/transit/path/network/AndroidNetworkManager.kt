@@ -1,11 +1,11 @@
-package com.sixbynine.transit.path.network
+package com.desaiwang.transit.path.network
 
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build.VERSION
-import com.sixbynine.transit.path.PathApplication
-import com.sixbynine.transit.path.util.IsTest
+import com.desaiwang.transit.path.PathApplication
+import com.desaiwang.transit.path.util.IsTest
 
 object AndroidNetworkManager : NetworkManager {
     private val connectivityManager: ConnectivityManager

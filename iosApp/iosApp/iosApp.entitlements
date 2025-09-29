@@ -4,7 +4,7 @@
 <dict>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.com.sixbynine.transit.path</string>
+		<string>group.com.desaiwang.transit.path</string>
 	</array>
 </dict>
 </plist>

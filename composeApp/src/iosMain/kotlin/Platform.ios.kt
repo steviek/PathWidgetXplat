@@ -1,4 +1,4 @@
-import com.sixbynine.transit.path.time.IosPlatformTimeUtils
+import com.desaiwang.transit.path.time.IosPlatformTimeUtils
 import platform.UIKit.UIDevice
 
 class IOSPlatform: Platform {

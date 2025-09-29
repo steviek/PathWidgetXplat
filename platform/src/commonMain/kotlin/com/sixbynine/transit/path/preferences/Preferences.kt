@@ -1,4 +1,4 @@
-package com.sixbynine.transit.path.preferences
+package com.desaiwang.transit.path.preferences
 
 import kotlinx.datetime.Instant
 import kotlinx.serialization.encodeToString

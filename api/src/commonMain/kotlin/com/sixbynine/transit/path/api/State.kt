@@ -1,8 +1,8 @@
-package com.sixbynine.transit.path.api
+package com.desaiwang.transit.path.api
 
-import com.sixbynine.transit.path.api.State.NewJersey
-import com.sixbynine.transit.path.api.State.NewYork
-import com.sixbynine.transit.path.location.Location
+import com.desaiwang.transit.path.api.State.NewJersey
+import com.desaiwang.transit.path.api.State.NewYork
+import com.desaiwang.transit.path.location.Location
 
 enum class State {
     NewJersey, NewYork

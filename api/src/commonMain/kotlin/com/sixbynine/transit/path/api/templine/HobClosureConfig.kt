@@ -1,6 +1,6 @@
-package com.sixbynine.transit.path.api.templine
+package com.desaiwang.transit.path.api.templine
 
-import com.sixbynine.transit.path.schedule.LocalDateTimeSerializer
+import com.desaiwang.transit.path.schedule.LocalDateTimeSerializer
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.Month.FEBRUARY
 import kotlinx.datetime.Month.JANUARY

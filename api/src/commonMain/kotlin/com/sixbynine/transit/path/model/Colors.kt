@@ -1,8 +1,8 @@
-package com.sixbynine.transit.path.model
+package com.desaiwang.transit.path.model
 
 import androidx.compose.ui.graphics.Color
-import com.sixbynine.transit.path.Logging
-import com.sixbynine.transit.path.api.templine.HobClosureConfigRepository
+import com.desaiwang.transit.path.Logging
+import com.desaiwang.transit.path.api.templine.HobClosureConfigRepository
 
 object Colors {
     fun parse(hexString: String): Color {

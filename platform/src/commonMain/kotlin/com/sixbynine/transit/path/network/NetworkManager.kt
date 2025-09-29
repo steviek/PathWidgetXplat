@@ -1,4 +1,4 @@
-package com.sixbynine.transit.path.network
+package com.desaiwang.transit.path.network
 
 interface NetworkManager {
     fun isConnectedToInternet(): Boolean

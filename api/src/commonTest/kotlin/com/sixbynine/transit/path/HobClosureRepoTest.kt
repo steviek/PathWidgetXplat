@@ -1,6 +1,6 @@
-package com.sixbynine.transit.path
+package com.desaiwang.transit.path
 
-import com.sixbynine.transit.path.api.templine.HobClosureConfig
+import com.desaiwang.transit.path.api.templine.HobClosureConfig
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.test.Test

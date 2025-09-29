@@ -1,7 +1,7 @@
-package com.sixbynine.transit.path.util
+package com.desaiwang.transit.path.util
 
-import com.sixbynine.transit.path.api.NetworkException
-import com.sixbynine.transit.path.api.createHttpClient
+import com.desaiwang.transit.path.api.NetworkException
+import com.desaiwang.transit.path.api.createHttpClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.isSuccess

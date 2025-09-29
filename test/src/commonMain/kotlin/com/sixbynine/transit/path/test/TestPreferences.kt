@@ -1,8 +1,8 @@
-package com.sixbynine.transit.path.test
+package com.desaiwang.transit.path.test
 
-import com.sixbynine.transit.path.preferences.Preferences
-import com.sixbynine.transit.path.preferences.PreferencesKey
-import com.sixbynine.transit.path.preferences.testInstance
+import com.desaiwang.transit.path.preferences.Preferences
+import com.desaiwang.transit.path.preferences.PreferencesKey
+import com.desaiwang.transit.path.preferences.testInstance
 
 object TestPreferences : Preferences {
     private val data = mutableMapOf<PreferencesKey<*>, Any?>()

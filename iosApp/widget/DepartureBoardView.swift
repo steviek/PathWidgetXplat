@@ -75,7 +75,7 @@ struct DepartureBoardView: View {
                                         .frame(width: 16, height: 16)
                                         //.padding(4)
                                 }
-                                .padding(4)
+                                .padding(.horizontal, 12)
                                 
                             } else {
                                 Button(intent: RefreshIntent()) {

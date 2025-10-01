@@ -150,6 +150,7 @@ struct widget: Widget {
             }
             .containerBackground(.fill.tertiary, for: .widget)
         }
+        .supportedFamilies([.systemSmall])
     }
 
     private func showEmptyView(_ entry: SimpleEntry) -> Bool {

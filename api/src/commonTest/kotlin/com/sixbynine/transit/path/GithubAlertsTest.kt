@@ -31,7 +31,7 @@ import kotlinx.datetime.Month.DECEMBER
 import kotlinx.datetime.Month.FEBRUARY
 import kotlinx.datetime.Month.JULY
 import kotlinx.datetime.Month.JUNE
-import kotlinx.datetime.Month.SEPTEMBER
+import kotlinx.datetime.Month.OCTOBER
 import kotlinx.serialization.encodeToString
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -46,6 +46,7 @@ class GithubAlertsTest {
             FourteenthStreetOvernight,
             ConrailDemolition1,
             ConrailDemolition2,
+            ConrailDemolitionGlobal,
         )
 
         val json = JsonFormat.encodeToString(alerts)
@@ -296,16 +297,16 @@ class GithubAlertsTest {
                 startTime = LocalTime(0, 0),
                 endDay = MONDAY,
                 endTime = LocalTime(5, 0),
-                from = LocalDate(2025, SEPTEMBER, 20),
-                to = LocalDate(2025, SEPTEMBER, 22),
+                from = LocalDate(2025, OCTOBER, 3),
+                to = LocalDate(2025, OCTOBER, 6),
             ),
             hiddenTrainsFilter = TrainFilter.headSigns("World Trade Center"),
             displaySchedule = Schedule.repeatingDaily(
                 days = listOf(SATURDAY, SUNDAY),
                 start = LocalTime(0, 0),
                 end = LocalTime(5, 0),
-                from = LocalDate(2025, SEPTEMBER, 19),
-                to = LocalDate(2025, SEPTEMBER, 22),
+                from = LocalDate(2025, OCTOBER, 3),
+                to = LocalDate(2025, OCTOBER, 6),
             ),
             message = AlertText(
                 en = "No service between Harrison and Journal Square. Shuttle buses are running between HAR-JSQ and NWK-JSQ.",
@@ -325,6 +326,28 @@ class GithubAlertsTest {
                 WorldTradeCenter,
             ).map { it.pathApiName },
             hiddenTrainsFilter = TrainFilter.headSigns("Newark"),
+        )
+
+        val ConrailDemolitionGlobal = Alert(
+            stations = ConrailDemolition1.stations + ConrailDemolition2.stations,
+            isGlobal = true,
+            hideTrainsSchedule = Schedule(),
+            hiddenTrainsFilter = TrainFilter(),
+            displaySchedule = Schedule.repeatingDaily(
+                days = listOf(FRIDAY, SATURDAY),
+                start = LocalTime(15, 0),
+                end = LocalTime(5, 0),
+                from = LocalDate(2025, OCTOBER, 3),
+                to = LocalDate(2025, OCTOBER, 6),
+            ),
+            message = AlertText(
+                en = "No service between Harrison and Journal Square this weekend, starting at midnight Friday night",
+                es = "No hay servicio entre Harrison y Journal Square este fin de semana, a partir de la medianoche de la noche del viernes."
+            ),
+            url = AlertText(
+                en = "https://www.panynj.gov/path/en/schedules-maps.html"
+            ),
+            level = "INFO"
         )
     }
 }

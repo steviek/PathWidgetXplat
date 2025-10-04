@@ -315,7 +315,7 @@ class GithubAlertsTest {
             url = AlertText(
                 en = "https://www.panynj.gov/path/en/schedules-maps.html"
             ),
-            level = "WARN"
+            level = "INFO"
         )
 
         val ConrailDemolition2 = ConrailDemolition1.copy(

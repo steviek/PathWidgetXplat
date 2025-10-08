@@ -1,7 +1,7 @@
 package com.desaiwang.transit.path.api.impl
 
 import com.desaiwang.transit.path.app.settings.StationLimit.OnePerLine
-import com.desaiwang.transit.path.app.ui.ColorWrapper
+import com.desaiwang.transit.path.model.ColorWrapper
 import com.desaiwang.transit.path.model.Colors
 import com.desaiwang.transit.path.app.ui.common.AppUiTrainData
 import com.desaiwang.transit.path.app.ui.home.StationLimitFilter

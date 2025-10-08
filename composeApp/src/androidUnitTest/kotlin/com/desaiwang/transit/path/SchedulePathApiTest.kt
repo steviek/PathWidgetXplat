@@ -36,7 +36,7 @@ class SchedulePathApiTest {
                     it.projectedArrival.toLocalDateTime(NewYorkTimeZone).time.toString().take(5)
                 }
 
-        assertEquals(listOf("20:14", "20:34", "20:54", "21:14"), expTrains)
+        assertEquals(listOf("20:00", "20:20", "20:40", "21:00", "21:20"), expTrains)
     }
 
     @Test
@@ -66,7 +66,7 @@ class SchedulePathApiTest {
                     it.projectedArrival.toLocalDateTime(NewYorkTimeZone).time.toString().take(5)
                 }
 
-        assertEquals(listOf("20:06", "20:26", "20:46", "21:06", "21:26"), jsqTrains)
+        assertEquals(listOf("20:12", "20:32", "20:52", "21:12"), jsqTrains)
     }
 
     @Test
@@ -81,7 +81,7 @@ class SchedulePathApiTest {
                     it.projectedArrival.toLocalDateTime(NewYorkTimeZone).time.toString().take(5)
                 }
 
-        assertEquals(listOf("21:46", "22:06", "22:26", "22:46", "23:06"), jsqTrains)
+        assertEquals(listOf("21:52", "22:12", "22:32", "22:52"), jsqTrains)
     }
 
     private fun getUpcomingDepartures(dateTime: LocalDateTime) =

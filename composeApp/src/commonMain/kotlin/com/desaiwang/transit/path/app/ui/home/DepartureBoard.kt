@@ -233,7 +233,7 @@ private fun HomeScreenScope.StationHeader(
     Row(
         modifier = modifier.heightIn(40.dp).fillMaxWidth().padding(horizontal = gutter()),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally),
+        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
     ) {
         Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
             Text(

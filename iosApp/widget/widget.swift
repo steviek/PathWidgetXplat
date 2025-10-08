@@ -73,9 +73,13 @@ struct Provider: AppIntentTimelineProvider {
             hasError = false
             hasPathError = false
         } else {
+            // Apply auto-reverse logic if enabled
+            let effectiveOrigin = configuration.getEffectiveOrigin()
+            let effectiveDestination = configuration.getEffectiveDestination()
+            
             let fetchResult = await WidgetDataFetcher().fetchWidgetDataAsync(
-                originStation: configuration.originStation,
-                destinationStation: configuration.destinationStation,
+                originStation: effectiveOrigin,
+                destinationStation: effectiveDestination,
                 filter: configuration.filter.toTrainFilter(),
                 sort: configuration.sortOrder.toStationSort(),
                 lines: configuration.lines.map {
@@ -85,7 +89,16 @@ struct Provider: AppIntentTimelineProvider {
             widgetData = fetchResult.data
             hasError = fetchResult.hasError
             hasPathError = fetchResult.hasPathError
-            effectiveConfiguration = configuration
+            
+            // Update effective configuration with the actual stations used
+            effectiveConfiguration = ConfigurationAppIntent(
+                originStation: effectiveOrigin,
+                destinationStation: effectiveDestination,
+                timeDisplay: configuration.timeDisplay,
+                autoReverse: configuration.autoReverse,
+                reverseStartHour: configuration.reverseStartHour,
+                reverseEndHour: configuration.reverseEndHour
+            )
         }
 
         let now = Date()

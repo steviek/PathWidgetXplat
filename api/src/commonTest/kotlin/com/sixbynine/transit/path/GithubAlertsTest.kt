@@ -47,6 +47,7 @@ class GithubAlertsTest {
             ConrailDemolition1,
             ConrailDemolition2,
             ConrailDemolitionGlobal,
+            WeekendOvernightCleaning,
         )
 
         val json = JsonFormat.encodeToString(alerts)
@@ -225,15 +226,15 @@ class GithubAlertsTest {
                 days = DayOfWeek.entries,
                 start = LocalTime(0, 0),
                 end = LocalTime(5, 0),
-                from = LocalDate(2025, APRIL, 22),
-                to = LocalDate(2025, DECEMBER, 31),
+                from = LocalDate(2025, OCTOBER, 14),
+                to = LocalDate(2026, DECEMBER, 31),
             ),
             displaySchedule = Schedule.repeatingDaily(
                 days = DayOfWeek.entries,
                 start = LocalTime(22, 0),
                 end = LocalTime(5, 0),
-                from = LocalDate(2025, APRIL, 21),
-                to = LocalDate(2025, DECEMBER, 31),
+                from = LocalDate(2025, OCTOBER, 13),
+                to = LocalDate(2026, DECEMBER, 31),
             ),
             hiddenTrainsFilter = TrainFilter.all(),
             message = AlertText(
@@ -246,20 +247,20 @@ class GithubAlertsTest {
             level = "WARN"
         )
 
-        val EasterWeekendOvernightCleaning = Alert(
+        val WeekendOvernightCleaning = Alert(
             stations = listOf(NinthStreet, TwentyThirdStreet),
             hideTrainsSchedule = Schedule(),
             displaySchedule = Schedule.repeatingDaily(
-                from = LocalDate(2025, APRIL, 18),
-                to = LocalDate(2025, APRIL, 21),
+                from = LocalDate(2025, OCTOBER, 10),
+                to = LocalDate(2025, OCTOBER, 12),
                 days = listOf(FRIDAY, SATURDAY, SUNDAY),
                 start = LocalTime(22, 0),
                 end = LocalTime(5, 0),
             ),
             hiddenTrainsFilter = TrainFilter(),
             message = AlertText(
-                en = "9 St. & 23 St. stations will remain open overnight during Easter Weekend",
-                es = "Las estaciones de 9 St. y 23 St. permanecerán abiertas durante la noche durante el fin de semana de la Pascua"
+                en = "9 St. & 23 St. stations will remain open overnight this weekend",
+                es = "Las estaciones de 9 St. y 23 St. permanecerán abiertas durante la noche este fin de semana"
             ),
             url = AlertText(
                 en = "https://www.panynj.gov/path/en/schedules-maps/weekend-schedules.html"
@@ -275,7 +276,7 @@ class GithubAlertsTest {
                 start = LocalTime(22, 0),
                 end = LocalTime(7, 0),
                 from = LocalDate(2024, FEBRUARY, 25),
-                to = LocalDate(2025, DECEMBER, 31),
+                to = LocalDate(2026, DECEMBER, 31),
             ),
             hiddenTrainsFilter = TrainFilter(),
             message = AlertText(

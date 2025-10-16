@@ -14,7 +14,6 @@ fun HomeScreenScope.TrainLineContent(
     textStyle: TextStyle = MaterialTheme.typography.titleMedium,
     subtitleTextStyle: TextStyle = MaterialTheme.typography.bodyLarge,
     textColor: Color = MaterialTheme.colorScheme.onSurface,
-    fullWidth: Boolean = true,
 ) {
     TrainLineContent(
         data = listOf(data),
@@ -22,7 +21,6 @@ fun HomeScreenScope.TrainLineContent(
         textStyle = textStyle,
         subtitleTextStyle = subtitleTextStyle,
         textColor = textColor,
-        fullWidth = fullWidth,
     )
 }
 
@@ -33,7 +31,6 @@ fun HomeScreenScope.TrainLineContent(
     textStyle: TextStyle = MaterialTheme.typography.titleMedium,
     subtitleTextStyle: TextStyle = MaterialTheme.typography.bodyLarge,
     textColor: Color = MaterialTheme.colorScheme.onSurface,
-    fullWidth: Boolean = true,
 ) {
     com.desaiwang.transit.path.app.ui.common.TrainLineContent(
         data = data,
@@ -42,6 +39,5 @@ fun HomeScreenScope.TrainLineContent(
         textStyle = textStyle,
         subtitleTextStyle = subtitleTextStyle,
         textColor = textColor,
-        fullWidth = fullWidth,
     )
 }

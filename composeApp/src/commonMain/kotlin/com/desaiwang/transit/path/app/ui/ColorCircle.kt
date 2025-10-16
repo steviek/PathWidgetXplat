@@ -27,27 +27,27 @@ fun ColorCircle(colors: List<ColorWrapper>, modifier: Modifier = Modifier) {
                 border(1.dp, MaterialTheme.colorScheme.onSurface, CircleShape)
             }
     ) {
-        colors.firstOrNull()?.let {
-            Box(Modifier.size(24.dp).clip(CircleShape).background(it.unwrap()))
+        colors.firstOrNull()?.let { color ->
+            Box(Modifier.size(24.dp).clip(CircleShape).background(color.unwrap()))
         }
 
-        colors.getOrNull(1)?.let {
+        colors.getOrNull(1)?.let { color ->
             Box(
                 Modifier.size(24.dp)
                     .clip(CircleShape)
                     .padding(start = 12.dp)
                     .clip(RectangleShape)
-                    .background(it.unwrap())
+                    .background(color.unwrap())
             )
         }
 
-        colors.getOrNull(2)?.let {
+        colors.getOrNull(2)?.let { color ->
             Box(
                 Modifier.size(24.dp)
                     .clip(CircleShape)
                     .padding(start = 12.dp, top = 12.dp)
                     .clip(RectangleShape)
-                    .background(it.unwrap())
+                    .background(color.unwrap())
             )
         }
     }

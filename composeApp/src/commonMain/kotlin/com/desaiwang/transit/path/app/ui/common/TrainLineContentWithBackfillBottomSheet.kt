@@ -24,7 +24,6 @@ fun TrainLineContentWithWithBackfillBottomSheet(
     textStyle: TextStyle = MaterialTheme.typography.titleMedium,
     subtitleTextStyle: TextStyle = MaterialTheme.typography.bodyLarge,
     textColor: Color = MaterialTheme.colorScheme.onSurface,
-    fullWidth: Boolean = true,
 ) {
     var showBottomSheet by remember { mutableStateOf(false) }
     TrainLineContent(
@@ -42,7 +41,6 @@ fun TrainLineContentWithWithBackfillBottomSheet(
         textStyle = textStyle,
         subtitleTextStyle = subtitleTextStyle,
         textColor = textColor,
-        fullWidth = fullWidth,
     )
 
     val firstTrain = data.firstOrNull()

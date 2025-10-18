@@ -1,12 +1,192 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "1 AM" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 AM"
+          }
+        }
+      }
+    },
+    "1 PM" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 PM"
+          }
+        }
+      }
+    },
+    "2 AM" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 AM"
+          }
+        }
+      }
+    },
+    "2 PM" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 PM"
+          }
+        }
+      }
+    },
+    "3 AM" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 AM"
+          }
+        }
+      }
+    },
+    "3 PM" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 PM"
+          }
+        }
+      }
+    },
+    "4 AM" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "4 AM"
+          }
+        }
+      }
+    },
+    "4 PM" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "4 PM"
+          }
+        }
+      }
+    },
+    "5 AM" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5 AM"
+          }
+        }
+      }
+    },
     "5 min" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "5 min"
+          }
+        }
+      }
+    },
+    "5 PM" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5 PM"
+          }
+        }
+      }
+    },
+    "6 AM" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "6 AM"
+          }
+        }
+      }
+    },
+    "6 PM" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "6 PM"
+          }
+        }
+      }
+    },
+    "7 AM" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "7 AM"
+          }
+        }
+      }
+    },
+    "7 PM" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "7 PM"
+          }
+        }
+      }
+    },
+    "8 AM" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "8 AM"
+          }
+        }
+      }
+    },
+    "8 PM" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "8 PM"
+          }
+        }
+      }
+    },
+    "9 AM" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "9 AM"
+          }
+        }
+      }
+    },
+    "9 PM" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "9 PM"
           }
         }
       }
@@ -23,6 +203,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "9th Street"
+          }
+        }
+      }
+    },
+    "10 AM" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10 AM"
+          }
+        }
+      }
+    },
+    "10 PM" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10 PM"
+          }
+        }
+      }
+    },
+    "11 AM" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "11 AM"
+          }
+        }
+      }
+    },
+    "11 PM" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "11 PM"
+          }
+        }
+      }
+    },
+    "12 AM" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "12 AM"
+          }
+        }
+      }
+    },
+    "12 PM" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "12 PM"
           }
         }
       }
@@ -99,6 +339,16 @@
         }
       }
     },
+    "Auto-reverse for commute" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retroceso automático para desplazamientos"
+          }
+        }
+      }
+    },
     "Christopher Street" : {
       "localizations" : {
         "es" : {
@@ -138,6 +388,9 @@
           }
         }
       }
+    },
+    "Destination Station" : {
+
     },
     "Exchange Place" : {
       "localizations" : {
@@ -215,6 +468,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hoboken ⇆ World Trade Center"
+          }
+        }
+      }
+    },
+    "Hour" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hora"
           }
         }
       }
@@ -340,12 +603,35 @@
         }
       }
     },
+    "Origin Station" : {
+
+    },
     "Refresh" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Recargar"
+          }
+        }
+      }
+    },
+    "Reverse from" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inverso desde"
+          }
+        }
+      }
+    },
+    "Reverse until" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inverso a"
           }
         }
       }
@@ -361,6 +647,7 @@
       }
     },
     "Stations" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -396,6 +683,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Actualiza todos los widgets"
+          }
+        }
+      }
+    },
+    "When should reversal end?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Cuándo debería terminar la reversión?"
+          }
+        }
+      }
+    },
+    "When should stations reverse?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Cuándo deberían dar marcha atrás las estaciones?"
           }
         }
       }

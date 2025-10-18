@@ -132,26 +132,9 @@ struct SimpleEntry: TimelineEntry {
     let dataFrom: Date
 }
 
-struct CommuteSimpleEntry: TimelineEntry {
-    let date: Date
-    let size: CGSize
-    let configuration: CommuteConfigurationAppIntent
-    let data: DepartureBoardData?
-    let hasError: Bool
-    let hasPathError: Bool
-    let dataFrom: Date
-}
-
-@main
-struct PathWidgets: WidgetBundle {
-    var body: some Widget {
-        DepartureWidget()
-        CommuteWidget()
-    }
-}
 
 struct DepartureWidget: Widget {
-    let kind: String = "DepartureWidget"
+    let kind: String = "MultiStationDepartureWidget"
 
     var body: some WidgetConfiguration {
         AppIntentConfiguration(
@@ -170,9 +153,9 @@ struct DepartureWidget: Widget {
             }
             .containerBackground(.fill.tertiary, for: .widget)
         }
-        .configurationDisplayName("Departure Board")
-        .description("Multi-station PATH departure board")
-        .supportedFamilies([.systemMedium, .systemLarge])
+        .configurationDisplayName("PATH Multi-Station Board")
+        .description("Multi-station PATH departure board with full customization")
+        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
     }
 
     private func showEmptyView(_ entry: SimpleEntry) -> Bool {

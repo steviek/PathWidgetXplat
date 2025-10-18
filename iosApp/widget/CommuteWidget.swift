@@ -10,12 +10,22 @@ import WidgetKit
 import SwiftUI
 import ComposeApp
 
+struct CommuteSimpleEntry: TimelineEntry {
+    let date: Date
+    let size: CGSize
+    let configuration: CommuteConfigurationAppIntent
+    let data: DepartureBoardData?
+    let hasError: Bool
+    let hasPathError: Bool
+    let dataFrom: Date
+}
+
 struct CommuteProvider: AppIntentTimelineProvider {
     func placeholder(in context: Context) -> CommuteSimpleEntry {
         let entry = CommuteSimpleEntry(
             date: Date(),
             size: context.displaySize,
-            configuration: CommuteConfigurationAppIntent(originStation: .jsq, destinationStation: .wtc),
+            configuration: CommuteConfigurationAppIntent(originStation: .exp, destinationStation: .wtc, showLastRefreshedTime: true),
             data: nil,
             hasError: false,
             hasPathError: false,
@@ -48,8 +58,9 @@ struct CommuteProvider: AppIntentTimelineProvider {
         if (context.isPreview) {
             widgetData = Fixtures().widgetData(limit: Int32(stationLimit))
             effectiveConfiguration = CommuteConfigurationAppIntent(
-                originStation: .jsq,
-                destinationStation: .wtc
+                originStation: .exp,
+                destinationStation: .wtc,
+                showLastRefreshedTime: true
             )
             hasError = false
             hasPathError = false
@@ -58,7 +69,7 @@ struct CommuteProvider: AppIntentTimelineProvider {
             let effectiveOrigin = configuration.getEffectiveOrigin()
             let effectiveDestination = configuration.getEffectiveDestination()
             
-            let fetchResult = await WidgetDataFetcher().fetchWidgetDataAsync(
+            let fetchResult = await WidgetDataFetcher().fetchWidgetDataAsyncCommute(
                 originStation: effectiveOrigin,
                 destinationStation: effectiveDestination,
                 filter: Filter.all.toTrainFilter(),
@@ -98,15 +109,15 @@ struct CommuteProvider: AppIntentTimelineProvider {
 }
 
 struct CommuteWidget: Widget {
-    let kind: String = "CommuteWidget"
+    let kind: String = "SingleStationCommuteWidget"
 
     var body: some WidgetConfiguration {
         AppIntentConfiguration(kind: kind, intent: CommuteConfigurationAppIntent.self, provider: CommuteProvider()) { entry in
             CommuteDepartureBoardView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
         }
-        .configurationDisplayName("Commute Tracker")
-        .description("Commute-focused PATH widget with auto-reverse")
+        .configurationDisplayName("PATH Commute Tracker")
+        .description("Single-station commute widget with seasonal themes and auto-reverse")
         .supportedFamilies([.systemSmall])
     }
 }

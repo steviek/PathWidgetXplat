@@ -11,8 +11,23 @@ import SwiftUI
 import ComposeApp
 import CoreLocation
 
-struct CommuteDepartureBoardView: EntryView {
-    var entry: CommuteProvider.Entry
+struct CommuteDepartureBoardView: View {
+    let entry: CommuteProvider.Entry
+    
+    private func measureTextWidth(maxSize: CGSize, text: String, font: UIFont) -> CGFloat {
+        return measureTextSize(maxSize: maxSize, text: text, font: font).width
+    }
+    
+    private func measureTextSize(maxSize: CGSize, text: String, font: UIFont) -> CGRect {
+        let attributes = [NSAttributedString.Key.font: font]
+        let boundingRect = text.boundingRect(
+            with: maxSize,
+            options: [.usesLineFragmentOrigin, .usesFontLeading],
+            attributes: attributes,
+            context: nil
+        )
+        return boundingRect
+    }
     
     var body: some View {
         if showEmptyView(entry) {
@@ -76,7 +91,7 @@ struct CommuteStationView: View {
         VStack(alignment: .leading, spacing: 4) {
             CommuteStationTitle(
                 title: station.displayName,
-                destinationStation: entry.configuration.destinationStation.toStation()?.displayName,
+                destinationStation: entry.configuration.getEffectiveDestination().toStation()?.displayName,
                 textColor: textColor
             )
             
@@ -104,15 +119,15 @@ struct CommuteStationTitle: View {
             Text(
                 WidgetDataFormatter().formatHeadSign(
                     title: title,
-                    width: HeadSignWidth.narrow
-                ) { text in
-                    let textWidth = measureTextWidth(
-                        maxSize: CGSize(width: 200, height: 50),
-                        text: text,
-                        font: UIFont.arimaStyleMedium(size: 14)
-                    )
-                    return (textWidth <= 200).toKotlinBoolean()
-                }
+                    fits: { text in
+                        let textWidth = measureTextWidth(
+                            maxSize: CGSize(width: 200, height: 50),
+                            text: text,
+                            font: UIFont.arimaStyleMedium(size: 14)
+                        )
+                        return (textWidth <= 200).toKotlinBoolean()
+                    }
+                )
             )
             .font(Font.arimaStyleMedium(size: 14))
             .foregroundColor(textColor)
@@ -208,8 +223,8 @@ struct CommuteTrainDisplay: View {
             arrivalTime = WidgetDataFormatter().formatTime(instant: train.projectedArrival)
         } else {
             arrivalTime = WidgetDataFormatter().formatRelativeTime(
-                instant: train.projectedArrival,
-                now: entry.date.toKotlinInstant()
+                now: entry.date.toKotlinInstant(),
+                time: train.projectedArrival
             )
         }
         return arrivalTime
@@ -296,20 +311,38 @@ struct CommuteFooterView: View {
     let entry: CommuteProvider.Entry
     let textColor: Color
     
+    private func measureTextWidth(maxSize: CGSize, text: String, font: UIFont) -> CGFloat {
+        let attributes = [NSAttributedString.Key.font: font]
+        let boundingRect = text.boundingRect(
+            with: maxSize,
+            options: [.usesLineFragmentOrigin, .usesFontLeading],
+            attributes: attributes,
+            context: nil
+        )
+        return boundingRect.width
+    }
+    
     var body: some View {
-        HStack {
-            Text(getFooterText())
-                .font(Font.arimaStyle(size: 12))
-                .foregroundColor(textColor)
-                .multilineTextAlignment(.leading)
-            
-            Spacer()
-            
-            // Refresh button
-            Image(systemName: "arrow.clockwise")
-                .font(.system(size: 12))
-                .foregroundColor(textColor)
+        HStack(spacing: 0) {
+            // Time text grouped with refresh button (only if enabled)
+            if entry.configuration.showLastRefreshedTime {
+                Text(getFooterText())
+                    .font(Font.arimaStyle(size: 12))
+                    .italic()
+                    .foregroundColor(textColor)
+            }
+
+            Button(intent: RefreshIntent()) {
+                Image(systemName: "arrow.2.circlepath")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 16, height: 16)
+                    .foregroundColor(textColor)
+            }
+            .padding(.horizontal, 8)
+            .buttonStyle(.borderless)
         }
+        .frame(maxWidth: .infinity, alignment: .trailing)
     }
     
     private func getFooterText() -> String {

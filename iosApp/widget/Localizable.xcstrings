@@ -369,6 +369,12 @@
         }
       }
     },
+    "Commute Tracker for PATH" : {
+
+    },
+    "Commute-focused PATH widget with auto-reverse" : {
+
+    },
     "Departure board for PATH" : {
       "localizations" : {
         "es" : {
@@ -390,6 +396,9 @@
       }
     },
     "Destination Station" : {
+
+    },
+    "Enable location access to show nearest station" : {
 
     },
     "Exchange Place" : {
@@ -513,6 +522,12 @@
         }
       }
     },
+    "Location access required" : {
+
+    },
+    "Multi-station PATH departure board with full customization" : {
+
+    },
     "Newark" : {
       "localizations" : {
         "es" : {
@@ -606,6 +621,12 @@
     "Origin Station" : {
 
     },
+    "PATH Commute Tracker" : {
+
+    },
+    "PATH Multi-Station Board" : {
+
+    },
     "Refresh" : {
       "localizations" : {
         "es" : {
@@ -636,6 +657,12 @@
         }
       }
     },
+    "Show last refreshed time" : {
+
+    },
+    "Single-station commute widget with seasonal themes and auto-reverse" : {
+
+    },
     "Station Choice" : {
       "localizations" : {
         "es" : {
@@ -647,7 +674,6 @@
       }
     },
     "Stations" : {
-      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {

@@ -58,6 +58,7 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
                 \.$autoReverse
                 \.$reverseStartHour
                 \.$reverseEndHour
+                \.$showLastRefreshedTime
             }
         } otherwise: {
             Summary {
@@ -65,13 +66,14 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
                 \.$destinationStation
                 \.$timeDisplay
                 \.$autoReverse
+                \.$showLastRefreshedTime
             }
         }
     }
     
-    @Parameter(title: "Origin Station", default: .closest)
+    @Parameter(title: "Origin Station", default: .exp)
     var originStation: StationChoice
-    
+
     @Parameter(title: "Destination Station", default: .wtc)
     var destinationStation: StationChoice
     
@@ -94,6 +96,9 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
         requestValueDialog: IntentDialog("When should reversal end?")
     )
     var reverseEndHour: HourOfDay?
+
+    @Parameter(title: "Show last refreshed time", default: false)
+    var showLastRefreshedTime: Bool
     
     init() {
         self.originStation = .closest
@@ -105,10 +110,11 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
     }
     
     init(
-        originStation: StationChoice = .closest,
+        originStation: StationChoice = .exp,
         destinationStation: StationChoice = .wtc,
         timeDisplay: TimeDisplay = .relative,
         autoReverse: Bool = false,
+        showLastRefreshedTime: Bool = false,
         reverseStartHour: HourOfDay? = nil,
         reverseEndHour: HourOfDay? = nil
     ) {
@@ -116,6 +122,7 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
         self.destinationStation = destinationStation
         self.timeDisplay = timeDisplay
         self.autoReverse = autoReverse
+        self.showLastRefreshedTime = showLastRefreshedTime
         self.reverseStartHour = reverseStartHour
         self.reverseEndHour = reverseEndHour
     }

@@ -105,8 +105,8 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
         self.destinationStation = .wtc
         self.timeDisplay = .relative
         self.autoReverse = false
-        self.reverseStartHour = nil
-        self.reverseEndHour = nil
+        self.reverseStartHour = .am11
+        self.reverseEndHour = .pm8
     }
     
     init(

@@ -26,7 +26,7 @@ struct CommuteProvider: AppIntentTimelineProvider {
             date: Date(),
             size: context.displaySize,
             configuration: CommuteConfigurationAppIntent(originStation: .exp, destinationStation: .wtc, showLastRefreshedTime: true),
-            data: nil,
+            data: Fixtures().widgetData(limit: 1),
             hasError: false,
             hasPathError: false,
             dataFrom: Date()
@@ -39,7 +39,7 @@ struct CommuteProvider: AppIntentTimelineProvider {
             date: Date(),
             size: context.displaySize,
             configuration: configuration,
-            data: nil,
+            data: Fixtures().widgetData(limit: 1),
             hasError: false,
             hasPathError: false,
             dataFrom: Date()
@@ -86,6 +86,7 @@ struct CommuteProvider: AppIntentTimelineProvider {
                 destinationStation: effectiveDestination,
                 timeDisplay: configuration.timeDisplay,
                 autoReverse: configuration.autoReverse,
+                showLastRefreshedTime: configuration.showLastRefreshedTime,
                 reverseStartHour: configuration.reverseStartHour,
                 reverseEndHour: configuration.reverseEndHour
             )

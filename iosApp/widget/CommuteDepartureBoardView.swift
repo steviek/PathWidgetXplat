@@ -342,6 +342,8 @@ struct CommuteFooterView: View {
             .padding(.horizontal, 8)
             .buttonStyle(.borderless)
         }
+        //.padding([.horizontal], 12)
+        .padding([.bottom], 4)
         .frame(maxWidth: .infinity, alignment: .trailing)
     }
     
@@ -400,7 +402,7 @@ struct CommuteFooterView: View {
 
     /// Gets the display name for the destination station from the configuration
     private func getDestinationStationName() -> String {
-        return entry.configuration.destinationStation.toStation()?.displayName ?? "Unknown"
+        return entry.configuration.getEffectiveDestination().toStation()?.displayName ?? "Unknown"
     }
 
     /// Checks if the footer text fits within the available space

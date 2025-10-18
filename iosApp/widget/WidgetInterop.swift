@@ -114,7 +114,8 @@ extension WidgetDataFetcher {
                                 hasPathError: isPathError.toBool()
                             )
                         )
-                    }
+                    },
+                    isCommuteWidget: false
                 )
             }
         } catch {
@@ -140,22 +141,11 @@ extension WidgetDataFetcher {
         
         do {
             return try await withCheckedThrowingContinuation { continuation in
-                // Use the proper line filtering logic from WidgetDataFetcher
-                let relevantLineDirections = WidgetDataFetcher().getLinesForStationPair(
-                    departure: originStn.pathApiName,
-                    destination: destStn.pathApiName
-                )
-                
-                // Convert LineDirection set to Line array
-                let relevantLines = Array(relevantLineDirections).map { $0.line }
-                
-                // If no relevant lines found, use all lines as fallback
-                let finalLines = relevantLines.isEmpty ? lines : relevantLines
-                
-                fetchWidgetData(
+                // Use the commute-specific data fetcher that handles line filtering internally
+                WidgetDataFetcher().fetchWidgetDataForCommute(
                     stationLimit: 1,
                     stations: [originStn, destStn],
-                    lines: finalLines,
+                    lines: lines,
                     sort: sort,
                     filter: filter,
                     includeClosestStation: false,

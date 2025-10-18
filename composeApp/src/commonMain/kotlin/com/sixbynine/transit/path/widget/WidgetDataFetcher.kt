@@ -402,7 +402,10 @@ object WidgetDataFetcher {
         val stationDatas = arrayListOf<DepartureBoardData.StationData>()
         val avoidMissingTrains = currentAvoidMissingTrains()
 
-        adjustedStations.sortWith(StationComparator(sort, closestStations))
+        if ( !isCommuteWidget) {
+            adjustedStations.sortWith(StationComparator(sort, closestStations))
+        }
+
         val closestStationToUse = closestStations?.firstOrNull()
         if (closestStationToUse != null) {
             adjustedStations.remove(closestStationToUse)

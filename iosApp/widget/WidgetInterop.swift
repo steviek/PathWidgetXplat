@@ -144,7 +144,7 @@ extension WidgetDataFetcher {
                 // Use the commute-specific data fetcher that handles line filtering internally
                 WidgetDataFetcher().fetchWidgetDataForCommute(
                     stationLimit: 1,
-                    stations: [originStn, destStn],
+                    stations: [originStn, destStn], //both stations are needed to compute the lines that pass between them
                     lines: lines,
                     sort: sort,
                     filter: filter,

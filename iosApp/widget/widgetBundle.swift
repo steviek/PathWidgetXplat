@@ -33,7 +33,7 @@ struct widgetBundle: WidgetBundle {
     }
 
     var body: some Widget {
-        DepartureWidget()
         CommuteWidget()
+        DepartureWidget()
     }
 }

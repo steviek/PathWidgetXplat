@@ -151,10 +151,12 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
     
     // Get effective origin/destination with auto-reverse applied
     func getEffectiveOrigin() -> StationChoice {
+        //return destinationStation
         return shouldReverseStations() ? destinationStation : originStation
     }
     
     func getEffectiveDestination() -> StationChoice {
+        //return originStation
         return shouldReverseStations() ? originStation : destinationStation
     }
 }

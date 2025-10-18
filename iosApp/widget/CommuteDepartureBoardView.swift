@@ -55,10 +55,14 @@ struct CommuteDepartureBoardContent: View {
         
         ZStack {
             // Seasonal background
-            Image(seasonalBackground)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .clipped()
+            GeometryReader { geometry in
+                Image(seasonalBackground)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .clipped()
+                    .edgesIgnoringSafeArea(.all)
+            }
             
             VStack(alignment: .leading, spacing: 0) {
                 // Main content
@@ -79,6 +83,7 @@ struct CommuteDepartureBoardContent: View {
             }
             .padding(12)
         }
+        .frame(width: entry.size.width, height: entry.size.height)
     }
 }
 
@@ -91,7 +96,7 @@ struct CommuteStationView: View {
         VStack(alignment: .leading, spacing: 4) {
             CommuteStationTitle(
                 title: station.displayName,
-                destinationStation: entry.configuration.getEffectiveDestination().toStation()?.displayName,
+                destinationStation: entry.configuration.destinationStation.toStation()?.displayName,
                 textColor: textColor
             )
             
@@ -157,7 +162,7 @@ struct CommuteTrainDisplay: View {
     let textColor: Color
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 1) {
+        VStack(alignment: .leading, spacing: -2) {
             // First train - prominent display
             let firstTrain = trains.first!
             let firstTime = formatArrivalTime(firstTrain)
@@ -330,20 +335,31 @@ struct CommuteFooterView: View {
                     .font(Font.arimaStyle(size: 12))
                     .italic()
                     .foregroundColor(textColor)
+                    .padding(.trailing, 4)
+
+                Button(intent: RefreshIntent()) {
+                    Image(systemName: "arrow.2.circlepath")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 14, height: 14)
+                        .foregroundColor(textColor)
+                }
+                .padding(.horizontal, 2)
+                .buttonStyle(.borderless)
+            } else{
+                Button(intent: RefreshIntent()) {
+                    Image(systemName: "arrow.2.circlepath")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 16, height: 16)
+                        .foregroundColor(textColor)
+                }
+                .padding(.horizontal, 2)
+                .buttonStyle(.borderless)
             }
 
-            Button(intent: RefreshIntent()) {
-                Image(systemName: "arrow.2.circlepath")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 16, height: 16)
-                    .foregroundColor(textColor)
-            }
-            .padding(.horizontal, 8)
-            .buttonStyle(.borderless)
+
         }
-        //.padding([.horizontal], 12)
-        .padding([.bottom], 4)
         .frame(maxWidth: .infinity, alignment: .trailing)
     }
     
@@ -402,7 +418,7 @@ struct CommuteFooterView: View {
 
     /// Gets the display name for the destination station from the configuration
     private func getDestinationStationName() -> String {
-        return entry.configuration.getEffectiveDestination().toStation()?.displayName ?? "Unknown"
+        return entry.configuration.destinationStation.toStation()?.displayName ?? "Unknown"
     }
 
     /// Checks if the footer text fits within the available space

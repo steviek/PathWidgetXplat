@@ -118,7 +118,7 @@ struct CommuteWidget: Widget {
                 .containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName("PATH Commute Tracker")
-        .description("Single-station commute widget with seasonal themes and auto-reverse")
+        .description("Route based widget with seasonal themes and auto-reverse for commutes")
         .supportedFamilies([.systemSmall])
     }
 }

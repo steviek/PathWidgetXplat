@@ -396,7 +396,14 @@
       }
     },
     "Destination Station" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estación de destino"
+          }
+        }
+      }
     },
     "Enable location access to show nearest station" : {
 
@@ -619,7 +626,14 @@
       }
     },
     "Origin Station" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estación de origen"
+          }
+        }
+      }
     },
     "PATH Commute Tracker" : {
 
@@ -661,7 +675,14 @@
 
     },
     "Show last refreshed time" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar hora de la última actualización"
+          }
+        }
+      }
     },
     "Station Choice" : {
       "localizations" : {

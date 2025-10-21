@@ -402,7 +402,7 @@ object WidgetDataFetcher {
         val stationDatas = arrayListOf<DepartureBoardData.StationData>()
         val avoidMissingTrains = currentAvoidMissingTrains()
 
-        if ( !isCommuteWidget) {
+        if (!isCommuteWidget) {
             adjustedStations.sortWith(StationComparator(sort, closestStations))
         }
 
@@ -427,8 +427,9 @@ object WidgetDataFetcher {
                         }
                     }
                     ?: continue
-            val filteredTrains = if (isCommuteWidget && adjustedStations.size >= 2) {
-                // For commute widget with 2+ stations, use direction-based filtering
+            
+            // For commute widget with 2 stations, filter trains to those that pass through both stations
+            val filteredTrains = if (isCommuteWidget && adjustedStations.size == 2) {
                 val lineDirections = getLinesForStationPair(station.pathApiName, adjustedStations.last().pathApiName)
                 
                 // Filter trains by direction

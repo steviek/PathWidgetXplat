@@ -8,6 +8,7 @@ import com.sixbynine.transit.path.api.PathApiException
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.Stations
+import com.sixbynine.transit.path.api.State
 import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.api.UpcomingDepartures
 import com.sixbynine.transit.path.api.alerts.Alert
@@ -27,6 +28,7 @@ import com.sixbynine.transit.path.app.settings.AvoidMissingTrains.Disabled
 import com.sixbynine.transit.path.app.settings.AvoidMissingTrains.OffPeak
 import com.sixbynine.transit.path.app.settings.SettingsManager.currentAvoidMissingTrains
 import com.sixbynine.transit.path.location.Location
+import com.sixbynine.transit.path.location.LocationCheckResult
 import com.sixbynine.transit.path.location.LocationCheckResult.Failure
 import com.sixbynine.transit.path.location.LocationCheckResult.JustChecked
 import com.sixbynine.transit.path.location.LocationCheckResult.NoPermission
@@ -67,6 +69,8 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TimeSource.Monotonic
+import kotlin.experimental.ExperimentalObjCName
+import kotlin.native.ObjCName
 
 object WidgetDataFetcher {
 
@@ -109,6 +113,7 @@ object WidgetDataFetcher {
             isPathError: Boolean,
             data: DepartureBoardData?,
         ) -> Unit,
+        isCommuteWidget: Boolean = false,
     ): AgedValue<DepartureBoardData>? {
         val (fetch, previous) = fetchWidgetDataWithPrevious(
             stationLimit = stationLimit,
@@ -118,6 +123,7 @@ object WidgetDataFetcher {
             filter,
             includeClosestStation,
             staleness,
+            isCommuteWidget = isCommuteWidget,
         )
         GlobalScope.launch {
             fetch.await().onSuccess(onSuccess).onFailure { error, hadInternet, data ->
@@ -138,6 +144,7 @@ object WidgetDataFetcher {
         canRefreshLocation: Boolean = true,
         isBackgroundUpdate: Boolean = false,
         now: Instant = now(),
+        isCommuteWidget: Boolean = false,
         fetchId: Int? = null,
     ): FetchWithPrevious<DepartureBoardData> {
         val fetchIdLabel = fetchId?.let { " [$fetchId]" }.orEmpty()
@@ -155,6 +162,7 @@ object WidgetDataFetcher {
             alerts: List<Alert>?,
             closestStations: List<Station>?,
             isPathApiBroken: Boolean,
+            isCommuteWidget: Boolean = false,
         ): DepartureBoardData {
             return createWidgetData(
                 now,
@@ -167,7 +175,8 @@ object WidgetDataFetcher {
                 closestStations,
                 alerts,
                 data,
-                isPathApiBroken
+                isPathApiBroken,
+                isCommuteWidget
             )
         }
 
@@ -184,6 +193,7 @@ object WidgetDataFetcher {
                     previousAlerts?.value.orEmpty(),
                     lastClosestStations,
                     isPathApiBroken = false,
+                    isCommuteWidget = isCommuteWidget,
                 )
             )
         }
@@ -303,6 +313,7 @@ object WidgetDataFetcher {
                         alertsResult.data,
                         stationsByProximity,
                         isPathApiBroken = isPathApiBroken,
+                        isCommuteWidget = isCommuteWidget,
                     )
                 }
 
@@ -385,12 +396,16 @@ object WidgetDataFetcher {
         alerts: List<Alert>?,
         data: UpcomingDepartures,
         isPathApiBroken: Boolean,
+        isCommuteWidget: Boolean = false,
     ): DepartureBoardData {
         val adjustedStations = stations.toMutableList()
         val stationDatas = arrayListOf<DepartureBoardData.StationData>()
         val avoidMissingTrains = currentAvoidMissingTrains()
 
-        adjustedStations.sortWith(StationComparator(sort, closestStations))
+        if (!isCommuteWidget) {
+            adjustedStations.sortWith(StationComparator(sort, closestStations))
+        }
+
         val closestStationToUse = closestStations?.firstOrNull()
         if (closestStationToUse != null) {
             adjustedStations.remove(closestStationToUse)
@@ -412,39 +427,70 @@ object WidgetDataFetcher {
                         }
                     }
                     ?: continue
-            val signs =
-                apiTrains
-                    .groupBy { it.headsign }
-                    .mapNotNull { (headSign, trains) ->
-                        if (!matchesFilter(station, headSign, filter)) {
-                            return@mapNotNull null
-                        }
-
-                        val headSignLines = trains.flatMap { it.lines }.toSet()
-                        if (headSignLines.isNotEmpty() && headSignLines.none { it in lines }) {
-                            return@mapNotNull null
-                        }
-
-                        val colors =
-                            trains.flatMap { it.lineColors }
-                                .distinct()
-                                .sortedBy { it.color.toArgb() }
-                        val arrivals =
-                            trains.map {
-                                adjustToAvoidMissingTrains(
-                                    now,
-                                    it.projectedArrival,
-                                    avoidMissingTrains
+            
+            // For commute widget with 2 stations, filter trains to those that pass through both stations
+            val filteredTrains = if (isCommuteWidget && adjustedStations.size == 2) {
+                val lineDirections = getLinesForStationPair(station.pathApiName, adjustedStations.last().pathApiName)
+                
+                // Filter trains by direction
+                apiTrains.filter { train ->
+                    val direction = train.directionState
+                    if (direction == null) {
+                        // No direction state, allow the train
+                        true
+                    } else {
+                        // Check if this train is on any of our lines AND going in the right direction
+                        train.lines?.any { line ->
+                            lineDirections.any { lineDir ->
+                                lineDir.line == line && (
+                                (lineDir.wantToNY && direction == State.NewYork) ||
+                                (!lineDir.wantToNY && direction == State.NewJersey)
                                 )
                             }
-                                .distinct()
-                                .sorted()
-                        if (arrivals.isEmpty()) return@mapNotNull null
-                        DepartureBoardData.SignData(headSign, colors, arrivals)
+                        } ?: false // No lines on train, filter it out
                     }
-                    .sortedBy { it.projectedArrivals.min() }
+                }
+            } else {
+                // For regular widget or commute widget with < 2 stations, use simple line filtering
+                apiTrains.filter { train ->
+                    train.lines?.any { line -> line in lines } ?: false
+                }
+            }
 
-            val trains = apiTrains
+            // Process signs from filtered trains, this is grouped by headsign
+            val signs = filteredTrains
+                .groupBy { it.headsign }
+                .mapNotNull { (headSign, trains) ->
+                    if (!matchesFilter(station, headSign, filter)) {
+                        return@mapNotNull null
+                    }
+
+                    val headSignLines = trains.flatMap { it.lines }.toSet()
+                    if (headSignLines.isNotEmpty() && headSignLines.none { it in lines }) {
+                        return@mapNotNull null
+                    }
+
+                    val colors =
+                        trains.flatMap { it.lineColors }
+                            .distinct()
+                            .sortedBy { it.color.toArgb() }
+                    val arrivals =
+                        trains.map {
+                            adjustToAvoidMissingTrains(
+                                now,
+                                it.projectedArrival,
+                                avoidMissingTrains
+                            )
+                        }
+                            .distinct()
+                            .sorted()
+                    if (arrivals.isEmpty()) return@mapNotNull null
+                    DepartureBoardData.SignData(headSign, colors, arrivals)
+                }
+                .sortedBy { it.projectedArrivals.min() }
+
+            // Process trains from filtered trains, each train is a single headsign
+            val trains = filteredTrains
                 .asSequence()
                 .map {
                     val colors = it.lineColors.distinct()
@@ -457,14 +503,6 @@ object WidgetDataFetcher {
                         backfillSource = it.backfillSource,
                         lines = it.lines,
                     )
-                }
-                .filter { train ->
-                    (train.lines == null || train.lines.orEmpty().any { line -> line in lines })
-                        .also {
-                            if (!it) {
-                                Logging.d("Filtering out train $train because it's not in the right lines")
-                            }
-                        }
                 }
                 .filter { station == closestStationToUse || matchesFilter(station, it, filter) }
                 .map { it.adjustedToAvoidMissingTrains(now, avoidMissingTrains) }
@@ -600,5 +638,113 @@ object WidgetDataFetcher {
                 _nonFetchLocationReceived.tryEmit(Unit)
             }
         }
+    }
+
+    /**
+     * Determines which PATH lines run between a departure station and destination station.
+     * This function is exposed to iOS through Kotlin Multiplatform.
+     */
+    data class LineDirection(
+        val line: Line,
+        val wantToNY: Boolean
+    )
+
+    @OptIn(kotlin.experimental.ExperimentalObjCName::class)
+    @ObjCName(name = "getLinesForStationPair") // This exposes the function directly to Swift
+    fun getLinesForStationPair(departure: String, destination: String): Set<LineDirection> {
+        // Define the main PATH routes
+        val nwkWtcRoute = listOf("NWK", "HAR", "JSQ", "GRV", "EXP", "WTC")
+        val jsq33sRoute = listOf("JSQ", "GRV", "NEW", "CHR", "09S", "14S", "23S", "33S")
+        val hobWtcRoute = listOf("HOB", "NEW", "EXP", "WTC")
+        val hob33sRoute = listOf("HOB", "CHR", "09S", "14S", "23S", "33S")
+        val jsqHob33sRoute = listOf("JSQ", "GRV", "NEW", "HOB", "CHR", "09S", "14S", "23S", "33S")
+
+        val lineDirections = mutableSetOf<LineDirection>()
+
+        // Check if current time is during late night/weekend hours (11pm-6am or weekends)
+        val currentTime = now().toLocalDateTime(NewYorkTimeZone)
+        val hour = currentTime.hour
+        val dayOfWeek = currentTime.dayOfWeek
+        val isLateNightOrWeekend = hour >= 23 || hour < 6 || dayOfWeek == SATURDAY || dayOfWeek == SUNDAY
+
+        // Check NWK-WTC route (valid all times)
+        val nwkWtcDep = nwkWtcRoute.indexOf(departure)
+        val nwkWtcDest = nwkWtcRoute.indexOf(destination)
+        if (nwkWtcDep != -1 && nwkWtcDest != -1) {
+            lineDirections.add(LineDirection(
+                line = Line.NewarkWtc,
+                wantToNY = nwkWtcDep < nwkWtcDest
+            ))
+        }
+
+        if (isLateNightOrWeekend) {
+            // During late night/weekend hours, check JSQ-HOB-33S route
+            val jsqHobDep = jsqHob33sRoute.indexOf(departure)
+            val jsqHobDest = jsqHob33sRoute.indexOf(destination)
+            if (jsqHobDep != -1 && jsqHobDest != -1) {
+                lineDirections.add(LineDirection(line = Line.JournalSquare33rd, wantToNY = jsqHobDep < jsqHobDest))
+                lineDirections.add(LineDirection(line = Line.Hoboken33rd, wantToNY = jsqHobDep < jsqHobDest))
+            }
+        } else {
+            // During regular hours (6am-11pm, Monday-Friday), check regular routes
+            // Check JSQ-33S route
+            val jsq33sDep = jsq33sRoute.indexOf(departure)
+            val jsq33sDest = jsq33sRoute.indexOf(destination)
+            if (jsq33sDep != -1 && jsq33sDest != -1) {
+                lineDirections.add(LineDirection(
+                    line = Line.JournalSquare33rd,
+                    wantToNY = jsq33sDep < jsq33sDest
+                ))
+            }
+
+            // Check HOB-WTC route
+            val hobWtcDep = hobWtcRoute.indexOf(departure)
+            val hobWtcDest = hobWtcRoute.indexOf(destination)
+            if (hobWtcDep != -1 && hobWtcDest != -1) {
+                lineDirections.add(LineDirection(
+                    line = Line.HobokenWtc,
+                    wantToNY = hobWtcDep < hobWtcDest
+                ))
+            }
+
+            // Check HOB-33S route
+            val hob33sDep = hob33sRoute.indexOf(departure)
+            val hob33sDest = hob33sRoute.indexOf(destination)
+            if (hob33sDep != -1 && hob33sDest != -1) {
+                lineDirections.add(LineDirection(
+                    line = Line.Hoboken33rd,
+                    wantToNY = hob33sDep < hob33sDest
+                ))
+            }
+        }
+
+        return lineDirections
+    }
+
+    @OptIn(kotlin.experimental.ExperimentalObjCName::class)
+    @ObjCName(name = "fetchWidgetDataForCommute") // This exposes the function directly to Swift
+    fun fetchWidgetDataForCommute(
+        stationLimit: Int,
+        stations: List<Station>,
+        lines: List<Line>,
+        sort: StationSort,
+        filter: TrainFilter,
+        includeClosestStation: Boolean,
+        staleness: Staleness,
+        onSuccess: (DepartureBoardData) -> Unit,
+        onFailure: (Throwable, Boolean, Boolean, DepartureBoardData?) -> Unit
+    ) {
+        fetchWidgetData(
+            stationLimit = stationLimit,
+            stations = stations,
+            lines = lines,
+            sort = sort,
+            filter = filter,
+            includeClosestStation = includeClosestStation,
+            staleness = staleness,
+            onSuccess = onSuccess,
+            onFailure = onFailure,
+            isCommuteWidget = true
+        )
     }
 }

@@ -53,7 +53,7 @@ fun TrainLineContent(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (isSystemInDarkTheme()) Color(0xFF282828) else Color.White
+            containerColor = MaterialTheme.colorScheme.inverseOnSurface
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
@@ -65,8 +65,7 @@ fun TrainLineContent(
         ) {
             // Colored rectangle on the left
             ColorRect(
-                colors = colors,
-                height = if (data.size > 1) 64.dp else 48.dp
+                colors = colors
             )
             
             // Content area

@@ -114,12 +114,59 @@ extension WidgetDataFetcher {
                                 hasPathError: isPathError.toBool()
                             )
                         )
+                    },
+                    isCommuteWidget: false
+                )
+            }
+        } catch {
+            return FetchResult(data: nil, hadInternet: true, hasError: true, hasPathError: false)
+        }
+    }
+    
+    func fetchWidgetDataAsyncCommute(
+        originStation: StationChoice,
+        destinationStation: StationChoice,
+        filter: TrainFilter,
+        sort: StationSort,
+        lines: [Line]
+    ) async -> FetchResult {
+        // Convert station choices to actual stations
+        let origin = originStation.toStation()
+        let destination = destinationStation.toStation()
+        
+        // If either station is nil (closest) or both stations are the same, return error
+        guard let originStn = origin, let destStn = destination, originStn != destStn else {
+            return FetchResult(data: nil, hadInternet: true, hasError: true, hasPathError: false)
+        }
+        
+        do {
+            return try await withCheckedThrowingContinuation { continuation in
+                // Use the commute-specific data fetcher that handles line filtering internally
+                WidgetDataFetcher().fetchWidgetDataForCommute(
+                    stationLimit: 1,
+                    stations: [originStn, destStn], //both stations are needed to compute the lines that pass between them
+                    lines: lines,
+                    sort: sort,
+                    filter: filter,
+                    includeClosestStation: false,
+                    staleness: widgetFetchStaleness(force: false),
+                    onSuccess: { data in
+                        continuation.resume(returning: FetchResult(data: data, hadInternet: true, hasError: false, hasPathError: false))
+                    },
+                    onFailure: { (e, hadInternet, isPathError, data) in
+                        continuation.resume(
+                            returning: FetchResult(
+                                data: data,
+                                hadInternet: hadInternet.toBool(),
+                                hasError: true,
+                                hasPathError: isPathError.toBool()
+                            )
+                        )
                     }
                 )
             }
         } catch {
             return FetchResult(data: nil, hadInternet: true, hasError: true, hasPathError: false)
         }
-
     }
 }

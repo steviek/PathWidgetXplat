@@ -19,7 +19,7 @@ jobs:
           java-version: '21'
 
       - name: run schedule generator
-        run: ./gradlew :schedule:generator:run
+        run: ./gradlew :schedule:generator:run --no-daemon
 
       - name: put schedule in place
         run: |

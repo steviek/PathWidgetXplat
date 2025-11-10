@@ -24,7 +24,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("com.sixbynine.transit.path.schedule.generator.MainKt")
+    mainClass.set("com.sixbynine.transit.path.schedule.generator.ScheduleGeneratorKt")
 }
 
 tasks.named("run") {

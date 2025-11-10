@@ -16,6 +16,7 @@ kotlin {
         }
     }
 
+    jvm()
 
     iosX64()
     iosArm64()
@@ -45,6 +46,11 @@ kotlin {
 
         androidMain.dependencies {
             implementation(libs.ktor.okhttp)
+        }
+
+        jvmMain.dependencies {
+            implementation(libs.ktor.okhttp)
+            implementation(libs.slf4j)
         }
 
         val androidUnitTest by getting {

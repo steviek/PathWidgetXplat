@@ -12,30 +12,18 @@ jobs:
       - name: get repo content
         uses: actions/checkout@v2
 
-      - name: setup python
-        uses: actions/setup-python@v5
+      - name: setup java
+        uses: actions/setup-java@v4
         with:
-          python-version: '3.13'
+          distribution: 'temurin'
+          java-version: '21'
 
-      - name: setup directory
-        run: |
-          cp schedule.json schedule-generator
-          cp schedule_override.json schedule-generator
-
-      - name: install python packages
-        working-directory: schedule-generator
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: run script
-        working-directory: schedule-generator
-        run: python index.py
+      - name: run schedule generator
+        run: ./gradlew :schedule:generator:run
 
       - name: put schedule in place
         run: |
-          mv schedule-generator/schedule.json .
-          mv schedule-generator/schedule_override.json .
+          mv build/outputs/schedule.json .
       
       - name: commit
         uses: stefanzweifel/git-auto-commit-action@v4

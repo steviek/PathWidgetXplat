@@ -23,7 +23,7 @@ jobs:
 
       - name: put schedule in place
         run: |
-          mv build/outputs/schedule.json .
+          mv schedule/generator/build/outputs/schedule.json .
       
       - name: commit
         uses: stefanzweifel/git-auto-commit-action@v4

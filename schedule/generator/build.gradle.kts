@@ -26,3 +26,7 @@ dependencies {
 application {
     mainClass.set("com.sixbynine.transit.path.schedule.generator.MainKt")
 }
+
+tasks.named("run") {
+    outputs.dir("build/outputs")
+}

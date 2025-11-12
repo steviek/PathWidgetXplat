@@ -61,6 +61,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.DayOfWeek.SATURDAY
 import kotlinx.datetime.DayOfWeek.SUNDAY
 import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -296,8 +297,10 @@ object WidgetDataFetcher {
 
                 (this as? Job)?.children?.let {
                     if (it.toList().isNotEmpty()) {
-                        Logging.w("Fetch$fetchIdLabel: Ready to return data, but there are " +
-                                "ongoing jobs to cancel")
+                        Logging.w(
+                            "Fetch$fetchIdLabel: Ready to return data, but there are " +
+                                    "ongoing jobs to cancel"
+                        )
                         it.forEach { it.cancel() }
                     }
                 }
@@ -378,7 +381,13 @@ object WidgetDataFetcher {
         val stationDatas = arrayListOf<DepartureBoardData.StationData>()
         val avoidMissingTrains = currentAvoidMissingTrains()
 
-        adjustedStations.sortWith(StationComparator(sort, closestStations))
+        adjustedStations.sortWith(
+            StationComparator(
+                sort,
+                closestStations,
+                now.toLocalDateTime(TimeZone.currentSystemDefault())
+            )
+        )
         val closestStationToUse = closestStations?.firstOrNull()
         if (closestStationToUse != null) {
             adjustedStations.remove(closestStationToUse)

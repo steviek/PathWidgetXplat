@@ -8,7 +8,5 @@ enum class Line(override val number: Int) : IntPersistable {
     companion object {
         val permanentLines: List<Line> =
             listOf(NewarkWtc, HobokenWtc, JournalSquare33rd, Hoboken33rd)
-
-        val permanentLinesForWtc33rd = listOf(HobokenWtc, JournalSquare33rd)
     }
 }

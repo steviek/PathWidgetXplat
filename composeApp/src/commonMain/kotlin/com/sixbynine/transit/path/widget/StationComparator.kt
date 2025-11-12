@@ -6,16 +6,12 @@ import com.sixbynine.transit.path.api.isInNewJersey
 import com.sixbynine.transit.path.api.isInNewYork
 import com.sixbynine.transit.path.app.settings.SettingsManager
 import com.sixbynine.transit.path.app.settings.isActiveAt
-import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 
 class StationComparator(
     private val sort: StationSort?,
     private val closestStations: List<Station>?,
-    private val now: LocalDateTime =
-        Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+    now: LocalDateTime,
 ) : Comparator<Station> {
 
     private val commutingConfiguration = SettingsManager.commutingConfiguration.value

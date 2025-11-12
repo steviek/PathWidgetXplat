@@ -4,7 +4,6 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import com.sixbynine.transit.path.api.templine.HobClosureConfigRepository
 import com.sixbynine.transit.path.model.Colors.approxEquals
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -36,9 +35,6 @@ data class ColorWrapper(val color: Color) {
             Colors.NwkWtcSingle -> Color(213, 61, 46)
             Colors.Hob33sSingle -> Color(43, 133, 187)
             Colors.HobWtcSingle -> Color(70, 156, 35)
-            Colors.Wtc33sSingle -> HobClosureConfigRepository.getConfig().tempLineInfo.let {
-                Colors.parse(it.darkColor ?: it.lightColor)
-            }
             else -> color
         }
     }

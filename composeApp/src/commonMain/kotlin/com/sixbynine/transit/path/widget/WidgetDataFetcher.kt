@@ -39,7 +39,6 @@ import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.util.AgedValue
 import com.sixbynine.transit.path.util.DataResult
 import com.sixbynine.transit.path.util.FetchWithPrevious
-import com.sixbynine.transit.path.util.Staleness
 import com.sixbynine.transit.path.util.flatten
 import com.sixbynine.transit.path.util.globalDataStore
 import com.sixbynine.transit.path.util.isFailure
@@ -86,14 +85,6 @@ object WidgetDataFetcher {
     val nonFetchLocationReceived = _nonFetchLocationReceived.asSharedFlow()
 
     @Suppress("UNUSED") // Used by swift code
-    fun widgetFetchStaleness(force: Boolean): Staleness {
-        return Staleness(
-            staleAfter = if (force) 5.seconds else 30.seconds,
-            invalidAfter = Duration.INFINITE,
-        )
-    }
-
-    @Suppress("UNUSED") // Used by swift code
     fun fetchWidgetData(
         stationLimit: Int,
         stations: List<Station>,
@@ -101,7 +92,6 @@ object WidgetDataFetcher {
         sort: StationSort,
         filter: TrainFilter,
         includeClosestStation: Boolean,
-        staleness: Staleness,
         onSuccess: (DepartureBoardData) -> Unit,
         onFailure: (
             error: Throwable,
@@ -117,7 +107,6 @@ object WidgetDataFetcher {
             sort,
             filter,
             includeClosestStation,
-            staleness,
         )
         GlobalScope.launch {
             fetch.await().onSuccess(onSuccess).onFailure { error, hadInternet, data ->
@@ -134,7 +123,6 @@ object WidgetDataFetcher {
         sort: StationSort,
         filter: TrainFilter,
         includeClosestStation: Boolean,
-        staleness: Staleness,
         canRefreshLocation: Boolean = true,
         isBackgroundUpdate: Boolean = false,
         now: Instant = now(),
@@ -146,7 +134,7 @@ object WidgetDataFetcher {
                     "includeClosestStation = $includeClosestStation"
         )
         val (liveDepartures, previousDepartures) =
-            PathApi.instance.getUpcomingDepartures(now, staleness)
+            PathApi.instance.getUpcomingDepartures(now)
         val (alerts, previousAlerts) = AlertsRepository.getAlerts(now)
 
         fun createWidgetData(
@@ -174,7 +162,7 @@ object WidgetDataFetcher {
         val previous = run {
             val data =
                 previousDepartures ?: run {
-                    SchedulePathApi().getUpcomingDepartures(now, staleness).previous
+                    SchedulePathApi().getUpcomingDepartures(now).previous
                 } ?: return@run null
             AgedValue(
                 data.age,
@@ -254,7 +242,7 @@ object WidgetDataFetcher {
                         }
                 val isPathApiBroken = live.isFailure() && live.error is PathApiException
                 val scheduled = if (isPathApiBroken) {
-                    SchedulePathApi().getUpcomingDepartures(now, staleness).fetch.await()
+                    SchedulePathApi().getUpcomingDepartures(now).fetch.await()
                 } else {
                     null
                 }

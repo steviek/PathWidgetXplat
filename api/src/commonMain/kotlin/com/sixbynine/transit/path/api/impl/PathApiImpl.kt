@@ -10,7 +10,6 @@ import com.sixbynine.transit.path.api.path.PathRepository.PathServiceResults
 import com.sixbynine.transit.path.model.ColorWrapper
 import com.sixbynine.transit.path.model.Colors
 import com.sixbynine.transit.path.util.FetchWithPrevious
-import com.sixbynine.transit.path.util.Staleness
 import com.sixbynine.transit.path.util.map
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.seconds
@@ -19,9 +18,8 @@ internal class PathApiImpl : PathApi {
 
     override fun getUpcomingDepartures(
         now: Instant,
-        staleness: Staleness
     ): FetchWithPrevious<UpcomingDepartures> {
-        return PathRepository.getResults(now, staleness).map { resultsToMap(now, it) }
+        return PathRepository.getResults(now).map { resultsToMap(now, it) }
     }
 
     private fun resultsToMap(

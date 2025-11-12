@@ -16,13 +16,10 @@ import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.MobilePathApplication
 import com.sixbynine.transit.path.api.PathApi
 import com.sixbynine.transit.path.time.now
-import com.sixbynine.transit.path.util.Staleness
 import com.sixbynine.transit.path.util.await
 import com.sixbynine.transit.path.util.isSuccess
 import com.sixbynine.transit.path.util.onFailure
 import java.util.concurrent.TimeUnit
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 
 class WidgetRefreshWorker(
     context: Context,
@@ -39,10 +36,7 @@ class WidgetRefreshWorker(
         Logging.d("Refresh widget data from worker, isBackground=$isBackground")
 
         PathApi.instance
-            .getUpcomingDepartures(
-                now = now(),
-                staleness = Staleness(staleAfter = 30.seconds, invalidAfter = Duration.INFINITE)
-            )
+            .getUpcomingDepartures(now = now())
             .await()
             .onFailure { _, hadInternet, data ->
                 if (!hadInternet && data != null && isBackground) {

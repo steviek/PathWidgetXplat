@@ -1,123 +1,22 @@
 package com.sixbynine.transit.path.api.path
 
-import com.sixbynine.transit.path.Logging
-import com.sixbynine.transit.path.api.PathApiException
-import com.sixbynine.transit.path.network.NetworkManager
-import com.sixbynine.transit.path.preferences.StringPreferencesKey
-import com.sixbynine.transit.path.preferences.persisting
-import com.sixbynine.transit.path.preferences.persistingInstant
-import com.sixbynine.transit.path.util.AgedValue
-import com.sixbynine.transit.path.util.DataResult
 import com.sixbynine.transit.path.util.FetchWithPrevious
-import com.sixbynine.transit.path.util.IoScope
-import com.sixbynine.transit.path.util.JsonFormat
-import com.sixbynine.transit.path.util.Staleness
-import com.sixbynine.transit.path.util.readRemoteFile
-import com.sixbynine.transit.path.util.suspendRunCatching
-import kotlinx.coroutines.CoroutineStart.LAZY
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withTimeout
+import com.sixbynine.transit.path.util.RemoteFileRepository
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.seconds
 
 object PathRepository {
-    private var lastPathResponse by persisting(StringPreferencesKey("last_success"))
-    private var lastPathResponseTime by persistingInstant("last_success_time")
-    private var ongoingFetch: Deferred<DataResult<PathServiceResults>>? = null
-    private val mutex = Mutex()
 
-    fun getResults(now: Instant, staleness: Staleness): FetchWithPrevious<PathServiceResults> {
-        val previous = getCachedResults(now)
-        return FetchWithPrevious.create(
-            previous = previous,
-            fetch = { fetch(now, previous) },
-            staleness = staleness,
-        )
-    }
+    private val helper = RemoteFileRepository(
+        keyPrefix = "path_data",
+        url = "https://www.panynj.gov/bin/portauthority/ridepath.json",
+        serializer = PathServiceResults.serializer(),
+        maxAge = 30.seconds
+    )
 
-    private fun fetch(
-        now: Instant,
-        previous: AgedValue<PathServiceResults>?
-    ): Deferred<DataResult<PathServiceResults>> {
-        ongoingFetch?.takeIf { it.isActive }?.let {
-            Logging.d("Join existing fetch")
-            return it
-        }
-
-        return IoScope.async(start = LAZY) {
-            val fetch = mutex.withLock {
-                ongoingFetch?.takeIf { it.isActive }?.let {
-                    Logging.d("Join existing fetch")
-                    return@withLock it
-                }
-
-
-                Logging.d("Starting a new fetch, previous had age of ${previous?.age}")
-
-                async {
-                    suspendRunCatching {
-                        withTimeout(5.seconds) {
-                            val responseText =
-                                readRemoteFile(
-                                    "https://www.panynj.gov/bin/portauthority/ridepath.json",
-                                )
-                                    .getOrThrow()
-
-                            lastPathResponseTime = now
-                            lastPathResponse = responseText
-
-                            JsonFormat.decodeFromString<PathServiceResults>(responseText).also {
-                                if (it.results.isEmpty()) {
-                                    throw PathApiException.NoResults
-                                }
-                            }
-                        }
-                    }
-                        .fold(
-                            onSuccess = {
-                                Logging.d("successfully fetched ridepath data")
-                                DataResult.success(it)
-                            },
-                            onFailure = { error ->
-                                val shouldBeConnected = NetworkManager().isConnectedToInternet()
-                                var hadInternet = shouldBeConnected
-
-                                if ("Unable to resolve host" in error.message.toString()) {
-                                    hadInternet = false
-                                }
-                                Logging.w(
-                                    "fetching ridepath failed, hadInternet=$hadInternet, shouldBeConnected=$shouldBeConnected",
-                                    error
-                                )
-                                DataResult.failure(
-                                    error,
-                                    hadInternet = hadInternet,
-                                    data = previous?.value
-                                )
-                            },
-                        )
-                        .also { ongoingFetch = null }
-                }.also { ongoingFetch = it }
-            }
-
-            fetch.await()
-        }
-    }
-
-    private fun getCachedResults(now: Instant): AgedValue<PathServiceResults>? {
-        val lastPathResponseTime = lastPathResponseTime ?: return null
-        val result = runCatching {
-            val lastPathResponse = lastPathResponse ?: return null
-            JsonFormat.decodeFromString<PathServiceResults>(lastPathResponse)
-        }
-
-        return result.getOrNull()
-            ?.takeIf { it.results.isNotEmpty() }
-            ?.let { AgedValue(now - lastPathResponseTime, it) }
+    fun getResults(now: Instant): FetchWithPrevious<PathServiceResults> {
+        return helper.get(now)
     }
 
     @Serializable

@@ -17,7 +17,6 @@ import com.sixbynine.transit.path.schedule.ScheduleTiming
 import com.sixbynine.transit.path.schedule.Schedules
 import com.sixbynine.transit.path.time.NewYorkTimeZone
 import com.sixbynine.transit.path.util.FetchWithPrevious
-import com.sixbynine.transit.path.util.Staleness
 import com.sixbynine.transit.path.util.map
 import com.sixbynine.transit.path.util.orElse
 import kotlinx.datetime.DatePeriod
@@ -34,7 +33,6 @@ import kotlin.time.Duration.Companion.minutes
 class SchedulePathApi : PathApi {
     override fun getUpcomingDepartures(
         now: Instant,
-        staleness: Staleness
     ): FetchWithPrevious<UpcomingDepartures> {
         return GithubScheduleRepository.getSchedules(now)
             .map { createDepartureBoardMap(now, schedules = it) }

@@ -1,9 +1,9 @@
 package com.sixbynine.transit.path.api.impl
 
 import com.sixbynine.transit.path.api.DepartingTrain
-import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.Line.Hoboken33rd
 import com.sixbynine.transit.path.api.Line.HobokenWtc
+import com.sixbynine.transit.path.api.Line.JournalSquare33rd
 import com.sixbynine.transit.path.api.Line.NewarkWtc
 import com.sixbynine.transit.path.api.PathApi
 import com.sixbynine.transit.path.api.State.NewJersey
@@ -110,7 +110,7 @@ internal class MockPathApi : PathApi {
                     isDelayed = false,
                     backfillSource = null,
                     directionState = NewYork,
-                    lines = Line.permanentLinesForWtc33rd.toSet()
+                    lines = setOf(HobokenWtc, JournalSquare33rd)
                 ).takeIf {
                     station in listOf(
                         Newport,

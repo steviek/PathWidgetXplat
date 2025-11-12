@@ -49,7 +49,7 @@ object LineComputer {
             "EXP" -> when (target) {
                 "NWK", "HAR", "WTC", "EXP", "GRV" -> lines += NewarkWtc
                 "NEW", "HOB" -> lines += HobokenWtc
-                in NyNorthStations -> lines += Line.permanentLinesForWtc33rd
+                in NyNorthStations -> lines += listOf(HobokenWtc, JournalSquare33rd)
             }
 
             "NEW" -> when (target) {
@@ -67,14 +67,14 @@ object LineComputer {
                 "EXP" -> lines += listOf(NewarkWtc, HobokenWtc)
                 "NWK", "HAR", "JSQ", "GRV" -> lines += NewarkWtc
                 "NEW", "HOB" -> lines += HobokenWtc
-                in NyNorthStations -> lines += Line.permanentLinesForWtc33rd
+                in NyNorthStations -> lines += listOf(HobokenWtc, JournalSquare33rd)
             }
 
             in NyNorthStations -> when (target) {
                 in NyNorthStations -> lines += listOf(JournalSquare33rd, Hoboken33rd)
                 "HOB" -> lines += Hoboken33rd
                 "GRV", "JSQ" -> lines += JournalSquare33rd
-                "WTC" -> lines += Line.permanentLinesForWtc33rd
+                "WTC" -> lines += listOf(HobokenWtc, JournalSquare33rd)
             }
         }
 

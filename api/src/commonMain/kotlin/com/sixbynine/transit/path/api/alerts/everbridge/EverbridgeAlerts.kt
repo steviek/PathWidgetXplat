@@ -11,7 +11,6 @@ import com.sixbynine.transit.path.api.alerts.Alert
 import com.sixbynine.transit.path.api.alerts.AlertText
 import com.sixbynine.transit.path.api.alerts.Schedule
 import com.sixbynine.transit.path.api.alerts.TrainFilter
-import com.sixbynine.transit.path.api.templine.HobClosureConfigRepository
 import com.sixbynine.transit.path.time.NewYorkTimeZone
 import com.sixbynine.transit.path.util.InstantAsEpochMillisSerializer
 import kotlinx.datetime.DateTimeUnit.DayBased
@@ -134,16 +133,12 @@ private val IncidentMessage.lines: Set<Line>
             ?.value
             .orEmpty()
             .flatMap { line ->
-                if (line in HobClosureConfigRepository.getConfig().tempLineInfo.codes) {
-                    return@flatMap Line.permanentLinesForWtc33rd
-                }
                 when (line) {
                     "JSQ-33 via HOB" -> listOf(JournalSquare33rd, Hoboken33rd)
                     "NWK-WTC" -> listOf(NewarkWtc)
                     "HOB-WTC" -> listOf(HobokenWtc)
                     "JSQ-33" -> listOf(JournalSquare33rd)
                     "HOB-33" -> listOf(Hoboken33rd)
-                    "WTC-33" -> Line.permanentLinesForWtc33rd
                     "PATH" -> Line.permanentLines
                     else -> emptyList()
                 }

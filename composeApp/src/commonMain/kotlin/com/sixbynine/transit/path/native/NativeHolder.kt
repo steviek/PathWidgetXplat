@@ -2,7 +2,6 @@ package com.sixbynine.transit.path.native
 
 import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.NonFatalReporter
-import com.sixbynine.transit.path.api.templine.HobClosureConfigRepository
 import com.sixbynine.transit.path.widget.WidgetReloader
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,9 +15,6 @@ object NativeHolder {
         nonFatalReporter: (Throwable) -> Unit,
     ) {
         this.widgetReloader.value = widgetReloader
-
-        // kick start some initialization here
-        HobClosureConfigRepository.getConfig()
 
         Logging.nonFatalReporter = NonFatalReporter { e -> nonFatalReporter(e) }
     }

@@ -101,7 +101,6 @@ extension WidgetDataFetcher {
                     sort: sort,
                     filter: filter,
                     includeClosestStation: includeClosestStation,
-                    staleness: widgetFetchStaleness(force: false),
                     onSuccess: { data in
                         continuation.resume(returning: FetchResult(data: data, hadInternet: true, hasError: false, hasPathError: false))
                     },

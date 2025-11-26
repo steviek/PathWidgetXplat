@@ -12,14 +12,19 @@ data class Station(
 
 object Stations {
     fun fromHeadSign(headSign: String): Station? = when {
-        "World Trade" in headSign -> WorldTradeCenter
+        "World Trade" in headSign || headSign == "WTC" -> WorldTradeCenter
         headSign == "Newark" -> Newark
         "33" in headSign -> ThirtyThirdStreet
         headSign == "Hoboken" -> Hoboken
-        "Journal" in headSign -> JournalSquare
+        "Journal" in headSign || headSign == "JSQ" -> JournalSquare
         "Exchange" in headSign -> ExchangePlace
         "Grove" in headSign -> GroveStreet
         "Harrison" in headSign -> Harrison
+        headSign == "Newport" -> Newport
+        "Chris" in headSign -> ChristopherStreet
+        "9" in headSign -> NinthStreet
+        "14" in headSign -> FourteenthStreet
+        "23" in headSign -> TwentyThirdStreet
         else -> null
     }
 

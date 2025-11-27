@@ -369,12 +369,6 @@
         }
       }
     },
-    "Commute Tracker for PATH" : {
-
-    },
-    "Commute-focused PATH widget with auto-reverse" : {
-
-    },
     "Departure board for PATH" : {
       "localizations" : {
         "es" : {
@@ -386,6 +380,7 @@
       }
     },
     "Departure board for PATH trains" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -530,10 +525,24 @@
       }
     },
     "Location access required" : {
-
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se requiere acceso a la ubicación"
+          }
+        }
+      }
     },
-    "Multi-station PATH departure board with full customization" : {
-
+    "My Commute" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mi trayecto"
+          }
+        }
+      }
     },
     "Newark" : {
       "localizations" : {
@@ -635,12 +644,6 @@
         }
       }
     },
-    "PATH Commute Tracker" : {
-
-    },
-    "PATH Multi-Station Board" : {
-
-    },
     "Refresh" : {
       "localizations" : {
         "es" : {
@@ -733,6 +736,9 @@
           }
         }
       }
+    },
+    "View upcoming train departures by station" : {
+
     },
     "When should reversal end?" : {
       "localizations" : {

@@ -46,8 +46,8 @@ enum HourOfDay : Int, AppEnum {
 }
 
 struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
-    static var title: LocalizedStringResource = "Commute Tracker for PATH"
-    static var description = IntentDescription("Commute-focused PATH widget with auto-reverse")
+    static var title: LocalizedStringResource = "My Commute"
+    static var description = IntentDescription("Route based widget with seasonal themes and auto-reverse for commutes")
     
     static var parameterSummary: some ParameterSummary {
         When(\.$autoReverse, .equalTo, true) {

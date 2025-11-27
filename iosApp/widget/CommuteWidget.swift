@@ -116,7 +116,7 @@ struct CommuteWidget: Widget {
             CommuteDepartureBoardView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
         }
-        .configurationDisplayName("PATH Commute Tracker")
+        .configurationDisplayName("My Commute")
         .description("Route based widget with seasonal themes and auto-reverse for commutes")
         .supportedFamilies([.systemSmall])
     }

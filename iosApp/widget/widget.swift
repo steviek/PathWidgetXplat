@@ -153,8 +153,8 @@ struct DepartureWidget: Widget {
             }
             .containerBackground(.fill.tertiary, for: .widget)
         }
-        .configurationDisplayName("PATH Multi-Station Board")
-        .description("Multi-station PATH departure board with full customization")
+        .configurationDisplayName("Departure board for PATH")
+        .description("View upcoming train departures by station")
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
     }
 

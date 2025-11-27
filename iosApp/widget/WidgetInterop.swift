@@ -127,7 +127,6 @@ extension WidgetDataFetcher {
         originStation: StationChoice,
         destinationStation: StationChoice,
         filter: TrainFilter,
-        sort: StationSort,
         lines: [Line]
     ) async -> FetchResult {
         // Convert station choices to actual stations
@@ -146,7 +145,7 @@ extension WidgetDataFetcher {
                     stationLimit: 1,
                     stations: [originStn, destStn], //both stations are needed to compute the lines that pass between them
                     lines: lines,
-                    sort: sort,
+                    sort: nil,
                     filter: filter,
                     includeClosestStation: false,
                     staleness: widgetFetchStaleness(force: false),

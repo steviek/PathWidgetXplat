@@ -73,7 +73,6 @@ struct CommuteProvider: AppIntentTimelineProvider {
                 originStation: effectiveOrigin,
                 destinationStation: effectiveDestination,
                 filter: Filter.all.toTrainFilter(),
-                sort: SortOrder.alphabetical.toStationSort(),
                 lines: LineChoice.allCases.map { $0.toLine() }
             )
             widgetData = fetchResult.data

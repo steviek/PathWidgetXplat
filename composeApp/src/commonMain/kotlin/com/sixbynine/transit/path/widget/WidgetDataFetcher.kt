@@ -102,7 +102,7 @@ object WidgetDataFetcher {
         stationLimit: Int,
         stations: List<Station>,
         lines: Collection<Line>,
-        sort: StationSort,
+        sort: StationSort?,
         filter: TrainFilter,
         includeClosestStation: Boolean,
         staleness: Staleness,
@@ -137,7 +137,7 @@ object WidgetDataFetcher {
         stationLimit: Int,
         stations: List<Station>,
         lines: Collection<Line>,
-        sort: StationSort,
+        sort: StationSort?,
         filter: TrainFilter,
         includeClosestStation: Boolean,
         staleness: Staleness,
@@ -390,7 +390,7 @@ object WidgetDataFetcher {
         stationLimit: Int,
         stations: List<Station>,
         lines: Collection<Line>,
-        sort: StationSort,
+        sort: StationSort?,
         filter: TrainFilter,
         closestStations: List<Station>?,
         alerts: List<Alert>?,
@@ -402,7 +402,7 @@ object WidgetDataFetcher {
         val stationDatas = arrayListOf<DepartureBoardData.StationData>()
         val avoidMissingTrains = currentAvoidMissingTrains()
 
-        if (!isCommuteWidget) {
+        if (sort != null) {
             adjustedStations.sortWith(StationComparator(sort, closestStations))
         }
 
@@ -727,7 +727,7 @@ object WidgetDataFetcher {
         stationLimit: Int,
         stations: List<Station>,
         lines: List<Line>,
-        sort: StationSort,
+        sort: StationSort?,
         filter: TrainFilter,
         includeClosestStation: Boolean,
         staleness: Staleness,

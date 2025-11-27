@@ -166,6 +166,7 @@ class WidgetDataFetchingUseCase private constructor() {
             filter = TrainFilter.All,
             includeClosestStation = SettingsManager.locationSetting.value == Enabled,
             staleness = staleness,
+            isCommuteWidget = false,
         )
     }
 

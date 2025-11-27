@@ -113,7 +113,7 @@ object WidgetDataFetcher {
             isPathError: Boolean,
             data: DepartureBoardData?,
         ) -> Unit,
-        isCommuteWidget: Boolean = false,
+        isCommuteWidget: Boolean,
     ): AgedValue<DepartureBoardData>? {
         val (fetch, previous) = fetchWidgetDataWithPrevious(
             stationLimit = stationLimit,
@@ -144,7 +144,7 @@ object WidgetDataFetcher {
         canRefreshLocation: Boolean = true,
         isBackgroundUpdate: Boolean = false,
         now: Instant = now(),
-        isCommuteWidget: Boolean = false,
+        isCommuteWidget: Boolean,
         fetchId: Int? = null,
     ): FetchWithPrevious<DepartureBoardData> {
         val fetchIdLabel = fetchId?.let { " [$fetchId]" }.orEmpty()

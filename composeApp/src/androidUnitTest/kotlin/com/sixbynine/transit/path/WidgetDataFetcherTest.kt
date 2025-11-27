@@ -37,6 +37,7 @@ class WidgetDataFetcherTest {
             includeClosestStation = false,
             staleness = Staleness(staleAfter = INFINITE, invalidAfter = INFINITE),
             now = Aug24.atTime(21, 40).toInstant(NewYorkTimeZone),
+            isCommuteWidget = false,
         ).await()
 
         val trains =

@@ -160,8 +160,8 @@ object AndroidWidgetDataRepository {
                 staleAfter = if (force) 5.seconds else 30.seconds,
                 invalidAfter = Duration.INFINITE, // Always show old data while loading widget.
             ),
+            isCommuteWidget = false,
             fetchId = fetchId,
-
         )
     }
 }

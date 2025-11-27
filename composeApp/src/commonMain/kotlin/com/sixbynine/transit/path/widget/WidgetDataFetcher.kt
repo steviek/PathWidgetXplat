@@ -8,7 +8,6 @@ import com.sixbynine.transit.path.api.PathApiException
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.Stations
-import com.sixbynine.transit.path.api.State
 import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.api.UpcomingDepartures
 import com.sixbynine.transit.path.api.alerts.Alert
@@ -16,6 +15,7 @@ import com.sixbynine.transit.path.api.alerts.AlertsRepository
 import com.sixbynine.transit.path.api.alerts.affectsLines
 import com.sixbynine.transit.path.api.alerts.hidesTrainAt
 import com.sixbynine.transit.path.api.impl.SchedulePathApi
+import com.sixbynine.transit.path.api.impl.TrainBackfillHelper
 import com.sixbynine.transit.path.api.isEastOf
 import com.sixbynine.transit.path.api.isInNewJersey
 import com.sixbynine.transit.path.api.isInNewYork
@@ -430,25 +430,9 @@ object WidgetDataFetcher {
             
             // For commute widget with 2 stations, filter trains to those that pass through both stations
             val filteredTrains = if (isCommuteWidget && adjustedStations.size == 2) {
-                val lineDirections = getLinesForStationPair(station.pathApiName, adjustedStations.last().pathApiName)
-                
-                // Filter trains by direction
+                val destination = adjustedStations.last()
                 apiTrains.filter { train ->
-                    val direction = train.directionState
-                    if (direction == null) {
-                        // No direction state, allow the train
-                        true
-                    } else {
-                        // Check if this train is on any of our lines AND going in the right direction
-                        train.lines?.any { line ->
-                            lineDirections.any { lineDir ->
-                                lineDir.line == line && (
-                                (lineDir.wantToNY && direction == State.NewYork) ||
-                                (!lineDir.wantToNY && direction == State.NewJersey)
-                                )
-                            }
-                        } ?: false // No lines on train, filter it out
-                    }
+                    TrainBackfillHelper.doesTrainConnect(train, station, destination)
                 }
             } else {
                 // For regular widget or commute widget with < 2 stations, use simple line filtering
@@ -638,87 +622,6 @@ object WidgetDataFetcher {
                 _nonFetchLocationReceived.tryEmit(Unit)
             }
         }
-    }
-
-    /**
-     * Determines which PATH lines run between a departure station and destination station.
-     * This function is exposed to iOS through Kotlin Multiplatform.
-     */
-    data class LineDirection(
-        val line: Line,
-        val wantToNY: Boolean
-    )
-
-    @OptIn(kotlin.experimental.ExperimentalObjCName::class)
-    @ObjCName(name = "getLinesForStationPair") // This exposes the function directly to Swift
-    fun getLinesForStationPair(departure: String, destination: String): Set<LineDirection> {
-        // Define the main PATH routes
-        val nwkWtcRoute = listOf("NWK", "HAR", "JSQ", "GRV", "EXP", "WTC")
-        val jsq33sRoute = listOf("JSQ", "GRV", "NEW", "CHR", "09S", "14S", "23S", "33S")
-        val hobWtcRoute = listOf("HOB", "NEW", "EXP", "WTC")
-        val hob33sRoute = listOf("HOB", "CHR", "09S", "14S", "23S", "33S")
-        val jsqHob33sRoute = listOf("JSQ", "GRV", "NEW", "HOB", "CHR", "09S", "14S", "23S", "33S")
-
-        val lineDirections = mutableSetOf<LineDirection>()
-
-        // Check if current time is during late night/weekend hours (11pm-6am or weekends)
-        val currentTime = now().toLocalDateTime(NewYorkTimeZone)
-        val hour = currentTime.hour
-        val dayOfWeek = currentTime.dayOfWeek
-        val isLateNightOrWeekend = hour >= 23 || hour < 6 || dayOfWeek == SATURDAY || dayOfWeek == SUNDAY
-
-        // Check NWK-WTC route (valid all times)
-        val nwkWtcDep = nwkWtcRoute.indexOf(departure)
-        val nwkWtcDest = nwkWtcRoute.indexOf(destination)
-        if (nwkWtcDep != -1 && nwkWtcDest != -1) {
-            lineDirections.add(LineDirection(
-                line = Line.NewarkWtc,
-                wantToNY = nwkWtcDep < nwkWtcDest
-            ))
-        }
-
-        if (isLateNightOrWeekend) {
-            // During late night/weekend hours, check JSQ-HOB-33S route
-            val jsqHobDep = jsqHob33sRoute.indexOf(departure)
-            val jsqHobDest = jsqHob33sRoute.indexOf(destination)
-            if (jsqHobDep != -1 && jsqHobDest != -1) {
-                lineDirections.add(LineDirection(line = Line.JournalSquare33rd, wantToNY = jsqHobDep < jsqHobDest))
-                lineDirections.add(LineDirection(line = Line.Hoboken33rd, wantToNY = jsqHobDep < jsqHobDest))
-            }
-        } else {
-            // During regular hours (6am-11pm, Monday-Friday), check regular routes
-            // Check JSQ-33S route
-            val jsq33sDep = jsq33sRoute.indexOf(departure)
-            val jsq33sDest = jsq33sRoute.indexOf(destination)
-            if (jsq33sDep != -1 && jsq33sDest != -1) {
-                lineDirections.add(LineDirection(
-                    line = Line.JournalSquare33rd,
-                    wantToNY = jsq33sDep < jsq33sDest
-                ))
-            }
-
-            // Check HOB-WTC route
-            val hobWtcDep = hobWtcRoute.indexOf(departure)
-            val hobWtcDest = hobWtcRoute.indexOf(destination)
-            if (hobWtcDep != -1 && hobWtcDest != -1) {
-                lineDirections.add(LineDirection(
-                    line = Line.HobokenWtc,
-                    wantToNY = hobWtcDep < hobWtcDest
-                ))
-            }
-
-            // Check HOB-33S route
-            val hob33sDep = hob33sRoute.indexOf(departure)
-            val hob33sDest = hob33sRoute.indexOf(destination)
-            if (hob33sDep != -1 && hob33sDest != -1) {
-                lineDirections.add(LineDirection(
-                    line = Line.Hoboken33rd,
-                    wantToNY = hob33sDep < hob33sDest
-                ))
-            }
-        }
-
-        return lineDirections
     }
 
     @OptIn(kotlin.experimental.ExperimentalObjCName::class)

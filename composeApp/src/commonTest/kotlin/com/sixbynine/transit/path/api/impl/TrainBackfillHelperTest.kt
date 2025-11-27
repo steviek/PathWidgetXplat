@@ -3,15 +3,20 @@ package com.sixbynine.transit.path.api.impl
 import com.sixbynine.transit.path.api.DepartingTrain
 import com.sixbynine.transit.path.api.Line.HobokenWtc
 import com.sixbynine.transit.path.api.Line.NewarkWtc
+import com.sixbynine.transit.path.api.Line.JournalSquare33rd
+import com.sixbynine.transit.path.api.Line.Hoboken33rd
 import com.sixbynine.transit.path.api.State.NewJersey
 import com.sixbynine.transit.path.api.State.NewYork
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.Stations.ExchangePlace
 import com.sixbynine.transit.path.api.Stations.GroveStreet
 import com.sixbynine.transit.path.api.Stations.Harrison
+import com.sixbynine.transit.path.api.Stations.Hoboken
 import com.sixbynine.transit.path.api.Stations.JournalSquare
 import com.sixbynine.transit.path.api.Stations.Newark
 import com.sixbynine.transit.path.api.Stations.Newport
+import com.sixbynine.transit.path.api.Stations.TwentyThirdStreet
+import com.sixbynine.transit.path.api.Stations.ThirtyThirdStreet
 import com.sixbynine.transit.path.api.Stations.WorldTradeCenter
 import com.sixbynine.transit.path.model.Colors
 import com.sixbynine.transit.path.util.IsTest
@@ -28,6 +33,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -372,6 +378,54 @@ class TrainBackfillHelperTest {
         assertEquals(listOf("10:23", "10:43"), expTrainTimes)
     }
 
+    @Test
+    fun `doesTrainConnect logic`() {
+        val time = LocalDate(2021, JANUARY, 21).atTime(10, 0).toUtcInstant()
+
+        // NWK -> WTC should connect Newark to WTC
+        val nwkToWtcTrain = nwkWtcTrain(time)
+        assertTrue(TrainBackfillHelper.doesTrainConnect(nwkToWtcTrain, Newark, WorldTradeCenter))
+        assertTrue(TrainBackfillHelper.doesTrainConnect(nwkToWtcTrain, JournalSquare, ExchangePlace))
+
+        // NWK -> WTC should NOT connect WTC to Newark (wrong direction)
+        assertFalse(TrainBackfillHelper.doesTrainConnect(nwkToWtcTrain, WorldTradeCenter, Newark))
+
+        // NWK -> WTC should NOT connect WTC to Grove (wrong direction)
+        assertFalse(TrainBackfillHelper.doesTrainConnect(nwkToWtcTrain, WorldTradeCenter, GroveStreet))
+
+        // JSQ -> 33 (Weekday)
+        val jsq33Train = jsq33Train(time)
+        // Should connect JSQ to 33rd
+        assertTrue(TrainBackfillHelper.doesTrainConnect(jsq33Train, JournalSquare, ThirtyThirdStreet))
+        // Should NOT connect JSQ to Hoboken (skips Hoboken)
+        assertFalse(TrainBackfillHelper.doesTrainConnect(jsq33Train, JournalSquare, Hoboken))
+
+        // JSQ -> 33 via HOB (Weekend/Late Night)
+        // Use a weekend time (Jan 24, 2021 was a Sunday)
+        val weekendTime = LocalDate(2021, JANUARY, 24).atTime(2, 0).toUtcInstant()
+        val jsq33ViaHobTrain = jsq33ViaHobTrain(weekendTime)
+        // Should connect JSQ to 33rd
+        assertTrue(TrainBackfillHelper.doesTrainConnect(jsq33ViaHobTrain, JournalSquare, ThirtyThirdStreet))
+        // Should connect JSQ to Hoboken
+        assertTrue(TrainBackfillHelper.doesTrainConnect(jsq33ViaHobTrain, JournalSquare, Hoboken))
+        // Should connect Hoboken to 33rd
+        assertTrue(TrainBackfillHelper.doesTrainConnect(jsq33ViaHobTrain, Hoboken, ThirtyThirdStreet))
+        // Should NOT connect Hoboken to WTC
+        assertFalse(TrainBackfillHelper.doesTrainConnect(jsq33ViaHobTrain, Hoboken, WorldTradeCenter))
+
+        // 33 -> JSQ (Weekday)
+        val thirtyThirdToJsqTrain = thirtyThirdToJsqTrain(time)
+        assertTrue(TrainBackfillHelper.doesTrainConnect(thirtyThirdToJsqTrain, TwentyThirdStreet, JournalSquare))
+        assertFalse(TrainBackfillHelper.doesTrainConnect(thirtyThirdToJsqTrain, TwentyThirdStreet, ThirtyThirdStreet))
+
+        // 33 -> JSQ via Hoboken (Weekend/Late Night)
+        val thirtyThirdJsqViaHobTrain = thirtyThirdJsqViaHobTrain(weekendTime)
+        assertTrue(TrainBackfillHelper.doesTrainConnect(thirtyThirdJsqViaHobTrain, ThirtyThirdStreet, JournalSquare))
+        assertTrue(TrainBackfillHelper.doesTrainConnect(thirtyThirdJsqViaHobTrain, ThirtyThirdStreet, Hoboken))
+        assertTrue(TrainBackfillHelper.doesTrainConnect(thirtyThirdJsqViaHobTrain, Hoboken, JournalSquare))
+        assertFalse(TrainBackfillHelper.doesTrainConnect(thirtyThirdJsqViaHobTrain, Hoboken, WorldTradeCenter))
+    }
+
     private fun departuresMap(
         builder: DeparturesMapBuilder.() -> Unit
     ): Map<String, List<DepartingTrain>> {
@@ -520,6 +574,54 @@ class TrainBackfillHelperTest {
                 backfillSource = null,
                 directionState = NewYork,
                 lines = setOf(NewarkWtc)
+            )
+        }
+
+        fun jsq33Train(projectedArrival: Instant): DepartingTrain {
+            return DepartingTrain(
+                headsign = "33rd Street",
+                projectedArrival = projectedArrival,
+                lineColors = Colors.Jsq33s,
+                isDelayed = false,
+                backfillSource = null,
+                directionState = NewYork,
+                lines = setOf(JournalSquare33rd)
+            )
+        }
+
+        fun jsq33ViaHobTrain(projectedArrival: Instant): DepartingTrain {
+            return DepartingTrain(
+                headsign = "33rd Street via Hoboken",
+                projectedArrival = projectedArrival,
+                lineColors = Colors.Hob33s + Colors.Jsq33s,
+                isDelayed = false,
+                backfillSource = null,
+                directionState = NewYork,
+                lines = setOf(JournalSquare33rd, Hoboken33rd)
+            )
+        }
+
+        fun thirtyThirdToJsqTrain(projectedArrival: Instant): DepartingTrain {
+            return DepartingTrain(
+                headsign = "Journal Square",
+                projectedArrival = projectedArrival,
+                lineColors = Colors.Jsq33s,
+                isDelayed = false,
+                backfillSource = null,
+                directionState = NewJersey,
+                lines = emptySet() // LineHelper should infer this
+            )
+        }
+
+        fun thirtyThirdJsqViaHobTrain(projectedArrival: Instant): DepartingTrain {
+            return DepartingTrain(
+                headsign = "Journal Square via Hoboken",
+                projectedArrival = projectedArrival,
+                lineColors = Colors.Hob33s + Colors.Jsq33s,
+                isDelayed = false,
+                backfillSource = null,
+                directionState = NewJersey,
+                lines = emptySet() // LineHelper should infer this
             )
         }
     }

@@ -81,7 +81,7 @@ fun HomeScreenScope.DepartureBoard() {
                 Station(
                     station,
                     index,
-                    Modifier.padding(horizontal = 16.dp, vertical = 8.dp).animateItemPlacement()
+                    Modifier.padding(horizontal = 16.dp).animateItemPlacement()
                 )
             }
         }
@@ -135,7 +135,8 @@ private fun HomeScreenScope.Station(
         // Divider between items (not before the first one)
         if (index > 0) {
             HorizontalDivider(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                color = MaterialTheme.colorScheme.outline
             )
         }
         
@@ -149,8 +150,8 @@ private fun HomeScreenScope.Station(
                 containerColor = MaterialTheme.colorScheme.background
             )
         ) {
-            Column(Modifier.padding(bottom = 8.dp)) {
-            StationHeader(
+            Column(Modifier.padding(bottom = 24.dp)) {
+                StationHeader(
                 modifier = Modifier.fillMaxSize(),
                 canMoveDown = canMoveDown,
                 canMoveUp = canMoveUp,

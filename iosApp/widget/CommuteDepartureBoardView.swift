@@ -13,22 +13,7 @@ import CoreLocation
 
 struct CommuteDepartureBoardView: View {
     let entry: CommuteProvider.Entry
-    
-    private func measureTextWidth(maxSize: CGSize, text: String, font: UIFont) -> CGFloat {
-        return measureTextSize(maxSize: maxSize, text: text, font: font).width
-    }
-    
-    private func measureTextSize(maxSize: CGSize, text: String, font: UIFont) -> CGRect {
-        let attributes = [NSAttributedString.Key.font: font]
-        let boundingRect = text.boundingRect(
-            with: maxSize,
-            options: [.usesLineFragmentOrigin, .usesFontLeading],
-            attributes: attributes,
-            context: nil
-        )
-        return boundingRect
-    }
-    
+        
     var body: some View {
         if showEmptyView(entry) {
             CommuteEmptyView(entry: entry)
@@ -54,16 +39,14 @@ struct CommuteDepartureBoardContent: View {
         let textColor = SeasonalUtils.getSeasonalTextColor(for: entry.date)
         
         ZStack {
-            // Seasonal background
-            GeometryReader { geometry in
-                Image(seasonalBackground)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: geometry.size.width, height: geometry.size.height)
-                    .clipped()
-                    .edgesIgnoringSafeArea(.all)
-            }
-            
+            // Seasonal background sized directly from the widget context
+            Image(seasonalBackground)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: entry.size.width, height: entry.size.height)
+                .clipped()
+                .edgesIgnoringSafeArea(.all)
+                        
             VStack(alignment: .leading, spacing: 0) {
                 // Main content
                 if let data = entry.data {
@@ -97,7 +80,8 @@ struct CommuteStationView: View {
             CommuteStationTitle(
                 title: station.displayName,
                 destinationStation: entry.configuration.destinationStation.toStation()?.displayName,
-                textColor: textColor
+                textColor: textColor,
+                maxWidth: entry.size.width
             )
             
             if !station.trains.isEmpty {
@@ -117,6 +101,7 @@ struct CommuteStationTitle: View {
     let title: String
     let destinationStation: String?
     let textColor: Color
+    let maxWidth: CGFloat
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -125,12 +110,14 @@ struct CommuteStationTitle: View {
                 WidgetDataFormatter().formatHeadSign(
                     title: title,
                     fits: { text in
+                        // Use the widget's available width (or smaller) instead of a hardcoded value
+                        let availableWidth = maxWidth
                         let textWidth = measureTextWidth(
-                            maxSize: CGSize(width: 200, height: 50),
+                            maxSize: CGSize(width: availableWidth, height: 50),
                             text: text,
-                            font: UIFont.arimaStyleMedium(size: 14)
+                            font: UIFont.arimaStyleMediumItalic(size: 14)
                         )
-                        return (textWidth <= 200).toKotlinBoolean()
+                        return (textWidth <= availableWidth).toKotlinBoolean()
                     }
                 )
             )
@@ -174,12 +161,13 @@ struct CommuteTrainDisplay: View {
                         .font(Font.arimaStyleBold(size: 32))
                         .foregroundColor(textColor)
                 } else {
-                    // For relative time, split number and "min"
-                    let (numberPart, minPart) = splitTimeString(firstTime)
-                    Text(numberPart)
+                    // For relative time, show condensed format with "min" suffix
+                    let condensedTime = formatCondensedArrivalTime(firstTrain)
+                    let minSuffix = getMinSuffix(firstTrain)
+                    Text(condensedTime)
                         .font(Font.arimaStyleBold(size: 32))
                         .foregroundColor(textColor)
-                    Text(minPart)
+                    Text(minSuffix)
                         .font(Font.arimaStyleBold(size: 24))
                         .foregroundColor(textColor)
                 }
@@ -188,9 +176,12 @@ struct CommuteTrainDisplay: View {
             // Remaining trains - secondary line
             if trains.count > 1 {
                 let remainingTrains = Array(trains.dropFirst().prefix(5))
-                let remainingTimes = remainingTrains.map { formatArrivalTime($0) }
-                let alsoText = entry.configuration.timeDisplay == .clock ? "also at " : "also in "
-                let timesString = formatRemainingTimes(remainingTimes: remainingTimes, alsoText: alsoText)
+                let remainingArrivals = remainingTrains.map { $0.projectedArrival }
+                let timesString = GroupedWidgetLayoutHelper.Companion().joinAdditionalTimes(
+                    timeDisplay: entry.configuration.timeDisplay.toKotlinTimeDisplay(),
+                    times: remainingArrivals,
+                    displayAt: entry.date.toKotlinInstant()
+                )
                 
                 Text(timesString)
                     .font(Font.arimaStyle(size: 12))
@@ -205,64 +196,34 @@ struct CommuteTrainDisplay: View {
         .padding(.leading, 4)
     }
     
-    private func splitTimeString(_ timeString: String) -> (String, String) {
-        // Handle cases like "5 min", "1 min", "~5 min", "now"
-        if timeString == "now" {
-            return ("now", "")
-        }
-        
-        // Check if string contains "min"
-        if let minRange = timeString.range(of: " min") {
-            let numberPart = String(timeString[..<minRange.lowerBound])
-            let minPart = String(timeString[minRange.lowerBound...])
-            return (numberPart, minPart)
-        }
-        
-        // If no "min" found, return the whole string as number part
-        return (timeString, "")
-    }
-    
     private func formatArrivalTime(_ train: DepartureBoardData.TrainData) -> String {
-        var arrivalTime: String
-        if (entry.configuration.timeDisplay == .clock) {
-            arrivalTime = WidgetDataFormatter().formatTime(instant: train.projectedArrival)
+        if entry.configuration.timeDisplay == .clock {
+            return WidgetDataFormatter().formatTime(instant: train.projectedArrival)
         } else {
-            arrivalTime = WidgetDataFormatter().formatRelativeTime(
+            return WidgetDataFormatter().formatRelativeTime(
                 now: entry.date.toKotlinInstant(),
                 time: train.projectedArrival
             )
         }
-        return arrivalTime
     }
     
-    private func formatRemainingTimes(remainingTimes: [String], alsoText: String) -> String {
-        if entry.configuration.timeDisplay == .clock {
-            // For clock times, remove "~" from all except the first one
-            let processedTimes = remainingTimes.enumerated().map { index, time in
-                if index == 0 {
-                    return time // Keep first time as-is (with or without ~)
-                } else {
-                    // Remove "~" from subsequent times
-                    return time.hasPrefix("~") ? String(time.dropFirst()) : time
-                }
-            }
-            return alsoText + processedTimes.joined(separator: ", ")
-        } else {
-            // For relative times, extract numbers and add "mins" at the end
-            let timeNumbers = remainingTimes.enumerated().map { index, time in
-                var processedTime = time
-                // Remove "~" from all except the first one
-                if index > 0 && processedTime.hasPrefix("~") {
-                    processedTime = String(processedTime.dropFirst())
-                }
-                // Remove " mins" suffix if present
-                if processedTime.hasSuffix(" min") {
-                    return String(processedTime.dropLast(4))
-                }
-                return processedTime
-            }
-            return alsoText + timeNumbers.joined(separator: ", ") + " min"
+    private func formatCondensedArrivalTime(_ train: DepartureBoardData.TrainData) -> String {
+        return WidgetDataFormatter().formatCondensedRelativeTime(
+            now: entry.date.toKotlinInstant(),
+            time: train.projectedArrival
+        )
+    }
+    
+    private func getMinSuffix(_ train: DepartureBoardData.TrainData) -> String {
+        let minutes = WidgetDataFormatter().getMinutesBetween(
+            now: entry.date.toKotlinInstant(),
+            time: train.projectedArrival
+        )
+        // Only show " min" suffix if under an hour (and not "due")
+        if minutes >= 1 && minutes < 60 {
+            return " min"
         }
+        return ""
     }
 }
 
@@ -316,22 +277,17 @@ struct CommuteFooterView: View {
     let entry: CommuteProvider.Entry
     let textColor: Color
     
-    private func measureTextWidth(maxSize: CGSize, text: String, font: UIFont) -> CGFloat {
-        let attributes = [NSAttributedString.Key.font: font]
-        let boundingRect = text.boundingRect(
-            with: maxSize,
-            options: [.usesLineFragmentOrigin, .usesFontLeading],
-            attributes: attributes,
-            context: nil
-        )
-        return boundingRect.width
-    }
-    
     var body: some View {
         HStack(spacing: 0) {
             // Time text grouped with refresh button (only if enabled)
             if entry.configuration.showLastRefreshedTime {
-                Text(getFooterText())
+                Text(getFooterText(
+                    dataFrom: entry.dataFrom,
+                    displayDate: entry.date,
+                    hasError: entry.hasError,
+                    timeDisplay: entry.configuration.timeDisplay,
+                    footerTextFits: footerTextFits
+                ))
                     .font(Font.arimaStyle(size: 12))
                     .italic()
                     .foregroundColor(textColor)
@@ -363,71 +319,18 @@ struct CommuteFooterView: View {
         .frame(maxWidth: .infinity, alignment: .trailing)
     }
     
-    private func getFooterText() -> String {
-        let formattedFetchTime = WidgetDataFormatter().formatTime(instant: entry.dataFrom.toKotlinInstant())
-
-        // Priority 1: Show error messages if there's an error state
-        if entry.hasError {
-            return if footerTextFits(IosResourceProvider().getErrorLong()) {
-                // Use the full error message if it fits
-                IosResourceProvider().getErrorLong()
-            } else {
-                // Fall back to shorter error message if space is limited
-                IosResourceProvider().getErrorShort()
-            }
-        }
-
-        // Priority 2: Handle clock time display mode (shows actual clock times)
-        if entry.configuration.timeDisplay == .clock {
-            let longText = IosResourceProvider().getUpdatedAtTime(formattedFetchTime: formattedFetchTime)
-
-            return if footerTextFits(longText) {
-                // Show "Updated at [time]" if it fits
-                longText
-            } else {
-                // Just show the time if space is limited
-                formattedFetchTime
-            }
-        }
-
-        // Priority 3: Handle relative time display mode (shows "X minutes ago" style)
-        // Format the current display time (when the widget is showing data for)
-        let displayTime = WidgetDataFormatter().formatTime(instant: entry.date.toKotlinInstant())
+    /// Checks if the footer text fits within the available space
+    /// Accounts for the refresh button, destination station, and padding
+    private func footerTextFits(_ text: String) -> Bool {
+        // Calculate available width: total width - refresh button (24) - destination station text - padding (16)
+        let destinationStationWidth = measureTextWidth(maxSize: entry.size, text: getDestinationStationName(), font: UIFont.arimaStyleItalic(size: 12))
+        let maxWidth = entry.size.width - (24 + 16 + 8 + destinationStationWidth) // 8 for spacing between refresh and time
         
-        // Try the full relative time text first (e.g., "Updated at 2:30 PM, data from 2:25 PM")
-        let fullText = IosResourceProvider().getFullRelativeUpdatedAtTime(
-            displayTime: displayTime,
-            dataTime: formattedFetchTime
-        )
-        if footerTextFits(fullText) {
-            return fullText
-        }
-
-        // Try a shorter version of the relative time text
-        let shorterText = IosResourceProvider().getShorterRelativeUpdatedAtTime(
-            displayTime: displayTime,
-            dataTime: formattedFetchTime
-        )
-        if footerTextFits(shorterText) {
-            return shorterText
-        }
-
-        // Final fallback: just show the display time
-        return displayTime
+        return measureTextWidth(maxSize: entry.size, text: text, font: UIFont.arimaStyleItalic(size: 12)) <= maxWidth
     }
 
     /// Gets the display name for the destination station from the configuration
     private func getDestinationStationName() -> String {
         return entry.configuration.destinationStation.toStation()?.displayName ?? "Unknown"
-    }
-
-    /// Checks if the footer text fits within the available space
-    /// Accounts for the refresh button, destination station, and padding
-    private func footerTextFits(_ text: String) -> Bool {
-        // Calculate available width: total width - refresh button (24) - destination station text - padding (16)
-        let destinationStationWidth = measureTextWidth(maxSize: entry.size, text: getDestinationStationName(), font: UIFont.systemFont(ofSize: 12))
-        let maxWidth = entry.size.width - (24 + 16 + 8 + destinationStationWidth) // 8 for spacing between refresh and time
-
-        return measureTextWidth(maxSize: entry.size, text: text, font: UIFont.systemFont(ofSize: 12)) <= maxWidth
     }
 }

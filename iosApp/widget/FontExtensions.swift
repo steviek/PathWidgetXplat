@@ -57,6 +57,16 @@ extension UIFont {
         return UIFont(name: "Avenir", size: size) ?? UIFont.systemFont(ofSize: size, weight: weight)
     }
     
+    /// Creates an italic UIFont similar to Arima using Avenir with an italic trait when available
+    static func arimaStyleItalic(size: CGFloat, weight: UIFont.Weight = .regular) -> UIFont {
+        let baseFont = arimaStyle(size: size, weight: weight)
+        if let italicDescriptor = baseFont.fontDescriptor.withSymbolicTraits(.traitItalic) {
+            return UIFont(descriptor: italicDescriptor, size: size)
+        } else {
+            return baseFont
+        }
+    }
+    
     /// Creates a bold Arima-style UIFont
     static func arimaStyleBold(size: CGFloat) -> UIFont {
         return arimaStyle(size: size, weight: .bold)
@@ -65,6 +75,11 @@ extension UIFont {
     /// Creates a medium weight Arima-style UIFont
     static func arimaStyleMedium(size: CGFloat) -> UIFont {
         return arimaStyle(size: size, weight: .medium)
+    }
+    
+    /// Creates a medium weight, italic Arima-style UIFont
+    static func arimaStyleMediumItalic(size: CGFloat) -> UIFont {
+        return arimaStyleItalic(size: size, weight: .medium)
     }
 }
 

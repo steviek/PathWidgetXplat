@@ -45,6 +45,45 @@ enum HourOfDay : Int, AppEnum {
     ]
 }
 
+enum Weekday: String, AppEnum, CaseIterable {
+    case sunday = "sunday"
+    case monday = "monday"
+    case tuesday = "tuesday"
+    case wednesday = "wednesday"
+    case thursday = "thursday"
+    case friday = "friday"
+    case saturday = "saturday"
+    
+    static var typeDisplayRepresentation: TypeDisplayRepresentation = "Day"
+    
+    static var caseDisplayRepresentations: [Weekday: DisplayRepresentation] = [
+        .sunday: "Sunday",
+        .monday: "Monday",
+        .tuesday: "Tuesday",
+        .wednesday: "Wednesday",
+        .thursday: "Thursday",
+        .friday: "Friday",
+        .saturday: "Saturday"
+    ]
+    
+    static var weekdays: [Weekday] {
+        [.monday, .tuesday, .wednesday, .thursday, .friday]
+    }
+    
+    // Calendar weekday: 1 = Sunday, 2 = Monday, ..., 7 = Saturday
+    var calendarWeekday: Int {
+        switch self {
+        case .sunday: return 1
+        case .monday: return 2
+        case .tuesday: return 3
+        case .wednesday: return 4
+        case .thursday: return 5
+        case .friday: return 6
+        case .saturday: return 7
+        }
+    }
+}
+
 struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
     static var title: LocalizedStringResource = "My Commute"
     static var description = IntentDescription("Route based widget with seasonal themes and auto-reverse for commutes")
@@ -56,6 +95,7 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
                 \.$destinationStation
                 \.$timeDisplay
                 \.$autoReverse
+                \.$reverseDays
                 \.$reverseStartHour
                 \.$reverseEndHour
                 \.$showLastRefreshedTime
@@ -85,17 +125,23 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
     
     @Parameter(
         title: "Reverse from",
-        default: .am11,
+        default: .pm12,
         requestValueDialog: IntentDialog("When should stations reverse?")
     )
     var reverseStartHour: HourOfDay?
     
     @Parameter(
         title: "Reverse until",
-        default: .pm8,
+        default: .am3,
         requestValueDialog: IntentDialog("When should reversal end?")
     )
     var reverseEndHour: HourOfDay?
+
+        @Parameter(
+        title: "Reverse on days",
+        default: [Weekday.monday, Weekday.tuesday, Weekday.wednesday, Weekday.thursday, Weekday.friday]
+    )
+    var reverseDays: [Weekday]
 
     @Parameter(title: "Show last refreshed time", default: false)
     var showLastRefreshedTime: Bool
@@ -105,8 +151,9 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
         self.destinationStation = .wtc
         self.timeDisplay = .relative
         self.autoReverse = false
-        self.reverseStartHour = .am11
-        self.reverseEndHour = .pm8
+        self.reverseDays = Weekday.weekdays
+        self.reverseStartHour = .pm12
+        self.reverseEndHour = .am3
     }
     
     init(
@@ -115,6 +162,7 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
         timeDisplay: TimeDisplay = .relative,
         autoReverse: Bool = false,
         showLastRefreshedTime: Bool = false,
+        reverseDays: [Weekday] = Weekday.weekdays,
         reverseStartHour: HourOfDay? = nil,
         reverseEndHour: HourOfDay? = nil
     ) {
@@ -123,11 +171,12 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
         self.timeDisplay = timeDisplay
         self.autoReverse = autoReverse
         self.showLastRefreshedTime = showLastRefreshedTime
+        self.reverseDays = reverseDays
         self.reverseStartHour = reverseStartHour
         self.reverseEndHour = reverseEndHour
     }
     
-    // Helper function to determine if stations should be reversed based on current time
+    // Helper function to determine if stations should be reversed based on current time and day
     func shouldReverseStations() -> Bool {
         guard autoReverse else { return false }
         guard let startHour = reverseStartHour?.rawValue,
@@ -138,6 +187,13 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
         let calendar = Calendar.current
         let now = Date()
         let currentHour = calendar.component(.hour, from: now)
+        let currentWeekday = calendar.component(.weekday, from: now)
+        
+        // Check if current day is in the selected days
+        // Use weekdays as default if array is empty (fallback for parameter default issues)
+        let activeDays = reverseDays.isEmpty ? Weekday.weekdays : reverseDays
+        let isActiveDay = activeDays.contains { $0.calendarWeekday == currentWeekday }
+        guard isActiveDay else { return false }
         
         // Check if current hour is within the reverse range
         if startHour <= endHour {

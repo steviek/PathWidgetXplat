@@ -369,6 +369,16 @@
         }
       }
     },
+    "Day" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Día"
+          }
+        }
+      }
+    },
     "Departure board for PATH" : {
       "localizations" : {
         "es" : {
@@ -419,6 +429,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Filtro"
+          }
+        }
+      }
+    },
+    "Friday" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Viernes"
           }
         }
       }
@@ -530,6 +550,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Se requiere acceso a la ubicación"
+          }
+        }
+      }
+    },
+    "Monday" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lunes"
           }
         }
       }
@@ -664,6 +694,16 @@
         }
       }
     },
+    "Reverse on days" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invertir en los días"
+          }
+        }
+      }
+    },
     "Reverse until" : {
       "localizations" : {
         "es" : {
@@ -676,6 +716,16 @@
     },
     "Route based widget with seasonal themes and auto-reverse for commutes" : {
 
+    },
+    "Saturday" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sábado"
+          }
+        }
+      }
     },
     "Show last refreshed time" : {
       "localizations" : {
@@ -707,6 +757,26 @@
         }
       }
     },
+    "Sunday" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Domingo"
+          }
+        }
+      }
+    },
+    "Thursday" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jueves"
+          }
+        }
+      }
+    },
     "Time" : {
       "localizations" : {
         "es" : {
@@ -727,6 +797,16 @@
         }
       }
     },
+    "Tuesday" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Martes"
+          }
+        }
+      }
+    },
     "Updates all the widgets" : {
       "localizations" : {
         "es" : {
@@ -739,6 +819,16 @@
     },
     "View upcoming train departures by station" : {
 
+    },
+    "Wednesday" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Miércoles"
+          }
+        }
+      }
     },
     "When should reversal end?" : {
       "localizations" : {

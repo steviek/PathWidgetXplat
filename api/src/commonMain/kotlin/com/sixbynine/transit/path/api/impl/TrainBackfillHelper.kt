@@ -35,6 +35,7 @@ import com.sixbynine.transit.path.api.impl.TrainBackfillHelper.LineId.Companion.
 import com.sixbynine.transit.path.api.impl.TrainBackfillHelper.LineId.Companion.WTC_NWK
 import com.sixbynine.transit.path.api.impl.TrainBackfillHelper.LineIdToCheckpointsSlower
 import com.sixbynine.transit.path.api.isInNewYork
+import com.sixbynine.transit.path.api.terminalStation
 import com.sixbynine.transit.path.model.ColorWrapper
 import com.sixbynine.transit.path.model.Colors
 import com.sixbynine.transit.path.time.NewYorkTimeZone
@@ -135,16 +136,6 @@ object TrainBackfillHelper {
      * This is used for "backfilling" arrival times: when we know a train's departure from one
      * station, we can estimate its arrival at subsequent stations by adding the travel time
      * between checkpoints.
-     *
-     * Each entry maps a station to the duration since the train left the first station on the
-     * line. The final station uses [EndOfLine] as a sentinel value—this sentinel is not used
-     * for actual time calculations, but to indicate that the station is part of the route
-     * (e.g., for determining which stations a train will pass through).
-     *
-     * Example: For [NWK_WTC], a train leaving Newark at 0:00 will reach Harrison at ~1:42,
-     * Journal Square at ~12:43, etc. World Trade Center has [EndOfLine] because it's the
-     * terminus—we don't need to backfill times for the final stop, but we need to know
-     * the train reaches it.
      *
      * This version contains faster/peak travel times. See [LineIdToCheckpointsSlower] for
      * off-peak times.
@@ -383,28 +374,7 @@ object TrainBackfillHelper {
     fun doesTrainConnect(train: DepartingTrain, from: Station, to: Station): Boolean {
         val lineId = train.getLineId(from)
         val checkpoints = LineIdToCheckpointsFaster[lineId] ?: return false
-        val fromTime = checkpoints[from] ?: return false
-        val toTime = checkpoints[to] ?: return false
-        if (toTime <= fromTime) return false
-        
-        // Stop short logic
-        val trainTerminalStation = Stations.fromHeadSign(train.headsign)
-        if (trainTerminalStation != null &&
-            trainTerminalStation in checkpoints) {
-             val termTime = checkpoints[trainTerminalStation] ?: return true
-             if (termTime < toTime) return false
-        }
-        return true
-    }
-
-    fun getLineIdsConnecting(from: Station, to: Station): List<LineId> {
-         return LineIdToCheckpointsFaster.entries
-            .filter { (_, checkpoints) ->
-                val fromTime = checkpoints[from]
-                val toTime = checkpoints[to]
-                fromTime != null && toTime != null && toTime > fromTime
-            }
-            .map { it.key }
+        return checkpoints.doesTrainGoTo(train, to) && checkpoints.isEarlier(from, to)
     }
 
     /**
@@ -457,12 +427,6 @@ object TrainBackfillHelper {
                     return@eachTrain
                 }
 
-                infix fun Station.isLaterInLineThan(other: Station): Boolean {
-                    val d1 = checkpoints[this] ?: return false
-                    val d2 = checkpoints[other] ?: return true
-                    return d2 < d1
-                }
-
                 val stationCheckpointDuration = checkpoints[station] ?: return@eachTrain
                 checkpoints.forEach eachCheckpoint@{ futureStation, futureStationDuration ->
                     val travelTime = futureStationDuration - stationCheckpointDuration
@@ -471,10 +435,8 @@ object TrainBackfillHelper {
                         return@eachCheckpoint
                     }
 
-                    val trainTerminalStation = Stations.fromHeadSign(train.headsign)
-                    if (trainTerminalStation != null &&
-                        trainTerminalStation in checkpoints &&
-                        !(trainTerminalStation isLaterInLineThan futureStation)
+                    if (!checkpoints.doesTrainGoTo(train, futureStation) ||
+                        train.terminalStation == futureStation
                     ) {
                         // Don't backfill stations with trains that stop earlier than the station.
                         // e.g. don't backfill Harrison with a WTC-JSQ train.
@@ -501,7 +463,7 @@ object TrainBackfillHelper {
                         }
 
                         if (knownTrain.backfillSource == null ||
-                            knownTrain.backfillSource.station isLaterInLineThan station
+                            !checkpoints.isEarlier(knownTrain.backfillSource.station, station)
                         ) {
                             // live time or better backfill. move along
                             return@eachCheckpoint

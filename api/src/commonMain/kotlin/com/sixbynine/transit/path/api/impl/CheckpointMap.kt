@@ -1,6 +1,8 @@
 package com.sixbynine.transit.path.api.impl
 
+import com.sixbynine.transit.path.api.DepartingTrain
 import com.sixbynine.transit.path.api.Station
+import com.sixbynine.transit.path.api.terminalStation
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
@@ -39,6 +41,23 @@ data class CheckpointMap(
 
     fun forEach(action: (Station, Duration) -> Unit) {
         checkpoints.forEach { (station, duration) -> action(station, duration) }
+    }
+
+    /**
+     * Returns `true` if [first] and [second] both appear in the line, and [first] appears before
+     * [second], `null` otherwise.
+     */
+    fun isEarlier(first: Station, second: Station): Boolean {
+        val pos1 = get(first) ?: return false
+        val pos2 = get(second) ?: return false
+        return pos1 < pos2
+    }
+
+    fun doesTrainGoTo(train: DepartingTrain, station: Station): Boolean {
+        val stationPosition = getPosition(station) ?: return false
+        val destination = train.terminalStation ?: return true
+        val destinationPosition = getPosition(destination) ?: return true
+        return stationPosition <= destinationPosition
     }
 }
 

@@ -227,14 +227,14 @@ class GithubAlertsTest {
                 days = DayOfWeek.entries,
                 start = LocalTime(0, 0),
                 end = LocalTime(5, 0),
-                from = LocalDate(2025, OCTOBER, 14),
+                from = LocalDate(2025, DECEMBER, 2),
                 to = LocalDate(2026, DECEMBER, 31),
             ),
             displaySchedule = Schedule.repeatingDaily(
                 days = DayOfWeek.entries,
                 start = LocalTime(22, 0),
                 end = LocalTime(5, 0),
-                from = LocalDate(2025, OCTOBER, 13),
+                from = LocalDate(2025, DECEMBER, 1),
                 to = LocalDate(2026, DECEMBER, 31),
             ),
             hiddenTrainsFilter = TrainFilter.all(),
@@ -252,8 +252,8 @@ class GithubAlertsTest {
             stations = listOf(NinthStreet, TwentyThirdStreet),
             hideTrainsSchedule = Schedule(),
             displaySchedule = Schedule.repeatingDaily(
-                from = LocalDate(2025, OCTOBER, 10),
-                to = LocalDate(2025, OCTOBER, 12),
+                from = LocalDate(2025, NOVEMBER, 28),
+                to = LocalDate(2025, DECEMBER, 1),
                 days = listOf(FRIDAY, SATURDAY, SUNDAY),
                 start = LocalTime(22, 0),
                 end = LocalTime(5, 0),
@@ -264,7 +264,7 @@ class GithubAlertsTest {
                 es = "Las estaciones de 9 St. y 23 St. permanecerán abiertas durante la noche este fin de semana"
             ),
             url = AlertText(
-                en = "https://www.panynj.gov/path/en/schedules-maps/weekend-schedules.html"
+                en = "https://www.panynj.gov/path/en/schedules-maps/holidays/thanksgiving-schedule.html"
             ),
             level = "INFO"
         )

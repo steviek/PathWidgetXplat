@@ -276,7 +276,8 @@ class SchedulePathApi : PathApi {
                         val checkpoints =
                             TrainBackfillHelper.getCheckpoints(route, isSlowTime = isSlowAt(time))
                                 ?: return@forEachDeparture
-                        checkpoints.filterKeys { it != origin }.forEach { (checkpointStation, checkpointTime) ->
+                        checkpoints.forEach { checkpointStation, checkpointTime ->
+                            if (checkpointStation == origin) return@forEach
                             results.getOrPut(checkpointStation.pathApiName) { mutableListOf() } +=
                                 originTrain.copy(
                                     projectedArrival = originTrain.projectedArrival + checkpointTime

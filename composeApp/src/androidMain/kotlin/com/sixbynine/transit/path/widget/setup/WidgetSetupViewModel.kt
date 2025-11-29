@@ -10,7 +10,7 @@ import com.sixbynine.transit.path.api.State.NewJersey
 import com.sixbynine.transit.path.api.State.NewYork
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.Stations
-import com.sixbynine.transit.path.api.DepartureBoardTrainFilter
+import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.api.state
 import com.sixbynine.transit.path.location.AndroidLocationProvider
 import com.sixbynine.transit.path.location.LocationPermissionRequestResult.Denied
@@ -69,7 +69,7 @@ class WidgetSetupViewModel : ViewModel() {
                             copy(
                                 useClosestStation = storedData.useClosestStation,
                                 sortOrder = storedData.sortOrder ?: StationSort.Alphabetical,
-                                filter = storedData.filter ?: DepartureBoardTrainFilter.All,
+                                filter = storedData.filter ?: TrainFilter.All,
                                 lines = storedData.lines,
                                 njStations = Stations.All
                                     .filter { it.state == NewJersey }

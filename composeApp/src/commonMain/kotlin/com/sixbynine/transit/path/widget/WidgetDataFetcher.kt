@@ -8,7 +8,7 @@ import com.sixbynine.transit.path.api.PathApiException
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.Stations
-import com.sixbynine.transit.path.api.DepartureBoardTrainFilter
+import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.api.UpcomingDepartures
 import com.sixbynine.transit.path.api.alerts.Alert
 import com.sixbynine.transit.path.api.alerts.AlertsRepository
@@ -101,7 +101,7 @@ object WidgetDataFetcher {
         stations: List<Station>,
         lines: Collection<Line>,
         sort: StationSort?,
-        filter: DepartureBoardTrainFilter,
+        filter: TrainFilter,
         includeClosestStation: Boolean,
         staleness: Staleness,
         onSuccess: (DepartureBoardData) -> Unit,
@@ -136,7 +136,7 @@ object WidgetDataFetcher {
         stations: List<Station>,
         lines: Collection<Line>,
         sort: StationSort?,
-        filter: DepartureBoardTrainFilter,
+        filter: TrainFilter,
         includeClosestStation: Boolean,
         staleness: Staleness,
         canRefreshLocation: Boolean = true,
@@ -389,7 +389,7 @@ object WidgetDataFetcher {
         stations: List<Station>,
         lines: Collection<Line>,
         sort: StationSort?,
-        filter: DepartureBoardTrainFilter,
+        filter: TrainFilter,
         closestStations: List<Station>?,
         alerts: List<Alert>?,
         data: UpcomingDepartures,
@@ -524,7 +524,7 @@ object WidgetDataFetcher {
     private fun matchesFilter(
         station: Station,
         train: DepartureBoardData.TrainData,
-        filter: DepartureBoardTrainFilter
+        filter: TrainFilter
     ): Boolean {
         return matchesFilter(station, train.title, filter)
     }
@@ -532,9 +532,9 @@ object WidgetDataFetcher {
     private fun matchesFilter(
         station: Station,
         headSign: String,
-        filter: DepartureBoardTrainFilter
+        filter: TrainFilter
     ): Boolean {
-        if (filter == DepartureBoardTrainFilter.All) return true
+        if (filter == TrainFilter.All) return true
 
         val destination = Stations.fromHeadSign(headSign) ?: return true
         return when {
@@ -629,7 +629,7 @@ object WidgetDataFetcher {
         stations: List<Station>,
         lines: List<Line>,
         sort: StationSort?,
-        filter: DepartureBoardTrainFilter,
+        filter: TrainFilter,
         includeClosestStation: Boolean,
         staleness: Staleness,
         onSuccess: (DepartureBoardData) -> Unit,

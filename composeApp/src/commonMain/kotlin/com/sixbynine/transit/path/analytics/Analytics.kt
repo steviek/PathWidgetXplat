@@ -4,7 +4,7 @@ import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.LocationSetting
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.StationSort
-import com.sixbynine.transit.path.api.DepartureBoardTrainFilter
+import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.app.settings.AvoidMissingTrains
 import com.sixbynine.transit.path.app.settings.StationLimit
 import com.sixbynine.transit.path.app.settings.TimeDisplay
@@ -32,7 +32,7 @@ object Analytics {
         strategy.logEvent("set_location_setting", mapOf("setting" to setting.name.lowercase()))
     }
 
-    fun filterSet(filter: DepartureBoardTrainFilter) {
+    fun filterSet(filter: TrainFilter) {
         strategy.logEvent("set_filter", mapOf("filter" to filter.name.lowercase()))
     }
 

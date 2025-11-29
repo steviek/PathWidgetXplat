@@ -5,7 +5,7 @@ import com.sixbynine.transit.path.analytics.Analytics
 import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.LocationSetting
 import com.sixbynine.transit.path.api.StationSort
-import com.sixbynine.transit.path.api.DepartureBoardTrainFilter
+import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.location.LocationPermissionRequestResult.Denied
 import com.sixbynine.transit.path.location.LocationPermissionRequestResult.Granted
 import com.sixbynine.transit.path.location.LocationProvider
@@ -28,7 +28,7 @@ import kotlinx.serialization.encodeToString
 object SettingsManager {
     private const val AvoidMissingTrainsKey = "avoid_missing_trains"
 
-    private val trainFilterPersister = SettingPersister("train_filter", DepartureBoardTrainFilter.All)
+    private val trainFilterPersister = SettingPersister("train_filter", TrainFilter.All)
     private val groupTrainsPersister = SettingPersister("group_trains", true)
     private val lineFilterPersister = BitFlagSettingPersister("line_filter", Line.permanentLines)
     private val timeDisplayPersister = SettingPersister("time_display", TimeDisplay.Relative)
@@ -171,7 +171,7 @@ object SettingsManager {
         }
     }
 
-    fun updateTrainFilter(trainFilter: DepartureBoardTrainFilter) = lightweightScope.launchAndReturnUnit {
+    fun updateTrainFilter(trainFilter: TrainFilter) = lightweightScope.launchAndReturnUnit {
         Analytics.filterSet(trainFilter)
         trainFilterPersister.update(trainFilter)
     }

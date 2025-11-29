@@ -17,7 +17,7 @@ import androidx.glance.currentState
 import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.MobilePathApplication
 import com.sixbynine.transit.path.api.Stations
-import com.sixbynine.transit.path.api.DepartureBoardTrainFilter
+import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.api.anyMatch
 import com.sixbynine.transit.path.model.DepartureBoardData
 import com.sixbynine.transit.path.time.NewYorkTimeZone
@@ -103,14 +103,14 @@ class DepartureBoardWidget : GlanceAppWidget() {
             }
         }
 
-        if (configuration.filter == DepartureBoardTrainFilter.Interstate) {
+        if (configuration.filter == TrainFilter.Interstate) {
             newStations.forEachIndexed { index, stationData ->
                 val station =
                     Stations.All.find { it.pathApiName == stationData.id } ?: return@forEachIndexed
                 newStations[index] = stationData.copy(
                     signs = stationData.signs.filter { sign ->
                         val destination = Stations.fromHeadSign(sign.title) ?: return@filter true
-                        DepartureBoardTrainFilter.matchesFilter(station, destination, DepartureBoardTrainFilter.Interstate)
+                        TrainFilter.matchesFilter(station, destination, TrainFilter.Interstate)
                     }
                 )
             }

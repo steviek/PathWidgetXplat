@@ -1,7 +1,7 @@
 package com.sixbynine.transit.path.app.ui.station
 
-import com.sixbynine.transit.path.api.DepartureBoardTrainFilter
-import com.sixbynine.transit.path.api.DepartureBoardTrainFilter.Companion.matchesFilter
+import com.sixbynine.transit.path.api.TrainFilter
+import com.sixbynine.transit.path.api.TrainFilter.Companion.matchesFilter
 import com.sixbynine.transit.path.api.matches
 import com.sixbynine.transit.path.app.lifecycle.AppLifecycleObserver
 import com.sixbynine.transit.path.app.settings.SettingsManager
@@ -37,7 +37,7 @@ class StationViewModel(private val stationId: String?) : BaseViewModel<State, In
                     val stationData =
                         fetchData
                             .data
-                            ?.toDepartureBoardData(trainFilter = DepartureBoardTrainFilter.All)
+                            ?.toDepartureBoardData(trainFilter = TrainFilter.All)
                             ?.stations
                             ?.find { it.id == stationId }
 

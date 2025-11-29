@@ -7,7 +7,7 @@ import com.sixbynine.transit.path.api.LocationSetting.Enabled
 import com.sixbynine.transit.path.api.LocationSetting.EnabledPendingPermission
 import com.sixbynine.transit.path.api.PathApiException
 import com.sixbynine.transit.path.api.Stations
-import com.sixbynine.transit.path.api.DepartureBoardTrainFilter
+import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.app.lifecycle.AppLifecycleObserver
 import com.sixbynine.transit.path.app.settings.SettingsManager
 import com.sixbynine.transit.path.app.station.StationSelectionManager
@@ -163,7 +163,7 @@ class WidgetDataFetchingUseCase private constructor() {
             stations = Stations.All,
             sort = SettingsManager.stationSort.value,
             lines = Line.entries,
-            filter = DepartureBoardTrainFilter.All,
+            filter = TrainFilter.All,
             includeClosestStation = SettingsManager.locationSetting.value == Enabled,
             staleness = staleness,
             isCommuteWidget = false,

@@ -19,9 +19,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.sixbynine.transit.path.api.DepartureBoardTrainFilter
-import com.sixbynine.transit.path.api.DepartureBoardTrainFilter.All
-import com.sixbynine.transit.path.api.DepartureBoardTrainFilter.Interstate
+import com.sixbynine.transit.path.api.TrainFilter
+import com.sixbynine.transit.path.api.TrainFilter.All
+import com.sixbynine.transit.path.api.TrainFilter.Interstate
 import com.sixbynine.transit.path.app.settings.SettingsManager
 import com.sixbynine.transit.path.app.ui.AppUiScope
 import com.sixbynine.transit.path.app.ui.PathBottomSheet
@@ -48,15 +48,15 @@ fun AppUiScope.FilterBottomSheet(onDismiss: () -> Unit) {
 
 @Composable
 fun AppUiScope.FilterBottomSheet(
-    filter: DepartureBoardTrainFilter,
-    onFilterClick: (DepartureBoardTrainFilter) -> Unit,
+    filter: TrainFilter,
+    onFilterClick: (TrainFilter) -> Unit,
     onDismiss: () -> Unit
 ) {
     PathBottomSheet(
         isShown = true,
         onDismissRequest = onDismiss,
     ) {
-        DepartureBoardTrainFilter.entries.forEach {
+        TrainFilter.entries.forEach {
             FilterRow(it, selected = it == filter, onClick = { onFilterClick(it) })
         }
         Spacer(Modifier.height(16.dp))
@@ -65,7 +65,7 @@ fun AppUiScope.FilterBottomSheet(
 
 @Composable
 private fun AppUiScope.FilterRow(
-    filter: DepartureBoardTrainFilter,
+    filter: TrainFilter,
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier

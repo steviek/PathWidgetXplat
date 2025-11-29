@@ -7,9 +7,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.sixbynine.transit.path.PathWidgetPreview
 import com.sixbynine.transit.path.PreviewTheme
-import com.sixbynine.transit.path.api.DepartureBoardTrainFilter.Interstate
 import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.StationSort
+import com.sixbynine.transit.path.api.TrainFilter.Interstate
 import com.sixbynine.transit.path.app.settings.TimeDisplay.Relative
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.LocationSettingState
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.State

@@ -7,7 +7,7 @@ import com.sixbynine.transit.path.MobilePathApplication
 import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.StationSort.Alphabetical
 import com.sixbynine.transit.path.api.Stations
-import com.sixbynine.transit.path.api.DepartureBoardTrainFilter
+import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.app.lifecycle.AppLifecycleObserver
 import com.sixbynine.transit.path.model.DepartureBoardData
 import com.sixbynine.transit.path.util.DataResult
@@ -152,7 +152,7 @@ object AndroidWidgetDataRepository {
             stations = Stations.All,
             lines = Line.entries,
             sort = Alphabetical,
-            filter = DepartureBoardTrainFilter.All,
+            filter = TrainFilter.All,
             includeClosestStation = anyWidgetsUseLocation,
             canRefreshLocation = canRefreshLocation,
             isBackgroundUpdate = isBackgroundUpdate,

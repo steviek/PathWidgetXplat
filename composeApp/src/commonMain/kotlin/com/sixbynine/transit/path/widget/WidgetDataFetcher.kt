@@ -1,12 +1,13 @@
 package com.sixbynine.transit.path.widget
 
+import androidx.collection.arraySetOf
 import androidx.compose.ui.graphics.toArgb
 import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.PathApi
 import com.sixbynine.transit.path.api.PathApiException
 import com.sixbynine.transit.path.api.Station
-import com.sixbynine.transit.path.api.StationSort
+import com.sixbynine.transit.path.api.StationChoice
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.api.UpcomingDepartures
@@ -68,7 +69,6 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TimeSource.Monotonic
-import kotlin.native.ObjCName
 
 object WidgetDataFetcher {
 
@@ -97,12 +97,7 @@ object WidgetDataFetcher {
 
     @Suppress("UNUSED") // Used by swift code
     fun fetchWidgetData(
-        stationLimit: Int,
-        stations: List<Station>,
-        lines: Collection<Line>,
-        sort: StationSort?,
-        filter: TrainFilter,
-        includeClosestStation: Boolean,
+        config: PathWidgetConfiguration,
         staleness: Staleness,
         onSuccess: (DepartureBoardData) -> Unit,
         onFailure: (
@@ -111,18 +106,8 @@ object WidgetDataFetcher {
             isPathError: Boolean,
             data: DepartureBoardData?,
         ) -> Unit,
-        isCommuteWidget: Boolean,
     ): AgedValue<DepartureBoardData>? {
-        val (fetch, previous) = fetchWidgetDataWithPrevious(
-            stationLimit = stationLimit,
-            stations,
-            lines,
-            sort,
-            filter,
-            includeClosestStation,
-            staleness,
-            isCommuteWidget = isCommuteWidget,
-        )
+        val (fetch, previous) = fetchWidgetDataWithPrevious(config, staleness)
         GlobalScope.launch {
             fetch.await().onSuccess(onSuccess).onFailure { error, hadInternet, data ->
                 onFailure(error, hadInternet, error is PathApiException, data)
@@ -132,20 +117,15 @@ object WidgetDataFetcher {
     }
 
     fun fetchWidgetDataWithPrevious(
-        stationLimit: Int,
-        stations: List<Station>,
-        lines: Collection<Line>,
-        sort: StationSort?,
-        filter: TrainFilter,
-        includeClosestStation: Boolean,
+        config: PathWidgetConfiguration,
         staleness: Staleness,
         canRefreshLocation: Boolean = true,
         isBackgroundUpdate: Boolean = false,
         now: Instant = now(),
-        isCommuteWidget: Boolean,
         fetchId: Int? = null,
     ): FetchWithPrevious<DepartureBoardData> {
         val fetchIdLabel = fetchId?.let { " [$fetchId]" }.orEmpty()
+        val includeClosestStation = config.includeClosestStation
         Logging.d(
             "Fetch$fetchIdLabel widget data with previous, " +
                     "includeClosestStation = $includeClosestStation"
@@ -160,21 +140,15 @@ object WidgetDataFetcher {
             alerts: List<Alert>?,
             closestStations: List<Station>?,
             isPathApiBroken: Boolean,
-            isCommuteWidget: Boolean = false,
         ): DepartureBoardData {
             return createWidgetData(
                 now,
                 fetchTime,
-                stationLimit,
-                stations,
-                lines,
-                sort,
-                filter,
+                config,
                 closestStations,
                 alerts,
                 data,
                 isPathApiBroken,
-                isCommuteWidget
             )
         }
 
@@ -191,7 +165,6 @@ object WidgetDataFetcher {
                     previousAlerts?.value.orEmpty(),
                     lastClosestStations,
                     isPathApiBroken = false,
-                    isCommuteWidget = isCommuteWidget,
                 )
             )
         }
@@ -311,14 +284,15 @@ object WidgetDataFetcher {
                         alertsResult.data,
                         stationsByProximity,
                         isPathApiBroken = isPathApiBroken,
-                        isCommuteWidget = isCommuteWidget,
                     )
                 }
 
                 (this as? Job)?.children?.let {
                     if (it.toList().isNotEmpty()) {
-                        Logging.w("Fetch$fetchIdLabel: Ready to return data, but there are " +
-                                "ongoing jobs to cancel")
+                        Logging.w(
+                            "Fetch$fetchIdLabel: Ready to return data, but there are " +
+                                    "ongoing jobs to cancel"
+                        )
                         it.forEach { it.cancel() }
                     }
                 }
@@ -385,32 +359,37 @@ object WidgetDataFetcher {
     private fun createWidgetData(
         now: Instant,
         fetchTime: Instant,
-        stationLimit: Int,
-        stations: List<Station>,
-        lines: Collection<Line>,
-        sort: StationSort?,
-        filter: TrainFilter,
+        config: PathWidgetConfiguration,
         closestStations: List<Station>?,
         alerts: List<Alert>?,
         data: UpcomingDepartures,
         isPathApiBroken: Boolean,
-        isCommuteWidget: Boolean = false,
     ): DepartureBoardData {
-        val adjustedStations = stations.toMutableList()
+        fun StationChoice.resolve(): Station? = when (this) {
+            is StationChoice.Closest -> closestStations?.firstOrNull()
+            is StationChoice.Fixed -> station
+        }
+
+        val stations = when (config) {
+            is PathWidgetConfiguration.DepartureBoard -> {
+                config.stationChoices
+                    .mapNotNull { it.resolve() }
+                    .distinct()
+                    .sortedWith(StationComparator(config.sort, closestStations))
+                    .sortedBy { station ->
+                        if (station == closestStations?.firstOrNull()) 0 else 1
+                    }
+            }
+
+            is PathWidgetConfiguration.Commute -> {
+                listOfNotNull(config.origin.resolve())
+            }
+        }
         val stationDatas = arrayListOf<DepartureBoardData.StationData>()
         val avoidMissingTrains = currentAvoidMissingTrains()
+        val lines = arraySetOf<Line>()
 
-        if (sort != null) {
-            adjustedStations.sortWith(StationComparator(sort, closestStations))
-        }
-
-        val closestStationToUse = closestStations?.firstOrNull()
-        if (closestStationToUse != null) {
-            adjustedStations.remove(closestStationToUse)
-            adjustedStations.add(0, closestStationToUse)
-        }
-
-        for (station in adjustedStations) {
+        for (station in stations) {
             val stationAlerts = alerts?.filter { station.pathApiName in it.stations }.orEmpty()
 
             val apiTrains =
@@ -425,17 +404,26 @@ object WidgetDataFetcher {
                         }
                     }
                     ?: continue
-            
-            // For commute widget with 2 stations, filter trains to those that pass through both stations
-            val filteredTrains = if (isCommuteWidget && adjustedStations.size == 2) {
-                val destination = adjustedStations.last()
-                apiTrains.filter { train ->
-                    TrainBackfillHelper.doesTrainConnect(train, station, destination)
-                }
-            } else {
-                // For regular widget or commute widget with < 2 stations, use simple line filtering
-                apiTrains.filter { train ->
-                    train.lines?.any { line -> line in lines } ?: false
+
+            val filteredTrains = run filterTrains@{
+                when (config) {
+                    is PathWidgetConfiguration.DepartureBoard -> {
+                        apiTrains.filter { train ->
+                            val lines = train.lines
+                            (lines intersect config.lines).isNotEmpty() &&
+                                    matchesFilter(station, train.headsign, config.filter)
+                        }
+                    }
+
+                    is PathWidgetConfiguration.Commute -> {
+                        val origin = config.origin.resolve() ?: return@filterTrains emptyList()
+                        if (station != origin) return@filterTrains emptyList()
+                        val destination = config.destination.resolve()
+                            ?: return@filterTrains apiTrains
+                        apiTrains.filter { train ->
+                            TrainBackfillHelper.doesTrainConnect(train, origin, destination)
+                        }
+                    }
                 }
             }
 
@@ -443,15 +431,6 @@ object WidgetDataFetcher {
             val signs = filteredTrains
                 .groupBy { it.headsign }
                 .mapNotNull { (headSign, trains) ->
-                    if (!matchesFilter(station, headSign, filter)) {
-                        return@mapNotNull null
-                    }
-
-                    val headSignLines = trains.flatMap { it.lines }.toSet()
-                    if (headSignLines.isNotEmpty() && headSignLines.none { it in lines }) {
-                        return@mapNotNull null
-                    }
-
                     val colors =
                         trains.flatMap { it.lineColors }
                             .distinct()
@@ -486,7 +465,6 @@ object WidgetDataFetcher {
                         lines = it.lines,
                     )
                 }
-                .filter { station == closestStationToUse || matchesFilter(station, it, filter) }
                 .map { it.adjustedToAvoidMissingTrains(now, avoidMissingTrains) }
                 .distinctBy { it.title to it.projectedArrival }
                 .sortedBy { it.projectedArrival }
@@ -500,10 +478,14 @@ object WidgetDataFetcher {
                 state = station.state,
                 alerts = stationAlerts,
             )
+
+            filteredTrains.forEach {
+                lines += it.lines
+            }
         }
         val nextFetchTime =
             stationDatas
-                .take(stationLimit)
+                .take(config.stationLimit)
                 .flatMap { it.signs }
                 .mapNotNull { it.projectedArrivals.maxOrNull() }
                 .minOrNull()
@@ -512,21 +494,13 @@ object WidgetDataFetcher {
             alerts.orEmpty().filter { alert -> alert.isGlobal && alert.affectsLines(lines) }
         return DepartureBoardData(
             fetchTime = fetchTime,
-            stations = stationDatas.take(stationLimit),
+            stations = stationDatas.take(config.stationLimit),
             nextFetchTime = nextFetchTime,
-            closestStationId = closestStationToUse?.pathApiName,
+            closestStationId = closestStations?.firstOrNull()?.pathApiName,
             isPathApiBroken = isPathApiBroken,
             scheduleName = data.scheduleName,
             globalAlerts = globalAlerts,
         )
-    }
-
-    private fun matchesFilter(
-        station: Station,
-        train: DepartureBoardData.TrainData,
-        filter: TrainFilter
-    ): Boolean {
-        return matchesFilter(station, train.title, filter)
     }
 
     private fun matchesFilter(
@@ -622,30 +596,13 @@ object WidgetDataFetcher {
         }
     }
 
-    @OptIn(kotlin.experimental.ExperimentalObjCName::class)
-    @ObjCName(name = "fetchWidgetDataForCommute") // This exposes the function directly to Swift
-    fun fetchWidgetDataForCommute(
-        stationLimit: Int,
-        stations: List<Station>,
-        lines: List<Line>,
-        sort: StationSort?,
-        filter: TrainFilter,
-        includeClosestStation: Boolean,
-        staleness: Staleness,
-        onSuccess: (DepartureBoardData) -> Unit,
-        onFailure: (Throwable, Boolean, Boolean, DepartureBoardData?) -> Unit
-    ) {
-        fetchWidgetData(
-            stationLimit = stationLimit,
-            stations = stations,
-            lines = lines,
-            sort = sort,
-            filter = filter,
-            includeClosestStation = includeClosestStation,
-            staleness = staleness,
-            onSuccess = onSuccess,
-            onFailure = onFailure,
-            isCommuteWidget = true
-        )
+    private val PathWidgetConfiguration.includeClosestStation: Boolean get() = when (this) {
+        is PathWidgetConfiguration.Commute -> {
+            origin is StationChoice.Closest || destination is StationChoice.Closest
+        }
+
+        is PathWidgetConfiguration.DepartureBoard -> {
+            stationChoices.any { it is StationChoice.Closest }
+        }
     }
 }

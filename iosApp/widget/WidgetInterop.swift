@@ -23,8 +23,8 @@ extension SortOrder {
 }
 
 extension StationChoice {
-    func toStation() -> Station? {
-        return switch (self) {
+    func toSharedStationChoice() -> ComposeApp.StationChoice {
+        let station: Station? = switch (self) {
         case .closest:
             nil
         case .exp:
@@ -54,6 +54,16 @@ extension StationChoice {
         case .wtc:
             Stations().WorldTradeCenter
         }
+        
+        return if let station = station {
+            ComposeApp.StationChoiceFixed(station: station)
+        } else {
+            ComposeApp.StationChoiceClosest()
+        }
+    }
+    
+    func getCommuteWidgetDestinationName() -> String {
+        IosResourceProvider().getCommuteWidgetDisplayName(choice: toSharedStationChoice())
     }
 }
 
@@ -84,43 +94,21 @@ extension Filter {
 }
 
 extension WidgetDataFetcher {
-    func fetchWidgetDataAsync(
-        includeClosestStation: Bool,
+    func fetchDepartureBoardWidgetDataAsync(
         stationLimit: Int32,
-        stations: [Station],
+        stations: [StationChoice],
         lines: [Line],
         filter: TrainFilter,
         sort: StationSort
     ) async -> FetchResult {
-        do {
-            return try await withCheckedThrowingContinuation { continuation in
-                fetchWidgetData(
-                    stationLimit: stationLimit,
-                    stations: stations,
-                    lines: lines,
-                    sort: sort,
-                    filter: filter,
-                    includeClosestStation: includeClosestStation,
-                    staleness: widgetFetchStaleness(force: false),
-                    onSuccess: { data in
-                        continuation.resume(returning: FetchResult(data: data, hadInternet: true, hasError: false, hasPathError: false))
-                    },
-                    onFailure: { (e, hadInternet, isPathError, data) in
-                        continuation.resume(
-                            returning: FetchResult(
-                                data: data,
-                                hadInternet: hadInternet.toBool(),
-                                hasError: true,
-                                hasPathError: isPathError.toBool()
-                            )
-                        )
-                    },
-                    isCommuteWidget: false
-                )
-            }
-        } catch {
-            return FetchResult(data: nil, hadInternet: true, hasError: true, hasPathError: false)
-        }
+        let config = PathWidgetConfigurationDepartureBoard(
+            stationLimit: stationLimit,
+            stationChoices: stations.map { $0.toSharedStationChoice() },
+            lines: lines,
+            sort: sort,
+            filter: filter
+        )
+        return await fetchWidgetDataAsync(config: config)
     }
     
     func fetchWidgetDataAsyncCommute(
@@ -129,25 +117,19 @@ extension WidgetDataFetcher {
         filter: TrainFilter,
         lines: [Line]
     ) async -> FetchResult {
-        // Convert station choices to actual stations
-        let origin = originStation.toStation()
-        let destination = destinationStation.toStation()
+        let config = PathWidgetConfigurationCommute(
+            origin: originStation.toSharedStationChoice(),
+            destination: destinationStation.toSharedStationChoice()
+        )
         
-        // If either station is nil (closest) or both stations are the same, return error
-        guard let originStn = origin, let destStn = destination, originStn != destStn else {
-            return FetchResult(data: nil, hadInternet: true, hasError: true, hasPathError: false)
-        }
-        
+        return await fetchWidgetDataAsync(config: config)
+    }
+    
+    func fetchWidgetDataAsync(config: PathWidgetConfiguration) async -> FetchResult {
         do {
             return try await withCheckedThrowingContinuation { continuation in
-                // Use the commute-specific data fetcher that handles line filtering internally
-                WidgetDataFetcher().fetchWidgetDataForCommute(
-                    stationLimit: 1,
-                    stations: [originStn, destStn], //both stations are needed to compute the lines that pass between them
-                    lines: lines,
-                    sort: nil,
-                    filter: filter,
-                    includeClosestStation: false,
+                WidgetDataFetcher().fetchWidgetData(
+                    config: config,
                     staleness: widgetFetchStaleness(force: false),
                     onSuccess: { data in
                         continuation.resume(returning: FetchResult(data: data, hadInternet: true, hasError: false, hasPathError: false))

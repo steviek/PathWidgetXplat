@@ -72,12 +72,9 @@ struct Provider: AppIntentTimelineProvider {
             hasError = false
             hasPathError = false
         } else {
-            let fetchResult = await WidgetDataFetcher().fetchWidgetDataAsync(
-                includeClosestStation: configuration.stations.contains(where: { $0 == .closest }),
+            let fetchResult = await WidgetDataFetcher().fetchDepartureBoardWidgetDataAsync(
                 stationLimit: Int32(stationLimit),
-                stations: configuration.stations.compactMap {
-                    $0.toStation()
-                },
+                stations: configuration.stations,
                 lines: configuration.lines.map {
                     $0.toLine()
                 },

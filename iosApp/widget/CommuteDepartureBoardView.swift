@@ -79,7 +79,7 @@ struct CommuteStationView: View {
         VStack(alignment: .leading, spacing: 4) {
             CommuteStationTitle(
                 title: station.displayName,
-                destinationStation: entry.configuration.destinationStation.toStation()?.displayName,
+                destinationStation: entry.configuration.destinationStation.getCommuteWidgetDestinationName(),
                 textColor: textColor,
                 maxWidth: entry.size.width
             )
@@ -277,9 +277,12 @@ struct CommuteFooterView: View {
     let entry: CommuteProvider.Entry
     let textColor: Color
     
+    private var buttonSize: CGFloat {
+        entry.configuration.showLastRefreshedTime ? 14 : 16
+    }
+    
     var body: some View {
         HStack(spacing: 0) {
-            let buttonSize: Int
             // Time text grouped with refresh button (only if enabled)
             if entry.configuration.showLastRefreshedTime {
                 Text(getFooterText(
@@ -293,11 +296,8 @@ struct CommuteFooterView: View {
                     .italic()
                     .foregroundColor(textColor)
                     .padding(.trailing, 4)
-                buttonSize = 14
-            } else{
-                buttonSize = 16
-                
             }
+        
             Button(intent: RefreshIntent()) {
                 Image(systemName: "arrow.2.circlepath")
                     .resizable()
@@ -324,6 +324,6 @@ struct CommuteFooterView: View {
 
     /// Gets the display name for the destination station from the configuration
     private func getDestinationStationName() -> String {
-        return entry.configuration.destinationStation.toStation()?.displayName ?? "Unknown"
+        return entry.configuration.destinationStation.getCommuteWidgetDestinationName()
     }
 }

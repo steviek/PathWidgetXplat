@@ -4,10 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.MobilePathApplication
-import com.sixbynine.transit.path.api.Line
-import com.sixbynine.transit.path.api.StationSort.Alphabetical
-import com.sixbynine.transit.path.api.Stations
-import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.app.lifecycle.AppLifecycleObserver
 import com.sixbynine.transit.path.model.DepartureBoardData
 import com.sixbynine.transit.path.util.DataResult
@@ -148,19 +144,13 @@ object AndroidWidgetDataRepository {
             WidgetConfigurationManager.getWidgetConfigurations().values.any { it.useClosestStation }
 
         return WidgetDataFetcher.fetchWidgetDataWithPrevious(
-            stationLimit = Int.MAX_VALUE,
-            stations = Stations.All,
-            lines = Line.entries,
-            sort = Alphabetical,
-            filter = TrainFilter.All,
-            includeClosestStation = anyWidgetsUseLocation,
+            config = PathWidgetConfiguration.allData(includeClosestStation = anyWidgetsUseLocation),
             canRefreshLocation = canRefreshLocation,
             isBackgroundUpdate = isBackgroundUpdate,
             staleness = Staleness(
                 staleAfter = if (force) 5.seconds else 30.seconds,
                 invalidAfter = Duration.INFINITE, // Always show old data while loading widget.
             ),
-            isCommuteWidget = false,
             fetchId = fetchId,
         )
     }

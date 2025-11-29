@@ -1,9 +1,9 @@
 package com.sixbynine.transit.path.api.impl
 
 import com.sixbynine.transit.path.api.DepartingTrain
-import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.Line.Hoboken33rd
 import com.sixbynine.transit.path.api.Line.HobokenWtc
+import com.sixbynine.transit.path.api.Line.JournalSquare33rd
 import com.sixbynine.transit.path.api.Line.NewarkWtc
 import com.sixbynine.transit.path.api.PathApi
 import com.sixbynine.transit.path.api.State.NewJersey
@@ -25,7 +25,6 @@ import com.sixbynine.transit.path.api.UpcomingDepartures
 import com.sixbynine.transit.path.model.Colors
 import com.sixbynine.transit.path.util.AgedValue
 import com.sixbynine.transit.path.util.FetchWithPrevious
-import com.sixbynine.transit.path.util.Staleness
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -34,7 +33,6 @@ internal class MockPathApi : PathApi {
 
     override fun getUpcomingDepartures(
         now: Instant,
-        staleness: Staleness
     ): FetchWithPrevious<UpcomingDepartures> {
         val stationsToDepartures = Stations.All.associateWith { station ->
             listOfNotNull(
@@ -112,7 +110,7 @@ internal class MockPathApi : PathApi {
                     isDelayed = false,
                     backfillSource = null,
                     directionState = NewYork,
-                    lines = Line.permanentLinesForWtc33rd.toSet()
+                    lines = setOf(HobokenWtc, JournalSquare33rd)
                 ).takeIf {
                     station in listOf(
                         Newport,

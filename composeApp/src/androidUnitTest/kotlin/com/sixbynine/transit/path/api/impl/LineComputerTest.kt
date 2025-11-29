@@ -1,6 +1,8 @@
 package com.sixbynine.transit.path.api.impl
 
 import com.sixbynine.transit.path.api.Line
+import com.sixbynine.transit.path.api.Line.HobokenWtc
+import com.sixbynine.transit.path.api.Line.JournalSquare33rd
 import com.sixbynine.transit.path.model.Colors
 import com.sixbynine.transit.path.test.TestSetupHelper
 import org.junit.Before
@@ -16,7 +18,7 @@ class LineComputerTest {
     @Test
     fun `wtc-33s line from hob-wtc colors`() {
         var lines = LineComputer.computeLines("EXP", "33S", Colors.Hob33s)
-        Line.permanentLinesForWtc33rd.forEach { line ->
+        listOf(HobokenWtc, JournalSquare33rd).forEach { line ->
             assertContains(lines, line)
         }
 
@@ -29,7 +31,7 @@ class LineComputerTest {
         TestSetupHelper.setUp()
 
         val lines = LineComputer.computeLines("WTC", "33S", Colors.Hob33s)
-        Line.permanentLinesForWtc33rd.forEach { line ->
+        listOf(HobokenWtc, JournalSquare33rd).forEach { line ->
             assertContains(lines, line)
         }
     }
@@ -49,12 +51,12 @@ class LineComputerTest {
     fun `wtc-33s line from purple colors`() {
         TestSetupHelper.setUp()
 
-        var lines = LineComputer.computeLines("EXP", "33S", Colors.Wtc33s)
-        Line.permanentLinesForWtc33rd.forEach { line ->
+        var lines = LineComputer.computeLines("EXP", "33S", Colors.HobWtc)
+        listOf(HobokenWtc, JournalSquare33rd).forEach { line ->
             assertContains(lines, line)
         }
 
-        lines = LineComputer.computeLines("NEW", "WTC", Colors.Wtc33s)
+        lines = LineComputer.computeLines("NEW", "WTC", Colors.HobWtc)
         assertContains(lines, Line.HobokenWtc)
     }
 }

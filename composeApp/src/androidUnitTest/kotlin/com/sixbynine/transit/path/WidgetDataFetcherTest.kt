@@ -6,7 +6,6 @@ import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.TrainFilter.All
 import com.sixbynine.transit.path.test.TestSetupHelper
 import com.sixbynine.transit.path.time.NewYorkTimeZone
-import com.sixbynine.transit.path.util.Staleness
 import com.sixbynine.transit.path.util.await
 import com.sixbynine.transit.path.widget.WidgetDataFetcher
 import kotlinx.coroutines.test.runTest
@@ -17,7 +16,6 @@ import kotlinx.datetime.toLocalDateTime
 import org.junit.Before
 import org.junit.Test
 import java.time.Month.AUGUST
-import kotlin.time.Duration.Companion.INFINITE
 
 class WidgetDataFetcherTest {
 
@@ -35,7 +33,6 @@ class WidgetDataFetcherTest {
             sort = StationSort.Alphabetical,
             filter = All,
             includeClosestStation = false,
-            staleness = Staleness(staleAfter = INFINITE, invalidAfter = INFINITE),
             now = Aug24.atTime(21, 40).toInstant(NewYorkTimeZone),
         ).await()
 

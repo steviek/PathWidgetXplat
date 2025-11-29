@@ -39,7 +39,6 @@ import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.util.AgedValue
 import com.sixbynine.transit.path.util.DataResult
 import com.sixbynine.transit.path.util.FetchWithPrevious
-import com.sixbynine.transit.path.util.Staleness
 import com.sixbynine.transit.path.util.flatten
 import com.sixbynine.transit.path.util.globalDataStore
 import com.sixbynine.transit.path.util.isFailure
@@ -62,6 +61,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.DayOfWeek.SATURDAY
 import kotlinx.datetime.DayOfWeek.SUNDAY
 import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -86,14 +86,6 @@ object WidgetDataFetcher {
     val nonFetchLocationReceived = _nonFetchLocationReceived.asSharedFlow()
 
     @Suppress("UNUSED") // Used by swift code
-    fun widgetFetchStaleness(force: Boolean): Staleness {
-        return Staleness(
-            staleAfter = if (force) 5.seconds else 30.seconds,
-            invalidAfter = Duration.INFINITE,
-        )
-    }
-
-    @Suppress("UNUSED") // Used by swift code
     fun fetchWidgetData(
         stationLimit: Int,
         stations: List<Station>,
@@ -101,7 +93,6 @@ object WidgetDataFetcher {
         sort: StationSort,
         filter: TrainFilter,
         includeClosestStation: Boolean,
-        staleness: Staleness,
         onSuccess: (DepartureBoardData) -> Unit,
         onFailure: (
             error: Throwable,
@@ -117,7 +108,6 @@ object WidgetDataFetcher {
             sort,
             filter,
             includeClosestStation,
-            staleness,
         )
         GlobalScope.launch {
             fetch.await().onSuccess(onSuccess).onFailure { error, hadInternet, data ->
@@ -134,7 +124,6 @@ object WidgetDataFetcher {
         sort: StationSort,
         filter: TrainFilter,
         includeClosestStation: Boolean,
-        staleness: Staleness,
         canRefreshLocation: Boolean = true,
         isBackgroundUpdate: Boolean = false,
         now: Instant = now(),
@@ -146,7 +135,7 @@ object WidgetDataFetcher {
                     "includeClosestStation = $includeClosestStation"
         )
         val (liveDepartures, previousDepartures) =
-            PathApi.instance.getUpcomingDepartures(now, staleness)
+            PathApi.instance.getUpcomingDepartures(now)
         val (alerts, previousAlerts) = AlertsRepository.getAlerts(now)
 
         fun createWidgetData(
@@ -174,7 +163,7 @@ object WidgetDataFetcher {
         val previous = run {
             val data =
                 previousDepartures ?: run {
-                    SchedulePathApi().getUpcomingDepartures(now, staleness).previous
+                    SchedulePathApi().getUpcomingDepartures(now).previous
                 } ?: return@run null
             AgedValue(
                 data.age,
@@ -254,7 +243,7 @@ object WidgetDataFetcher {
                         }
                 val isPathApiBroken = live.isFailure() && live.error is PathApiException
                 val scheduled = if (isPathApiBroken) {
-                    SchedulePathApi().getUpcomingDepartures(now, staleness).fetch.await()
+                    SchedulePathApi().getUpcomingDepartures(now).fetch.await()
                 } else {
                     null
                 }
@@ -308,8 +297,10 @@ object WidgetDataFetcher {
 
                 (this as? Job)?.children?.let {
                     if (it.toList().isNotEmpty()) {
-                        Logging.w("Fetch$fetchIdLabel: Ready to return data, but there are " +
-                                "ongoing jobs to cancel")
+                        Logging.w(
+                            "Fetch$fetchIdLabel: Ready to return data, but there are " +
+                                    "ongoing jobs to cancel"
+                        )
                         it.forEach { it.cancel() }
                     }
                 }
@@ -390,7 +381,13 @@ object WidgetDataFetcher {
         val stationDatas = arrayListOf<DepartureBoardData.StationData>()
         val avoidMissingTrains = currentAvoidMissingTrains()
 
-        adjustedStations.sortWith(StationComparator(sort, closestStations))
+        adjustedStations.sortWith(
+            StationComparator(
+                sort,
+                closestStations,
+                now.toLocalDateTime(TimeZone.currentSystemDefault())
+            )
+        )
         val closestStationToUse = closestStations?.firstOrNull()
         if (closestStationToUse != null) {
             adjustedStations.remove(closestStationToUse)

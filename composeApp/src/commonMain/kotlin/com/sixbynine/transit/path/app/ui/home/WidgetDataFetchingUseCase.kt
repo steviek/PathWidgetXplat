@@ -11,15 +11,14 @@ import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.app.lifecycle.AppLifecycleObserver
 import com.sixbynine.transit.path.app.settings.SettingsManager
 import com.sixbynine.transit.path.app.station.StationSelectionManager
+import com.sixbynine.transit.path.model.DepartureBoardData
 import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.util.FetchWithPrevious
-import com.sixbynine.transit.path.util.Staleness
 import com.sixbynine.transit.path.util.awaitTrue
 import com.sixbynine.transit.path.util.collect
 import com.sixbynine.transit.path.util.collectIn
 import com.sixbynine.transit.path.util.collectLatest
 import com.sixbynine.transit.path.util.isFailure
-import com.sixbynine.transit.path.model.DepartureBoardData
 import com.sixbynine.transit.path.widget.WidgetDataFetcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -37,7 +36,6 @@ import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 
 /**
  * Encapsulates the logic for what the latest fetched [DepartureBoardData] is and when we should fetch
@@ -48,7 +46,7 @@ class WidgetDataFetchingUseCase private constructor() {
     private val subscribers = mutableSetOf<Any>()
     private val scope = CoroutineScope(Dispatchers.Default)
 
-    private val initialFetch = startFetch(staleness = UnforcedStaleness)
+    private val initialFetch = startFetch()
 
     private val _fetchData = MutableStateFlow(createInitialFetchData(initialFetch))
     val fetchData = _fetchData.asStateFlow()
@@ -142,7 +140,7 @@ class WidgetDataFetchingUseCase private constructor() {
                 delay(500)
             }
 
-            startFetch(if (force) ForcedStaleness else UnforcedStaleness).fetch.await()
+            startFetch().fetch.await()
         }
         _fetchData.value = FetchData(
             lastFetchTime = result.data?.fetchTime,
@@ -157,7 +155,7 @@ class WidgetDataFetchingUseCase private constructor() {
         )
     }
 
-    private fun startFetch(staleness: Staleness): FetchWithPrevious<DepartureBoardData> {
+    private fun startFetch(): FetchWithPrevious<DepartureBoardData> {
         return WidgetDataFetcher.fetchWidgetDataWithPrevious(
             stationLimit = Int.MAX_VALUE,
             stations = Stations.All,
@@ -165,7 +163,6 @@ class WidgetDataFetchingUseCase private constructor() {
             lines = Line.entries,
             filter = TrainFilter.All,
             includeClosestStation = SettingsManager.locationSetting.value == Enabled,
-            staleness = staleness,
         )
     }
 
@@ -185,8 +182,6 @@ class WidgetDataFetchingUseCase private constructor() {
 
     companion object {
         private val FetchInvalidAfter = 6.hours
-        private val ForcedStaleness = Staleness(staleAfter = 10.seconds, invalidAfter = FetchInvalidAfter)
-        private val UnforcedStaleness = Staleness(staleAfter = 30.seconds, invalidAfter = FetchInvalidAfter)
         private val FetchInterval = 1.minutes
 
         private fun createInitialFetchData(data: FetchWithPrevious<DepartureBoardData>): FetchData {

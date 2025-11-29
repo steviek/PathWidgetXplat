@@ -4,7 +4,6 @@ import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.impl.SchedulePathApi
 import com.sixbynine.transit.path.test.TestSetupHelper
 import com.sixbynine.transit.path.time.NewYorkTimeZone
-import com.sixbynine.transit.path.util.Staleness
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
@@ -15,7 +14,6 @@ import org.junit.Before
 import org.junit.Test
 import java.time.Month.AUGUST
 import kotlin.test.assertEquals
-import kotlin.time.Duration
 
 class SchedulePathApiTest {
 
@@ -87,7 +85,6 @@ class SchedulePathApiTest {
     private fun getUpcomingDepartures(dateTime: LocalDateTime) =
         SchedulePathApi().getUpcomingDepartures(
             dateTime.toInstant(NewYorkTimeZone),
-            Staleness(staleAfter = Duration.INFINITE, invalidAfter = Duration.INFINITE)
         )
 
     companion object {

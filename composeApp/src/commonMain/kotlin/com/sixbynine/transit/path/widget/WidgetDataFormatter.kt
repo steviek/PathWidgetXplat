@@ -138,14 +138,34 @@ object WidgetDataFormatter {
         return time.formatted(includePeriodMarker = false)
     }
 
-    fun formatRelativeTime(now: Instant, time: Instant): String {
+    fun getMinutesBetween(now: Instant, time: Instant): Long {
         val duration = time - now
-        return if (duration < 1.minutes) {
+        return duration.inWholeMinutes
+    }
+
+    fun formatRelativeTime(now: Instant, time: Instant): String {
+        val minutes = getMinutesBetween(now, time)
+        return if (minutes < 1) {
             localizedString(en = "due", es = "llega")
-        } else if (duration < 1.hours) {
-            duration.inWholeMinutes.toString() + " min"
+        } else if (minutes < 60) {
+            "$minutes min"
         } else {
-            duration.inWholeHours.toString() + " hr " + (duration.inWholeMinutes % 60) + " min"
+            val hours = minutes / 60
+            val remainingMinutes = minutes % 60
+            "$hours hr $remainingMinutes min"
+        }
+    }
+
+    fun formatCondensedRelativeTime(now: Instant, time: Instant): String {
+        val minutes = getMinutesBetween(now, time)
+        return if (minutes < 1) {
+            localizedString(en = "due", es = "llega")
+        } else if (minutes < 60) {
+            minutes.toString()
+        } else {
+            val hours = minutes / 60
+            val remainingMinutes = minutes % 60
+            "$hours hr $remainingMinutes"
         }
     }
 

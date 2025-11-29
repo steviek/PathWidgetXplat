@@ -96,7 +96,7 @@ enum TrainGrouping : String, AppEnum {
 
 struct ConfigurationAppIntent: WidgetConfigurationIntent {
     static var title: LocalizedStringResource = "Departure board for PATH"
-    static var description = IntentDescription("Departure board for PATH trains")
+    static var description = IntentDescription("View upcoming train departures by station")
     
     @Parameter(title: "Stations", default: [])
     var stations: [StationChoice]

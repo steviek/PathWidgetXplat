@@ -45,12 +45,20 @@ import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Duration.Companion.days
 
 object TrainBackfillHelper {
 
     private const val ShouldLog = false
+    private val EndOfLine = 36500.days
 
-    private data class LineId(
+    /**
+     * Identifies a specific train route configuration/service pattern.
+     *
+     * This is used to match incoming train data (headsign, colors, direction) to a known
+     * set of checkpoints for backfilling arrival times at subsequent stations.
+     */
+    data class LineId(
         val headSign: String,
         val colors: List<ColorWrapper>,
         val direction: State?,
@@ -122,30 +130,54 @@ object TrainBackfillHelper {
         }
     }
 
+    /**
+     * Maps each [LineId] to its station checkpoints with cumulative travel times from the origin.
+     *
+     * This is used for "backfilling" arrival times: when we know a train's departure from one
+     * station, we can estimate its arrival at subsequent stations by adding the travel time
+     * between checkpoints.
+     *
+     * Each entry maps a station to the duration since the train left the first station on the
+     * line. The final station uses [EndOfLine] as a sentinel value—this sentinel is not used
+     * for actual time calculations, but to indicate that the station is part of the route
+     * (e.g., for determining which stations a train will pass through).
+     *
+     * Example: For [NWK_WTC], a train leaving Newark at 0:00 will reach Harrison at ~1:42,
+     * Journal Square at ~12:43, etc. World Trade Center has [EndOfLine] because it's the
+     * terminus—we don't need to backfill times for the final stop, but we need to know
+     * the train reaches it.
+     *
+     * This version contains faster/peak travel times. See [LineIdToCheckpointsSlower] for
+     * off-peak times.
+     */
     private val LineIdToCheckpointsFaster = mapOf(
         NWK_WTC to mapOf(
             Newark to 0.minutes,
             Harrison to 1.minutes + 42.seconds,
             JournalSquare to 12.minutes + 43.seconds,
             GroveStreet to 17.minutes + 30.seconds,
-            ExchangePlace to 20.minutes + 30.seconds
+            ExchangePlace to 20.minutes + 30.seconds,
+            WorldTradeCenter to EndOfLine,
         ),
         WTC_NWK to mapOf(
             WorldTradeCenter to 0.minutes,
             ExchangePlace to 3.minutes + 24.seconds,
             GroveStreet to 6.minutes + 27.seconds,
             JournalSquare to 11.minutes + 27.seconds,
-            Harrison to 22.minutes + 33.seconds
+            Harrison to 22.minutes + 33.seconds,
+            Newark to EndOfLine,
         ),
         HOB_WTC to mapOf(
             Hoboken to 0.minutes,
             Newport to 3.minutes + 42.seconds,
             ExchangePlace to 8.minutes + 42.seconds,
+            WorldTradeCenter to EndOfLine,
         ),
         WTC_HOB to mapOf(
             WorldTradeCenter to 0.minutes,
             ExchangePlace to 3.minutes + 42.seconds,
             Newport to 8.minutes + 38.seconds,
+            Hoboken to EndOfLine,
         ),
         OK_33S_JSQ to mapOf(
             ThirtyThirdStreet to 0.minutes,
@@ -155,6 +187,7 @@ object TrainBackfillHelper {
             ChristopherStreet to 6.minutes + 31.seconds,
             Newport to 16.minutes + 31.seconds,
             GroveStreet to 20.minutes + 31.seconds,
+            JournalSquare to EndOfLine,
         ),
         PAIN_33S_JSQ to mapOf(
             ThirtyThirdStreet to 0.minutes,
@@ -165,6 +198,7 @@ object TrainBackfillHelper {
             Hoboken to 19.minutes + 48.seconds,
             Newport to 23.minutes + 30.seconds,
             GroveStreet to 27.minutes + 30.seconds,
+            JournalSquare to EndOfLine,
         ),
         OK_JSQ_33S to mapOf(
             JournalSquare to 0.minutes,
@@ -174,6 +208,7 @@ object TrainBackfillHelper {
             NinthStreet to 17.minutes + 13.seconds,
             FourteenthStreet to 18.minutes + 14.seconds,
             TwentyThirdStreet to 20.minutes + 14.seconds,
+            ThirtyThirdStreet to EndOfLine,
         ),
         PAIN_JSQ_33S to mapOf(
             JournalSquare to 0.minutes,
@@ -184,6 +219,7 @@ object TrainBackfillHelper {
             NinthStreet to 27.minutes + 37.seconds,
             FourteenthStreet to 28.minutes + 38.seconds,
             TwentyThirdStreet to 30.minutes + 38.seconds,
+            ThirtyThirdStreet to EndOfLine,
         ),
         OK_33S_HOB to mapOf(
             ThirtyThirdStreet to 0.minutes,
@@ -191,6 +227,7 @@ object TrainBackfillHelper {
             FourteenthStreet to 3.minutes + 31.seconds,
             NinthStreet to 4.minutes + 31.seconds,
             ChristopherStreet to 6.minutes + 31.seconds,
+            Hoboken to EndOfLine,
         ),
         OK_HOB_33S to mapOf(
             Hoboken to 0.minutes,
@@ -198,6 +235,7 @@ object TrainBackfillHelper {
             NinthStreet to 10.minutes + 42.seconds,
             FourteenthStreet to 11.minutes + 43.seconds,
             TwentyThirdStreet to 13.minutes + 43.seconds,
+            ThirtyThirdStreet to EndOfLine,
         ),
         WTC_33S to mapOf(
             WorldTradeCenter to 0.minutes,
@@ -207,6 +245,7 @@ object TrainBackfillHelper {
             NinthStreet to 17.minutes + 13.seconds,
             FourteenthStreet to 18.minutes + 14.seconds,
             TwentyThirdStreet to 20.minutes + 14.seconds,
+            ThirtyThirdStreet to EndOfLine,
         ),
         WTC_FROM_33S to mapOf(
             ThirtyThirdStreet to 0.minutes,
@@ -216,6 +255,7 @@ object TrainBackfillHelper {
             ChristopherStreet to 6.minutes + 31.seconds,
             Newport to 16.minutes + 31.seconds,
             ExchangePlace to 21.minutes + 31.seconds,
+            WorldTradeCenter to EndOfLine,
         )
     )
 
@@ -345,6 +385,60 @@ object TrainBackfillHelper {
         aliases
     }
 
+    fun doesTrainConnect(train: DepartingTrain, from: Station, to: Station): Boolean {
+        val lineId = train.getLineId(from)
+        val checkpoints = LineIdToCheckpointsFaster[lineId] ?: return false
+        val fromTime = checkpoints[from] ?: return false
+        val toTime = checkpoints[to] ?: return false
+        if (toTime <= fromTime) return false
+        
+        // Stop short logic
+        val trainTerminalStation = Stations.fromHeadSign(train.headsign)
+        if (trainTerminalStation != null &&
+            checkpoints.containsKey(trainTerminalStation)) {
+             val termTime = checkpoints[trainTerminalStation] ?: return true
+             if (termTime < toTime) return false
+        }
+        return true
+    }
+
+    fun getLineIdsConnecting(from: Station, to: Station): List<LineId> {
+         return LineIdToCheckpointsFaster.entries
+            .filter { (_, checkpoints) ->
+                val fromTime = checkpoints[from]
+                val toTime = checkpoints[to]
+                fromTime != null && toTime != null && toTime > fromTime
+            }
+            .map { it.key }
+    }
+
+    /**
+     * Augments the given train departures by "backfilling" estimated arrival times at downstream
+     * stations based on known checkpoint travel times.
+     *
+     * ## How it works:
+     * 1. For each train at each station, determine its [LineId] (route pattern).
+     * 2. Look up the checkpoints for that line to find travel times to subsequent stations.
+     * 3. For each downstream station on the route, create a "hypothetical" train entry with
+     *    an estimated arrival time (known arrival at current station + travel time between
+     *    the current station and the downstream station, derived from checkpoint durations).
+     * 4. Add the hypothetical train to the downstream station's list, unless:
+     *    - A live (non-backfilled) train already exists for that time slot, or
+     *    - A better backfill exists (from a station closer to the destination).
+     *
+     * ## Short-turn handling:
+     * Trains that terminate early (e.g., WTC→JSQ instead of WTC→NWK) won't backfill stations
+     * beyond their terminal—the headsign is checked against the route to avoid this.
+     *
+     * ## Deduplication:
+     * When a backfilled train conflicts with an existing entry (same line, similar time),
+     * the algorithm prefers:
+     * 1. Live data (no backfill source) over backfilled data
+     * 2. Backfills from stations closer to the destination over those from farther away
+     *
+     * @param trains Map of station ID to list of departing trains at that station
+     * @return A new map with backfilled trains added to downstream stations
+     */
     fun withBackfill(
         trains: Map<String, List<DepartingTrain>>,
     ): Map<String, List<DepartingTrain>> {
@@ -376,6 +470,8 @@ object TrainBackfillHelper {
 
                 val stationCheckpointDuration = checkpoints[station] ?: return@eachTrain
                 checkpoints.forEach eachCheckpoint@{ (futureStation, futureStationDuration) ->
+                     //skip any station that has EndOfLine because we shouldn't backfill the last station
+                    if (futureStationDuration >= EndOfLine) return@eachCheckpoint
                     val travelTime = futureStationDuration - stationCheckpointDuration
                     if (travelTime <= Duration.ZERO) {
                         // earlier station in the line if this is negative...

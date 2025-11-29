@@ -132,8 +132,9 @@ struct SimpleEntry: TimelineEntry {
     let dataFrom: Date
 }
 
-struct widget: Widget {
-    let kind: String = "widget"
+
+struct DepartureWidget: Widget {
+    let kind: String = "MultiStationDepartureWidget"
 
     var body: some WidgetConfiguration {
         AppIntentConfiguration(
@@ -152,6 +153,9 @@ struct widget: Widget {
             }
             .containerBackground(.fill.tertiary, for: .widget)
         }
+        .configurationDisplayName("Departure board for PATH")
+        .description("View upcoming train departures by station")
+        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
     }
 
     private func showEmptyView(_ entry: SimpleEntry) -> Bool {

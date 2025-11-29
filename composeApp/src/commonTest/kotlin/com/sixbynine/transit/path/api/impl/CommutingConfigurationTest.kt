@@ -1,7 +1,8 @@
 package com.sixbynine.transit.path.api.impl
 
-import com.sixbynine.transit.path.app.settings.Schedule
-import com.sixbynine.transit.path.app.settings.isActiveAt
+import com.sixbynine.transit.path.app.settings.CommutingSchedule
+import com.sixbynine.transit.path.schedule.DailySchedule
+import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.DayOfWeek.FRIDAY
 import kotlinx.datetime.DayOfWeek.MONDAY
 import kotlinx.datetime.DayOfWeek.SATURDAY
@@ -9,7 +10,10 @@ import kotlinx.datetime.DayOfWeek.SUNDAY
 import kotlinx.datetime.DayOfWeek.THURSDAY
 import kotlinx.datetime.DayOfWeek.TUESDAY
 import kotlinx.datetime.DayOfWeek.WEDNESDAY
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
+import kotlinx.datetime.Month.FEBRUARY
+import kotlinx.datetime.atTime
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -17,7 +21,7 @@ import kotlin.test.assertTrue
 class CommutingConfigurationTest {
     @Test
     fun `not crossing midnight`() {
-        val schedule = Schedule(
+        val schedule = CommutingSchedule(
             days = setOf(TUESDAY, WEDNESDAY),
             start = 10.h,
             end = 16.h
@@ -33,7 +37,7 @@ class CommutingConfigurationTest {
 
     @Test
     fun `crossing midnight`() {
-        val schedule = Schedule(
+        val schedule = CommutingSchedule(
             days = setOf(THURSDAY, SATURDAY),
             start = 22.h,
             end = 5.h
@@ -51,16 +55,21 @@ class CommutingConfigurationTest {
 
     @Test
     fun `start same as end`() {
-        val schedule = Schedule(
+        val schedule = CommutingSchedule(
             days = setOf(THURSDAY, SATURDAY),
             start = 22.h,
             end = 22.h
         )
 
         assertTrue { schedule.isActiveAt(THURSDAY, 23.h) }
-        assertTrue { schedule.isActiveAt(SATURDAY, 4.h) }
+        assertTrue { schedule.isActiveAt(FRIDAY, 4.h) }
 
+        assertFalse { schedule.isActiveAt(SATURDAY, 4.h) }
         assertFalse { schedule.isActiveAt(FRIDAY, 23.h) }
+    }
+
+    private fun DailySchedule.isActiveAt(dayOfWeek: DayOfWeek, time: LocalTime): Boolean {
+        return isActiveAt(LocalDate(2025, FEBRUARY, 10 + dayOfWeek.ordinal).atTime(time))
     }
 
     private val Int.h get() = LocalTime(this, 0)

@@ -1,10 +1,12 @@
 package com.sixbynine.transit.path.schedule
 
+import com.sixbynine.transit.path.time.closedDayOfWeekSet
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.isoDayNumber
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.PrimitiveKind.INT
 import kotlinx.serialization.descriptors.PrimitiveKind.SHORT
@@ -13,27 +15,34 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
-
 @Serializable
-data class Schedules(
+data class Timetables(
     @Serializable(with = LocalDateTimeSerializer::class) val validFrom: LocalDateTime,
     @Serializable(with = LocalDateTimeSerializer::class) val validTo: LocalDateTime?,
-    val schedules: List<Schedule>,
-    val timings: List<ScheduleTiming>,
+    val schedules: List<Timetable>,
+    val timings: List<TimetableTiming>,
     val name: String?,
 )
 
 @Serializable
-data class ScheduleTiming(
+data class TimetableTiming(
     val scheduleId: Int,
-    @Serializable(with = DayOfWeekAsIntSerializer::class) val startDay: DayOfWeek,
-    @Serializable(with = LocalTimeAsShortSerializer::class) val startTime: LocalTime,
-    @Serializable(with = DayOfWeekAsIntSerializer::class) val endDay: DayOfWeek,
-    @Serializable(with = LocalTimeAsShortSerializer::class) val endTime: LocalTime,
-)
+    @Serializable(with = DayOfWeekAsIntSerializer::class)
+    val startDay: DayOfWeek,
+    @Serializable(with = LocalTimeAsShortSerializer::class)
+    @SerialName("startTime")
+    override val start: LocalTime,
+    @Serializable(with = DayOfWeekAsIntSerializer::class)
+    val endDay: DayOfWeek,
+    @Serializable(with = LocalTimeAsShortSerializer::class)
+    @SerialName("endTime")
+    override val end: LocalTime,
+) : DailySchedule {
+    override val days: Set<DayOfWeek> = closedDayOfWeekSet(startDay, endDay)
+}
 
 @Serializable
-data class Schedule(
+data class Timetable(
     val id: Int,
     val name: String,
     val departures: Map<String, List<@Serializable(with = LocalTimeAsShortSerializer::class) LocalTime>>,

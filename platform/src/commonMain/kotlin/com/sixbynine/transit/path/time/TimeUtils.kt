@@ -31,7 +31,20 @@ fun DayOfWeek.plusDays(days: Int): DayOfWeek {
     while (newOrdinal >= 7) {
         newOrdinal -= 7
     }
-    return DayOfWeek.values()[newOrdinal]
+    return DayOfWeek.entries[newOrdinal]
 }
 
 fun DayOfWeek.minusDays(days: Int): DayOfWeek = plusDays(-days)
+
+fun DayOfWeek.previous() = minusDays(1)
+fun DayOfWeek.next() = plusDays(1)
+
+fun closedDayOfWeekSet(start: DayOfWeek, end: DayOfWeek): Set<DayOfWeek> {
+    return buildSet {
+        var current = start
+        while (current <= end) {
+            add(current)
+            current = current.next()
+        }
+    }
+}

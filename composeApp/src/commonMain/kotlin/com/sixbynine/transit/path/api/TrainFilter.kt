@@ -7,7 +7,7 @@ import com.sixbynine.transit.path.preferences.IntPersistable
 enum class TrainFilter(override val number: Int) : IntPersistable {
     All(1), Interstate(2);
 
-    companion object Companion {
+    companion object {
         fun matchesFilter(
             origin: Station,
             train: DepartureBoardData.TrainData,
@@ -18,7 +18,6 @@ enum class TrainFilter(override val number: Int) : IntPersistable {
             return matchesFilter(origin, destination, filter)
         }
 
-        // Change these too
         fun matchesFilter(
             origin: Station,
             train: AppUiTrainData,

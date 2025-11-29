@@ -3,11 +3,11 @@ package com.sixbynine.transit.path.app.settings
 import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.LocationSetting
 import com.sixbynine.transit.path.api.StationSort
-import com.sixbynine.transit.path.api.TrainFilter
+import com.sixbynine.transit.path.api.DepartureBoardTrainFilter
 
 data class AppSettings(
     val locationSetting: LocationSetting,
-    val trainFilter: TrainFilter,
+    val trainFilter: DepartureBoardTrainFilter,
     val lineFilters: Set<Line>,
     val timeDisplay: TimeDisplay,
     val stationLimit: StationLimit,

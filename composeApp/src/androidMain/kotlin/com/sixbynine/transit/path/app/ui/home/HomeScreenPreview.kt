@@ -9,7 +9,7 @@ import com.sixbynine.transit.path.PathWidgetPreview
 import com.sixbynine.transit.path.PreviewTheme
 import com.sixbynine.transit.path.api.LocationSetting
 import com.sixbynine.transit.path.api.Stations
-import com.sixbynine.transit.path.api.TrainFilter
+import com.sixbynine.transit.path.api.DepartureBoardTrainFilter
 import com.sixbynine.transit.path.app.settings.TimeDisplay
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.EditClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.RetryClicked
@@ -38,7 +38,7 @@ fun HomeScreenPreview() {
                 hasError = false,
                 data = runBlocking { Fixtures.widgetData().toDepartureBoardData(
                     timeDisplay = TimeDisplay.Relative,
-                    trainFilter = TrainFilter.All,
+                    trainFilter = DepartureBoardTrainFilter.All,
                     locationSetting = LocationSetting.Disabled,
                 ) },
                 timeDisplay = TimeDisplay.Relative,

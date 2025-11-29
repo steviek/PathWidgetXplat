@@ -49,9 +49,9 @@ struct CommuteDepartureBoardContent: View {
                         
             VStack(alignment: .leading, spacing: 0) {
                 // Main content
-                if let data = entry.data {
+                if let data = entry.data, let station = data.stations.first {
                     CommuteStationView(
-                        station: data.stations.first!,
+                        station: station,
                         entry: entry,
                         textColor: textColor
                     )
@@ -279,6 +279,7 @@ struct CommuteFooterView: View {
     
     var body: some View {
         HStack(spacing: 0) {
+            let buttonSize: Int
             // Time text grouped with refresh button (only if enabled)
             if entry.configuration.showLastRefreshedTime {
                 Text(getFooterText(
@@ -292,28 +293,20 @@ struct CommuteFooterView: View {
                     .italic()
                     .foregroundColor(textColor)
                     .padding(.trailing, 4)
-
-                Button(intent: RefreshIntent()) {
-                    Image(systemName: "arrow.2.circlepath")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 14, height: 14)
-                        .foregroundColor(textColor)
-                }
-                .padding(.horizontal, 2)
-                .buttonStyle(.borderless)
+                buttonSize = 14
             } else{
-                Button(intent: RefreshIntent()) {
-                    Image(systemName: "arrow.2.circlepath")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 16, height: 16)
-                        .foregroundColor(textColor)
-                }
-                .padding(.horizontal, 2)
-                .buttonStyle(.borderless)
+                buttonSize = 16
+                
             }
-
+            Button(intent: RefreshIntent()) {
+                Image(systemName: "arrow.2.circlepath")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: buttonSize, height: buttonSize)
+                    .foregroundColor(textColor)
+            }
+            .padding(.horizontal, 2)
+            .buttonStyle(.borderless)
 
         }
         .frame(maxWidth: .infinity, alignment: .trailing)

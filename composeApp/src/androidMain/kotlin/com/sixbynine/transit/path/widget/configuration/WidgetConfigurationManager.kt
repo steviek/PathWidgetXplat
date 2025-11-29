@@ -12,7 +12,7 @@ import androidx.glance.state.PreferencesGlanceStateDefinition
 import com.sixbynine.transit.path.MobilePathApplication
 import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.StationSort
-import com.sixbynine.transit.path.api.TrainFilter
+import com.sixbynine.transit.path.api.DepartureBoardTrainFilter
 import com.sixbynine.transit.path.preferences.IntPersistable
 import com.sixbynine.transit.path.util.JsonFormat
 import com.sixbynine.transit.path.widget.DepartureBoardWidget
@@ -84,7 +84,7 @@ object WidgetConfigurationManager {
         lines: Collection<Line>,
         useClosestStation: Boolean,
         sort: StationSort,
-        filter: TrainFilter,
+        filter: DepartureBoardTrainFilter,
     ) {
         id ?: return
 

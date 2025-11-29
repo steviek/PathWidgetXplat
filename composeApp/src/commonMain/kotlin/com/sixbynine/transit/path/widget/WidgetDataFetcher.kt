@@ -8,7 +8,7 @@ import com.sixbynine.transit.path.api.PathApiException
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.Stations
-import com.sixbynine.transit.path.api.TrainFilter
+import com.sixbynine.transit.path.api.DepartureBoardTrainFilter
 import com.sixbynine.transit.path.api.UpcomingDepartures
 import com.sixbynine.transit.path.api.alerts.Alert
 import com.sixbynine.transit.path.api.alerts.AlertsRepository
@@ -28,7 +28,6 @@ import com.sixbynine.transit.path.app.settings.AvoidMissingTrains.Disabled
 import com.sixbynine.transit.path.app.settings.AvoidMissingTrains.OffPeak
 import com.sixbynine.transit.path.app.settings.SettingsManager.currentAvoidMissingTrains
 import com.sixbynine.transit.path.location.Location
-import com.sixbynine.transit.path.location.LocationCheckResult
 import com.sixbynine.transit.path.location.LocationCheckResult.Failure
 import com.sixbynine.transit.path.location.LocationCheckResult.JustChecked
 import com.sixbynine.transit.path.location.LocationCheckResult.NoPermission
@@ -69,7 +68,6 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TimeSource.Monotonic
-import kotlin.experimental.ExperimentalObjCName
 import kotlin.native.ObjCName
 
 object WidgetDataFetcher {
@@ -103,7 +101,7 @@ object WidgetDataFetcher {
         stations: List<Station>,
         lines: Collection<Line>,
         sort: StationSort?,
-        filter: TrainFilter,
+        filter: DepartureBoardTrainFilter,
         includeClosestStation: Boolean,
         staleness: Staleness,
         onSuccess: (DepartureBoardData) -> Unit,
@@ -138,7 +136,7 @@ object WidgetDataFetcher {
         stations: List<Station>,
         lines: Collection<Line>,
         sort: StationSort?,
-        filter: TrainFilter,
+        filter: DepartureBoardTrainFilter,
         includeClosestStation: Boolean,
         staleness: Staleness,
         canRefreshLocation: Boolean = true,
@@ -391,7 +389,7 @@ object WidgetDataFetcher {
         stations: List<Station>,
         lines: Collection<Line>,
         sort: StationSort?,
-        filter: TrainFilter,
+        filter: DepartureBoardTrainFilter,
         closestStations: List<Station>?,
         alerts: List<Alert>?,
         data: UpcomingDepartures,
@@ -526,7 +524,7 @@ object WidgetDataFetcher {
     private fun matchesFilter(
         station: Station,
         train: DepartureBoardData.TrainData,
-        filter: TrainFilter
+        filter: DepartureBoardTrainFilter
     ): Boolean {
         return matchesFilter(station, train.title, filter)
     }
@@ -534,9 +532,9 @@ object WidgetDataFetcher {
     private fun matchesFilter(
         station: Station,
         headSign: String,
-        filter: TrainFilter
+        filter: DepartureBoardTrainFilter
     ): Boolean {
-        if (filter == TrainFilter.All) return true
+        if (filter == DepartureBoardTrainFilter.All) return true
 
         val destination = Stations.fromHeadSign(headSign) ?: return true
         return when {
@@ -631,7 +629,7 @@ object WidgetDataFetcher {
         stations: List<Station>,
         lines: List<Line>,
         sort: StationSort?,
-        filter: TrainFilter,
+        filter: DepartureBoardTrainFilter,
         includeClosestStation: Boolean,
         staleness: Staleness,
         onSuccess: (DepartureBoardData) -> Unit,

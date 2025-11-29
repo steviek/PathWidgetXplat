@@ -1,10 +1,10 @@
 package com.sixbynine.transit.path.api.impl
 
 import com.sixbynine.transit.path.api.DepartingTrain
-import com.sixbynine.transit.path.api.Line.HobokenWtc
-import com.sixbynine.transit.path.api.Line.NewarkWtc
-import com.sixbynine.transit.path.api.Line.JournalSquare33rd
 import com.sixbynine.transit.path.api.Line.Hoboken33rd
+import com.sixbynine.transit.path.api.Line.HobokenWtc
+import com.sixbynine.transit.path.api.Line.JournalSquare33rd
+import com.sixbynine.transit.path.api.Line.NewarkWtc
 import com.sixbynine.transit.path.api.State.NewJersey
 import com.sixbynine.transit.path.api.State.NewYork
 import com.sixbynine.transit.path.api.Station
@@ -15,8 +15,8 @@ import com.sixbynine.transit.path.api.Stations.Hoboken
 import com.sixbynine.transit.path.api.Stations.JournalSquare
 import com.sixbynine.transit.path.api.Stations.Newark
 import com.sixbynine.transit.path.api.Stations.Newport
-import com.sixbynine.transit.path.api.Stations.TwentyThirdStreet
 import com.sixbynine.transit.path.api.Stations.ThirtyThirdStreet
+import com.sixbynine.transit.path.api.Stations.TwentyThirdStreet
 import com.sixbynine.transit.path.api.Stations.WorldTradeCenter
 import com.sixbynine.transit.path.model.Colors
 import com.sixbynine.transit.path.util.IsTest
@@ -357,6 +357,24 @@ class TrainBackfillHelperTest {
         val jsqTrains = backfilled[JournalSquare.pathApiName]
         val jsqTrainTimes = jsqTrains?.map { it.projectedArrival.printForAssertions() }
         assertEquals(listOf("10:20", "10:22"), jsqTrainTimes)
+    }
+
+    @Test
+    fun `do not backfill for end of line`() {
+        val trains = departuresMap {
+            station(ExchangePlace) {
+                nwkWtcTrainAt(10, 20)
+            }
+
+            station(WorldTradeCenter) {
+                newarkTrainAt(10, 35)
+            }
+        }
+
+        val backfilled = TrainBackfillHelper.withBackfill(trains)
+        val wtcTrains = backfilled[WorldTradeCenter.pathApiName]
+        val wtcTrainTimes = wtcTrains?.map { it.projectedArrival.printForAssertions() }
+        assertEquals(listOf("10:35"), wtcTrainTimes)
     }
 
     @Test

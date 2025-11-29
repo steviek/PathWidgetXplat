@@ -2,6 +2,9 @@ package com.sixbynine.transit.path.app.ui.settings
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import com.sixbynine.transit.path.api.DepartureBoardTrainFilter
+import com.sixbynine.transit.path.api.DepartureBoardTrainFilter.All
+import com.sixbynine.transit.path.api.DepartureBoardTrainFilter.Interstate
 import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.Line.Hoboken33rd
 import com.sixbynine.transit.path.api.Line.HobokenWtc
@@ -12,9 +15,6 @@ import com.sixbynine.transit.path.api.StationSort.Alphabetical
 import com.sixbynine.transit.path.api.StationSort.NjAm
 import com.sixbynine.transit.path.api.StationSort.NyAm
 import com.sixbynine.transit.path.api.StationSort.Proximity
-import com.sixbynine.transit.path.api.TrainFilter
-import com.sixbynine.transit.path.api.TrainFilter.All
-import com.sixbynine.transit.path.api.TrainFilter.Interstate
 import com.sixbynine.transit.path.app.settings.AvoidMissingTrains
 import com.sixbynine.transit.path.app.settings.StationLimit
 import com.sixbynine.transit.path.app.settings.TimeDisplay
@@ -86,13 +86,13 @@ val TimeDisplay.title: StringResource
         TimeDisplay.Clock -> string.setting_time_display_clock
     }
 
-val TrainFilter.title: StringResource
+val DepartureBoardTrainFilter.title: StringResource
     get() = when (this) {
         All -> string.show_all_trains
         Interstate -> string.show_interstate_trains
     }
 
-val TrainFilter.subtext: StringResource?
+val DepartureBoardTrainFilter.subtext: StringResource?
     get() = when (this) {
         All -> null
         Interstate -> string.interstate_explanation

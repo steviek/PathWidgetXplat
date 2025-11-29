@@ -1,27 +1,49 @@
 package com.sixbynine.transit.path.api
 
 import com.sixbynine.transit.path.app.ui.common.AppUiTrainData
-import com.sixbynine.transit.path.preferences.IntPersistable
 import com.sixbynine.transit.path.model.DepartureBoardData
+import com.sixbynine.transit.path.preferences.IntPersistable
 
-enum class TrainFilter(override val number: Int) : IntPersistable {
+sealed interface TrainFilter {
+    fun matchesFilter(
+        origin: Station,
+        train: DepartureBoardData.TrainData,
+    ): Boolean
+}
+
+data class CommuteTrainFilter(val origin: Station, val destination: Station) : TrainFilter {
+    override fun matchesFilter(
+        origin: Station,
+        train: DepartureBoardData.TrainData
+    ): Boolean {
+        TODO("Not yet implemented")
+    }
+}
+
+
+enum class DepartureBoardTrainFilter(override val number: Int) : IntPersistable, TrainFilter {
     All(1), Interstate(2);
 
-    companion object {
+    override fun matchesFilter(origin: Station, train: DepartureBoardData.TrainData): Boolean {
+        if (this == All) return true
+        val destination = Stations.fromHeadSign(train.title) ?: return true
+        return matchesFilter(origin, destination, this)
+    }
+
+    companion object Companion {
         fun matchesFilter(
             origin: Station,
             train: DepartureBoardData.TrainData,
-            filter: TrainFilter
+            filter: DepartureBoardTrainFilter
         ): Boolean {
-            if (filter == All) return true
-            val destination = Stations.fromHeadSign(train.title) ?: return true
-            return matchesFilter(origin, destination, filter)
+           return filter.matchesFilter(origin, train)
         }
 
+        // Change these too
         fun matchesFilter(
             origin: Station,
             train: AppUiTrainData,
-            filter: TrainFilter
+            filter: DepartureBoardTrainFilter
         ): Boolean {
             if (filter == All) return true
             val destination = Stations.fromHeadSign(train.title) ?: return true
@@ -31,7 +53,7 @@ enum class TrainFilter(override val number: Int) : IntPersistable {
         fun matchesFilter(
             station: Station,
             destination: Station,
-            filter: TrainFilter
+            filter: DepartureBoardTrainFilter
         ): Boolean {
             if (filter == All) return true
 

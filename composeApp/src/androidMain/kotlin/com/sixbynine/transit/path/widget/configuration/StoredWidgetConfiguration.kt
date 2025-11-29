@@ -2,7 +2,7 @@ package com.sixbynine.transit.path.widget.configuration
 
 import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.StationSort
-import com.sixbynine.transit.path.api.TrainFilter
+import com.sixbynine.transit.path.api.DepartureBoardTrainFilter
 import com.sixbynine.transit.path.preferences.IntPersistable
 import kotlinx.serialization.Serializable
 import kotlin.contracts.contract
@@ -14,7 +14,7 @@ data class StoredWidgetConfiguration(
     private val linesBitmask: Int? = null,
     val useClosestStation: Boolean = false,
     val sortOrder: StationSort? = null,
-    val filter: TrainFilter? = null,
+    val filter: DepartureBoardTrainFilter? = null,
     val version: Int = 1,
 ) {
     val lines: Set<Line>

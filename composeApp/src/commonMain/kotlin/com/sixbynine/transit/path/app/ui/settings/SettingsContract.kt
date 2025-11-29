@@ -2,7 +2,7 @@ package com.sixbynine.transit.path.app.ui.settings
 
 import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.StationSort
-import com.sixbynine.transit.path.api.TrainFilter
+import com.sixbynine.transit.path.api.DepartureBoardTrainFilter
 import com.sixbynine.transit.path.app.ui.ScreenScope
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.Intent
 import com.sixbynine.transit.path.app.ui.settings.SettingsContract.State
@@ -10,7 +10,7 @@ import com.sixbynine.transit.path.app.ui.settings.SettingsContract.State
 object SettingsContract {
     data class State(
         val locationSetting: LocationSettingState,
-        val trainFilter: TrainFilter,
+        val trainFilter: DepartureBoardTrainFilter,
         val lines: Set<Line>,
         val stationSort: StationSort,
         val showPresumedTrains: Boolean,
@@ -28,7 +28,7 @@ object SettingsContract {
     }
 
     sealed interface Intent {
-        data class TrainFilterChanged(val filter: TrainFilter) : Intent
+        data class TrainFilterChanged(val filter: DepartureBoardTrainFilter) : Intent
         data class LineFilterToggled(val filter: Line, val isChecked: Boolean) : Intent
         data class StationSortSelected(val sort: StationSort) : Intent
         data class ShowPresumedTrainsChanged(val show: Boolean) : Intent

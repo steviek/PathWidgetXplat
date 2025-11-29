@@ -7,8 +7,8 @@ import com.sixbynine.transit.path.api.LocationSetting.Enabled
 import com.sixbynine.transit.path.api.StationSort
 import com.sixbynine.transit.path.api.StationSort.Alphabetical
 import com.sixbynine.transit.path.api.Stations
-import com.sixbynine.transit.path.api.TrainFilter
-import com.sixbynine.transit.path.api.TrainFilter.Companion.matchesFilter
+import com.sixbynine.transit.path.api.DepartureBoardTrainFilter
+import com.sixbynine.transit.path.api.DepartureBoardTrainFilter.Companion.matchesFilter
 import com.sixbynine.transit.path.api.alerts.AlertText
 import com.sixbynine.transit.path.api.alerts.getText
 import com.sixbynine.transit.path.api.alerts.isDisplayedNow
@@ -389,7 +389,7 @@ class HomeScreenViewModel(maxWidth: Dp, maxHeight: Dp) : PathViewModel<State, In
 
     companion object {
         fun com.sixbynine.transit.path.model.DepartureBoardData.toDepartureBoardData(
-            trainFilter: TrainFilter = SettingsManager.trainFilter.value,
+            trainFilter: DepartureBoardTrainFilter = SettingsManager.trainFilter.value,
             timeDisplay: TimeDisplay = SettingsManager.timeDisplay.value,
             locationSetting: LocationSetting = SettingsManager.locationSetting.value,
             stationSelection: StationSelection = StationSelectionManager.selection.value,

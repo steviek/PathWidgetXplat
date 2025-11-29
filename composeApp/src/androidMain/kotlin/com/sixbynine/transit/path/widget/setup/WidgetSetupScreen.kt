@@ -23,7 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.StationSort
-import com.sixbynine.transit.path.api.TrainFilter
+import com.sixbynine.transit.path.api.DepartureBoardTrainFilter
 import com.sixbynine.transit.path.app.ui.CheckboxWithText
 import com.sixbynine.transit.path.app.ui.settings.RadioSection
 import com.sixbynine.transit.path.app.ui.settings.SettingsHeader
@@ -139,7 +139,7 @@ fun WidgetSetupScreenScope.WidgetSetupScreenContent() {
                         title = stringResource(string.filter),
                         titleStyle = TitleStyle
                     ) {
-                        TrainFilter.entries.forEach { filter ->
+                        DepartureBoardTrainFilter.entries.forEach { filter ->
                             item(
                                 text = stringResource(filter.title),
                                 subtext = filter.subtext?.let { stringResource(it) },

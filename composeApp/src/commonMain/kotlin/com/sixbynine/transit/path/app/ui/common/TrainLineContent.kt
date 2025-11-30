@@ -31,6 +31,7 @@ import com.sixbynine.transit.path.app.settings.TimeDisplay
 import com.sixbynine.transit.path.app.ui.ColorRect
 import com.sixbynine.transit.path.model.ColorWrapper
 import com.sixbynine.transit.path.time.now
+import com.sixbynine.transit.path.util.conditional
 import com.sixbynine.transit.path.widget.GroupedWidgetLayoutHelper
 
 
@@ -44,6 +45,8 @@ fun TrainLineContent(
     textColor: Color = MaterialTheme.colorScheme.onSurface,
     fullWidth: Boolean = true,
 ) {
+    fun Modifier.maybeFillWidth() = conditional(fullWidth) { fillMaxWidth() }
+    
     val colors = ArrayList<ColorWrapper>(3)
     data.fastForEach {
         it.colors.fastForEach { color ->
@@ -53,7 +56,7 @@ fun TrainLineContent(
         }
     }
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.maybeFillWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.inverseOnSurface
@@ -63,7 +66,7 @@ fun TrainLineContent(
         )
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
+            modifier = Modifier.maybeFillWidth().height(IntrinsicSize.Min),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Colored rectangle on the left
@@ -80,7 +83,7 @@ fun TrainLineContent(
                 verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.maybeFillWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(

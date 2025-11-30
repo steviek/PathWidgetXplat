@@ -33,9 +33,10 @@ object SeasonUtils {
         val winterSolstice = LocalDate(year, 12, 21)
 
         return when {
-            localDate >= springEquinox && localDate < summerSolstice -> Season.Spring
-            localDate >= summerSolstice && localDate < fallEquinox -> Season.Summer
-            localDate >= fallEquinox && localDate < winterSolstice -> Season.Fall
+            localDate >= winterSolstice -> Season.Winter
+            localDate >= fallEquinox -> Season.Fall
+            localDate >= summerSolstice -> Season.Summer
+            localDate >= springEquinox -> Season.Spring
             else -> Season.Winter
         }
     }

@@ -9,7 +9,7 @@ import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.alerts.Alert
 import com.sixbynine.transit.path.api.alerts.AlertText
-import com.sixbynine.transit.path.api.alerts.Schedule
+import com.sixbynine.transit.path.api.alerts.AlertSchedule
 import com.sixbynine.transit.path.api.alerts.TrainFilter
 import com.sixbynine.transit.path.api.templine.HobClosureConfigRepository
 import com.sixbynine.transit.path.time.NewYorkTimeZone
@@ -93,7 +93,7 @@ fun EverbridgeAlert.toCommonAlert(): Alert {
     val isElevatorAlert = elevatorStations.isNotEmpty()
     return Alert(
         stations = elevatorStations,
-        hideTrainsSchedule = Schedule(),
+        hideTrainsSchedule = AlertSchedule(),
         displaySchedule = schedule,
         hiddenTrainsFilter = TrainFilter(),
         message = AlertText(incidentMessage.preMessage),
@@ -104,12 +104,12 @@ fun EverbridgeAlert.toCommonAlert(): Alert {
     )
 }
 
-private val EverbridgeAlert.schedule: Schedule
+private val EverbridgeAlert.schedule: AlertSchedule
     get() {
         val date = incidentMessage.date
         val minEndTime = modifiedDate.plus(1.hours).toLocalDateTime(NewYorkTimeZone)
         val endOfOriginalDate = date?.plus(1, DayBased(1))?.atTime(0, 0)
-        return Schedule.once(
+        return AlertSchedule.once(
             from = modifiedDate.toLocalDateTime(NewYorkTimeZone),
             to = if (endOfOriginalDate == null) {
                 minEndTime

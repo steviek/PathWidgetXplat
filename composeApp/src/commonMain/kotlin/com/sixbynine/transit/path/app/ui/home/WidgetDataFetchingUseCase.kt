@@ -1,16 +1,14 @@
 package com.sixbynine.transit.path.app.ui.home
 
 import com.sixbynine.transit.path.Logging
-import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.LocationSetting.Disabled
 import com.sixbynine.transit.path.api.LocationSetting.Enabled
 import com.sixbynine.transit.path.api.LocationSetting.EnabledPendingPermission
 import com.sixbynine.transit.path.api.PathApiException
-import com.sixbynine.transit.path.api.Stations
-import com.sixbynine.transit.path.api.TrainFilter
 import com.sixbynine.transit.path.app.lifecycle.AppLifecycleObserver
 import com.sixbynine.transit.path.app.settings.SettingsManager
 import com.sixbynine.transit.path.app.station.StationSelectionManager
+import com.sixbynine.transit.path.model.DepartureBoardData
 import com.sixbynine.transit.path.time.now
 import com.sixbynine.transit.path.util.FetchWithPrevious
 import com.sixbynine.transit.path.util.Staleness
@@ -19,7 +17,7 @@ import com.sixbynine.transit.path.util.collect
 import com.sixbynine.transit.path.util.collectIn
 import com.sixbynine.transit.path.util.collectLatest
 import com.sixbynine.transit.path.util.isFailure
-import com.sixbynine.transit.path.model.DepartureBoardData
+import com.sixbynine.transit.path.widget.PathWidgetConfiguration
 import com.sixbynine.transit.path.widget.WidgetDataFetcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -159,14 +157,11 @@ class WidgetDataFetchingUseCase private constructor() {
 
     private fun startFetch(staleness: Staleness): FetchWithPrevious<DepartureBoardData> {
         return WidgetDataFetcher.fetchWidgetDataWithPrevious(
-            stationLimit = Int.MAX_VALUE,
-            stations = Stations.All,
-            sort = SettingsManager.stationSort.value,
-            lines = Line.entries,
-            filter = TrainFilter.All,
-            includeClosestStation = SettingsManager.locationSetting.value == Enabled,
+            config = PathWidgetConfiguration.allData(
+                includeClosestStation = SettingsManager.locationSetting.value == Enabled,
+                sort = SettingsManager.stationSort.value
+            ),
             staleness = staleness,
-            isCommuteWidget = false,
         )
     }
 

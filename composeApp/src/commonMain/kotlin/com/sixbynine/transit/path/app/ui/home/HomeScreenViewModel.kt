@@ -20,7 +20,6 @@ import com.sixbynine.transit.path.app.lifecycle.AppLifecycleObserver
 import com.sixbynine.transit.path.app.settings.SettingsManager
 import com.sixbynine.transit.path.app.settings.TimeDisplay
 import com.sixbynine.transit.path.app.settings.TimeDisplay.Relative
-import com.sixbynine.transit.path.app.settings.isActiveAt
 import com.sixbynine.transit.path.app.station.StationSelection
 import com.sixbynine.transit.path.app.station.StationSelectionManager
 import com.sixbynine.transit.path.app.ui.PathViewModel

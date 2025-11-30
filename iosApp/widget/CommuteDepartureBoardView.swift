@@ -49,9 +49,9 @@ struct CommuteDepartureBoardContent: View {
                         
             VStack(alignment: .leading, spacing: 0) {
                 // Main content
-                if let data = entry.data {
+                if let data = entry.data, let station = data.stations.first {
                     CommuteStationView(
-                        station: data.stations.first!,
+                        station: station,
                         entry: entry,
                         textColor: textColor
                     )
@@ -79,7 +79,7 @@ struct CommuteStationView: View {
         VStack(alignment: .leading, spacing: 4) {
             CommuteStationTitle(
                 title: station.displayName,
-                destinationStation: entry.configuration.destinationStation.toStation()?.displayName,
+                destinationStation: entry.configuration.destinationStation.getCommuteWidgetDestinationName(),
                 textColor: textColor,
                 maxWidth: entry.size.width
             )
@@ -277,6 +277,10 @@ struct CommuteFooterView: View {
     let entry: CommuteProvider.Entry
     let textColor: Color
     
+    private var buttonSize: CGFloat {
+        entry.configuration.showLastRefreshedTime ? 14 : 16
+    }
+    
     var body: some View {
         HStack(spacing: 0) {
             // Time text grouped with refresh button (only if enabled)
@@ -292,28 +296,17 @@ struct CommuteFooterView: View {
                     .italic()
                     .foregroundColor(textColor)
                     .padding(.trailing, 4)
-
-                Button(intent: RefreshIntent()) {
-                    Image(systemName: "arrow.2.circlepath")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 14, height: 14)
-                        .foregroundColor(textColor)
-                }
-                .padding(.horizontal, 2)
-                .buttonStyle(.borderless)
-            } else{
-                Button(intent: RefreshIntent()) {
-                    Image(systemName: "arrow.2.circlepath")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 16, height: 16)
-                        .foregroundColor(textColor)
-                }
-                .padding(.horizontal, 2)
-                .buttonStyle(.borderless)
             }
-
+        
+            Button(intent: RefreshIntent()) {
+                Image(systemName: "arrow.2.circlepath")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: buttonSize, height: buttonSize)
+                    .foregroundColor(textColor)
+            }
+            .padding(.horizontal, 2)
+            .buttonStyle(.borderless)
 
         }
         .frame(maxWidth: .infinity, alignment: .trailing)
@@ -331,6 +324,6 @@ struct CommuteFooterView: View {
 
     /// Gets the display name for the destination station from the configuration
     private func getDestinationStationName() -> String {
-        return entry.configuration.destinationStation.toStation()?.displayName ?? "Unknown"
+        return entry.configuration.destinationStation.getCommuteWidgetDestinationName()
     }
 }

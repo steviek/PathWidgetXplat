@@ -2,6 +2,8 @@ package com.sixbynine.transit.path.api.alerts
 
 import com.sixbynine.transit.path.api.Line
 import com.sixbynine.transit.path.api.Station
+import com.sixbynine.transit.path.schedule.DailySchedule
+import com.sixbynine.transit.path.schedule.Schedule
 import com.sixbynine.transit.path.time.NewYorkTimeZone
 import com.sixbynine.transit.path.time.now
 import kotlinx.datetime.DayOfWeek
@@ -20,16 +22,16 @@ data class Alert(
 
     /**
      * When the alert takes effect. While effective, the alert will hide trains matching the
-     * [trains] filter for [stations].
+     * [hiddenTrainsFilter] filter for [stations].
      */
     @SerialName("schedule")
-    val hideTrainsSchedule: Schedule,
+    val hideTrainsSchedule: AlertSchedule,
 
     /**
      * When the alert should display in the app. If the alert does not hide trains, this is the only
      * schedule that should be set.
      */
-    val displaySchedule: Schedule? = null,
+    val displaySchedule: AlertSchedule? = null,
 
     /** Trains that are skipping the stations while the alert is active. */
     @SerialName("trains")
@@ -53,11 +55,11 @@ data class Alert(
 
 fun Alert(
     stations: List<Station>,
-    hideTrainsSchedule: Schedule,
+    hideTrainsSchedule: AlertSchedule,
     hiddenTrainsFilter: TrainFilter,
     message: AlertText? = null,
     url: AlertText? = null,
-    displaySchedule: Schedule? = null,
+    displaySchedule: AlertSchedule? = null,
     isGlobal: Boolean = false,
     level: String? = null,
     lines: Set<Line>? = null
@@ -81,14 +83,19 @@ fun Alert.affectsLines(lineSet: Collection<Line>): Boolean {
 
 /** Schedule for an alert being active. All local times are local to NYC...duh. */
 @Serializable
-data class Schedule(
+data class AlertSchedule(
     /** Daily repeating schedule for the alert. */
     val repeatingDaily: RepeatingDailySchedule? = null,
     /** Weekly repeating schedule for the alert. */
     val repeatingWeekly: RepeatingWeeklySchedule? = null,
     /** One-time schedule for the alert. */
     val once: OnceSchedule? = null,
-) {
+): Schedule {
+
+    override fun isActiveAt(dateTime: LocalDateTime): Boolean {
+        return listOfNotNull(repeatingWeekly, repeatingDaily, once).any { it.isActiveAt(dateTime) }
+    }
+
     companion object {
         fun repeatingDaily(
             days: List<DayOfWeek>,
@@ -96,10 +103,10 @@ data class Schedule(
             end: LocalTime,
             from: LocalDate,
             to: LocalDate,
-        ): Schedule {
-            return Schedule(
+        ): AlertSchedule {
+            return AlertSchedule(
                 repeatingDaily = RepeatingDailySchedule(
-                    days = days.map { it },
+                    days = days.toSet(),
                     start = start,
                     end = end,
                     from = from,
@@ -115,8 +122,8 @@ data class Schedule(
             endTime: LocalTime,
             from: LocalDate,
             to: LocalDate,
-        ): Schedule {
-            return Schedule(
+        ): AlertSchedule {
+            return AlertSchedule(
                 repeatingWeekly = RepeatingWeeklySchedule(
                     startDay = startDay,
                     startTime = startTime,
@@ -128,8 +135,8 @@ data class Schedule(
             )
         }
 
-        fun once(from: LocalDateTime, to: LocalDateTime): Schedule {
-            return Schedule(once = OnceSchedule(from, to))
+        fun once(from: LocalDateTime, to: LocalDateTime): AlertSchedule {
+            return AlertSchedule(once = OnceSchedule(from, to))
         }
     }
 }
@@ -141,16 +148,16 @@ data class Schedule(
 @Serializable
 data class RepeatingDailySchedule(
     /** Days of week when the schedule starts. */
-    val days: List<DayOfWeek>,
+    override val days: Set<DayOfWeek>,
     /** The (inclusive) time on the day when the schedule starts. */
-    val start: LocalTime,
+    override val start: LocalTime,
     /** The (exclusive) time when the schedule ends. */
-    val end: LocalTime,
+    override val end: LocalTime,
     /** The (inclusive) date the schedule starts being valid. */
-    val from: LocalDate,
+    override val from: LocalDate,
     /** The (inclusive) date when the schedule stops being valid. */
-    val to: LocalDate,
-)
+    override val to: LocalDate,
+) : DailySchedule
 
 /**
  * Repeating schedule for a time range that repeats each week.
@@ -169,7 +176,27 @@ data class RepeatingWeeklySchedule(
     val from: LocalDate,
     /** The (inclusive) date when the schedule stops being valid. */
     val to: LocalDate,
-)
+) : Schedule {
+    override fun isActiveAt(dateTime: LocalDateTime): Boolean {
+        if (dateTime.date !in from..to) return false
+
+        val day = dateTime.dayOfWeek
+        val time = dateTime.time
+
+        return when {
+            day == startDay && day == endDay && startTime <= endTime -> if (startTime <= endTime) {
+                time in startTime ..< endTime
+            } else {
+                time >= startTime || time < endTime
+            }
+            day == startDay -> time >= startTime
+            day == endDay -> time < endTime
+            startDay < endDay -> day in startDay..endDay
+            else -> day >= startDay || day <= endDay
+
+        }
+    }
+}
 
 /** A schedule simply valid from [from] to [to]. */
 @Serializable
@@ -178,7 +205,11 @@ data class OnceSchedule(
     val from: LocalDateTime,
     /** When the schedule stops being valid. */
     val to: LocalDateTime,
-)
+) : Schedule {
+    override fun isActiveAt(dateTime: LocalDateTime): Boolean {
+        return dateTime >= from && dateTime < to
+    }
+}
 
 @Serializable
 data class AlertText(val localizations: List<TextAndLocale>) {
@@ -234,51 +265,6 @@ fun Alert.isDisplayedAt(dateTime: LocalDateTime): Boolean {
 
 val Alert.isWarning: Boolean get() = level == null || level.startsWith("WARN", ignoreCase = true)
 
-fun Schedule.isActiveAt(dateTime: LocalDateTime): Boolean {
-    repeatingWeekly?.run {
-        if (dateTime.date !in from..to) return false
-
-        val day = dateTime.dayOfWeek
-        val time = dateTime.time
-
-        return when {
-            day == startDay && day == endDay -> time >= startTime && time < endTime
-            day == startDay -> time >= startTime
-            day == endDay -> time < endTime
-            startDay < endDay -> day in startDay..endDay
-            else -> day >= startDay || day <= endDay
-
-        }
-    }
-
-    repeatingDaily?.run {
-        if (dateTime.date !in from..to) return false
-
-        val day = dateTime.dayOfWeek
-        val time = dateTime.time
-
-        if (start < end) {
-            return day in days && time >= start && time < end
-        }
-
-        if (time >= start) {
-            return day in days
-        }
-
-        if (time < end) {
-            return day.previousDay in days
-        }
-
-        return false
-    }
-
-    once?.run {
-        return dateTime in from..to
-    }
-
-    return false
-}
-
 fun Alert.hidesTrain(stationName: String, headSign: String): Boolean {
     if (stationName !in stations) return false
 
@@ -296,5 +282,3 @@ fun Alert.hidesTrainAt(stationName: String, headSign: String, time: Instant): Bo
     return canHideTrainsAt(dateTime) && hidesTrain(stationName, headSign)
 }
 
-private val DayOfWeek.previousDay: DayOfWeek
-    get() = DayOfWeek.values().getOrNull(ordinal - 1) ?: DayOfWeek.values().last()

@@ -1,6 +1,6 @@
-import com.sixbynine.transit.path.schedule.Schedule
-import com.sixbynine.transit.path.schedule.ScheduleTiming
-import com.sixbynine.transit.path.schedule.Schedules
+import com.sixbynine.transit.path.schedule.Timetable
+import com.sixbynine.transit.path.schedule.TimetableTiming
+import com.sixbynine.transit.path.schedule.Timetables
 import kotlinx.datetime.DayOfWeek.MONDAY
 import kotlinx.datetime.DayOfWeek.SATURDAY
 import kotlinx.datetime.DayOfWeek.SUNDAY
@@ -37,12 +37,12 @@ private fun printMainSchedule() {
             departures = RegularWeekdayDepartures
         )
 
-    val weekdayScheduleTiming = ScheduleTiming(
+    val weekdayScheduleTiming = TimetableTiming(
         scheduleId = 1,
         startDay = MONDAY,
-        startTime = MIDNIGHT,
+        start = MIDNIGHT,
         endDay = SATURDAY,
-        endTime = MIDNIGHT
+        end = MIDNIGHT
     )
 
     val saturdaySchedule =
@@ -52,12 +52,12 @@ private fun printMainSchedule() {
             departures = RegularSaturdayDepartures
         )
 
-    val saturdayScheduleTiming = ScheduleTiming(
+    val saturdayScheduleTiming = TimetableTiming(
         scheduleId = 2,
         startDay = SATURDAY,
-        startTime = MIDNIGHT,
+        start = MIDNIGHT,
         endDay = SUNDAY,
-        endTime = MIDNIGHT
+        end = MIDNIGHT
     )
 
     val sundaySchedule =
@@ -67,15 +67,15 @@ private fun printMainSchedule() {
             departures = RegularSundayDepartures
         )
 
-    val sundayScheduleTiming = ScheduleTiming(
+    val sundayScheduleTiming = TimetableTiming(
         scheduleId = 2,
         startDay = SUNDAY,
-        startTime = MIDNIGHT,
+        start = MIDNIGHT,
         endDay = MONDAY,
-        endTime = MIDNIGHT
+        end = MIDNIGHT
     )
 
-    val schedules = Schedules(
+    val schedules = Timetables(
         validFrom = LocalDate(2024, APRIL, 7).atTime(MIDNIGHT),
         validTo = null,
         schedules = listOf(weekdaySchedule, saturdaySchedule, sundaySchedule),
@@ -90,37 +90,37 @@ private fun printOverrideSchedule() {
     val satSchedule =
         createSchedule(id = 10, name = "Aug 31 Schedule", departures = AdjustedSaturdayDepartures)
 
-    val saturdayScheduleTiming = ScheduleTiming(
+    val saturdayScheduleTiming = TimetableTiming(
         scheduleId = satSchedule.id,
         startDay = SATURDAY,
-        startTime = MIDNIGHT,
+        start = MIDNIGHT,
         endDay = SUNDAY,
-        endTime = MIDNIGHT
+        end = MIDNIGHT
     )
 
     val sunSchedule =
         createSchedule(id = 11, name = "Sep 1 Schedule", departures = AdjustedSundayDepartures)
 
-    val sundayScheduleTiming = ScheduleTiming(
+    val sundayScheduleTiming = TimetableTiming(
         scheduleId = sunSchedule.id,
         startDay = SUNDAY,
-        startTime = MIDNIGHT,
+        start = MIDNIGHT,
         endDay = MONDAY,
-        endTime = MIDNIGHT
+        end = MIDNIGHT
     )
 
     val monSchedule =
         createSchedule(id = 12, name = "Sep 2 Schedule", departures = AdjustedMondayDepartures)
 
-    val mondayScheduleTiming = ScheduleTiming(
+    val mondayScheduleTiming = TimetableTiming(
         scheduleId = monSchedule.id,
         startDay = MONDAY,
-        startTime = MIDNIGHT,
+        start = MIDNIGHT,
         endDay = TUESDAY,
-        endTime = MIDNIGHT
+        end = MIDNIGHT
     )
 
-    val schedules = Schedules(
+    val schedules = Timetables(
         validFrom = LocalDate(2024, AUGUST, 31).atTime(MIDNIGHT),
         validTo = LocalDate(2024, SEPTEMBER, 3).atTime(MIDNIGHT),
         schedules = listOf(satSchedule, sunSchedule, monSchedule),
@@ -131,8 +131,8 @@ private fun printOverrideSchedule() {
     println(json.encodeToString(schedules))
 }
 
-private fun createSchedule(id: Int, name: String, departures: Departures): Schedule {
-    return Schedule(
+private fun createSchedule(id: Int, name: String, departures: Departures): Timetable {
+    return Timetable(
         id = id,
         name = name,
         departures = mapOf(

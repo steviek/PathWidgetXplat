@@ -2,6 +2,11 @@ package com.sixbynine.transit.path.model
 
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.Month
+import kotlinx.datetime.Month.DECEMBER
+import kotlinx.datetime.Month.JUNE
+import kotlinx.datetime.Month.MARCH
+import kotlinx.datetime.Month.SEPTEMBER
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
@@ -27,10 +32,10 @@ object SeasonUtils {
         val localDate = instant.toLocalDateTime(TimeZone.currentSystemDefault()).date
         val year = localDate.year
 
-        val springEquinox = LocalDate(year, 3, 20)
-        val summerSolstice = LocalDate(year, 6, 21)
-        val fallEquinox = LocalDate(year, 9, 22)
-        val winterSolstice = LocalDate(year, 12, 21)
+        val springEquinox = LocalDate(year, MARCH, 20)
+        val summerSolstice = LocalDate(year, JUNE, 21)
+        val fallEquinox = LocalDate(year, SEPTEMBER, 22)
+        val winterSolstice = LocalDate(year, DECEMBER, 21)
 
         return when {
             localDate >= winterSolstice -> Season.Winter

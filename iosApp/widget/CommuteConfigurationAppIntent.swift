@@ -45,7 +45,7 @@ enum HourOfDay : Int, AppEnum {
     ]
 }
 
-enum Weekday: String, AppEnum, CaseIterable {
+enum DayOfWeek: String, AppEnum, CaseIterable {
     case sunday = "sunday"
     case monday = "monday"
     case tuesday = "tuesday"
@@ -56,7 +56,7 @@ enum Weekday: String, AppEnum, CaseIterable {
     
     static var typeDisplayRepresentation: TypeDisplayRepresentation = "Day"
     
-    static var caseDisplayRepresentations: [Weekday: DisplayRepresentation] = [
+    static var caseDisplayRepresentations: [DayOfWeek: DisplayRepresentation] = [
         .sunday: "Sunday",
         .monday: "Monday",
         .tuesday: "Tuesday",
@@ -66,7 +66,7 @@ enum Weekday: String, AppEnum, CaseIterable {
         .saturday: "Saturday"
     ]
     
-    static var weekdays: [Weekday] {
+    static var weekdays: [DayOfWeek] {
         [.monday, .tuesday, .wednesday, .thursday, .friday]
     }
     
@@ -86,7 +86,7 @@ enum Weekday: String, AppEnum, CaseIterable {
 
 struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
     static var title: LocalizedStringResource = "My Commute"
-    static var description = IntentDescription("Route based widget with seasonal themes and auto-reverse for commutes")
+    static var description = IntentDescription("Route based widget with reverse for commutes home and seasonal themes")
     
     static var parameterSummary: some ParameterSummary {
         When(\.$autoReverse, .equalTo, true) {
@@ -120,7 +120,7 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
     @Parameter(title: "Time", default: TimeDisplay.relative)
     var timeDisplay: TimeDisplay
     
-    @Parameter(title: "Auto-reverse for commute", default: false)
+    @Parameter(title: "Reverse for commute home", default: true)
     var autoReverse: Bool
     
     @Parameter(
@@ -139,9 +139,9 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
 
         @Parameter(
         title: "Reverse on days",
-        default: [Weekday.monday, Weekday.tuesday, Weekday.wednesday, Weekday.thursday, Weekday.friday]
+        default: [DayOfWeek.monday, DayOfWeek.tuesday, DayOfWeek.wednesday, DayOfWeek.thursday, DayOfWeek.friday]
     )
-    var reverseDays: [Weekday]
+    var reverseDays: [DayOfWeek]
 
     @Parameter(title: "Show last refreshed time", default: false)
     var showLastRefreshedTime: Bool
@@ -151,7 +151,7 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
         self.destinationStation = .wtc
         self.timeDisplay = .relative
         self.autoReverse = false
-        self.reverseDays = Weekday.weekdays
+        self.reverseDays = DayOfWeek.weekdays
         self.reverseStartHour = .pm12
         self.reverseEndHour = .am3
     }
@@ -162,7 +162,7 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
         timeDisplay: TimeDisplay = .relative,
         autoReverse: Bool = false,
         showLastRefreshedTime: Bool = false,
-        reverseDays: [Weekday] = Weekday.weekdays,
+        reverseDays: [DayOfWeek] = DayOfWeek.weekdays,
         reverseStartHour: HourOfDay? = nil,
         reverseEndHour: HourOfDay? = nil
     ) {
@@ -187,22 +187,32 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
         let calendar = Calendar.current
         let now = Date()
         let currentHour = calendar.component(.hour, from: now)
-        let currentWeekday = calendar.component(.weekday, from: now)
+        var currentWeekday = calendar.component(.weekday, from: now)
+
+        if startHour == endHour {
+            // If start == end, then it's valid from start on the start day until the end on
+            // the next day.
+        } else if startHour > endHour {
+            // Overnight schedule, disabled between end and start time.
+            if currentHour >= endHour && currentHour < startHour {
+                return false
+            }
+        } else {
+            // Non-overnight
+            if currentHour < startHour || currentHour >= endHour {
+                return false
+            }
+        }
+        
+        if startHour >= endHour && currentHour < endHour {
+            currentWeekday -= 1
+            if currentWeekday < 1 { currentWeekday = 7 }
+        }
         
         // Check if current day is in the selected days
         // Use weekdays as default if array is empty (fallback for parameter default issues)
-        let activeDays = reverseDays.isEmpty ? Weekday.weekdays : reverseDays
-        let isActiveDay = activeDays.contains { $0.calendarWeekday == currentWeekday }
-        guard isActiveDay else { return false }
-        
-        // Check if current hour is within the reverse range
-        if startHour <= endHour {
-            // Normal range (e.g., 9am to 5pm)
-            return currentHour >= startHour && currentHour < endHour
-        } else {
-            // Overnight range (e.g., 9pm to 6am)
-            return currentHour >= startHour || currentHour < endHour
-        }
+        let activeDays = reverseDays.isEmpty ? DayOfWeek.weekdays : reverseDays
+        return activeDays.contains { $0.calendarWeekday == currentWeekday }
     }
     
     // Get effective origin/destination with auto-reverse applied

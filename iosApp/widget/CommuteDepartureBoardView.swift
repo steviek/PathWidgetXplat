@@ -264,7 +264,7 @@ struct CommuteEmptyView: View {
             Text("Location access required")
                 .font(Font.arimaStyleMedium(size: 14))
                 .foregroundColor(.secondary)
-            Text("Enable location access to show nearest station")
+            Text("Open the app, go to Settings, and enable 'Closest station' to grant permission.")
                 .font(Font.arimaStyle(size: 12))
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)

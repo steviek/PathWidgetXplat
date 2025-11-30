@@ -339,16 +339,6 @@
         }
       }
     },
-    "Auto-reverse for commute" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Retroceso automático para desplazamientos"
-          }
-        }
-      }
-    },
     "Christopher Street" : {
       "localizations" : {
         "es" : {
@@ -409,9 +399,6 @@
           }
         }
       }
-    },
-    "Enable location access to show nearest station" : {
-
     },
     "Exchange Place" : {
       "localizations" : {
@@ -654,6 +641,9 @@
         }
       }
     },
+    "Open the app, go to Settings, and enable 'Closest station' to grant permission." : {
+
+    },
     "Order" : {
       "localizations" : {
         "es" : {
@@ -680,6 +670,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Recargar"
+          }
+        }
+      }
+    },
+    "Reverse for commute home" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revertir para el viaje a casa"
           }
         }
       }
@@ -714,8 +714,15 @@
         }
       }
     },
-    "Route based widget with seasonal themes and auto-reverse for commutes" : {
-
+    "Route based widget with reverse for commutes home and seasonal themes" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Widget basado en ruta con reverso para viajes a casa y temas estacionales"
+          }
+        }
+      }
     },
     "Saturday" : {
       "localizations" : {

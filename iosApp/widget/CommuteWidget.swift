@@ -117,7 +117,7 @@ struct CommuteWidget: Widget {
                 .containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName("My Commute")
-        .description("Route based widget with seasonal themes and auto-reverse for commutes")
+        .description("Route based widget with reverse for commutes home and seasonal themes")
         .supportedFamilies([.systemSmall])
     }
 }

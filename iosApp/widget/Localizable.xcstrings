@@ -641,8 +641,15 @@
         }
       }
     },
-    "Open the app, go to Settings, and enable 'Closest station' to grant permission." : {
-
+    "Open the app settings and enable 'Closest station' to grant permission." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre la configuración de la aplicación y habilita 'La estación más cercana' para otorgar permiso."
+          }
+        }
+      }
     },
     "Order" : {
       "localizations" : {

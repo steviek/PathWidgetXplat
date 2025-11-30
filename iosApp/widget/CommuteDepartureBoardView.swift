@@ -15,19 +15,69 @@ struct CommuteDepartureBoardView: View {
     let entry: CommuteProvider.Entry
         
     var body: some View {
-        if showEmptyView(entry) {
+        if showSameStationError(entry) {
+            CommuteSameStationView(entry: entry)
+        } else if showEmptyView(entry) {
             CommuteEmptyView(entry: entry)
         } else {
             CommuteDepartureBoardContent(entry: entry)
         }
     }
     
+    private func showSameStationError(_ entry: CommuteProvider.Entry) -> Bool {
+        let origin = entry.configuration.getEffectiveOrigin()
+        let destination = entry.configuration.getEffectiveDestination()
+        
+        if origin == destination {
+            return true
+        }
+        
+        if let data = entry.data, let station = data.stations.first {
+            if let fixed = destination.toSharedStationChoice() as? StationChoiceFixed {
+                return fixed.station.pathApiName == station.id
+            }
+        }
+        
+        return false
+    }
+
     private func showEmptyView(_ entry: CommuteProvider.Entry) -> Bool {
         // Show empty view if origin is "closest" and we don't have location permission
         if entry.configuration.originStation == .closest {
             return !CLLocationManager().isAuthorizedForWidgetUpdates
         }
         return false
+    }
+    
+    fileprivate enum TextStyles {
+        enum Station {
+            static let titleSize: CGFloat = 14
+            static let title = Font.arimaStyleMedium(size: titleSize)
+            // Italicized for measurement to match view modifier
+            static let titleMeasurement = UIFont.arimaStyleMediumItalic(size: titleSize)
+            
+            static let destinationSize: CGFloat = 14
+            static let destination = Font.arimaStyle(size: destinationSize)
+        }
+        
+        enum Train {
+            static let timeLarge = Font.arimaStyleBold(size: 32)
+            static let timeMedium = Font.arimaStyleBold(size: 24)
+            static let info = Font.arimaStyle(size: 12)
+        }
+        
+        enum Footer {
+            static let textSize: CGFloat = 12
+            static let text = Font.arimaStyle(size: textSize)
+            // Italicized for measurement to match view modifier
+            static let textMeasurement = UIFont.arimaStyleItalic(size: textSize)
+        }
+        
+        enum Message {
+            static let title = Font.arimaStyleMedium(size: 14)
+            static let body = Font.arimaStyle(size: 12)
+            static let tiny = Font.arimaStyle(size: 11)
+        }
     }
 }
 
@@ -115,13 +165,13 @@ struct CommuteStationTitle: View {
                         let textWidth = measureTextWidth(
                             maxSize: CGSize(width: availableWidth, height: 50),
                             text: text,
-                            font: UIFont.arimaStyleMediumItalic(size: 14)
+                            font: CommuteDepartureBoardView.TextStyles.Station.titleMeasurement
                         )
                         return (textWidth <= availableWidth).toKotlinBoolean()
                     }
                 )
             )
-            .font(Font.arimaStyleMedium(size: 14))
+            .font(CommuteDepartureBoardView.TextStyles.Station.title)
             .foregroundColor(textColor)
             .italic()
             
@@ -132,7 +182,7 @@ struct CommuteStationTitle: View {
                         .font(.system(size: 12))
                         .foregroundColor(textColor)
                     Text(destination)
-                        .font(Font.arimaStyle(size: 14))
+                        .font(CommuteDepartureBoardView.TextStyles.Station.destination)
                         .italic()
                         .foregroundColor(textColor)
                 }
@@ -144,52 +194,75 @@ struct CommuteStationTitle: View {
 }
 
 struct CommuteTrainDisplay: View {
-    let trains: [DepartureBoardData.TrainData]
+    let trains: [DepartureBoardData.TrainData]?
     let entry: CommuteProvider.Entry
     let textColor: Color
+    let errorMessage: String?
+    
+    init(
+        trains: [DepartureBoardData.TrainData]? = nil,
+        entry: CommuteProvider.Entry,
+        textColor: Color,
+        errorMessage: String? = nil
+    ) {
+        self.trains = trains
+        self.entry = entry
+        self.textColor = textColor
+        self.errorMessage = errorMessage
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: -2) {
-            // First train - prominent display
-            let firstTrain = trains.first!
-            let firstTime = formatArrivalTime(firstTrain)
-            
-            HStack(alignment: .firstTextBaseline, spacing: 0) {
-                if entry.configuration.timeDisplay == .clock {
-                    // For clock time, display as single text
-                    Text(firstTime)
-                        .font(Font.arimaStyleBold(size: 32))
-                        .foregroundColor(textColor)
-                } else {
-                    // For relative time, show condensed format with "min" suffix
-                    let condensedTime = formatCondensedArrivalTime(firstTrain)
-                    let minSuffix = getMinSuffix(firstTrain)
-                    Text(condensedTime)
-                        .font(Font.arimaStyleBold(size: 32))
-                        .foregroundColor(textColor)
-                    Text(minSuffix)
-                        .font(Font.arimaStyleBold(size: 24))
-                        .foregroundColor(textColor)
-                }
-            }
-            
-            // Remaining trains - secondary line
-            if trains.count > 1 {
-                let remainingTrains = Array(trains.dropFirst().prefix(5))
-                let remainingArrivals = remainingTrains.map { $0.projectedArrival }
-                let timesString = GroupedWidgetLayoutHelper.Companion().joinAdditionalTimes(
-                    timeDisplay: entry.configuration.timeDisplay.toKotlinTimeDisplay(),
-                    times: remainingArrivals,
-                    displayAt: entry.date.toKotlinInstant()
-                )
+            if let trains = trains, let firstTrain = trains.first {
+                // Train times display
+                let firstTime = formatArrivalTime(firstTrain)
                 
-                Text(timesString)
-                    .font(Font.arimaStyle(size: 12))
-                    .foregroundColor(textColor)
-                    .multilineTextAlignment(.leading)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .frame(maxWidth: 200, alignment: .leading)
-                    .padding(.leading, 2)
+                HStack(alignment: .firstTextBaseline, spacing: 0) {
+                    if entry.configuration.timeDisplay == .clock {
+                        // For clock time, display as single text
+                        Text(firstTime)
+                            .font(CommuteDepartureBoardView.TextStyles.Train.timeLarge)
+                            .foregroundColor(textColor)
+                    } else {
+                        // For relative time, show condensed format with "min" suffix
+                        let condensedTime = formatCondensedArrivalTime(firstTrain)
+                        let minSuffix = getMinSuffix(firstTrain)
+                        Text(condensedTime)
+                            .font(CommuteDepartureBoardView.TextStyles.Train.timeLarge)
+                            .foregroundColor(textColor)
+                        Text(minSuffix)
+                            .font(CommuteDepartureBoardView.TextStyles.Train.timeMedium)
+                            .foregroundColor(textColor)
+                    }
+                }
+                
+                // Remaining trains - secondary line
+                if trains.count > 1 {
+                    let remainingTrains = Array(trains.dropFirst().prefix(5))
+                    let remainingArrivals = remainingTrains.map { $0.projectedArrival }
+                    let timesString = GroupedWidgetLayoutHelper.Companion().joinAdditionalTimes(
+                        timeDisplay: entry.configuration.timeDisplay.toKotlinTimeDisplay(),
+                        times: remainingArrivals,
+                        displayAt: entry.date.toKotlinInstant()
+                    )
+                    
+                    Text(timesString)
+                        .font(CommuteDepartureBoardView.TextStyles.Train.info)
+                        .foregroundColor(textColor)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: 200, alignment: .leading)
+                        .padding(.leading, 2)
+                }
+            } else if let errorMessage = errorMessage {
+                // Error message display
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(errorMessage)
+                        .font(CommuteDepartureBoardView.TextStyles.Message.body)
+                        .foregroundColor(textColor)
+                        .multilineTextAlignment(.leading)
+                }
+                .padding(.top, 4)
             }
         }
         .frame(maxWidth: .infinity)
@@ -234,7 +307,7 @@ struct CommuteNoTrainsView: View {
         HStack {
             Spacer()
             Text(IosResourceProvider().getNoTrainsText())
-                .font(Font.arimaStyle(size: 11))
+                .font(CommuteDepartureBoardView.TextStyles.Message.tiny)
                 .foregroundColor(textColor)
                 .multilineTextAlignment(.leading)
             Spacer()
@@ -249,7 +322,7 @@ struct CommuteErrorView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(IosResourceProvider().getErrorLong())
-                .font(Font.arimaStyleMedium(size: 14))
+                .font(CommuteDepartureBoardView.TextStyles.Message.title)
                 .foregroundColor(textColor)
                 .multilineTextAlignment(.leading)
         }
@@ -262,14 +335,61 @@ struct CommuteEmptyView: View {
     var body: some View {
         VStack {
             Text("Location access required")
-                .font(Font.arimaStyleMedium(size: 14))
+                .font(CommuteDepartureBoardView.TextStyles.Message.title)
                 .foregroundColor(.secondary)
-            Text("Open the app, go to Settings, and enable 'Closest station' to grant permission.")
-                .font(Font.arimaStyle(size: 12))
+            Text("Open the app settings and enable 'Closest station' to grant permission.")
+                .font(CommuteDepartureBoardView.TextStyles.Message.body)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
         }
         .padding()
+    }
+}
+
+struct CommuteSameStationView: View {
+    let entry: CommuteProvider.Entry
+    
+    var body: some View {
+        let seasonalBackground = SeasonalUtils.getSeasonalBackgroundName(for: entry.date)
+        let textColor = SeasonalUtils.getSeasonalTextColor(for: entry.date)
+        let originName = entry.configuration.getEffectiveOrigin().getCommuteWidgetDestinationName()
+        let destinationName = entry.configuration.getEffectiveDestination().getCommuteWidgetDestinationName()
+        
+        ZStack {
+            // Seasonal background sized directly from the widget context
+            Image(seasonalBackground)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: entry.size.width, height: entry.size.height)
+                .clipped()
+                .edgesIgnoringSafeArea(.all)
+            
+            VStack(alignment: .leading, spacing: 0) {
+                // Main content - show station titles and error message
+                VStack(alignment: .leading, spacing: 4) {
+                    CommuteStationTitle(
+                        title: originName,
+                        destinationStation: destinationName,
+                        textColor: textColor,
+                        maxWidth: entry.size.width
+                    )
+                    
+                    // Error message instead of train times
+                    CommuteTrainDisplay(
+                        entry: entry,
+                        textColor: textColor,
+                        errorMessage: "Origin and destination stations cannot be the same."
+                    )
+                }
+                
+                Spacer()
+                
+                // Footer
+                CommuteFooterView(entry: entry, textColor: textColor)
+            }
+            .padding(12)
+        }
+        .frame(width: entry.size.width, height: entry.size.height)
     }
 }
 
@@ -292,7 +412,7 @@ struct CommuteFooterView: View {
                     timeDisplay: entry.configuration.timeDisplay,
                     footerTextFits: footerTextFits
                 ))
-                    .font(Font.arimaStyle(size: 12))
+                    .font(CommuteDepartureBoardView.TextStyles.Footer.text)
                     .italic()
                     .foregroundColor(textColor)
                     .padding(.trailing, 4)
@@ -316,10 +436,10 @@ struct CommuteFooterView: View {
     /// Accounts for the refresh button, destination station, and padding
     private func footerTextFits(_ text: String) -> Bool {
         // Calculate available width: total width - refresh button (24) - destination station text - padding (16)
-        let destinationStationWidth = measureTextWidth(maxSize: entry.size, text: getDestinationStationName(), font: UIFont.arimaStyleItalic(size: 12))
+        let destinationStationWidth = measureTextWidth(maxSize: entry.size, text: getDestinationStationName(), font: CommuteDepartureBoardView.TextStyles.Footer.textMeasurement)
         let maxWidth = entry.size.width - (24 + 16 + 8 + destinationStationWidth) // 8 for spacing between refresh and time
         
-        return measureTextWidth(maxSize: entry.size, text: text, font: UIFont.arimaStyleItalic(size: 12)) <= maxWidth
+        return measureTextWidth(maxSize: entry.size, text: text, font: CommuteDepartureBoardView.TextStyles.Footer.textMeasurement) <= maxWidth
     }
 
     /// Gets the display name for the destination station from the configuration

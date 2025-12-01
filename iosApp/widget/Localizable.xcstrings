@@ -831,6 +831,16 @@
         }
       }
     },
+    "Seasonal themed backgrounds" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fondos temáticos estacionales"
+          }
+        }
+      }
+    },
     "View upcoming train departures by station" : {
 
     },

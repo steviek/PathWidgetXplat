@@ -99,6 +99,7 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
                 \.$reverseStartHour
                 \.$reverseEndHour
                 \.$showLastRefreshedTime
+                \.$useSeasonalBackgrounds
             }
         } otherwise: {
             Summary {
@@ -107,6 +108,7 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
                 \.$timeDisplay
                 \.$autoReverse
                 \.$showLastRefreshedTime
+                \.$useSeasonalBackgrounds
             }
         }
     }
@@ -145,6 +147,9 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
 
     @Parameter(title: "Show last refreshed time", default: false)
     var showLastRefreshedTime: Bool
+
+    @Parameter(title: "Seasonal themed backgrounds", default: true)
+    var useSeasonalBackgrounds: Bool
     
     init() {
         self.originStation = .closest
@@ -154,6 +159,7 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
         self.reverseDays = DayOfWeek.weekdays
         self.reverseStartHour = .pm12
         self.reverseEndHour = .am3
+        self.useSeasonalBackgrounds = true
     }
     
     init(
@@ -162,6 +168,7 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
         timeDisplay: TimeDisplay = .relative,
         autoReverse: Bool = false,
         showLastRefreshedTime: Bool = false,
+        useSeasonalBackgrounds: Bool = true,
         reverseDays: [DayOfWeek] = DayOfWeek.weekdays,
         reverseStartHour: HourOfDay? = nil,
         reverseEndHour: HourOfDay? = nil
@@ -171,6 +178,7 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
         self.timeDisplay = timeDisplay
         self.autoReverse = autoReverse
         self.showLastRefreshedTime = showLastRefreshedTime
+        self.useSeasonalBackgrounds = useSeasonalBackgrounds
         self.reverseDays = reverseDays
         self.reverseStartHour = reverseStartHour
         self.reverseEndHour = reverseEndHour

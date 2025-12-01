@@ -86,6 +86,8 @@ struct CommuteProvider: AppIntentTimelineProvider {
                 timeDisplay: configuration.timeDisplay,
                 autoReverse: configuration.autoReverse,
                 showLastRefreshedTime: configuration.showLastRefreshedTime,
+                useSeasonalBackgrounds: configuration.useSeasonalBackgrounds,
+                reverseDays: configuration.reverseDays,
                 reverseStartHour: configuration.reverseStartHour,
                 reverseEndHour: configuration.reverseEndHour
             )

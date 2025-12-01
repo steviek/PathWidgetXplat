@@ -8,6 +8,7 @@
 
 import WidgetKit
 import SwiftUI
+import UIKit
 import ComposeApp
 import CoreLocation
 
@@ -85,17 +86,34 @@ struct CommuteDepartureBoardContent: View {
     let entry: CommuteProvider.Entry
     
     var body: some View {
+        let useSeasonal = entry.configuration.useSeasonalBackgrounds
         let seasonalBackground = SeasonalUtils.getSeasonalBackgroundName(for: entry.date)
-        let textColor = SeasonalUtils.getSeasonalTextColor(for: entry.date)
         
-        ZStack {
+        let textColor: Color
+        let buttonColor: Color
+        
+        if useSeasonal {
+            textColor = SeasonalUtils.getSeasonalTextColor(for: entry.date)
+            buttonColor = textColor
+        } else {
+            textColor = .primary
+            buttonColor = .accentColor
+        }
+        
+        return ZStack {
             // Seasonal background sized directly from the widget context
-            Image(seasonalBackground)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: entry.size.width, height: entry.size.height)
-                .clipped()
-                .edgesIgnoringSafeArea(.all)
+            if useSeasonal {
+                Image(seasonalBackground)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: entry.size.width, height: entry.size.height)
+                    .clipped()
+                    .edgesIgnoringSafeArea(.all)
+            } else {
+                Color(uiColor: .systemBackground)
+                    .frame(width: entry.size.width, height: entry.size.height)
+                    .edgesIgnoringSafeArea(.all)
+            }
                         
             VStack(alignment: .leading, spacing: 0) {
                 // Main content
@@ -112,7 +130,7 @@ struct CommuteDepartureBoardContent: View {
                 Spacer()
                 
                 // Footer
-                CommuteFooterView(entry: entry, textColor: textColor)
+                CommuteFooterView(entry: entry, textColor: textColor, buttonColor: buttonColor)
             }
             .padding(12)
         }
@@ -350,19 +368,36 @@ struct CommuteSameStationView: View {
     let entry: CommuteProvider.Entry
     
     var body: some View {
+        let useSeasonal = entry.configuration.useSeasonalBackgrounds
         let seasonalBackground = SeasonalUtils.getSeasonalBackgroundName(for: entry.date)
-        let textColor = SeasonalUtils.getSeasonalTextColor(for: entry.date)
         let originName = entry.configuration.getEffectiveOrigin().getCommuteWidgetDestinationName()
         let destinationName = entry.configuration.getEffectiveDestination().getCommuteWidgetDestinationName()
         
-        ZStack {
+        let textColor: Color
+        let buttonColor: Color
+        
+        if useSeasonal {
+            textColor = SeasonalUtils.getSeasonalTextColor(for: entry.date)
+            buttonColor = textColor
+        } else {
+            textColor = .primary
+            buttonColor = .accentColor
+        }
+        
+        return ZStack {
             // Seasonal background sized directly from the widget context
-            Image(seasonalBackground)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: entry.size.width, height: entry.size.height)
-                .clipped()
-                .edgesIgnoringSafeArea(.all)
+            if useSeasonal {
+                Image(seasonalBackground)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: entry.size.width, height: entry.size.height)
+                    .clipped()
+                    .edgesIgnoringSafeArea(.all)
+            } else {
+                Color(uiColor: .systemBackground)
+                    .frame(width: entry.size.width, height: entry.size.height)
+                    .edgesIgnoringSafeArea(.all)
+            }
             
             VStack(alignment: .leading, spacing: 0) {
                 // Main content - show station titles and error message
@@ -385,7 +420,7 @@ struct CommuteSameStationView: View {
                 Spacer()
                 
                 // Footer
-                CommuteFooterView(entry: entry, textColor: textColor)
+                CommuteFooterView(entry: entry, textColor: textColor, buttonColor: buttonColor)
             }
             .padding(12)
         }
@@ -396,6 +431,7 @@ struct CommuteSameStationView: View {
 struct CommuteFooterView: View {
     let entry: CommuteProvider.Entry
     let textColor: Color
+    let buttonColor: Color
     
     private var buttonSize: CGFloat {
         entry.configuration.showLastRefreshedTime ? 14 : 16
@@ -423,7 +459,7 @@ struct CommuteFooterView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: buttonSize, height: buttonSize)
-                    .foregroundColor(textColor)
+                    .foregroundColor(buttonColor)
             }
             .padding(.horizontal, 2)
             .buttonStyle(.borderless)

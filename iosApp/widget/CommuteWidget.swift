@@ -48,12 +48,27 @@ struct CommuteProvider: AppIntentTimelineProvider {
     }
     
     func timeline(for configuration: CommuteConfigurationAppIntent, in context: Context) async -> Timeline<CommuteSimpleEntry> {
+        let entries = await createEntries(
+            for: configuration,
+            in: context,
+            count: configuration.timeDisplay == .relative ? 16 : 1
+        )
+        let refreshTime = Date().addingTimeInterval(10 * 60)
+        return Timeline(entries: entries, policy: .after(refreshTime))
+    }
+    
+    private func createEntries(
+        for configuration: CommuteConfigurationAppIntent,
+        in context: Context,
+        count: Int
+    ) async -> [CommuteSimpleEntry] {
         let stationLimit = 1 // We only want to show one station for commute widget
         
-        let widgetData: DepartureBoardData?
+        let effectiveConfiguration: CommuteConfigurationAppIntent
+        var widgetData: DepartureBoardData?
         let hasError: Bool
         let hasPathError: Bool
-        let effectiveConfiguration: CommuteConfigurationAppIntent
+        let dataFrom: Date
         
         if (context.isPreview) {
             widgetData = Fixtures().widgetData(limit: Int32(stationLimit))
@@ -64,6 +79,7 @@ struct CommuteProvider: AppIntentTimelineProvider {
             )
             hasError = false
             hasPathError = false
+            dataFrom = Date()
         } else {
             // Apply auto-reverse logic if enabled
             let effectiveOrigin = configuration.getEffectiveOrigin()
@@ -78,6 +94,7 @@ struct CommuteProvider: AppIntentTimelineProvider {
             widgetData = fetchResult.data
             hasError = fetchResult.hasError
             hasPathError = fetchResult.hasPathError
+            dataFrom = widgetData?.fetchTime.toDate() ?? Date()
             
             // Update effective configuration with the actual stations used
             effectiveConfiguration = CommuteConfigurationAppIntent(
@@ -94,19 +111,31 @@ struct CommuteProvider: AppIntentTimelineProvider {
         }
 
         let now = Date()
-        let nextUpdate = Calendar.current.date(byAdding: .minute, value: 1, to: now)!
-        
-        let entry = CommuteSimpleEntry(
-            date: now,
-            size: context.displaySize,
-            configuration: effectiveConfiguration,
-            data: widgetData,
-            hasError: hasError,
-            hasPathError: hasPathError,
-            dataFrom: widgetData?.fetchTime.toDate() ?? now
-        )
+        var entries: [CommuteSimpleEntry] = []
+        var date = now
 
-        return Timeline(entries: [entry], policy: .after(nextUpdate))
+        for _ in 0..<count {
+            if (!context.isPreview) {
+                widgetData = WidgetDataFetcher().prunePassedDepartures(
+                    data: widgetData,
+                    time: date.toKotlinInstant()
+                )
+            }
+            entries.append(
+                CommuteSimpleEntry(
+                    date: date,
+                    size: context.displaySize,
+                    configuration: effectiveConfiguration,
+                    data: widgetData,
+                    hasError: hasError,
+                    hasPathError: hasPathError,
+                    dataFrom: dataFrom
+                )
+            )
+            date = TimeUtilities().getStartOfNextMinute(time: date.toKotlinInstant()).toDate()
+        }
+
+        return entries
     }
 }
 

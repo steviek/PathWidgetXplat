@@ -138,40 +138,10 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
         requestValueDialog: IntentDialog("When should reversal end?")
     )
     var reverseEndHour: HourOfDay?
-    
-    @Parameter(
-        title: "Reverse from",
-        requestValueDialog: IntentDialog("When should stations reverse?")
-    )
-    var reverseStartTime: Date?
-    
-    @Parameter(
-        title: "Reverse until",
-        requestValueDialog: IntentDialog("When should reversal end?")
-    )
-    var reverseEndTime: Date?
-    
-    // Helper to create default date for 12:00 PM (noon)
-    private static func defaultStartTime() -> Date {
-        let calendar = Calendar.current
-        var components = calendar.dateComponents([.year, .month, .day], from: Date())
-        components.hour = 12
-        components.minute = 0
-        return calendar.date(from: components) ?? Date()
-    }
-    
-    // Helper to create default date for 3:00 AM
-    private static func defaultEndTime() -> Date {
-        let calendar = Calendar.current
-        var components = calendar.dateComponents([.year, .month, .day], from: Date())
-        components.hour = 3
-        components.minute = 0
-        return calendar.date(from: components) ?? Date()
-    }
 
-    @Parameter(
-    title: "Reverse on days",
-    default: [DayOfWeek.monday, DayOfWeek.tuesday, DayOfWeek.wednesday, DayOfWeek.thursday, DayOfWeek.friday]
+        @Parameter(
+        title: "Reverse on days",
+        default: [DayOfWeek.monday, DayOfWeek.tuesday, DayOfWeek.wednesday, DayOfWeek.thursday, DayOfWeek.friday]
     )
     var reverseDays: [DayOfWeek]
 
@@ -190,18 +160,6 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
         self.reverseStartHour = .pm12
         self.reverseEndHour = .am3
         self.useSeasonalBackgrounds = true
-        
-        let calendar = Calendar.current
-        // Default: 12:00 PM (noon)
-        var components = calendar.dateComponents([.year, .month, .day], from: Date())
-        components.hour = 12
-        components.minute = 0
-        self.reverseStartTime = calendar.date(from: components)
-        
-        // Default: 3:00 AM
-        components.hour = 3
-        components.minute = 0
-        self.reverseEndTime = calendar.date(from: components)
     }
     
     init(
@@ -224,99 +182,13 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
         self.reverseDays = reverseDays
         self.reverseStartHour = reverseStartHour
         self.reverseEndHour = reverseEndHour
-        
-        // Convert HourOfDay to Date if provided, otherwise use defaults
-        let calendar = Calendar.current
-        var components = calendar.dateComponents([.year, .month, .day], from: Date())
-        
-        if let startHour = reverseStartHour {
-            components.hour = startHour.rawValue
-            components.minute = 0
-            self.reverseStartTime = calendar.date(from: components)
-        } else {
-            // Default: 12:00 PM (noon)
-            components.hour = 12
-            components.minute = 0
-            self.reverseStartTime = calendar.date(from: components)
-        }
-        
-        if let endHour = reverseEndHour {
-            components.hour = endHour.rawValue
-            components.minute = 0
-            self.reverseEndTime = calendar.date(from: components)
-        } else {
-            // Default: 3:00 AM
-            components.hour = 3
-            components.minute = 0
-            self.reverseEndTime = calendar.date(from: components)
-        }
-    }
-    
-    @available(iOS 18, *)
-    init(
-        originStation: StationChoice = .exp,
-        destinationStation: StationChoice = .wtc,
-        timeDisplay: TimeDisplay = .relative,
-        autoReverse: Bool = false,
-        showLastRefreshedTime: Bool = false,
-        useSeasonalBackgrounds: Bool = true,
-        reverseDays: [DayOfWeek] = DayOfWeek.weekdays,
-        reverseStartTime: Date? = nil,
-        reverseEndTime: Date? = nil
-    ) {
-        self.originStation = originStation
-        self.destinationStation = destinationStation
-        self.timeDisplay = timeDisplay
-        self.autoReverse = autoReverse
-        self.showLastRefreshedTime = showLastRefreshedTime
-        self.useSeasonalBackgrounds = useSeasonalBackgrounds
-        self.reverseDays = reverseDays
-        self.reverseStartTime = reverseStartTime
-        self.reverseEndTime = reverseEndTime
-        
-        // Convert Date to HourOfDay for backward compatibility
-        if let startTime = reverseStartTime {
-            let hour = Calendar.current.component(.hour, from: startTime)
-            self.reverseStartHour = HourOfDay(rawValue: hour)
-        } else {
-            self.reverseStartHour = .pm12
-        }
-        
-        if let endTime = reverseEndTime {
-            let hour = Calendar.current.component(.hour, from: endTime)
-            self.reverseEndHour = HourOfDay(rawValue: hour)
-        } else {
-            self.reverseEndHour = .am3
-        }
-    }
-    
-    // Helper methods to get hour value (0-23) from either Date (iOS 18+) or HourOfDay (iOS < 18)
-    // On iOS 18+, Date parameters automatically format based on user's 12hr/24hr preference
-    func getReverseStartHour() -> Int? {
-        if #available(iOS 18, *) {
-            // On iOS 18+, prefer Date parameter if set, otherwise fall back to HourOfDay
-            if let date = reverseStartTime {
-                return Calendar.current.component(.hour, from: date)
-            }
-        }
-        return reverseStartHour?.rawValue
-    }
-    
-    func getReverseEndHour() -> Int? {
-        if #available(iOS 18, *) {
-            // On iOS 18+, prefer Date parameter if set, otherwise fall back to HourOfDay
-            if let date = reverseEndTime {
-                return Calendar.current.component(.hour, from: date)
-            }
-        }
-        return reverseEndHour?.rawValue
     }
     
     // Helper function to determine if stations should be reversed based on current time and day
     func shouldReverseStations() -> Bool {
         guard autoReverse else { return false }
-        guard let startHour = getReverseStartHour(),
-              let endHour = getReverseEndHour() else {
+        guard let startHour = reverseStartHour?.rawValue,
+              let endHour = reverseEndHour?.rawValue else {
             return false
         }
         

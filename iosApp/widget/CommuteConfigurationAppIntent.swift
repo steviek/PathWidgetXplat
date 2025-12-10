@@ -10,41 +10,6 @@ import WidgetKit
 import AppIntents
 import ComposeApp
 
-enum HourOfDay : Int, AppEnum {
-    case am12 = 0, am1 = 1, am2 = 2, am3 = 3, am4 = 4, am5 = 5, am6 = 6, am7 = 7, am8 = 8, am9 = 9, am10 = 10, am11 = 11
-    case pm12 = 12, pm1 = 13, pm2 = 14, pm3 = 15, pm4 = 16, pm5 = 17, pm6 = 18, pm7 = 19, pm8 = 20, pm9 = 21, pm10 = 22, pm11 = 23
-
-    
-    static var typeDisplayRepresentation: TypeDisplayRepresentation = "Hour"
-    
-    static var caseDisplayRepresentations: [HourOfDay : DisplayRepresentation] = [
-        .am12: "12 AM",
-        .am1: "1 AM",
-        .am2: "2 AM",
-        .am3: "3 AM",
-        .am4: "4 AM",
-        .am5: "5 AM",
-        .am6: "6 AM",
-        .am7: "7 AM",
-        .am8: "8 AM",
-        .am9: "9 AM",
-        .am10: "10 AM",
-        .am11: "11 AM",
-        .pm12: "12 PM",
-        .pm1: "1 PM",
-        .pm2: "2 PM",
-        .pm3: "3 PM",
-        .pm4: "4 PM",
-        .pm5: "5 PM",
-        .pm6: "6 PM",
-        .pm7: "7 PM",
-        .pm8: "8 PM",
-        .pm9: "9 PM",
-        .pm10: "10 PM",
-        .pm11: "11 PM"
-    ]
-}
-
 enum DayOfWeek: String, AppEnum, CaseIterable {
     case sunday = "sunday"
     case monday = "monday"
@@ -84,6 +49,74 @@ enum DayOfWeek: String, AppEnum, CaseIterable {
     }
 }
 
+// MARK: - Hour Entity Types
+
+// Default hour IDs
+private let defaultStartHourId = 12
+private let defaultEndHourId = 3
+
+// Helper to format hour according to user's locale
+private func formatHour(_ hour: Int) -> String {
+    let date = Calendar.current.date(bySetting: .hour, value: hour, of: Date()) ?? Date()
+    return date.formatted(date: .omitted, time: .shortened)
+}
+
+// Protocol for shared hour entity behavior
+protocol HourEntityProtocol: AppEntity where ID == Int {
+    var id: Int { get }
+    init(id: Int)
+}
+
+extension HourEntityProtocol {
+    var displayRepresentation: DisplayRepresentation {
+        DisplayRepresentation(stringLiteral: formatHour(id))
+    }
+}
+
+// Start hour entity (default: 12 PM)
+struct StartHourEntity: HourEntityProtocol {
+    static var typeDisplayRepresentation: TypeDisplayRepresentation = "Hour"
+    static var defaultQuery = StartHourQuery()
+    var id: Int
+}
+
+// End hour entity (default: 3 AM)
+struct EndHourEntity: HourEntityProtocol {
+    static var typeDisplayRepresentation: TypeDisplayRepresentation = "Hour"
+    static var defaultQuery = EndHourQuery()
+    var id: Int
+}
+
+// MARK: - Hour Entity Queries
+
+struct StartHourQuery: EntityQuery {
+    func entities(for identifiers: [Int]) async throws -> [StartHourEntity] {
+        identifiers.map { StartHourEntity(id: $0) }
+    }
+    
+    func suggestedEntities() async throws -> [StartHourEntity] {
+        (0..<24).map { StartHourEntity(id: $0) }
+    }
+    
+    func defaultResult() async -> StartHourEntity? {
+        StartHourEntity(id: defaultStartHourId)
+    }
+}
+
+struct EndHourQuery: EntityQuery {
+    func entities(for identifiers: [Int]) async throws -> [EndHourEntity] {
+        identifiers.map { EndHourEntity(id: $0) }
+    }
+    
+    func suggestedEntities() async throws -> [EndHourEntity] {
+        (0..<24).map { EndHourEntity(id: $0) }
+    }
+    
+    func defaultResult() async -> EndHourEntity? {
+        EndHourEntity(id: defaultEndHourId)
+    }
+}
+
 struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
     static var title: LocalizedStringResource = "My Commute"
     static var description = IntentDescription("Route based widget with reverse for commutes home and seasonal themes")
@@ -96,8 +129,8 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
                 \.$timeDisplay
                 \.$autoReverse
                 \.$reverseDays
-                \.$reverseStartHour
-                \.$reverseEndHour
+                \.$startHour
+                \.$endHour
                 \.$showLastRefreshedTime
                 \.$useSeasonalBackgrounds
             }
@@ -125,23 +158,15 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
     @Parameter(title: "Reverse for commute home", default: true)
     var autoReverse: Bool
     
-    @Parameter(
-        title: "Reverse from",
-        default: .pm12,
-        requestValueDialog: IntentDialog("When should stations reverse?")
-    )
-    var reverseStartHour: HourOfDay?
+    @Parameter(title: "Reverse from", default: nil)
+    var startHour: StartHourEntity?
     
-    @Parameter(
-        title: "Reverse until",
-        default: .am3,
-        requestValueDialog: IntentDialog("When should reversal end?")
-    )
-    var reverseEndHour: HourOfDay?
+    @Parameter(title: "Reverse until", default: nil)
+    var endHour: EndHourEntity?
 
-        @Parameter(
-        title: "Reverse on days",
-        default: [DayOfWeek.monday, DayOfWeek.tuesday, DayOfWeek.wednesday, DayOfWeek.thursday, DayOfWeek.friday]
+    @Parameter(
+    title: "Reverse on days",
+    default: [DayOfWeek.monday, DayOfWeek.tuesday, DayOfWeek.wednesday, DayOfWeek.thursday, DayOfWeek.friday]
     )
     var reverseDays: [DayOfWeek]
 
@@ -157,9 +182,9 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
         self.timeDisplay = .relative
         self.autoReverse = false
         self.reverseDays = DayOfWeek.weekdays
-        self.reverseStartHour = .pm12
-        self.reverseEndHour = .am3
         self.useSeasonalBackgrounds = true
+        self.startHour = StartHourEntity(id: defaultStartHourId)
+        self.endHour = EndHourEntity(id: defaultEndHourId)
     }
     
     init(
@@ -170,8 +195,8 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
         showLastRefreshedTime: Bool = false,
         useSeasonalBackgrounds: Bool = true,
         reverseDays: [DayOfWeek] = DayOfWeek.weekdays,
-        reverseStartHour: HourOfDay? = nil,
-        reverseEndHour: HourOfDay? = nil
+        startHour: StartHourEntity? = nil,
+        endHour: EndHourEntity? = nil
     ) {
         self.originStation = originStation
         self.destinationStation = destinationStation
@@ -180,39 +205,42 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
         self.showLastRefreshedTime = showLastRefreshedTime
         self.useSeasonalBackgrounds = useSeasonalBackgrounds
         self.reverseDays = reverseDays
-        self.reverseStartHour = reverseStartHour
-        self.reverseEndHour = reverseEndHour
+        self.startHour = startHour ?? StartHourEntity(id: defaultStartHourId)
+        self.endHour = endHour ?? EndHourEntity(id: defaultEndHourId)
     }
+    
+    // Get hour IDs with defaults applied
+    var startHourId: Int { startHour?.id ?? defaultStartHourId }
+    var endHourId: Int { endHour?.id ?? defaultEndHourId }
     
     // Helper function to determine if stations should be reversed based on current time and day
     func shouldReverseStations() -> Bool {
         guard autoReverse else { return false }
-        guard let startHour = reverseStartHour?.rawValue,
-              let endHour = reverseEndHour?.rawValue else {
-            return false
-        }
+        
+        let startId = startHourId
+        let endId = endHourId
         
         let calendar = Calendar.current
         let now = Date()
         let currentHour = calendar.component(.hour, from: now)
         var currentWeekday = calendar.component(.weekday, from: now)
 
-        if startHour == endHour {
+        if startId == endId {
             // If start == end, then it's valid from start on the start day until the end on
             // the next day.
-        } else if startHour > endHour {
+        } else if startId > endId {
             // Overnight schedule, disabled between end and start time.
-            if currentHour >= endHour && currentHour < startHour {
+            if currentHour >= endId && currentHour < startId {
                 return false
             }
         } else {
             // Non-overnight
-            if currentHour < startHour || currentHour >= endHour {
+            if currentHour < startId || currentHour >= endId {
                 return false
             }
         }
         
-        if startHour >= endHour && currentHour < endHour {
+        if startId >= endId && currentHour < endId {
             currentWeekday -= 1
             if currentWeekday < 1 { currentWeekday = 7 }
         }

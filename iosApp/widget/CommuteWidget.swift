@@ -97,16 +97,16 @@ struct CommuteProvider: AppIntentTimelineProvider {
             dataFrom = widgetData?.fetchTime.toDate() ?? Date()
             
             // Update effective configuration with the actual stations used
+            // autoReverse doesn't need to be set here because it's handled by the shouldReverseStations() function
             effectiveConfiguration = CommuteConfigurationAppIntent(
                 originStation: effectiveOrigin,
                 destinationStation: effectiveDestination,
                 timeDisplay: configuration.timeDisplay,
-                autoReverse: configuration.autoReverse,
                 showLastRefreshedTime: configuration.showLastRefreshedTime,
                 useSeasonalBackgrounds: configuration.useSeasonalBackgrounds,
                 reverseDays: configuration.reverseDays,
-                reverseStartHour: configuration.reverseStartHour,
-                reverseEndHour: configuration.reverseEndHour
+                startHour: configuration.startHour,
+                endHour: configuration.endHour
             )
         }
 

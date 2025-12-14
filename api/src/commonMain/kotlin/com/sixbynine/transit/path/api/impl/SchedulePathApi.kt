@@ -13,8 +13,8 @@ import com.sixbynine.transit.path.api.schedule.GithubScheduleRepository
 import com.sixbynine.transit.path.api.schedule.ScheduleAndOverride
 import com.sixbynine.transit.path.model.ColorWrapper
 import com.sixbynine.transit.path.model.Colors
-import com.sixbynine.transit.path.schedule.ScheduleTiming
-import com.sixbynine.transit.path.schedule.Schedules
+import com.sixbynine.transit.path.schedule.TimetableTiming
+import com.sixbynine.transit.path.schedule.Timetables
 import com.sixbynine.transit.path.time.NewYorkTimeZone
 import com.sixbynine.transit.path.util.FetchWithPrevious
 import com.sixbynine.transit.path.util.Staleness
@@ -107,7 +107,7 @@ class SchedulePathApi : PathApi {
 
     private fun createDepartureBoardMap(
         now: Instant,
-        schedules: Schedules
+        schedules: Timetables
     ): Map<String, List<DepartingTrain>> {
         val results = mutableMapOf<String, MutableList<DepartingTrain>>()
 
@@ -276,7 +276,8 @@ class SchedulePathApi : PathApi {
                         val checkpoints =
                             TrainBackfillHelper.getCheckpoints(route, isSlowTime = isSlowAt(time))
                                 ?: return@forEachDeparture
-                        checkpoints.filterKeys { it != origin }.forEach { (checkpointStation, checkpointTime) ->
+                        checkpoints.forEach { checkpointStation, checkpointTime ->
+                            if (checkpointStation == origin) return@forEach
                             results.getOrPut(checkpointStation.pathApiName) { mutableListOf() } +=
                                 originTrain.copy(
                                     projectedArrival = originTrain.projectedArrival + checkpointTime
@@ -291,44 +292,8 @@ class SchedulePathApi : PathApi {
         return results
     }
 
-    private fun ScheduleTiming.isActiveAt(now: Instant): Boolean {
-        val localNow = now.toLocalDateTime(NewYorkTimeZone)
-        val day = localNow.dayOfWeek
-        val time = localNow.time
-        // Yeah, this could be nicer...
-        return if (startDay < endDay) {
-            if (startTime < endTime) {
-                when {
-                    day == startDay && (startDay == endDay) -> time >= startTime && time < endTime
-                    day == startDay -> time >= startTime
-                    day == endDay -> time < endTime
-                    else -> day > startDay && day < endDay
-                }
-            } else {
-                when {
-                    day == startDay && (startDay == endDay) -> time >= startTime || time < endTime
-                    day == startDay -> time >= startTime
-                    day == endDay -> time < endTime
-                    else -> day > startDay && day < endDay
-                }
-            }
-        } else {
-            if (startTime < endTime) {
-                when {
-                    day == startDay && (startDay == endDay) -> time >= startTime && time < endTime
-                    day == startDay -> time >= startTime
-                    day == endDay -> time < endTime
-                    else -> day > startDay || day < endDay
-                }
-            } else {
-                when {
-                    day == startDay && (startDay == endDay) -> time >= startTime || time < endTime
-                    day == startDay -> time >= startTime
-                    day == endDay -> time < endTime
-                    else -> day > startDay || day < endDay
-                }
-            }
-        }
+    private fun TimetableTiming.isActiveAt(now: Instant): Boolean {
+        return isActiveAt(now.toLocalDateTime(NewYorkTimeZone))
     }
 }
 

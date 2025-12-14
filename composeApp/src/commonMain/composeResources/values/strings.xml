@@ -27,7 +27,8 @@
     <string name="closest_station_setting_title">Display the closest station first</string>
     <string name="collapse">Collapse</string>
     <string name="commuting_schedule">Commuting home schedule</string>
-    <string name="commuting_schedule_description">Customize the schedule for when you are commuting home. This controls the commuter sort options. For example, if you chose New Jersey Commuter, then New Jersey stations will show first unless this schedule is active</string>
+    <string name="commuting_schedule_description">Customize the schedule for when you are commuting home. This controls the commuter sort options. For example, if you chose New Jersey Commuter, then New Jersey stations will show first unless this schedule is active.
+    This setting applies to the app and the departure board widget, but not the commute widget.</string>
     <string name="complete_widget_setup">Complete widget setup</string>
     <string name="confirm">Confirm</string>
     <string name="days">Days</string>

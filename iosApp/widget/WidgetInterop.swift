@@ -23,8 +23,8 @@ extension SortOrder {
 }
 
 extension StationChoice {
-    func toStation() -> Station? {
-        return switch (self) {
+    func toSharedStationChoice() -> ComposeApp.StationChoice {
+        let station: Station? = switch (self) {
         case .closest:
             nil
         case .exp:
@@ -54,6 +54,16 @@ extension StationChoice {
         case .wtc:
             Stations().WorldTradeCenter
         }
+        
+        return if let station = station {
+            ComposeApp.StationChoiceFixed(station: station)
+        } else {
+            ComposeApp.StationChoiceClosest()
+        }
+    }
+    
+    func getCommuteWidgetDestinationName() -> String {
+        IosResourceProvider().getCommuteWidgetDisplayName(choice: toSharedStationChoice())
     }
 }
 
@@ -84,23 +94,42 @@ extension Filter {
 }
 
 extension WidgetDataFetcher {
-    func fetchWidgetDataAsync(
-        includeClosestStation: Bool,
+    func fetchDepartureBoardWidgetDataAsync(
         stationLimit: Int32,
-        stations: [Station],
+        stations: [StationChoice],
         lines: [Line],
         filter: TrainFilter,
         sort: StationSort
     ) async -> FetchResult {
+        let config = PathWidgetConfigurationDepartureBoard(
+            stationLimit: stationLimit,
+            stationChoices: stations.map { $0.toSharedStationChoice() },
+            lines: lines,
+            sort: sort,
+            filter: filter
+        )
+        return await fetchWidgetDataAsync(config: config)
+    }
+    
+    func fetchWidgetDataAsyncCommute(
+        originStation: StationChoice,
+        destinationStation: StationChoice,
+        filter: TrainFilter,
+        lines: [Line]
+    ) async -> FetchResult {
+        let config = PathWidgetConfigurationCommute(
+            origin: originStation.toSharedStationChoice(),
+            destination: destinationStation.toSharedStationChoice()
+        )
+        
+        return await fetchWidgetDataAsync(config: config)
+    }
+    
+    func fetchWidgetDataAsync(config: PathWidgetConfiguration) async -> FetchResult {
         do {
             return try await withCheckedThrowingContinuation { continuation in
-                fetchWidgetData(
-                    stationLimit: stationLimit,
-                    stations: stations,
-                    lines: lines,
-                    sort: sort,
-                    filter: filter,
-                    includeClosestStation: includeClosestStation,
+                WidgetDataFetcher().fetchWidgetData(
+                    config: config,
                     staleness: widgetFetchStaleness(force: false),
                     onSuccess: { data in
                         continuation.resume(returning: FetchResult(data: data, hadInternet: true, hasError: false, hasPathError: false))
@@ -120,6 +149,5 @@ extension WidgetDataFetcher {
         } catch {
             return FetchResult(data: nil, hadInternet: true, hasError: true, hasPathError: false)
         }
-
     }
 }

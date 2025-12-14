@@ -119,6 +119,16 @@
         }
       }
     },
+    "Day" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Día"
+          }
+        }
+      }
+    },
     "Departure board for PATH" : {
       "localizations" : {
         "es" : {
@@ -129,12 +139,12 @@
         }
       }
     },
-    "Departure board for PATH trains" : {
+    "Destination Station" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tablero de salidas para el tren PATH"
+            "value" : "Estación de destino"
           }
         }
       }
@@ -155,6 +165,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Filtro"
+          }
+        }
+      }
+    },
+    "Friday" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Viernes"
           }
         }
       }
@@ -219,6 +239,16 @@
         }
       }
     },
+    "Hour" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hora"
+          }
+        }
+      }
+    },
     "Journal Square" : {
       "localizations" : {
         "es" : {
@@ -246,6 +276,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Líneas"
+          }
+        }
+      }
+    },
+    "Location access required" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se requiere acceso a la ubicación"
+          }
+        }
+      }
+    },
+    "Monday" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lunes"
+          }
+        }
+      }
+    },
+    "My Commute" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mi trayecto"
           }
         }
       }
@@ -330,6 +390,16 @@
         }
       }
     },
+    "Open the app settings and enable 'Closest station' to grant permission." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre la configuración de la aplicación y habilita 'La estación más cercana' para otorgar permiso."
+          }
+        }
+      }
+    },
     "Order" : {
       "localizations" : {
         "es" : {
@@ -340,12 +410,102 @@
         }
       }
     },
+    "Origin Station" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estación de origen"
+          }
+        }
+      }
+    },
     "Refresh" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Recargar"
+          }
+        }
+      }
+    },
+    "Reverse for commute home" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revertir para el viaje a casa"
+          }
+        }
+      }
+    },
+    "Reverse from" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inverso desde"
+          }
+        }
+      }
+    },
+    "Reverse on days" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invertir en los días"
+          }
+        }
+      }
+    },
+    "Reverse until" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inverso a"
+          }
+        }
+      }
+    },
+    "Route based widget with reverse for commutes home and seasonal themes" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Widget basado en ruta con reverso para viajes a casa y temas estacionales"
+          }
+        }
+      }
+    },
+    "Saturday" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sábado"
+          }
+        }
+      }
+    },
+    "Seasonal themed backgrounds" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fondos temáticos estacionales"
+          }
+        }
+      }
+    },
+    "Show last refreshed time" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar hora de la última actualización"
           }
         }
       }
@@ -370,6 +530,26 @@
         }
       }
     },
+    "Sunday" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Domingo"
+          }
+        }
+      }
+    },
+    "Thursday" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jueves"
+          }
+        }
+      }
+    },
     "Time" : {
       "localizations" : {
         "es" : {
@@ -390,12 +570,35 @@
         }
       }
     },
+    "Tuesday" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Martes"
+          }
+        }
+      }
+    },
     "Updates all the widgets" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Actualiza todos los widgets"
+          }
+        }
+      }
+    },
+    "View upcoming train departures by station" : {
+
+    },
+    "Wednesday" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Miércoles"
           }
         }
       }

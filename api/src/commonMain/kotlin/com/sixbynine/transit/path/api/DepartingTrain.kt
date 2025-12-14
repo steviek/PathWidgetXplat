@@ -19,3 +19,5 @@ data class BackfillSource(
     val station: Station,
     val projectedArrival: Instant,
 )
+
+val DepartingTrain.terminalStation: Station? get() = Stations.fromHeadSign(headsign)

@@ -10,8 +10,8 @@ import com.sixbynine.transit.path.api.Stations.NinthStreet
 import com.sixbynine.transit.path.api.Stations.TwentyThirdStreet
 import com.sixbynine.transit.path.api.Stations.WorldTradeCenter
 import com.sixbynine.transit.path.api.alerts.Alert
+import com.sixbynine.transit.path.api.alerts.AlertSchedule
 import com.sixbynine.transit.path.api.alerts.AlertText
-import com.sixbynine.transit.path.api.alerts.Schedule
 import com.sixbynine.transit.path.api.alerts.TrainFilter
 import com.sixbynine.transit.path.api.alerts.canHideTrainsAt
 import com.sixbynine.transit.path.api.alerts.github.GithubAlerts
@@ -62,7 +62,7 @@ class GithubAlertsTest {
     fun `active at repeating weekly`() {
         val alert = Alert(
             stations = listOf(GroveStreet),
-            hideTrainsSchedule = Schedule.repeatingWeekly(
+            hideTrainsSchedule = AlertSchedule.repeatingWeekly(
                 startDay = SATURDAY,
                 startTime = LocalTime(6, 0),
                 endDay = MONDAY,
@@ -85,7 +85,7 @@ class GithubAlertsTest {
     fun `active at repeating daily`() {
         val alert = Alert(
             stations = listOf(GroveStreet),
-            hideTrainsSchedule = Schedule.repeatingDaily(
+            hideTrainsSchedule = AlertSchedule.repeatingDaily(
                 days = listOf(WEDNESDAY),
                 start = LocalTime(6, 0),
                 end = LocalTime(10, 0),
@@ -103,7 +103,7 @@ class GithubAlertsTest {
     fun `active at same start and end time`() {
         val alert = Alert(
             stations = listOf(GroveStreet),
-            hideTrainsSchedule = Schedule.repeatingDaily(
+            hideTrainsSchedule = AlertSchedule.repeatingDaily(
                 days = listOf(SATURDAY),
                 start = LocalTime(0, 0),
                 end = LocalTime(0, 0),
@@ -124,7 +124,7 @@ class GithubAlertsTest {
     fun `active at same start and end time not midnight`() {
         val alert = Alert(
             stations = listOf(GroveStreet),
-            hideTrainsSchedule = Schedule.repeatingDaily(
+            hideTrainsSchedule = AlertSchedule.repeatingDaily(
                 days = listOf(SATURDAY),
                 start = LocalTime(4, 0),
                 end = LocalTime(4, 0),
@@ -147,7 +147,7 @@ class GithubAlertsTest {
     fun `active at repeating daily overnight`() {
         val alert = Alert(
             stations = listOf(GroveStreet),
-            hideTrainsSchedule = Schedule.repeatingDaily(
+            hideTrainsSchedule = AlertSchedule.repeatingDaily(
                 days = listOf(WEDNESDAY, FRIDAY),
                 start = LocalTime(22, 0),
                 end = LocalTime(10, 0),
@@ -177,7 +177,7 @@ class GithubAlertsTest {
     fun `active at once`() {
         val alert = Alert(
             stations = listOf(GroveStreet),
-            hideTrainsSchedule = Schedule.once(
+            hideTrainsSchedule = AlertSchedule.once(
                 from = LocalDateTime(2024, APRIL, 6, 10, 0),
                 to = LocalDateTime(2024, JUNE, 30, 10, 0),
             ),
@@ -194,7 +194,7 @@ class GithubAlertsTest {
     fun `hidesTrain with headsign`() {
         val alert = Alert(
             stations = listOf(GroveStreet),
-            hideTrainsSchedule = Schedule(),
+            hideTrainsSchedule = AlertSchedule(),
             hiddenTrainsFilter = TrainFilter.headSigns("33rd", "World Trade"),
         )
 
@@ -210,7 +210,7 @@ class GithubAlertsTest {
     fun `hidesTrain with all`() {
         val alert = Alert(
             stations = listOf(NinthStreet, TwentyThirdStreet),
-            hideTrainsSchedule = Schedule(),
+            hideTrainsSchedule = AlertSchedule(),
             hiddenTrainsFilter = TrainFilter.all(),
         )
 
@@ -223,14 +223,14 @@ class GithubAlertsTest {
     private companion object {
         val GeneralOvernightCleaning = Alert(
             stations = listOf(NinthStreet, TwentyThirdStreet),
-            hideTrainsSchedule = Schedule.repeatingDaily(
+            hideTrainsSchedule = AlertSchedule.repeatingDaily(
                 days = DayOfWeek.entries,
                 start = LocalTime(0, 0),
                 end = LocalTime(5, 0),
                 from = LocalDate(2025, DECEMBER, 2),
                 to = LocalDate(2026, DECEMBER, 31),
             ),
-            displaySchedule = Schedule.repeatingDaily(
+            displaySchedule = AlertSchedule.repeatingDaily(
                 days = DayOfWeek.entries,
                 start = LocalTime(22, 0),
                 end = LocalTime(5, 0),
@@ -250,8 +250,8 @@ class GithubAlertsTest {
 
         val WeekendOvernightCleaning = Alert(
             stations = listOf(NinthStreet, TwentyThirdStreet),
-            hideTrainsSchedule = Schedule(),
-            displaySchedule = Schedule.repeatingDaily(
+            hideTrainsSchedule = AlertSchedule(),
+            displaySchedule = AlertSchedule.repeatingDaily(
                 from = LocalDate(2025, NOVEMBER, 28),
                 to = LocalDate(2025, DECEMBER, 1),
                 days = listOf(FRIDAY, SATURDAY, SUNDAY),
@@ -271,8 +271,8 @@ class GithubAlertsTest {
 
         val FourteenthStreetOvernight = Alert(
             stations = listOf(FourteenthStreet),
-            hideTrainsSchedule = Schedule(),
-            displaySchedule = Schedule.repeatingDaily(
+            hideTrainsSchedule = AlertSchedule(),
+            displaySchedule = AlertSchedule.repeatingDaily(
                 days = DayOfWeek.entries,
                 start = LocalTime(22, 0),
                 end = LocalTime(7, 0),
@@ -294,7 +294,7 @@ class GithubAlertsTest {
                 Newark,
                 Harrison,
             ),
-            hideTrainsSchedule = Schedule.repeatingWeekly(
+            hideTrainsSchedule = AlertSchedule.repeatingWeekly(
                 startDay = SATURDAY,
                 startTime = LocalTime(0, 0),
                 endDay = MONDAY,
@@ -303,7 +303,7 @@ class GithubAlertsTest {
                 to = LocalDate(2025, NOVEMBER, 6),
             ),
             hiddenTrainsFilter = TrainFilter.headSigns("World Trade Center"),
-            displaySchedule = Schedule.repeatingDaily(
+            displaySchedule = AlertSchedule.repeatingDaily(
                 days = listOf(SATURDAY, SUNDAY),
                 start = LocalTime(0, 0),
                 end = LocalTime(5, 0),
@@ -332,9 +332,9 @@ class GithubAlertsTest {
 
         val ConrailDemolitionGlobal = Alert(
             stations = ConrailDemolition1.stations + ConrailDemolition2.stations,
-            hideTrainsSchedule = Schedule(),
+            hideTrainsSchedule = AlertSchedule(),
             hiddenTrainsFilter = TrainFilter(),
-            displaySchedule = Schedule.repeatingDaily(
+            displaySchedule = AlertSchedule.repeatingDaily(
                 days = listOf(FRIDAY, SATURDAY),
                 start = LocalTime(15, 0),
                 end = LocalTime(5, 0),

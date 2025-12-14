@@ -8,6 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
+		0903CD972EA343790072F0FE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0903CD902EA343790072F0FE /* Assets.xcassets */; };
+		0903CD982EA343790072F0FE /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0903CD952EA343790072F0FE /* Media.xcassets */; };
+		0903CD992EA343790072F0FE /* CommuteWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0903CD932EA343790072F0FE /* CommuteWidget.swift */; };
+		0903CD9A2EA343790072F0FE /* SeasonalUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0903CD962EA343790072F0FE /* SeasonalUtils.swift */; };
+		0903CD9B2EA343790072F0FE /* FontExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0903CD942EA343790072F0FE /* FontExtensions.swift */; };
+		0903CD9C2EA343790072F0FE /* CommuteConfigurationAppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0903CD912EA343790072F0FE /* CommuteConfigurationAppIntent.swift */; };
+		0903CD9D2EA343790072F0FE /* CommuteDepartureBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0903CD922EA343790072F0FE /* CommuteDepartureBoardView.swift */; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
 		AA34DA372BB0F7F600DB50A0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA34DA362BB0F7F600DB50A0 /* Assets.xcassets */; };
@@ -74,6 +81,13 @@
 
 /* Begin PBXFileReference section */
 		058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		0903CD902EA343790072F0FE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		0903CD912EA343790072F0FE /* CommuteConfigurationAppIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommuteConfigurationAppIntent.swift; sourceTree = "<group>"; };
+		0903CD922EA343790072F0FE /* CommuteDepartureBoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommuteDepartureBoardView.swift; sourceTree = "<group>"; };
+		0903CD932EA343790072F0FE /* CommuteWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommuteWidget.swift; sourceTree = "<group>"; };
+		0903CD942EA343790072F0FE /* FontExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontExtensions.swift; sourceTree = "<group>"; };
+		0903CD952EA343790072F0FE /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Media.xcassets; sourceTree = "<group>"; };
+		0903CD962EA343790072F0FE /* SeasonalUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeasonalUtils.swift; sourceTree = "<group>"; };
 		2152FB032600AC8F00CF470E /* iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSApp.swift; sourceTree = "<group>"; };
 		7555FF7B242A565900829871 /* Departures for PATH.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Departures for PATH.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FF82242A565900829871 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -194,6 +208,13 @@
 		AAB47C1C2B15A46400079022 /* widget */ = {
 			isa = PBXGroup;
 			children = (
+				0903CD902EA343790072F0FE /* Assets.xcassets */,
+				0903CD912EA343790072F0FE /* CommuteConfigurationAppIntent.swift */,
+				0903CD922EA343790072F0FE /* CommuteDepartureBoardView.swift */,
+				0903CD932EA343790072F0FE /* CommuteWidget.swift */,
+				0903CD942EA343790072F0FE /* FontExtensions.swift */,
+				0903CD952EA343790072F0FE /* Media.xcassets */,
+				0903CD962EA343790072F0FE /* SeasonalUtils.swift */,
 				AAB47C1D2B15A46400079022 /* widgetBundle.swift */,
 				AAB47C1F2B15A46400079022 /* widget.swift */,
 				AAB47C252B15A46500079022 /* Info.plist */,
@@ -330,6 +351,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0903CD972EA343790072F0FE /* Assets.xcassets in Resources */,
+				0903CD982EA343790072F0FE /* Media.xcassets in Resources */,
 				AAB47C482B1660D800079022 /* Localizable.xcstrings in Resources */,
 				AA34DA382BB0F7F600DB50A0 /* Assets.xcassets in Resources */,
 				AAD500072B7275F400D6F505 /* GoogleService-Info.plist in Resources */,
@@ -419,6 +442,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				AAB47C3E2B15ABB800079022 /* EmptyDepartureBoardView.swift in Sources */,
+				0903CD992EA343790072F0FE /* CommuteWidget.swift in Sources */,
+				0903CD9A2EA343790072F0FE /* SeasonalUtils.swift in Sources */,
+				0903CD9B2EA343790072F0FE /* FontExtensions.swift in Sources */,
+				0903CD9C2EA343790072F0FE /* CommuteConfigurationAppIntent.swift in Sources */,
+				0903CD9D2EA343790072F0FE /* CommuteDepartureBoardView.swift in Sources */,
 				AAD56F272D0BF449001EE80B /* WidgetReloader.swift in Sources */,
 				AA9B5F862C233A6900251F59 /* StationTitle.swift in Sources */,
 				AAB47C442B15AD4000079022 /* FetchResult.swift in Sources */,

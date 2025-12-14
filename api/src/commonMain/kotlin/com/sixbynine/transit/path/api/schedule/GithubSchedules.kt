@@ -1,8 +1,8 @@
 package com.sixbynine.transit.path.api.schedule
 
-import com.sixbynine.transit.path.schedule.Schedules
+import com.sixbynine.transit.path.schedule.Timetables
 
 data class ScheduleAndOverride(
-    val regularSchedule: Schedules,
-    val override: Schedules?,
+    val regularSchedule: Timetables,
+    val override: Timetables?,
 )

@@ -72,12 +72,9 @@ struct Provider: AppIntentTimelineProvider {
             hasError = false
             hasPathError = false
         } else {
-            let fetchResult = await WidgetDataFetcher().fetchWidgetDataAsync(
-                includeClosestStation: configuration.stations.contains(where: { $0 == .closest }),
+            let fetchResult = await WidgetDataFetcher().fetchDepartureBoardWidgetDataAsync(
                 stationLimit: Int32(stationLimit),
-                stations: configuration.stations.compactMap {
-                    $0.toStation()
-                },
+                stations: configuration.stations,
                 lines: configuration.lines.map {
                     $0.toLine()
                 },
@@ -132,8 +129,9 @@ struct SimpleEntry: TimelineEntry {
     let dataFrom: Date
 }
 
-struct widget: Widget {
-    let kind: String = "widget"
+
+struct DepartureWidget: Widget {
+    let kind: String = "MultiStationDepartureWidget"
 
     var body: some WidgetConfiguration {
         AppIntentConfiguration(
@@ -152,6 +150,9 @@ struct widget: Widget {
             }
             .containerBackground(.fill.tertiary, for: .widget)
         }
+        .configurationDisplayName("Departure board for PATH")
+        .description("View upcoming train departures by station")
+        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
     }
 
     private func showEmptyView(_ entry: SimpleEntry) -> Bool {

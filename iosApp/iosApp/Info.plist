@@ -29,6 +29,8 @@
 		<string>en</string>
 		<string>es</string>
 	</array>
+    <key>ITSAppUsesNonExemptEncryption </key>
+    <false />
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>LSHasLocalizedDisplayName</key>

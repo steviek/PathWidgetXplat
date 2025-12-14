@@ -3,6 +3,7 @@ package com.sixbynine.transit.path.app.ui.home
 import androidx.compose.ui.util.fastForEach
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.Stations.ChristopherStreet
+import com.sixbynine.transit.path.api.Stations.ExchangePlace
 import com.sixbynine.transit.path.api.Stations.FourteenthStreet
 import com.sixbynine.transit.path.api.Stations.GroveStreet
 import com.sixbynine.transit.path.api.Stations.Hoboken
@@ -31,7 +32,7 @@ object TrainGrouper {
     private fun simplifyTitle(station: Station, trainData: AppUiTrainData): AppUiTrainData {
         val newTitle = when (trainData.title) {
             "Journal Square via Hoboken" -> when (station) {
-                Newport, GroveStreet, Hoboken -> "Journal Square"
+                Newport, GroveStreet, Hoboken, ExchangePlace -> "Journal Square"
                 else -> null
             }
 

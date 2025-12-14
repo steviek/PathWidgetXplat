@@ -337,9 +337,9 @@ private fun LocalDateTime.inRange(from: LocalDateTime, to: LocalDateTime?): Bool
 }
 
 fun LocalDateTime.minusDays(days: Int): LocalDateTime {
-    return date.minus(DatePeriod(days = 1)).atTime(time)
+    return date.minus(DatePeriod(days = days)).atTime(time)
 }
 
 fun LocalDateTime.plusDays(days: Int): LocalDateTime {
-    return date.plus(DatePeriod(days = 1)).atTime(time)
+    return date.plus(DatePeriod(days = days)).atTime(time)
 }

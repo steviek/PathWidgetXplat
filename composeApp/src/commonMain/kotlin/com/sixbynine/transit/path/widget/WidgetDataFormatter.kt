@@ -18,7 +18,6 @@ import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.getString
 import pathwidgetxplat.composeapp.generated.resources.Res.string
 import pathwidgetxplat.composeapp.generated.resources.language_code
-import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
 object WidgetDataFormatter {
@@ -184,6 +183,10 @@ object WidgetDataFormatter {
         }
 
         return hourString + ":" + minute.toString().padStart(2, '0') + periodMarker
+    }
+
+    fun formatHourOfDay(hour: Int): String {
+        return LocalTime(hour, 0).formatted(includePeriodMarker = true)
     }
 
     fun DayOfWeek.singleLetterLabel(): String = when (this) {

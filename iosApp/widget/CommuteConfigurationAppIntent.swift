@@ -57,8 +57,7 @@ private let defaultEndHourId = 3
 
 // Helper to format hour according to user's locale
 private func formatHour(_ hour: Int) -> String {
-    let date = Calendar.current.date(bySetting: .hour, value: hour, of: Date()) ?? Date()
-    return date.formatted(date: .omitted, time: .shortened)
+    return WidgetDataFormatter().formatHourOfDay(hour: Int32(hour))
 }
 
 // Protocol for shared hour entity behavior

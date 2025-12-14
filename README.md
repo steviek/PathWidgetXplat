@@ -10,7 +10,6 @@ The widgets are native by necessity, and written in [SwiftUI](https://developer.
 
 You can use any of the following options to work with the code here:
 
-- [Fleet](https://www.jetbrains.com/fleet/): Jetbrains' new multiplatform-first IDE that's capable of working with all the languages in the project and running both the Android and iOS apps
 - [Android Studio](https://developer.android.com/studio) Standard IDE for editing kotlin/Android code. With the [kotlin multiplatform plugin](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform), you can run the code on both Android and iOS
 - [Xcode](https://developer.apple.com/xcode/) allows for running the code on iOS, managing iOS simulators, and editing Swift code
 

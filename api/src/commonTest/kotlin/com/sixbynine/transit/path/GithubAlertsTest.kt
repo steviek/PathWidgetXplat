@@ -31,6 +31,7 @@ import kotlinx.datetime.Month.DECEMBER
 import kotlinx.datetime.Month.FEBRUARY
 import kotlinx.datetime.Month.JULY
 import kotlinx.datetime.Month.JUNE
+import kotlinx.datetime.Month.NOVEMBER
 import kotlinx.datetime.Month.OCTOBER
 import kotlinx.serialization.encodeToString
 import kotlin.test.Test
@@ -226,14 +227,14 @@ class GithubAlertsTest {
                 days = DayOfWeek.entries,
                 start = LocalTime(0, 0),
                 end = LocalTime(5, 0),
-                from = LocalDate(2025, OCTOBER, 14),
+                from = LocalDate(2025, DECEMBER, 2),
                 to = LocalDate(2026, DECEMBER, 31),
             ),
             displaySchedule = AlertSchedule.repeatingDaily(
                 days = DayOfWeek.entries,
                 start = LocalTime(22, 0),
                 end = LocalTime(5, 0),
-                from = LocalDate(2025, OCTOBER, 13),
+                from = LocalDate(2025, DECEMBER, 1),
                 to = LocalDate(2026, DECEMBER, 31),
             ),
             hiddenTrainsFilter = TrainFilter.all(),
@@ -251,8 +252,8 @@ class GithubAlertsTest {
             stations = listOf(NinthStreet, TwentyThirdStreet),
             hideTrainsSchedule = AlertSchedule(),
             displaySchedule = AlertSchedule.repeatingDaily(
-                from = LocalDate(2025, OCTOBER, 10),
-                to = LocalDate(2025, OCTOBER, 12),
+                from = LocalDate(2025, NOVEMBER, 28),
+                to = LocalDate(2025, DECEMBER, 1),
                 days = listOf(FRIDAY, SATURDAY, SUNDAY),
                 start = LocalTime(22, 0),
                 end = LocalTime(5, 0),
@@ -263,7 +264,7 @@ class GithubAlertsTest {
                 es = "Las estaciones de 9 St. y 23 St. permanecerán abiertas durante la noche este fin de semana"
             ),
             url = AlertText(
-                en = "https://www.panynj.gov/path/en/schedules-maps/weekend-schedules.html"
+                en = "https://www.panynj.gov/path/en/schedules-maps/holidays/thanksgiving-schedule.html"
             ),
             level = "INFO"
         )
@@ -298,16 +299,16 @@ class GithubAlertsTest {
                 startTime = LocalTime(0, 0),
                 endDay = MONDAY,
                 endTime = LocalTime(5, 0),
-                from = LocalDate(2025, OCTOBER, 3),
-                to = LocalDate(2025, OCTOBER, 6),
+                from = LocalDate(2025, OCTOBER, 24),
+                to = LocalDate(2025, NOVEMBER, 6),
             ),
             hiddenTrainsFilter = TrainFilter.headSigns("World Trade Center"),
             displaySchedule = AlertSchedule.repeatingDaily(
                 days = listOf(SATURDAY, SUNDAY),
                 start = LocalTime(0, 0),
                 end = LocalTime(5, 0),
-                from = LocalDate(2025, OCTOBER, 3),
-                to = LocalDate(2025, OCTOBER, 6),
+                from = LocalDate(2025, OCTOBER, 24),
+                to = LocalDate(2025, NOVEMBER, 6),
             ),
             message = AlertText(
                 en = "No service between Harrison and Journal Square. Shuttle buses are running between HAR-JSQ and NWK-JSQ.",
@@ -331,15 +332,14 @@ class GithubAlertsTest {
 
         val ConrailDemolitionGlobal = Alert(
             stations = ConrailDemolition1.stations + ConrailDemolition2.stations,
-            isGlobal = true,
             hideTrainsSchedule = AlertSchedule(),
             hiddenTrainsFilter = TrainFilter(),
             displaySchedule = AlertSchedule.repeatingDaily(
                 days = listOf(FRIDAY, SATURDAY),
                 start = LocalTime(15, 0),
                 end = LocalTime(5, 0),
-                from = LocalDate(2025, OCTOBER, 3),
-                to = LocalDate(2025, OCTOBER, 6),
+                from = LocalDate(2025, OCTOBER, 25),
+                to = LocalDate(2025, NOVEMBER, 6),
             ),
             message = AlertText(
                 en = "No service between Harrison and Journal Square this weekend, starting at midnight Friday night",

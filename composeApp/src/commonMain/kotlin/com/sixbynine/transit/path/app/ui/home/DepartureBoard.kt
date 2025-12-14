@@ -3,6 +3,7 @@ package com.sixbynine.transit.path.app.ui.home
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -17,8 +18,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -44,6 +48,8 @@ import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StationC
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.Intent.StationLongClicked
 import com.sixbynine.transit.path.app.ui.home.HomeScreenContract.StationData
 import com.sixbynine.transit.path.app.ui.home.TrainGrouper.groupTrains
+import com.sixbynine.transit.path.app.ui.home.AlertBox
+import com.sixbynine.transit.path.app.ui.home.AlertBoxColors
 import com.sixbynine.transit.path.app.ui.icon.IconType
 import com.sixbynine.transit.path.app.ui.icon.NativeIconButton
 import com.sixbynine.transit.path.util.conditional
@@ -75,7 +81,7 @@ fun HomeScreenScope.DepartureBoard() {
                 Station(
                     station,
                     index,
-                    Modifier.padding(horizontal = 16.dp, vertical = 8.dp).animateItemPlacement()
+                    Modifier.padding(horizontal = 16.dp).animateItemPlacement()
                 )
             }
         }
@@ -125,14 +131,27 @@ private fun HomeScreenScope.Station(
         nextStation.state == station.state
     }
 
-    Card(
-        modifier.combinedClickable(
-            onLongClick = { onIntent(StationLongClicked(station.id)) },
-            onClick = { onIntent(StationClicked(station.id)) }
-        )
-    ) {
-        Column(Modifier.padding(bottom = 8.dp)) {
-            StationHeader(
+    Column(modifier) {
+        // Divider between items (not before the first one)
+        if (index > 0) {
+            HorizontalDivider(
+                modifier = Modifier.fillMaxWidth(),
+                color = MaterialTheme.colorScheme.outline
+            )
+        }
+        
+        Card(
+            modifier = Modifier.combinedClickable(
+                onLongClick = { onIntent(StationLongClicked(station.id)) },
+                onClick = { onIntent(StationClicked(station.id)) }
+            ),
+            shape = RectangleShape,
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.background
+            )
+        ) {
+            Column(Modifier.padding(bottom = 24.dp)) {
+                StationHeader(
                 modifier = Modifier.fillMaxSize(),
                 canMoveDown = canMoveDown,
                 canMoveUp = canMoveUp,
@@ -181,6 +200,7 @@ private fun HomeScreenScope.Station(
                 )
 
             }
+        }
         }
     }
 
@@ -233,9 +253,9 @@ private fun HomeScreenScope.StationHeader(
     Row(
         modifier = modifier.heightIn(40.dp).fillMaxWidth().padding(horizontal = gutter()),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally),
+        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
     ) {
-        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
             Text(
                 text = data.station.displayName,
                 style = MaterialTheme.typography.titleLarge,

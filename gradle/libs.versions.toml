@@ -16,9 +16,9 @@ androidx-test-junit = "1.1.5"
 androidx-espresso-core = "3.5.1"
 kotlin = "1.9.20"
 kotlin-atomic = "0.22.0"
-kotlin-dateTime="0.6.1"
-kotlin-serialization-json="1.6.0"
-kotlin-coroutines="1.7.3"
+kotlin-dateTime = "0.6.1"
+kotlin-serialization-json = "1.6.0"
+kotlin-coroutines = "1.7.3"
 junit = "4.13.2"
 moko-resources = "0.24.0-alpha-5"
 moko-mvvm = "0.16.1"
@@ -41,7 +41,7 @@ kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotl
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 kotlin-atomic = { module = "org.jetbrains.kotlinx:atomicfu-gradle-plugin", version.ref = "kotlin-atomic" }
 kotlin-date-time = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlin-dateTime" }
-kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization-json"}
+kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization-json" }
 kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines" }
 kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlin-coroutines" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -82,12 +82,14 @@ google-accompanist = { module = "com.google.accompanist:accompanist-permissions"
 facebook-flipper = { module = "com.facebook.flipper:flipper", version.ref = "flipper" }
 facebook-soloader = { module = "com.facebook.soloader:soloader", version.ref = "soloader" }
 facebook-flipper-network-plugin = { module = "com.facebook.flipper:flipper-network-plugin", version.ref = "flipper" }
+slf4j = { module = "org.slf4j:slf4j-simple", version = "2.0.17" }
+ksoup = { module = "com.fleeksoft.ksoup:ksoup", version = "0.0.6" }
 
 [plugins]
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
-google-services = {id = "com.google.gms.google-services", version.ref = "google-services" }
+google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crashlytics-plugin" }

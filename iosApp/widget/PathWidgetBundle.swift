@@ -11,7 +11,7 @@ import SwiftUI
 import ComposeApp
 
 @main
-struct widgetBundle: WidgetBundle {
+struct PathWidgetBundle: WidgetBundle {
 
     init() {
         let locationHelper = LocationHelper()

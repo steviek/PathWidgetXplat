@@ -13,8 +13,8 @@ import CoreLocation
 
 struct Provider: AppIntentTimelineProvider {
 
-    func placeholder(in context: Context) -> SimpleEntry {
-        let entry = SimpleEntry(
+    func placeholder(in context: Context) -> DepartureBoardWidgetEntry {
+        let entry = DepartureBoardWidgetEntry(
             date: Date(),
             size: context.displaySize,
             configuration: ConfigurationAppIntent(stations: [.jsq]),
@@ -30,7 +30,7 @@ struct Provider: AppIntentTimelineProvider {
     func snapshot(
         for configuration: ConfigurationAppIntent,
         in context: Context
-    ) async -> SimpleEntry {
+    ) async -> DepartureBoardWidgetEntry {
         let entry = await createEntries(
             for: configuration,
             in: context,
@@ -42,7 +42,7 @@ struct Provider: AppIntentTimelineProvider {
     func timeline(
         for configuration: ConfigurationAppIntent,
         in context: Context
-    ) async -> Timeline<SimpleEntry> {
+    ) async -> Timeline<DepartureBoardWidgetEntry> {
         let entries = await createEntries(
             for: configuration,
             in: context,
@@ -56,7 +56,7 @@ struct Provider: AppIntentTimelineProvider {
         for configuration: ConfigurationAppIntent,
         in context: Context,
         count: Int
-    ) async -> [SimpleEntry] {
+    ) async -> [DepartureBoardWidgetEntry] {
         let stationLimit =
             WidgetConfigurationUtils.getWidgetLimit(family: context.family)
 
@@ -89,7 +89,7 @@ struct Provider: AppIntentTimelineProvider {
 
         let now = Date()
 
-        var entries: [SimpleEntry] = []
+        var entries: [DepartureBoardWidgetEntry] = []
         var date = now
 
         for _ in 0..<count {
@@ -100,7 +100,7 @@ struct Provider: AppIntentTimelineProvider {
                 )
             }
             entries.append(
-                SimpleEntry(
+                DepartureBoardWidgetEntry(
                     date: date,
                     size: context.displaySize,
                     configuration: effectiveConfiguration,
@@ -118,7 +118,7 @@ struct Provider: AppIntentTimelineProvider {
     }
 }
 
-struct SimpleEntry: TimelineEntry {
+struct DepartureBoardWidgetEntry: TimelineEntry {
     let date: Date
     let size: CGSize
     let configuration: ConfigurationAppIntent
@@ -155,7 +155,7 @@ struct DepartureWidget: Widget {
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
     }
 
-    private func showEmptyView(_ entry: SimpleEntry) -> Bool {
+    private func showEmptyView(_ entry: DepartureBoardWidgetEntry) -> Bool {
     
         let choices = entry.configuration.stations
         if choices.count >= 2 {

@@ -10,7 +10,7 @@ import SwiftUI
 import ComposeApp
 
 protocol EntryView : View {
-    var entry: SimpleEntry { get }
+    var entry: DepartureBoardWidgetEntry { get }
 }
 
 extension EntryView {

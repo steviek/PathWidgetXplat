@@ -11,7 +11,7 @@ import ComposeApp
 
 struct UngroupedStationView: EntryView {
     
-    let entry: SimpleEntry
+    let entry: DepartureBoardWidgetEntry
     let station: DepartureBoardData.StationData
     let width: CGFloat
     let height: CGFloat

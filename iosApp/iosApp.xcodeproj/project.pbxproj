@@ -28,8 +28,8 @@
 		AA9B5F882C23785800251F59 /* EntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9B5F872C23785800251F59 /* EntryView.swift */; };
 		AAB47C192B15A46400079022 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AAB47C182B15A46400079022 /* WidgetKit.framework */; };
 		AAB47C1B2B15A46400079022 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AAB47C1A2B15A46400079022 /* SwiftUI.framework */; };
-		AAB47C1E2B15A46400079022 /* widgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB47C1D2B15A46400079022 /* widgetBundle.swift */; };
-		AAB47C202B15A46400079022 /* widget.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB47C1F2B15A46400079022 /* widget.swift */; };
+		AAB47C1E2B15A46400079022 /* PathWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB47C1D2B15A46400079022 /* PathWidgetBundle.swift */; };
+		AAB47C202B15A46400079022 /* DepartureBoardWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB47C1F2B15A46400079022 /* DepartureBoardWidget.swift */; };
 		AAB47C282B15A46500079022 /* widgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AAB47C172B15A46400079022 /* widgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		AAB47C392B15AB7700079022 /* WidgetConfigurationUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB47C382B15AB7700079022 /* WidgetConfigurationUtils.swift */; };
 		AAB47C3A2B15AB9600079022 /* DepartureBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB47C322B15AAF500079022 /* DepartureBoardView.swift */; };
@@ -105,8 +105,8 @@
 		AAB47C172B15A46400079022 /* widgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = widgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		AAB47C182B15A46400079022 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		AAB47C1A2B15A46400079022 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
-		AAB47C1D2B15A46400079022 /* widgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = widgetBundle.swift; sourceTree = "<group>"; };
-		AAB47C1F2B15A46400079022 /* widget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = widget.swift; sourceTree = "<group>"; };
+		AAB47C1D2B15A46400079022 /* PathWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PathWidgetBundle.swift; sourceTree = "<group>"; };
+		AAB47C1F2B15A46400079022 /* DepartureBoardWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepartureBoardWidget.swift; sourceTree = "<group>"; };
 		AAB47C252B15A46500079022 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AAB47C322B15AAF500079022 /* DepartureBoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepartureBoardView.swift; sourceTree = "<group>"; };
 		AAB47C342B15AB4200079022 /* ConfigurationAppIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationAppIntent.swift; sourceTree = "<group>"; };
@@ -215,8 +215,8 @@
 				0903CD942EA343790072F0FE /* FontExtensions.swift */,
 				0903CD952EA343790072F0FE /* Media.xcassets */,
 				0903CD962EA343790072F0FE /* SeasonalUtils.swift */,
-				AAB47C1D2B15A46400079022 /* widgetBundle.swift */,
-				AAB47C1F2B15A46400079022 /* widget.swift */,
+				AAB47C1D2B15A46400079022 /* PathWidgetBundle.swift */,
+				AAB47C1F2B15A46400079022 /* DepartureBoardWidget.swift */,
 				AAB47C252B15A46500079022 /* Info.plist */,
 				AAB47C322B15AAF500079022 /* DepartureBoardView.swift */,
 				AAB47C342B15AB4200079022 /* ConfigurationAppIntent.swift */,
@@ -460,8 +460,8 @@
 				AA9B5F802C1FC7B000251F59 /* UngroupedStationView.swift in Sources */,
 				AAB47C3C2B15AB9600079022 /* Interop.swift in Sources */,
 				AAB47C392B15AB7700079022 /* WidgetConfigurationUtils.swift in Sources */,
-				AAB47C1E2B15A46400079022 /* widgetBundle.swift in Sources */,
-				AAB47C202B15A46400079022 /* widget.swift in Sources */,
+				AAB47C1E2B15A46400079022 /* PathWidgetBundle.swift in Sources */,
+				AAB47C202B15A46400079022 /* DepartureBoardWidget.swift in Sources */,
 				AA9B5F7E2C1F83C100251F59 /* ViewExtensions.swift in Sources */,
 				AA9B5F882C23785800251F59 /* EntryView.swift in Sources */,
 				AAB47C402B15AD2300079022 /* RefreshIntent.swift in Sources */,

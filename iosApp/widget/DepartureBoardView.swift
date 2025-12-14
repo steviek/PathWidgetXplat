@@ -13,7 +13,7 @@ struct DepartureBoardView: View {
 
     @Environment(\.colorScheme) var colorScheme
 
-    let entry: SimpleEntry
+    let entry: DepartureBoardWidgetEntry
 
     var body: some View {
         return ZStack {

@@ -11,7 +11,7 @@ import ComposeApp
 
 struct DepartureBoardStations: View {
     
-    let entry: SimpleEntry
+    let entry: DepartureBoardWidgetEntry
     let data: DepartureBoardData
     let width: CGFloat
     let height: CGFloat

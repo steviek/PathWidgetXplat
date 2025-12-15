@@ -2,7 +2,6 @@ package com.sixbynine.transit.path.schedule.generator
 
 import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.util.readRemoteFile
-import com.sixbynine.transit.path.schedule.Schedules
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

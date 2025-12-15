@@ -6,9 +6,9 @@ import com.sixbynine.transit.path.api.Stations.JournalSquare
 import com.sixbynine.transit.path.api.Stations.ThirtyThirdStreet
 import com.sixbynine.transit.path.api.destination
 import com.sixbynine.transit.path.api.origin
-import com.sixbynine.transit.path.schedule.Schedule
-import com.sixbynine.transit.path.schedule.ScheduleTiming
-import com.sixbynine.transit.path.schedule.Schedules
+import com.sixbynine.transit.path.schedule.Timetable
+import com.sixbynine.transit.path.schedule.TimetableTiming
+import com.sixbynine.transit.path.schedule.Timetables
 import com.sixbynine.transit.path.time.NewYorkTimeZone
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.Instant
@@ -30,7 +30,7 @@ object ScheduleParser {
 
     private val MIDNIGHT = LocalTime(0, 0)
 
-    fun parse(response: String, name: String?): Schedules {
+    fun parse(response: String, name: String?): Timetables {
         val model = json.decodeFromString<JsonElement>(response)
 
         return JsonParsingScope(model).run {
@@ -40,43 +40,43 @@ object ScheduleParser {
         }
     }
 
-    private fun JsonParsingScope.readChildren(name: String?): Schedules {
-        val allSchedules = SchedulePage.entries.map { page ->
+    private fun JsonParsingScope.readChildren(name: String?): Timetables {
+        val allTimetables = SchedulePage.entries.map { page ->
             child(page.path) {
                 readPage(page)
             }
         }
-        check(allSchedules.isNotEmpty())
+        check(allTimetables.isNotEmpty())
 
-        val idsFromSchedules = allSchedules.flatMap { it.schedules.map { it.id } }
-        val idsFromTimings = allSchedules.flatMap { it.timings.map { it.scheduleId } }
+        val idsFromTimetables = allTimetables.flatMap { it.schedules.map { it.id } }
+        val idsFromTimings = allTimetables.flatMap { it.timings.map { it.scheduleId } }
 
-        check(idsFromSchedules.distinct().size == idsFromSchedules.size) {
-            "Schedule id was duplicated in schedules: $idsFromSchedules"
+        check(idsFromTimetables.distinct().size == idsFromTimetables.size) {
+            "Schedule id was duplicated in schedules: $idsFromTimetables"
         }
 
         check(idsFromTimings.distinct().size == idsFromTimings.size) {
             "Schedule id was duplicated in timings"
         }
 
-        check(idsFromSchedules.size == idsFromTimings.size) {
+        check(idsFromTimetables.size == idsFromTimings.size) {
             "Mismatch between schedule ids and timing ids"
         }
 
-        return Schedules(
-            validFrom = allSchedules.maxOf { it.validFrom },
+        return Timetables(
+            validFrom = allTimetables.maxOf { it.validFrom },
             validTo = null,
-            schedules = allSchedules.flatMap { it.schedules },
-            timings = allSchedules.flatMap { it.timings },
+            schedules = allTimetables.flatMap { it.schedules },
+            timings = allTimetables.flatMap { it.timings },
             name = name,
         )
     }
 
-    private fun JsonParsingScope.readPage(page: SchedulePage): Schedules {
+    private fun JsonParsingScope.readPage(page: SchedulePage): Timetables {
         val date = Instant.parse(child("date") { string() })
 
-        val schedules = arrayListOf<Schedule>()
-        val scheduleTimings = arrayListOf<ScheduleTiming>()
+        val schedules = arrayListOf<Timetable>()
+        val scheduleTimings = arrayListOf<TimetableTiming>()
 
         child(":items", "root", ":items") {
             val pageTitle = readTitleFromHeroCopy()
@@ -125,7 +125,7 @@ object ScheduleParser {
                     }
 
                     schedules.add(
-                        Schedule(
+                        Timetable(
                             id = scheduleId.id,
                             name = title,
                             departures = departures,
@@ -134,12 +134,12 @@ object ScheduleParser {
                         )
                     )
 
-                    scheduleTimings.add(scheduleId.toScheduleTiming())
+                    scheduleTimings.add(scheduleId.toTimetableTiming())
                 }
             }
         }
 
-        return Schedules(
+        return Timetables(
             validFrom = date.toLocalDateTime(NewYorkTimeZone),
             validTo = null,
             schedules = schedules,
@@ -154,17 +154,17 @@ object ScheduleParser {
         Sunday(3)
     }
 
-    private fun ScheduleId.toScheduleTiming(): ScheduleTiming {
+    private fun ScheduleId.toTimetableTiming(): TimetableTiming {
         val (startDay, endDay) = when (this) {
             ScheduleId.Weekday -> DayOfWeek.MONDAY to DayOfWeek.SATURDAY
             ScheduleId.Saturday -> DayOfWeek.SATURDAY to DayOfWeek.SUNDAY
             ScheduleId.Sunday -> DayOfWeek.SUNDAY to DayOfWeek.MONDAY
         }
-        return ScheduleTiming(
+        return TimetableTiming(
             startDay = startDay,
             endDay = endDay,
-            startTime = MIDNIGHT,
-            endTime = MIDNIGHT,
+            start = MIDNIGHT,
+            end = MIDNIGHT,
             scheduleId = id,
         )
     }

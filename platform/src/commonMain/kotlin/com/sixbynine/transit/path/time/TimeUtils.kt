@@ -42,9 +42,10 @@ fun DayOfWeek.next() = plusDays(1)
 fun closedDayOfWeekSet(start: DayOfWeek, end: DayOfWeek): Set<DayOfWeek> {
     return buildSet {
         var current = start
-        while (current <= end) {
+        while (current != end) {
             add(current)
             current = current.next()
         }
+        add(end)
     }
 }

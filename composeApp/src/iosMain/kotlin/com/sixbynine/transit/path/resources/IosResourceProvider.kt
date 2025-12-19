@@ -1,6 +1,7 @@
 package com.sixbynine.transit.path.resources
 
 import com.sixbynine.transit.path.api.StationChoice
+import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.util.localizedString
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.StringResource
@@ -44,8 +45,14 @@ object IosResourceProvider {
 
     fun getNoTrainsText(): String = getStringBlocking(string.station_empty)
 
-    fun getCommuteWidgetDisplayName(choice: StationChoice): String = when (choice) {
-        StationChoice.Closest -> localizedString(en = "Nearby", es = "Cerca")
+    fun getCommuteWidgetDisplayName(
+        choice: StationChoice,
+        closestStationId: String?
+    ): String = when (choice) {
+        StationChoice.Closest -> {
+            val station = closestStationId?.let { Stations.byId(it) }
+            station?.displayName ?: localizedString(en = "Nearby", es = "Cerca")
+        }
         is StationChoice.Fixed -> choice.station.displayName
     }
 

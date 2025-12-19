@@ -62,8 +62,8 @@ extension StationChoice {
         }
     }
     
-    func getCommuteWidgetDestinationName() -> String {
-        IosResourceProvider().getCommuteWidgetDisplayName(choice: toSharedStationChoice())
+    func getCommuteWidgetDestinationName(closestStationId: String?) -> String {
+        IosResourceProvider().getCommuteWidgetDisplayName(choice: toSharedStationChoice(), closestStationId: closestStationId)
     }
 }
 

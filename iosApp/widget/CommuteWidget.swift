@@ -18,6 +18,20 @@ struct CommuteSimpleEntry: TimelineEntry {
     let hasError: Bool
     let hasPathError: Bool
     let dataFrom: Date
+    
+    func getOriginDisplayName() -> String {
+        IosResourceProvider().getCommuteWidgetDisplayName(
+            choice: configuration.getEffectiveOrigin().toSharedStationChoice(),
+            closestStationId: data?.closestStationId
+        )
+    }
+    
+    func getDestinationDisplayName() -> String {
+        IosResourceProvider().getCommuteWidgetDisplayName(
+            choice: configuration.getEffectiveDestination().toSharedStationChoice(),
+            closestStationId: data?.closestStationId
+        )
+    }
 }
 
 struct CommuteProvider: AppIntentTimelineProvider {

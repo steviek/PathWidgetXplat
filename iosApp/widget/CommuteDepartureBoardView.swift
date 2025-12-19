@@ -147,7 +147,7 @@ struct CommuteStationView: View {
         VStack(alignment: .leading, spacing: 4) {
             CommuteStationTitle(
                 title: station.displayName,
-                destinationStation: entry.configuration.destinationStation.getCommuteWidgetDestinationName(),
+                destinationStation: entry.getDestinationDisplayName(),
                 textColor: textColor,
                 maxWidth: entry.size.width
             )
@@ -370,8 +370,8 @@ struct CommuteSameStationView: View {
     var body: some View {
         let useSeasonal = entry.configuration.useSeasonalBackgrounds
         let seasonalBackground = SeasonalUtils.getSeasonalBackgroundName(for: entry.date)
-        let originName = entry.configuration.getEffectiveOrigin().getCommuteWidgetDestinationName()
-        let destinationName = entry.configuration.getEffectiveDestination().getCommuteWidgetDestinationName()
+        let originName = entry.getOriginDisplayName()
+        let destinationName = entry.getDestinationDisplayName()
         
         let textColor: Color
         let buttonColor: Color
@@ -480,6 +480,6 @@ struct CommuteFooterView: View {
 
     /// Gets the display name for the destination station from the configuration
     private func getDestinationStationName() -> String {
-        return entry.configuration.destinationStation.getCommuteWidgetDestinationName()
+        return entry.getDestinationDisplayName()
     }
 }

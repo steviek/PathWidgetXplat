@@ -26,8 +26,8 @@ struct CommuteDepartureBoardView: View {
     }
     
     private func showSameStationError(_ entry: CommuteProvider.Entry) -> Bool {
-        let origin = entry.configuration.getEffectiveOrigin()
-        let destination = entry.configuration.getEffectiveDestination()
+        let origin = entry.configuration.getEffectiveOrigin(at: entry.date)
+        let destination = entry.configuration.getEffectiveDestination(at: entry.date)
         
         if origin == destination {
             return true

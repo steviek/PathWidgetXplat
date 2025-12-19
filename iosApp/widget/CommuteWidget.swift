@@ -21,14 +21,14 @@ struct CommuteSimpleEntry: TimelineEntry {
     
     func getOriginDisplayName() -> String {
         IosResourceProvider().getCommuteWidgetDisplayName(
-            choice: configuration.getEffectiveOrigin().toSharedStationChoice(),
+            choice: configuration.getEffectiveOrigin(at: date).toSharedStationChoice(),
             closestStationId: data?.closestStationId
         )
     }
     
     func getDestinationDisplayName() -> String {
         IosResourceProvider().getCommuteWidgetDisplayName(
-            choice: configuration.getEffectiveDestination().toSharedStationChoice(),
+            choice: configuration.getEffectiveDestination(at: date).toSharedStationChoice(),
             closestStationId: data?.closestStationId
         )
     }
@@ -83,6 +83,7 @@ struct CommuteProvider: AppIntentTimelineProvider {
         let hasError: Bool
         let hasPathError: Bool
         let dataFrom: Date
+        let now = Date()
         
         if (context.isPreview) {
             widgetData = Fixtures().widgetData(limit: Int32(stationLimit))
@@ -96,8 +97,8 @@ struct CommuteProvider: AppIntentTimelineProvider {
             dataFrom = Date()
         } else {
             // Apply auto-reverse logic if enabled
-            let effectiveOrigin = configuration.getEffectiveOrigin()
-            let effectiveDestination = configuration.getEffectiveDestination()
+            let effectiveOrigin = configuration.getEffectiveOrigin(at: now)
+            let effectiveDestination = configuration.getEffectiveDestination(at: now)
             
             let fetchResult = await WidgetDataFetcher().fetchWidgetDataAsyncCommute(
                 originStation: effectiveOrigin,
@@ -123,8 +124,7 @@ struct CommuteProvider: AppIntentTimelineProvider {
                 endHour: configuration.endHour
             )
         }
-
-        let now = Date()
+        
         var entries: [CommuteSimpleEntry] = []
         var date = now
 

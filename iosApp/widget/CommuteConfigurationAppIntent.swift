@@ -213,16 +213,15 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
     var endHourId: Int { endHour?.id ?? defaultEndHourId }
     
     // Helper function to determine if stations should be reversed based on current time and day
-    func shouldReverseStations() -> Bool {
+    func shouldReverseStations(at date: Date) -> Bool {
         guard autoReverse else { return false }
         
         let startId = startHourId
         let endId = endHourId
         
         let calendar = Calendar.current
-        let now = Date()
-        let currentHour = calendar.component(.hour, from: now)
-        var currentWeekday = calendar.component(.weekday, from: now)
+        let currentHour = calendar.component(.hour, from: date)
+        var currentWeekday = calendar.component(.weekday, from: date)
 
         if startId == endId {
             // If start == end, then it's valid from start on the start day until the end on
@@ -251,13 +250,13 @@ struct CommuteConfigurationAppIntent: WidgetConfigurationIntent {
     }
     
     // Get effective origin/destination with auto-reverse applied
-    func getEffectiveOrigin() -> StationChoice {
+    func getEffectiveOrigin(at date: Date) -> StationChoice {
         //return destinationStation
-        return shouldReverseStations() ? destinationStation : originStation
+        return shouldReverseStations(at: date) ? destinationStation : originStation
     }
     
-    func getEffectiveDestination() -> StationChoice {
+    func getEffectiveDestination(at date: Date) -> StationChoice {
         //return originStation
-        return shouldReverseStations() ? originStation : destinationStation
+        return shouldReverseStations(at: date) ? originStation : destinationStation
     }
 }

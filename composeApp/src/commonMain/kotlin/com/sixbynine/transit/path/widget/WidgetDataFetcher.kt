@@ -1,6 +1,5 @@
 package com.sixbynine.transit.path.widget
 
-import androidx.collection.arraySetOf
 import androidx.compose.ui.graphics.toArgb
 import com.sixbynine.transit.path.Logging
 import com.sixbynine.transit.path.api.Line
@@ -387,7 +386,7 @@ object WidgetDataFetcher {
         }
         val stationDatas = arrayListOf<DepartureBoardData.StationData>()
         val avoidMissingTrains = currentAvoidMissingTrains()
-        val lines = arraySetOf<Line>()
+        val lines = mutableSetOf<Line>()
 
         for (station in stations) {
             val stationAlerts = alerts?.filter { station.pathApiName in it.stations }.orEmpty()

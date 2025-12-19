@@ -9,5 +9,5 @@ expect fun getPlatform(): Platform
 expect val IsDebug: Boolean
 
 enum class PlatformType {
-    ANDROID, IOS
+    ANDROID, IOS, DESKTOP
 }

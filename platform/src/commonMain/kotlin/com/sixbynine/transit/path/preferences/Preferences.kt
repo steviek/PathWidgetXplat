@@ -12,6 +12,22 @@ interface Preferences {
     fun clear()
 }
 
+object InMemoryPreferences : Preferences {
+    private val map = mutableMapOf<String, Any?>()
+
+    override fun <T> set(key: PreferencesKey<T>, value: T?) {
+        map[key.key] = value
+    }
+
+    override fun <T> get(key: PreferencesKey<T>): T? {
+        return map[key.key] as? T?
+    }
+
+    override fun clear() {
+        map.clear()
+    }
+}
+
 var testInstance: Preferences? = null
 
 fun Preferences(): Preferences {

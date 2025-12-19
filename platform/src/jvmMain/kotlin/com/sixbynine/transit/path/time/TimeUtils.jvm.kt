@@ -1,5 +1,13 @@
 package com.sixbynine.transit.path.time
 
-actual fun getPlatformTimeUtils(): PlatformTimeUtils {
-    throw UnsupportedOperationException("Not implemented on jvm")
+import kotlinx.datetime.DayOfWeek
+
+actual fun getPlatformTimeUtils(): PlatformTimeUtils = object : PlatformTimeUtils{
+    override fun is24HourClock(): Boolean {
+        return true
+    }
+
+    override fun getFirstDayOfWeek(): DayOfWeek {
+        return DayOfWeek.MONDAY
+    }
 }

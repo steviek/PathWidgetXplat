@@ -1,3 +1,5 @@
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
@@ -23,6 +25,8 @@ kotlin {
     }
 
     androidTarget()
+
+    jvm("desktop")
 
     sourceSets {
         commonMain.dependencies {
@@ -83,6 +87,12 @@ kotlin {
             implementation(libs.ktor.darwin)
         }
 
+        val desktopMain by getting
+        desktopMain.dependencies {
+            implementation(compose.desktop.currentOs)
+            implementation(libs.kotlin.coroutines.swing)
+        }
+
         all {
             languageSettings.optIn("androidx.compose.foundation.ExperimentalFoundationApi")
             languageSettings.optIn("androidx.compose.foundation.layout.ExperimentalLayoutApi")
@@ -139,6 +149,26 @@ android {
     dependencies {
         coreLibraryDesugaring(libs.android.tools.desugar)
         debugImplementation(libs.compose.ui.tooling)
+    }
+}
+
+compose.desktop {
+    application {
+        mainClass = "MainKt"
+
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            packageName = "com.sixbynine.transit.path"
+            packageVersion = "1.0.0"
+
+            macOS {
+                iconFile.set(project.file("path_app_icon.icns"))
+            }
+
+            windows {
+                iconFile.set(project.file("path_app_icon.ico"))
+            }
+        }
     }
 }
 

@@ -1,6 +1,7 @@
 package com.sixbynine.transit.path.app.ui.icon
 
 import PlatformType.ANDROID
+import PlatformType.DESKTOP
 import PlatformType.IOS
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
@@ -35,7 +36,7 @@ fun NativeIconButton(
     iconSize: Dp = 24.dp,
 ) {
     val actualIconSize = when (getPlatform().type) {
-        ANDROID -> iconSize
+        ANDROID, DESKTOP -> iconSize
         IOS -> iconSize - 4.dp
     }
     val painter = IconPainter(icon)

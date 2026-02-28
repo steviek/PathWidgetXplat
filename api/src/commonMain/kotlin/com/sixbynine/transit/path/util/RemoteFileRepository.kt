@@ -2,7 +2,7 @@ package com.sixbynine.transit.path.util
 
 import com.sixbynine.transit.path.preferences.StringPreferencesKey
 import com.sixbynine.transit.path.time.now
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.serialization.KSerializer
 import kotlin.time.Duration
 

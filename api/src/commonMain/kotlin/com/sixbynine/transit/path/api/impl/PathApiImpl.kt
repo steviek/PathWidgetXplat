@@ -12,7 +12,7 @@ import com.sixbynine.transit.path.model.Colors
 import com.sixbynine.transit.path.util.FetchWithPrevious
 import com.sixbynine.transit.path.util.Staleness
 import com.sixbynine.transit.path.util.map
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlin.time.Duration.Companion.seconds
 
 internal class PathApiImpl : PathApi {

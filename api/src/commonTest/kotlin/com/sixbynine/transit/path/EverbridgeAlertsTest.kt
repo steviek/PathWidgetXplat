@@ -13,10 +13,9 @@ import com.sixbynine.transit.path.api.alerts.getText
 import com.sixbynine.transit.path.api.alerts.isDisplayedAt
 import com.sixbynine.transit.path.test.TestSetupHelper
 import com.sixbynine.transit.path.util.JsonFormat
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.Month.DECEMBER
-import kotlinx.datetime.Month.OCTOBER
+import kotlinx.datetime.Month
 import kotlinx.serialization.encodeToString
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -64,8 +63,8 @@ class EverbridgeAlertsTest {
         assertEquals(result.stations, emptyList())
         assertEquals(setOf(NewarkWtc), result.lines)
         assertEquals(result.message, AlertText(NwkWtcDown.incidentMessage.preMessage))
-        assertTrue(result.isDisplayedAt(LocalDateTime(2024, OCTOBER, 21, 13, 57)))
-        assertFalse(result.canHideTrainsAt(LocalDateTime(2024, OCTOBER, 21, 13, 57)))
+        assertTrue(result.isDisplayedAt(LocalDateTime(2024, Month.OCTOBER, 21, 13, 57)))
+        assertFalse(result.canHideTrainsAt(LocalDateTime(2024, Month.OCTOBER, 21, 13, 57)))
         assertTrue(result.isGlobal)
     }
 

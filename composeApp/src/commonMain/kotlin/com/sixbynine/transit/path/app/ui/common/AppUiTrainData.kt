@@ -3,7 +3,7 @@ package com.sixbynine.transit.path.app.ui.common
 import com.sixbynine.transit.path.api.BackfillSource
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.model.ColorWrapper
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class AppUiTrainData(
     val id: String,

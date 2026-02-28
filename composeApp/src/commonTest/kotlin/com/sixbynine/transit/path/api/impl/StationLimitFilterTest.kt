@@ -7,7 +7,7 @@ import com.sixbynine.transit.path.app.ui.common.AppUiTrainData
 import com.sixbynine.transit.path.app.ui.home.StationLimitFilter
 import com.sixbynine.transit.path.app.ui.home.filter
 import com.sixbynine.transit.path.util.IsTest
-import kotlinx.datetime.Clock.System
+import kotlin.time.Clock.System
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals

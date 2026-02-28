@@ -26,7 +26,7 @@ extension EntryView {
         measureTextSize(maxSize: entry.size, text: text, font: font)
     }
     
-    func formatTrainTime(_ time: Kotlinx_datetimeInstant) -> String {
+    func formatTrainTime(_ time: KotlinInstant) -> String {
         if (entry.configuration.timeDisplay == .clock) {
             return WidgetDataFormatter().formatTime(instant: time)
         } else {

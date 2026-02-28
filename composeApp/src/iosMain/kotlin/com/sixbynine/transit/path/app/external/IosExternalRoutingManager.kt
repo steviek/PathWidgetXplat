@@ -5,7 +5,7 @@ import com.sixbynine.transit.path.time.now
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import platform.Foundation.NSURL
 import platform.StoreKit.SKStoreReviewController
 import platform.UIKit.UIActivityViewController

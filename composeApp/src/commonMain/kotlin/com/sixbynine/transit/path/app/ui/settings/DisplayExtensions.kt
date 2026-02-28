@@ -22,7 +22,7 @@ import com.sixbynine.transit.path.model.ColorWrapper
 import com.sixbynine.transit.path.model.Colors
 import com.sixbynine.transit.path.time.is24HourClock
 import com.sixbynine.transit.path.widget.WidgetDataFormatter
-import kotlinx.datetime.Clock.System
+import kotlin.time.Clock.System
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import pathwidgetxplat.composeapp.generated.resources.Res.string

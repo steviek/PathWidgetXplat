@@ -2,7 +2,7 @@ package com.sixbynine.transit.path.api.alerts.github
 
 import com.sixbynine.transit.path.util.FetchWithPrevious
 import com.sixbynine.transit.path.util.RemoteFileRepository
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlin.time.Duration.Companion.minutes
 
 object GithubAlertsRepository {

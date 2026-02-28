@@ -4,7 +4,7 @@ import com.sixbynine.transit.path.schedule.Timetables
 import com.sixbynine.transit.path.util.FetchWithPrevious
 import com.sixbynine.transit.path.util.RemoteFileRepository
 import com.sixbynine.transit.path.util.combine
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 

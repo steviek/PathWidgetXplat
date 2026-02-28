@@ -8,14 +8,13 @@ import com.sixbynine.transit.path.api.Line.NewarkWtc
 import com.sixbynine.transit.path.api.Station
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.alerts.Alert
-import com.sixbynine.transit.path.api.alerts.AlertText
 import com.sixbynine.transit.path.api.alerts.AlertSchedule
+import com.sixbynine.transit.path.api.alerts.AlertText
 import com.sixbynine.transit.path.api.alerts.TrainFilter
 import com.sixbynine.transit.path.api.templine.HobClosureConfigRepository
 import com.sixbynine.transit.path.time.NewYorkTimeZone
 import com.sixbynine.transit.path.util.InstantAsEpochMillisSerializer
 import kotlinx.datetime.DateTimeUnit.DayBased
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.atTime
 import kotlinx.datetime.format.char
@@ -25,6 +24,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNames
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Instant
 
 private const val PATH_ALERTS_URL = "https://www.panynj.gov/path/en/alerts.html"
 
@@ -58,7 +58,7 @@ data class IncidentMessage(
     /** The full alert message **/
     val preMessage: String,
     /** Variables **/
-    val formVariableItems: List<Variable>,
+    val formVariableItems: List<Variable>?,
     /** Format for dates. */
     @SerialName("sysVarTodayDateFormat")
     val dateFormat: String?,
@@ -78,7 +78,7 @@ data class Variable(
 )
 
 private fun EverbridgeAlert.isElevatorMessageFor(station: Station): Boolean {
-    val elevatorDesc = incidentMessage.formVariableItems.firstOrNull {
+    val elevatorDesc = incidentMessage.formVariableItems?.firstOrNull {
         it.variableName.contains("elevator", ignoreCase = true)
     }
     val elevatorValue = elevatorDesc?.value?.firstOrNull() ?: return false
@@ -124,7 +124,7 @@ private operator fun IncidentMessage.get(name: String): Variable? {
 }
 
 private fun IncidentMessage.getVariable(name: String): Variable? {
-    return formVariableItems.find { it.variableName == name }
+    return formVariableItems?.find { it.variableName == name }
 }
 
 private val IncidentMessage.lines: Set<Line>

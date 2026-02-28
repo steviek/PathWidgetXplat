@@ -1,6 +1,6 @@
 package com.sixbynine.transit.path.util
 
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class TimestampedValue<T>(val timestamp: Instant, val value: T)
 

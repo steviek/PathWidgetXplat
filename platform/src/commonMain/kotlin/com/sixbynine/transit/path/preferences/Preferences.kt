@@ -1,8 +1,8 @@
 package com.sixbynine.transit.path.preferences
 
-import kotlinx.datetime.Instant
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlin.time.Instant
 
 interface Preferences {
     operator fun <T> set(key: PreferencesKey<T>, value: T?)

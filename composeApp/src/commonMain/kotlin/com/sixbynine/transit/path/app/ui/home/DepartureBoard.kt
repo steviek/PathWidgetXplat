@@ -81,7 +81,7 @@ fun HomeScreenScope.DepartureBoard() {
                 Station(
                     station,
                     index,
-                    Modifier.padding(horizontal = 16.dp).animateItemPlacement()
+                    Modifier.padding(horizontal = 16.dp).animateItem()
                 )
             }
         }

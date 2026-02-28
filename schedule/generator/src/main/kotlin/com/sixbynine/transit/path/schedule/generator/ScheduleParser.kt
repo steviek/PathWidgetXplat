@@ -11,7 +11,7 @@ import com.sixbynine.transit.path.schedule.TimetableTiming
 import com.sixbynine.transit.path.schedule.Timetables
 import com.sixbynine.transit.path.time.NewYorkTimeZone
 import kotlinx.datetime.DayOfWeek
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.ExperimentalSerializationApi

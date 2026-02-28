@@ -83,7 +83,7 @@ private fun StationScope.Content() {
                                 timeDisplay = state.timeDisplay,
                                 station = state.station.station,
                                 modifier = Modifier.heightIn(48.dp)
-                                    .animateItemPlacement()
+                                    .animateItem()
                                     .padding(horizontal = 16.dp, vertical = 8.dp),
                             )
                         }
@@ -102,7 +102,7 @@ private fun StationScope.Content() {
                                 timeDisplay = state.timeDisplay,
                                 station = state.station.station,
                                 modifier = Modifier.heightIn(48.dp)
-                                    .animateItemPlacement()
+                                    .animateItem()
                                     .padding(horizontal = 16.dp, vertical = 8.dp),
                             )
                         }
@@ -115,7 +115,7 @@ private fun StationScope.Content() {
                                 timeDisplay = state.timeDisplay,
                                 station = state.station.station,
                                 modifier = Modifier.heightIn(48.dp)
-                                    .animateItemPlacement()
+                                    .animateItem()
                                     .padding(horizontal = 16.dp, vertical = 8.dp),
                             )
                         }
@@ -134,7 +134,7 @@ private fun StationScope.Content() {
                                 timeDisplay = state.timeDisplay,
                                 station = state.station.station,
                                 modifier = Modifier.heightIn(48.dp)
-                                    .animateItemPlacement()
+                                    .animateItem()
                                     .padding(horizontal = 16.dp, vertical = 8.dp),
                             )
                         }

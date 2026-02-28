@@ -60,9 +60,8 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import kotlinx.datetime.DayOfWeek.SATURDAY
-import kotlinx.datetime.DayOfWeek.SUNDAY
-import kotlinx.datetime.Instant
+import kotlinx.datetime.DayOfWeek
+import kotlin.time.Instant
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -554,7 +553,8 @@ object WidgetDataFetcher {
 
     private fun isOffPeak(time: Instant): Boolean {
         val projectedDateTime = time.toLocalDateTime(NewYorkTimeZone)
-        if (projectedDateTime.dayOfWeek == SATURDAY || projectedDateTime.dayOfWeek == SUNDAY) {
+        if (projectedDateTime.dayOfWeek == DayOfWeek.SATURDAY ||
+            projectedDateTime.dayOfWeek == DayOfWeek.SUNDAY) {
             return true
         }
 

@@ -2,7 +2,7 @@ package com.sixbynine.transit.path.util
 
 import com.sixbynine.transit.path.preferences.LongPreferencesKey
 import com.sixbynine.transit.path.preferences.StringPreferencesKey
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 /** Like preferences, but shared between the main app and widgets. */
 // TODO: Unify with preferences and just have a boolean setting.

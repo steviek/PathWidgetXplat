@@ -7,6 +7,8 @@ plugins {
     alias(libs.plugins.jetbrainsCompose) apply false
     alias(libs.plugins.androidApplication) apply false
     alias(libs.plugins.androidLibrary) apply false
+    alias(libs.plugins.compose.compiler) apply false
+    alias(libs.plugins.kotlinAndroid) apply false
     alias(libs.plugins.kotlinMultiplatform) apply false
     alias(libs.plugins.google.services) apply false
     alias(libs.plugins.crashlytics) apply false
@@ -19,14 +21,7 @@ subprojects {
             with(kotlinExtension) {
                 applyDefaultHierarchyTemplate()
 
-                androidTarget {
-                    compilations.all {
-                        kotlinOptions {
-                            jvmTarget = "17"
-                        }
-                    }
-                }
-
+                androidTarget()
                 iosX64()
                 iosArm64()
                 iosSimulatorArm64()

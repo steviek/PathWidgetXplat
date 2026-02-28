@@ -4,14 +4,7 @@ import com.sixbynine.transit.path.time.is24HourClock
 import com.sixbynine.transit.path.util.localizedString
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.DayOfWeek
-import kotlinx.datetime.DayOfWeek.FRIDAY
-import kotlinx.datetime.DayOfWeek.MONDAY
-import kotlinx.datetime.DayOfWeek.SATURDAY
-import kotlinx.datetime.DayOfWeek.SUNDAY
-import kotlinx.datetime.DayOfWeek.THURSDAY
-import kotlinx.datetime.DayOfWeek.TUESDAY
-import kotlinx.datetime.DayOfWeek.WEDNESDAY
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -190,25 +183,23 @@ object WidgetDataFormatter {
     }
 
     fun DayOfWeek.singleLetterLabel(): String = when (this) {
-        MONDAY -> localizedString(en = "M", es = "L")
-        TUESDAY -> localizedString(en = "T", es = "M")
-        WEDNESDAY -> localizedString(en = "W", es = "X")
-        THURSDAY -> localizedString(en = "T", es = "J")
-        FRIDAY -> localizedString(en = "F", es = "V")
-        SATURDAY -> localizedString(en = "S", es = "S")
-        SUNDAY -> localizedString(en = "S", es = "D")
-        else -> ""
+        DayOfWeek.MONDAY -> localizedString(en = "M", es = "L")
+        DayOfWeek.TUESDAY -> localizedString(en = "T", es = "M")
+        DayOfWeek.WEDNESDAY -> localizedString(en = "W", es = "X")
+        DayOfWeek.THURSDAY -> localizedString(en = "T", es = "J")
+        DayOfWeek.FRIDAY -> localizedString(en = "F", es = "V")
+        DayOfWeek.SATURDAY -> localizedString(en = "S", es = "S")
+        DayOfWeek.SUNDAY -> localizedString(en = "S", es = "D")
     }
 
     fun DayOfWeek.displayLabel(): String = when (this) {
-        MONDAY -> localizedString(en = "Monday", es = "Lunes")
-        TUESDAY -> localizedString(en = "Tuesday", es = "Martes")
-        WEDNESDAY -> localizedString(en = "Wednesday", es = "Miércoles")
-        THURSDAY -> localizedString(en = "Thursday", es = "Jueves")
-        FRIDAY -> localizedString(en = "Friday", es = "Viernes")
-        SATURDAY -> localizedString(en = "Saturday", es = "Sábado")
-        SUNDAY -> localizedString(en = "Sunday", es = "Domingo")
-        else -> ""
+        DayOfWeek.MONDAY -> localizedString(en = "Monday", es = "Lunes")
+        DayOfWeek.TUESDAY -> localizedString(en = "Tuesday", es = "Martes")
+        DayOfWeek.WEDNESDAY -> localizedString(en = "Wednesday", es = "Miércoles")
+        DayOfWeek.THURSDAY -> localizedString(en = "Thursday", es = "Jueves")
+        DayOfWeek.FRIDAY -> localizedString(en = "Friday", es = "Viernes")
+        DayOfWeek.SATURDAY -> localizedString(en = "Saturday", es = "Sábado")
+        DayOfWeek.SUNDAY -> localizedString(en = "Sunday", es = "Domingo")
     }
 
 }

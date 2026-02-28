@@ -20,7 +20,7 @@ import com.sixbynine.transit.path.api.Stations.TwentyThirdStreet
 import com.sixbynine.transit.path.api.Stations.WorldTradeCenter
 import com.sixbynine.transit.path.model.Colors
 import com.sixbynine.transit.path.util.IsTest
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime

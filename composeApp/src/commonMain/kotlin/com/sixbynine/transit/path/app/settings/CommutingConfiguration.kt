@@ -3,11 +3,6 @@ package com.sixbynine.transit.path.app.settings
 import com.sixbynine.transit.path.schedule.DailySchedule
 import com.sixbynine.transit.path.schedule.Schedule
 import kotlinx.datetime.DayOfWeek
-import kotlinx.datetime.DayOfWeek.FRIDAY
-import kotlinx.datetime.DayOfWeek.MONDAY
-import kotlinx.datetime.DayOfWeek.THURSDAY
-import kotlinx.datetime.DayOfWeek.TUESDAY
-import kotlinx.datetime.DayOfWeek.WEDNESDAY
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.serialization.Serializable
@@ -22,7 +17,13 @@ data class CommutingConfiguration(
 
     companion object {
         val DefaultSchedule = CommutingSchedule(
-            days = setOf(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY),
+            days = setOf(
+                DayOfWeek.MONDAY,
+                DayOfWeek.TUESDAY,
+                DayOfWeek.WEDNESDAY,
+                DayOfWeek.THURSDAY,
+                DayOfWeek.FRIDAY,
+            ),
             start = LocalTime(12, 0),
             end = LocalTime(3, 0),
         )

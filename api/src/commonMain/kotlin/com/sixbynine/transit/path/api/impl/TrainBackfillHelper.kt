@@ -40,10 +40,9 @@ import com.sixbynine.transit.path.model.ColorWrapper
 import com.sixbynine.transit.path.model.Colors
 import com.sixbynine.transit.path.time.NewYorkTimeZone
 import com.sixbynine.transit.path.util.orElse
-import kotlinx.datetime.Clock
-import kotlinx.datetime.DayOfWeek.SATURDAY
-import kotlinx.datetime.DayOfWeek.SUNDAY
+import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -486,7 +485,7 @@ object TrainBackfillHelper {
 
     private fun getCloseTrainThreshold(): Duration {
         val date = Clock.System.now().toLocalDateTime(NewYorkTimeZone)
-        if (date.dayOfWeek in listOf(SATURDAY, SUNDAY)) {
+        if (date.dayOfWeek in listOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)) {
             return 10.minutes
         }
 

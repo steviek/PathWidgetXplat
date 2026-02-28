@@ -9,6 +9,7 @@ import com.sixbynine.transit.path.preferences.persistingInstant
 import com.sixbynine.transit.path.util.AgedValue
 import com.sixbynine.transit.path.util.DataResult
 import com.sixbynine.transit.path.util.FetchWithPrevious
+import com.sixbynine.transit.path.util.InstantAsISO8601Serializer
 import com.sixbynine.transit.path.util.IoScope
 import com.sixbynine.transit.path.util.JsonFormat
 import com.sixbynine.transit.path.util.Staleness
@@ -20,9 +21,9 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeout
-import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Instant
 
 object PathRepository {
     private var lastPathResponse by persisting(StringPreferencesKey("last_success"))
@@ -142,6 +143,7 @@ object PathRepository {
         val arrivalTimeMessage: String?,
         val lineColor: String,
         val headSign: String,
+        @Serializable(InstantAsISO8601Serializer::class)
         val lastUpdated: Instant
     ) {
         val durationToArrival get() = secondsToArrival.toInt().seconds

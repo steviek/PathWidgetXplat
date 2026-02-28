@@ -3,16 +3,15 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.compose.compiler)
 }
 
 kotlin {
     applyDefaultHierarchyTemplate()
 
     androidTarget {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "17"
-            }
+        compilerOptions {
+            jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
         }
     }
 
@@ -29,10 +28,10 @@ kotlin {
             implementation(projects.flipper)
             implementation(projects.schedule)
 
-            implementation(compose.foundation)
-            implementation(compose.ui)
             implementation(libs.ktor.core)
             implementation(libs.ktor.logging)
+            implementation(libs.compose.foundation)
+            implementation(libs.compose.ui)
 
             api(libs.kotlin.date.time)
             implementation(libs.kotlin.coroutines)

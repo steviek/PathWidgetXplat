@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.google.services)
     alias(libs.plugins.crashlytics)
+    alias(libs.plugins.compose.compiler)
 }
 
 kotlin {
@@ -24,7 +25,11 @@ kotlin {
         }
     }
 
-    androidTarget()
+    androidTarget {
+        compilerOptions {
+            jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+        }
+    }
 
     jvm("desktop")
 
@@ -35,10 +40,10 @@ kotlin {
             implementation(projects.platform)
             implementation(projects.schedule)
 
-            implementation(compose.animation)
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
+            implementation(libs.compose.animation)
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.foundation)
+            implementation(libs.compose.material3)
             implementation(compose.components.resources)
 
             implementation(libs.kotlin.date.time)
@@ -51,12 +56,8 @@ kotlin {
             implementation(libs.precompose)
         }
 
-        androidMain.configure {
-            dependsOn(commonMain.get())
-        }
-
         androidMain.dependencies {
-            implementation(compose.material3)
+            implementation(libs.compose.material3)
             implementation(libs.compose.ui)
             implementation(libs.compose.ui.tooling.preview)
             implementation(libs.androidx.activity.compose)
@@ -145,6 +146,8 @@ android {
     }
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     dependencies {
         coreLibraryDesugaring(libs.android.tools.desugar)

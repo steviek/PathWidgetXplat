@@ -1,8 +1,9 @@
 package com.sixbynine.transit.path.api
 
 import com.sixbynine.transit.path.model.ColorWrapper
-import kotlinx.datetime.Instant
+import com.sixbynine.transit.path.util.InstantAsISO8601Serializer
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 data class DepartingTrain(
     val headsign: String,
@@ -17,6 +18,7 @@ data class DepartingTrain(
 @Serializable
 data class BackfillSource(
     val station: Station,
+    @Serializable(InstantAsISO8601Serializer::class)
     val projectedArrival: Instant,
 )
 

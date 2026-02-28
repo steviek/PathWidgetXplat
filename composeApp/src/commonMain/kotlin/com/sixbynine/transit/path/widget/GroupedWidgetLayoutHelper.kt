@@ -10,7 +10,7 @@ import com.sixbynine.transit.path.model.DepartureBoardData.SignData
 import com.sixbynine.transit.path.model.DepartureBoardData.StationData
 import com.sixbynine.transit.path.util.localizedString
 import com.sixbynine.transit.path.widget.GroupedWidgetLayoutInfo.SignLayoutInfo
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 @Suppress("unused") // Called by swift
 class GroupedWidgetLayoutHelper(

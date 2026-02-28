@@ -6,7 +6,11 @@ plugins {
 kotlin {
     applyDefaultHierarchyTemplate()
 
-    androidTarget()
+    androidTarget {
+        compilerOptions {
+            jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+        }
+    }
 
     jvm()
 
@@ -24,6 +28,11 @@ android {
 
     buildFeatures {
         buildConfig = true
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     dependencies {

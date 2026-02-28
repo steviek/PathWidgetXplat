@@ -1,11 +1,11 @@
 package com.sixbynine.transit.path.time
 
-import kotlinx.datetime.Clock
 import kotlinx.datetime.DayOfWeek
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 interface PlatformTimeUtils {
     fun is24HourClock(): Boolean

@@ -11,7 +11,7 @@ import com.sixbynine.transit.path.model.DepartureBoardData
 import com.sixbynine.transit.path.model.DepartureBoardData.SignData
 import com.sixbynine.transit.path.model.DepartureBoardData.StationData
 import com.sixbynine.transit.path.model.DepartureBoardData.TrainData
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 import kotlin.time.Duration.Companion.minutes
 
 object Fixtures {

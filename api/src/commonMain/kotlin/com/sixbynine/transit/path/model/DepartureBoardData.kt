@@ -6,14 +6,17 @@ import com.sixbynine.transit.path.api.State
 import com.sixbynine.transit.path.api.Stations
 import com.sixbynine.transit.path.api.alerts.Alert
 import com.sixbynine.transit.path.model.DepartureBoardData.StationData
-import kotlinx.datetime.Instant
+import com.sixbynine.transit.path.util.InstantAsISO8601Serializer
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Instant
 
 @Serializable
 data class DepartureBoardData(
     val stations: List<StationData>,
+    @Serializable(InstantAsISO8601Serializer::class)
     val fetchTime: Instant,
+    @Serializable(InstantAsISO8601Serializer::class)
     val nextFetchTime: Instant,
     val closestStationId: String?,
     val isPathApiBroken: Boolean?,
@@ -34,7 +37,7 @@ data class DepartureBoardData(
     data class SignData(
         val title: String,
         val colors: List<ColorWrapper>,
-        val projectedArrivals: List<Instant>,
+        val projectedArrivals: List<@Serializable(InstantAsISO8601Serializer::class) Instant>,
         val lines: Set<Line>? = null,
     )
 
@@ -43,6 +46,7 @@ data class DepartureBoardData(
         val id: String,
         val title: String,
         val colors: List<ColorWrapper>,
+        @Serializable(InstantAsISO8601Serializer::class)
         val projectedArrival: Instant,
         val isDelayed: Boolean = false,
         val backfillSource: BackfillSource? = null,

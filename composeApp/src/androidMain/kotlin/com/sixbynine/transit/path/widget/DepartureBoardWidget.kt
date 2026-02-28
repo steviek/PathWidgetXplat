@@ -34,7 +34,7 @@ import com.sixbynine.transit.path.widget.ui.WidgetFooterHeight
 import com.sixbynine.transit.path.widget.ui.WidgetState
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atTime
 import kotlinx.datetime.toInstant

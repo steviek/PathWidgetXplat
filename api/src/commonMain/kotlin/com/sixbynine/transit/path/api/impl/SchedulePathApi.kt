@@ -21,7 +21,7 @@ import com.sixbynine.transit.path.util.Staleness
 import com.sixbynine.transit.path.util.map
 import com.sixbynine.transit.path.util.orElse
 import kotlinx.datetime.DatePeriod
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.atTime

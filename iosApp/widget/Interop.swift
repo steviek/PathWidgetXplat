@@ -12,14 +12,14 @@ import SwiftUI
 import WidgetKit
 
 extension Date {
-    func toKotlinInstant() -> Kotlinx_datetimeInstant {
-        Kotlinx_datetimeInstant.Companion().fromEpochMilliseconds(
+    func toKotlinInstant() -> KotlinInstant {
+        KotlinInstant.Companion().fromEpochMilliseconds(
             epochMilliseconds: Int64(self.timeIntervalSince1970 * 1000)
         )
     }
 }
 
-extension Kotlinx_datetimeInstant {
+extension KotlinInstant {
     func toDate() -> Date {
         Date(timeIntervalSince1970: Double(self.toEpochMilliseconds()) / 1000.0)
     }

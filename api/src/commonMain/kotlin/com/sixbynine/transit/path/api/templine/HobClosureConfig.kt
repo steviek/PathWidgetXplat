@@ -2,8 +2,7 @@ package com.sixbynine.transit.path.api.templine
 
 import com.sixbynine.transit.path.schedule.LocalDateTimeSerializer
 import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.Month.FEBRUARY
-import kotlinx.datetime.Month.JANUARY
+import kotlinx.datetime.Month
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -15,8 +14,8 @@ data class HobClosureConfig(
     companion object {
         val fallback get() = HobClosureConfig(
             tempLineInfo = TempLineInfo.fallback,
-            validFrom = LocalDateTime(2025, JANUARY, 18, 23, 59),
-            validTo = LocalDateTime(2025, FEBRUARY, 28, 5, 0),
+            validFrom = LocalDateTime(2025, Month.JANUARY, 18, 23, 59),
+            validTo = LocalDateTime(2025, Month.FEBRUARY, 28, 5, 0),
         )
     }
 }

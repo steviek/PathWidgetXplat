@@ -3,7 +3,7 @@ package com.sixbynine.transit.path.api
 import com.sixbynine.transit.path.api.impl.PathApiImpl
 import com.sixbynine.transit.path.util.FetchWithPrevious
 import com.sixbynine.transit.path.util.Staleness
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 interface PathApi {
 

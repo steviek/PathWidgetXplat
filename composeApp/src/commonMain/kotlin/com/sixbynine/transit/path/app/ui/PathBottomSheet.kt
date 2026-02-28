@@ -79,7 +79,9 @@ fun PathBottomSheet(
         ModalBottomSheet(
             onDismissRequest = onDismissRequest,
             sheetState = sheetState,
-            windowInsets = BottomSheetDefaults.windowInsets.only(WindowInsetsSides.Top)
+            contentWindowInsets = {
+                BottomSheetDefaults.windowInsets.only(WindowInsetsSides.Top)
+            }
         ) {
             Column(
                 modifier,

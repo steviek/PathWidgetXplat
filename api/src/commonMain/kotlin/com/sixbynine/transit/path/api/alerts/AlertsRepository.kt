@@ -5,7 +5,7 @@ import com.sixbynine.transit.path.api.alerts.everbridge.toCommonAlert
 import com.sixbynine.transit.path.api.alerts.github.GithubAlertsRepository
 import com.sixbynine.transit.path.util.FetchWithPrevious
 import com.sixbynine.transit.path.util.combine
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 object AlertsRepository {
     fun getAlerts(now: Instant): FetchWithPrevious<List<Alert>> {

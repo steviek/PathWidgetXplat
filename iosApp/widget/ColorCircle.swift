@@ -8,6 +8,7 @@
 
 import SwiftUI
 import ComposeApp
+import WidgetKit
 
 struct ColorCircle: View {
     
@@ -21,16 +22,25 @@ struct ColorCircle: View {
         let color1 = colors.first?.toColor(isDark: isDark) ?? Color.black
         let color2 = colors.count > 1 ? colors[1].toColor(isDark: isDark) : color1
         ZStack {
-            Circle()
-                .fill(color1)
+            Image(systemName: "circle.fill")
+                .resizable()
+                .desaturatedInLiquidGlass()
+                .foregroundStyle(color1)
+                .clipShape(Circle())
                 .frame(width: size, height: size)
             
-            SemiCircle()
-                .fill(color2)
+            Image(systemName: "circle.fill")
+                .resizable()
+                .desaturatedInLiquidGlass()
+                .foregroundStyle(color2)
+                .clipShape(SemiCircle())
                 .rotationEffect(.degrees(90))
                 .frame(width: size, height: size)
+
         }
         .overlay(isDark ? Circle().stroke(Color.white, lineWidth: 1) : nil)
+        .frame(width: size, height: size)
+        
     }
     
     private struct SemiCircle: Shape {

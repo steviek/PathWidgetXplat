@@ -19,6 +19,7 @@
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
 		AA34DA372BB0F7F600DB50A0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA34DA362BB0F7F600DB50A0 /* Assets.xcassets */; };
 		AA34DA382BB0F7F600DB50A0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA34DA362BB0F7F600DB50A0 /* Assets.xcassets */; };
+		AA5BEBD02F533D2000389C68 /* ImageExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5BEBCF2F533D1A00389C68 /* ImageExtensions.swift */; };
 		AA9B5F7C2C1F831C00251F59 /* DepartureBoardStations.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9B5F7B2C1F831C00251F59 /* DepartureBoardStations.swift */; };
 		AA9B5F7E2C1F83C100251F59 /* ViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9B5F7D2C1F83C100251F59 /* ViewExtensions.swift */; };
 		AA9B5F802C1FC7B000251F59 /* UngroupedStationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9B5F7F2C1FC7B000251F59 /* UngroupedStationView.swift */; };
@@ -95,6 +96,7 @@
 		AA34DA362BB0F7F600DB50A0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AA53B2142BC8EF920042009B /* iosApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = iosApp.entitlements; sourceTree = "<group>"; };
 		AA53B2152BC8EF9E0042009B /* widgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = widgetExtension.entitlements; sourceTree = "<group>"; };
+		AA5BEBCF2F533D1A00389C68 /* ImageExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageExtensions.swift; sourceTree = "<group>"; };
 		AA9B5F7B2C1F831C00251F59 /* DepartureBoardStations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepartureBoardStations.swift; sourceTree = "<group>"; };
 		AA9B5F7D2C1F83C100251F59 /* ViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewExtensions.swift; sourceTree = "<group>"; };
 		AA9B5F7F2C1FC7B000251F59 /* UngroupedStationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UngroupedStationView.swift; sourceTree = "<group>"; };
@@ -208,6 +210,7 @@
 		AAB47C1C2B15A46400079022 /* widget */ = {
 			isa = PBXGroup;
 			children = (
+				AA5BEBCF2F533D1A00389C68 /* ImageExtensions.swift */,
 				0903CD902EA343790072F0FE /* Assets.xcassets */,
 				0903CD912EA343790072F0FE /* CommuteConfigurationAppIntent.swift */,
 				0903CD922EA343790072F0FE /* CommuteDepartureBoardView.swift */,
@@ -446,6 +449,7 @@
 				0903CD9A2EA343790072F0FE /* SeasonalUtils.swift in Sources */,
 				0903CD9B2EA343790072F0FE /* FontExtensions.swift in Sources */,
 				0903CD9C2EA343790072F0FE /* CommuteConfigurationAppIntent.swift in Sources */,
+				AA5BEBD02F533D2000389C68 /* ImageExtensions.swift in Sources */,
 				0903CD9D2EA343790072F0FE /* CommuteDepartureBoardView.swift in Sources */,
 				AAD56F272D0BF449001EE80B /* WidgetReloader.swift in Sources */,
 				AA9B5F862C233A6900251F59 /* StationTitle.swift in Sources */,

@@ -83,10 +83,12 @@ struct CommuteDepartureBoardView: View {
 }
 
 struct CommuteDepartureBoardContent: View {
+    @Environment(\.widgetRenderingMode) var renderingMode
+    
     let entry: CommuteProvider.Entry
     
     var body: some View {
-        let useSeasonal = entry.configuration.useSeasonalBackgrounds
+        let useSeasonal = entry.configuration.useSeasonalBackgrounds && renderingMode != .accented
         let seasonalBackground = SeasonalUtils.getSeasonalBackgroundName(for: entry.date)
         
         let textColor: Color
@@ -108,10 +110,6 @@ struct CommuteDepartureBoardContent: View {
                     .aspectRatio(contentMode: .fill)
                     .frame(width: entry.size.width, height: entry.size.height)
                     .clipped()
-                    .edgesIgnoringSafeArea(.all)
-            } else {
-                Color(uiColor: .systemBackground)
-                    .frame(width: entry.size.width, height: entry.size.height)
                     .edgesIgnoringSafeArea(.all)
             }
                         

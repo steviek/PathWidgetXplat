@@ -1,6 +1,5 @@
 [versions]
 compose = "1.9.0"
-compose-compiler = "2.2.21"
 agp = "8.11.2"
 android-minSdk = "21"
 android-compileSdk = "36"

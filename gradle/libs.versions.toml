@@ -7,18 +7,11 @@ android-targetSdk = "36"
 android-tools-desugar = "2.0.4"
 androidx-activityCompose = "1.8.0"
 androidx-core-ktx = "1.13.1"
-androidx-appcompat = "1.6.1"
-androidx-material = "1.11.0"
-androidx-constraintlayout = "2.1.4"
-androidx-test-junit = "1.1.5"
-androidx-espresso-core = "3.5.1"
 kotlin = "2.3.0"
-kotlin-atomic = "0.22.0"
 kotlin-dateTime = "0.7.1"
 kotlin-serialization-json = "1.6.0"
 kotlin-coroutines = "1.7.3"
 junit = "4.13.2"
-moko-resources = "0.24.0-alpha-5"
 moko-mvvm = "0.16.1"
 uiToolingPreviewAndroid = "1.5.4"
 google-services = "4.4.0"
@@ -36,8 +29,6 @@ soloader = "0.10.5"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
-kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
-kotlin-atomic = { module = "org.jetbrains.kotlinx:atomicfu-gradle-plugin", version.ref = "kotlin-atomic" }
 kotlin-date-time = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlin-dateTime" }
 kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization-json" }
 kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines" }
@@ -48,24 +39,14 @@ compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose" }
 compose-ui-tooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.ref = "compose" }
 compose-ui-tooling-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "compose" }
 compose-animation = { module = "org.jetbrains.compose.animation:animation", version.ref = "compose" }
-compose-desktop = { module = "org.jetbrains.compose.desktop:desktop", version.ref = "compose" }
 compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "compose" }
-compose-material = { module = "org.jetbrains.compose.material:material", version.ref = "compose" }
 compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "compose" }
 compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose" }
 android-tools-desugar = { module = "com.android.tools:desugar_jdk_libs", version.ref = "android-tools-desugar" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
-androidx-test-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-junit" }
-androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "androidx-espresso-core" }
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidx-appcompat" }
-androidx-material = { group = "com.google.android.material", name = "material", version.ref = "androidx-material" }
-androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "androidx-constraintlayout" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 androidx-glance-appwidget = { group = "androidx.glance", name = "glance-appwidget", version.ref = "glance" }
 androidx-glance-material3 = { group = "androidx.glance", name = "glance-material3", version.ref = "glance" }
-resources-generator = { module = "dev.icerock.moko:resources-generator", version.ref = "moko-resources" }
-moko-resources = { module = "dev.icerock.moko:resources", version.ref = "moko-resources" }
-moko-resources-compose = { module = "dev.icerock.moko:resources-compose", version.ref = "moko-resources" }
 moko-mvvm = { module = "dev.icerock.moko:mvvm-compose", version.ref = "moko-mvvm" }
 androidx-ui-tooling-preview-android = { group = "androidx.compose.ui", name = "ui-tooling-preview-android", version.ref = "uiToolingPreviewAndroid" }
 precompose = { module = "moe.tlaster:precompose", version.ref = "precompose" }

@@ -22,6 +22,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
@@ -62,25 +63,29 @@ object PathRepository {
                 async {
                     suspendRunCatching {
                         withTimeout(5.seconds) {
+                            // ridepath.json (panynj.gov) stopped serving data in Nov 2026, so
+                            // realtime departures now come from Citymapper and are converted
+                            // into the same PathServiceResults shape.
                             val responseText =
-                                readRemoteFile(
-                                    "https://www.panynj.gov/bin/portauthority/ridepath.json",
-                                )
-                                    .getOrThrow()
+                                readRemoteFile(CitymapperDepartures.Url).getOrThrow()
 
-                            lastPathResponseTime = now
-                            lastPathResponse = responseText
-
-                            JsonFormat.decodeFromString<PathServiceResults>(responseText).also {
-                                if (it.results.isEmpty()) {
-                                    throw PathApiException.NoResults
-                                }
+                            val results = CitymapperDepartures.toPathServiceResults(
+                                JsonFormat.decodeFromString<CitymapperResponse>(responseText)
+                            )
+                            if (results.results.none { it.destinations.isNotEmpty() }) {
+                                throw PathApiException.NoResults
                             }
+
+                            // Cache the converted results so the cached format is unchanged.
+                            lastPathResponseTime = now
+                            lastPathResponse = JsonFormat.encodeToString(results)
+
+                            results
                         }
                     }
                         .fold(
                             onSuccess = {
-                                Logging.d("successfully fetched ridepath data")
+                                Logging.d("successfully fetched realtime departures")
                                 DataResult.success(it)
                             },
                             onFailure = { error ->
@@ -91,7 +96,7 @@ object PathRepository {
                                     hadInternet = false
                                 }
                                 Logging.w(
-                                    "fetching ridepath failed, hadInternet=$hadInternet, shouldBeConnected=$shouldBeConnected",
+                                    "fetching realtime departures failed, hadInternet=$hadInternet, shouldBeConnected=$shouldBeConnected",
                                     error
                                 )
                                 DataResult.failure(
